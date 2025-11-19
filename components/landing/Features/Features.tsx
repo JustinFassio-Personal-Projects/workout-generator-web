@@ -8,7 +8,7 @@ import styles from './Features.module.scss'
 export const Features: React.FC = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      import('aos').then((AOS) => {
+      import('aos').then(AOS => {
         AOS.default.init({
           duration: 800,
           easing: 'ease-out',
@@ -27,7 +27,8 @@ export const Features: React.FC = () => {
             <span className={styles.gradientText}> Elevate Your Fitness</span>
           </h2>
           <p className={styles.subtitle}>
-            Everything you need to create, track, and achieve your fitness goals in one powerful platform.
+            Everything you need to create, track, and achieve your fitness goals in one powerful
+            platform.
           </p>
         </div>
         <div className={styles.grid}>
@@ -46,4 +47,3 @@ export const Features: React.FC = () => {
     </section>
   )
 }
-

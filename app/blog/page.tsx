@@ -9,11 +9,11 @@ export default async function BlogPage() {
       <div className="mb-12">
         <h1 className="text-4xl font-bold mb-4 text-gray-900">Blog</h1>
         <p className="text-lg text-gray-600">
-          Discover fitness tips, workout strategies, and expert advice to help you achieve your goals.
+          Discover fitness tips, workout strategies, and expert advice to help you achieve your
+          goals.
         </p>
       </div>
       <BlogPostList posts={posts} />
     </div>
   )
 }
-

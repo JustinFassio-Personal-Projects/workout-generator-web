@@ -14,9 +14,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post }) => {
         <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-4">
           {post.category}
         </span>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          {post.title}
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
         <div className="flex items-center gap-4 text-gray-600 mb-6">
           <span>{formatDate(post.date)}</span>
           <span>•</span>
@@ -24,11 +22,8 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post }) => {
         </div>
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-8">
-            {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm"
-              >
+            {post.tags.map(tag => (
+              <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">
                 #{tag}
               </span>
             ))}
@@ -43,4 +38,3 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post }) => {
     </article>
   )
 }
-

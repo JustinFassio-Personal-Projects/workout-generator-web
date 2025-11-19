@@ -28,7 +28,7 @@ export const Testimonials: React.FC = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      import('aos').then((AOS) => {
+      import('aos').then(AOS => {
         AOS.default.init({
           duration: 800,
           easing: 'ease-out',
@@ -41,7 +41,7 @@ export const Testimonials: React.FC = () => {
   useEffect(() => {
     if (isAutoPlaying) {
       intervalRef.current = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % totalPages)
+        setCurrentIndex(prev => (prev + 1) % totalPages)
       }, 5000)
     } else {
       if (intervalRef.current) {
@@ -58,12 +58,12 @@ export const Testimonials: React.FC = () => {
 
   const handlePrev = () => {
     setIsAutoPlaying(false)
-    setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages)
+    setCurrentIndex(prev => (prev - 1 + totalPages) % totalPages)
   }
 
   const handleNext = () => {
     setIsAutoPlaying(false)
-    setCurrentIndex((prev) => (prev + 1) % totalPages)
+    setCurrentIndex(prev => (prev + 1) % totalPages)
   }
 
   return (
@@ -108,11 +108,7 @@ export const Testimonials: React.FC = () => {
               ))}
             </div>
           </div>
-          <button
-            className={styles.navButton}
-            onClick={handleNext}
-            aria-label="Next testimonials"
-          >
+          <button className={styles.navButton} onClick={handleNext} aria-label="Next testimonials">
             <ChevronRight size={24} />
           </button>
         </div>
@@ -133,4 +129,3 @@ export const Testimonials: React.FC = () => {
     </section>
   )
 }
-

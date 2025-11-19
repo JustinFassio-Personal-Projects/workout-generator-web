@@ -8,7 +8,7 @@ import styles from './Journey.module.scss'
 export const Journey: React.FC = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      import('aos').then((AOS) => {
+      import('aos').then(AOS => {
         AOS.default.init({
           duration: 800,
           easing: 'ease-out',
@@ -49,4 +49,3 @@ export const Journey: React.FC = () => {
     </section>
   )
 }
-

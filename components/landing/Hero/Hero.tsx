@@ -11,7 +11,7 @@ export const Hero: React.FC = () => {
   useEffect(() => {
     // Initialize AOS for this section
     if (typeof window !== 'undefined') {
-      import('aos').then((AOS) => {
+      import('aos').then(AOS => {
         AOS.default.init({
           duration: 800,
           easing: 'ease-out',
@@ -31,8 +31,8 @@ export const Hero: React.FC = () => {
             <span className={styles.gradientText}> AI-Powered Workouts</span>
           </h1>
           <p className={styles.heroSubtitle}>
-            Generate personalized workout plans tailored to your goals, fitness level, and available equipment. 
-            Start your transformation today.
+            Generate personalized workout plans tailored to your goals, fitness level, and available
+            equipment. Start your transformation today.
           </p>
           <div className={styles.heroActions}>
             <Button
@@ -79,4 +79,3 @@ export const Hero: React.FC = () => {
     </section>
   )
 }
-

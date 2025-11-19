@@ -8,7 +8,7 @@ import styles from './Pricing.module.scss'
 export const Pricing: React.FC = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      import('aos').then((AOS) => {
+      import('aos').then(AOS => {
         AOS.default.init({
           duration: 800,
           easing: 'ease-out',
@@ -39,4 +39,3 @@ export const Pricing: React.FC = () => {
     </section>
   )
 }
-

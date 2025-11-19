@@ -1,11 +1,5 @@
 import { LucideIcon } from 'lucide-react'
-import { 
-  UserPlus, 
-  Target, 
-  Dumbbell, 
-  Trophy,
-  TrendingUp 
-} from 'lucide-react'
+import { UserPlus, Target, Dumbbell, Trophy, TrendingUp } from 'lucide-react'
 
 export interface JourneyStep {
   id: string
@@ -22,7 +16,8 @@ export const journeySteps: JourneyStep[] = [
     id: '1',
     number: 1,
     title: 'Sign Up & Set Goals',
-    description: 'Create your account and tell us about your fitness goals, experience level, and preferences.',
+    description:
+      'Create your account and tell us about your fitness goals, experience level, and preferences.',
     icon: UserPlus,
     features: [
       'Quick 2-minute setup',
@@ -36,7 +31,8 @@ export const journeySteps: JourneyStep[] = [
     id: '2',
     number: 2,
     title: 'Get Your Plan',
-    description: 'Our AI generates a personalized workout plan tailored specifically to your goals and capabilities.',
+    description:
+      'Our AI generates a personalized workout plan tailored specifically to your goals and capabilities.',
     icon: Target,
     features: [
       'AI-powered generation',
@@ -50,7 +46,8 @@ export const journeySteps: JourneyStep[] = [
     id: '3',
     number: 3,
     title: 'Start Training',
-    description: 'Begin your fitness journey with guided workouts, exercise demonstrations, and real-time form tips.',
+    description:
+      'Begin your fitness journey with guided workouts, exercise demonstrations, and real-time form tips.',
     icon: Dumbbell,
     features: [
       'Step-by-step guidance',
@@ -64,21 +61,18 @@ export const journeySteps: JourneyStep[] = [
     id: '4',
     number: 4,
     title: 'Track Progress',
-    description: 'Monitor your improvements with detailed analytics, workout history, and achievement milestones.',
+    description:
+      'Monitor your improvements with detailed analytics, workout history, and achievement milestones.',
     icon: TrendingUp,
-    features: [
-      'Progress charts',
-      'Workout history',
-      'Achievement badges',
-      'Performance insights',
-    ],
+    features: ['Progress charts', 'Workout history', 'Achievement badges', 'Performance insights'],
     accentColor: '#15803d',
   },
   {
     id: '5',
     number: 5,
     title: 'Achieve Results',
-    description: 'Reach your fitness goals and celebrate your success with our community of motivated individuals.',
+    description:
+      'Reach your fitness goals and celebrate your success with our community of motivated individuals.',
     icon: Trophy,
     features: [
       'Goal completion',
@@ -89,4 +83,3 @@ export const journeySteps: JourneyStep[] = [
     accentColor: '#84cc16',
   },
 ]
-

@@ -37,25 +37,26 @@ export const Button: React.FC<ButtonProps> = ({
   )
 
   return (
-    <button
-      className={buttonClasses}
-      disabled={disabled || loading}
-      {...props}
-    >
+    <button className={buttonClasses} disabled={disabled || loading} {...props}>
       {loading ? (
         <span className={styles.spinner} />
       ) : (
         <>
           {Icon && iconPosition === 'left' && (
-            <Icon className={styles['button__icon--left']} size={size === 'sm' ? 16 : size === 'md' ? 20 : 24} />
+            <Icon
+              className={styles['button__icon--left']}
+              size={size === 'sm' ? 16 : size === 'md' ? 20 : 24}
+            />
           )}
           <span>{children}</span>
           {Icon && iconPosition === 'right' && (
-            <Icon className={styles['button__icon--right']} size={size === 'sm' ? 16 : size === 'md' ? 20 : 24} />
+            <Icon
+              className={styles['button__icon--right']}
+              size={size === 'sm' ? 16 : size === 'md' ? 20 : 24}
+            />
           )}
         </>
       )}
     </button>
   )
 }
-

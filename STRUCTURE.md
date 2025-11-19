@@ -65,11 +65,13 @@ Workout Generator/
 ### Classification:
 
 **Primary Pattern:** **Hybrid Domain-Driven Structure**
+
 - Combines feature-based organization (sections) with type-based organization (UI components)
 - Clear separation of concerns (data, styles, components)
 - Domain-driven for sections, atomic for reusable components
 
 **Not:**
+
 - ❌ Pure Atomic Design (components aren't organized by atoms/molecules/organisms)
 - ❌ Pure Feature-First (UI components are separated, not co-located with features)
 - ❌ Pure Layer-First (sections are feature-based, not purely by type)
@@ -87,4 +89,3 @@ Workout Generator/
 - Could adopt atomic design for UI components (atoms/molecules/organisms)
 - Could add a `lib/` or `utils/` folder for shared utilities
 - Could add `types/` folder for TypeScript type definitions
-

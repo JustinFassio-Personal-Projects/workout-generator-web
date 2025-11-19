@@ -1,17 +1,16 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { BlogPostCard } from '@/components/features/blog/BlogPostCard'
 import { BlogPost } from '@/features/blog/types'
-import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
+import { useBlogPosts } from '@/features/blog/hooks/useBlogPosts'
 import styles from './Blog.module.scss'
 
 export const Blog: React.FC = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [loading, setLoading] = useState(true)
+  const { posts, loading } = useBlogPosts()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -25,27 +24,14 @@ export const Blog: React.FC = () => {
     }
   }, [])
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const allPosts = await getAllPosts()
-        // Show only the 3 most recent posts on landing page
-        setPosts(allPosts.slice(0, 3))
-      } catch (error) {
-        console.error('Error fetching blog posts:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchPosts()
-  }, [])
+  // Show only the 3 most recent posts on landing page
+  const recentPosts = posts.slice(0, 3)
 
   if (loading) {
     return null
   }
 
-  if (posts.length === 0) {
+  if (recentPosts.length === 0) {
     return null
   }
 
@@ -63,7 +49,7 @@ export const Blog: React.FC = () => {
           </p>
         </div>
         <div className={styles.grid}>
-          {posts.map((post, index) => (
+          {recentPosts.map((post, index) => (
             <div key={post.id} data-aos="fade-up" data-aos-delay={index * 100}>
               <BlogPostCard post={post} />
             </div>

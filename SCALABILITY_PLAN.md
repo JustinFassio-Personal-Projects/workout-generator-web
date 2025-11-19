@@ -3,12 +3,14 @@
 ## Current Structure Analysis
 
 ### ✅ What Works Well:
+
 - **Sections** for landing page components
 - **UI components** separated for reusability
 - **Data layer** separated from components
 - **Design system** centralized
 
 ### ⚠️ Potential Issues as Site Grows:
+
 - `components/sections/` is landing-page specific
 - No clear separation between landing page and app features
 - Missing structure for routes/pages
@@ -111,18 +113,21 @@ Workout Generator/
 ## Migration Strategy
 
 ### Phase 1: Prepare Structure (Now)
+
 1. Rename `components/sections/` → `components/landing/`
 2. Create `components/features/` directory
 3. Create `features/` directory for feature modules
 4. Create `lib/`, `hooks/`, `types/` directories
 
 ### Phase 2: Add First Feature (Blog)
+
 1. Create `app/blog/` routes
 2. Create `components/features/blog/` components
 3. Create `features/blog/` module
 4. Move blog-related data to `data/blog/`
 
 ### Phase 3: Add Calendar Feature
+
 1. Create `app/calendar/` routes
 2. Create `components/features/calendar/` components
 3. Create `features/calendar/` module
@@ -159,6 +164,7 @@ features/blog/
 ## Example: Adding Blog Feature
 
 ### 1. Create Routes
+
 ```
 app/blog/
 ├── page.tsx              # Blog listing page
@@ -168,6 +174,7 @@ app/blog/
 ```
 
 ### 2. Create Feature Components
+
 ```
 components/features/blog/
 ├── BlogPostCard.tsx      # Card for blog post preview
@@ -177,6 +184,7 @@ components/features/blog/
 ```
 
 ### 3. Create Feature Module
+
 ```
 features/blog/
 ├── components/           # Re-export or move components here
@@ -188,6 +196,7 @@ features/blog/
 ```
 
 ### 4. Use in Pages
+
 ```tsx
 // app/blog/page.tsx
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
@@ -201,16 +210,16 @@ export default function BlogPage() {
 
 ## Decision Matrix
 
-| Feature Type | Location | Example |
-|-------------|---------|---------|
-| **Landing Page Section** | `components/landing/` | Hero, Features |
-| **Feature UI Component** | `components/features/[feature]/` | BlogPostCard |
-| **Reusable UI Component** | `components/ui/` | Button, Card |
-| **Feature Logic/Hooks** | `features/[feature]/hooks/` | useBlogPosts |
-| **Feature Utilities** | `features/[feature]/lib/` | getBlogPosts |
-| **Shared Utilities** | `lib/` | formatDate, apiClient |
-| **Shared Hooks** | `hooks/` | useMediaQuery |
-| **Route/Page** | `app/[feature]/` | app/blog/page.tsx |
+| Feature Type              | Location                         | Example               |
+| ------------------------- | -------------------------------- | --------------------- |
+| **Landing Page Section**  | `components/landing/`            | Hero, Features        |
+| **Feature UI Component**  | `components/features/[feature]/` | BlogPostCard          |
+| **Reusable UI Component** | `components/ui/`                 | Button, Card          |
+| **Feature Logic/Hooks**   | `features/[feature]/hooks/`      | useBlogPosts          |
+| **Feature Utilities**     | `features/[feature]/lib/`        | getBlogPosts          |
+| **Shared Utilities**      | `lib/`                           | formatDate, apiClient |
+| **Shared Hooks**          | `hooks/`                         | useMediaQuery         |
+| **Route/Page**            | `app/[feature]/`                 | app/blog/page.tsx     |
 
 ## Recommendations
 
@@ -219,4 +228,3 @@ export default function BlogPage() {
 3. **Separate Concerns** - UI components vs business logic
 4. **Follow Next.js Patterns** - Use App Router conventions
 5. **Plan for Growth** - Structure supports multiple features
-

@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Check code formatting
+        run: npm run format:check
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Run critical path tests
+        run: npm run test:critical
+
+      - name: Generate test coverage
+        run: npm run test:coverage
+        # Runs all tests with coverage (includes critical tests)
+
+      - name: Build application
+        run: npm run build
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Check for secrets in code
+        run: |
+          if grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" src/ app/ components/ features/ 2>/dev/null | grep -v "node_modules" | grep -v ".test." | grep -v ".spec."; then
+            echo "⚠️  Warning: Potential secrets found in code. Please review."
+            exit 1
+          fi
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+

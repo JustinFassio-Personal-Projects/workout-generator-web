@@ -74,4 +74,3 @@ export const JourneyStepCard: React.FC<JourneyStepCardProps> = ({
     </div>
   )
 }
-

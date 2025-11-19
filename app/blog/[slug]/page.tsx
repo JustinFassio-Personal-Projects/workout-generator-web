@@ -4,14 +4,10 @@ import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs()
-  return slugs.map((slug) => ({ slug }))
+  return slugs.map(slug => ({ slug }))
 }
 
-export default async function BlogPostPage({ 
-  params 
-}: { 
-  params: { slug: string } 
-}) {
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug)
 
   if (!post) {
@@ -20,4 +16,3 @@ export default async function BlogPostPage({
 
   return <BlogPostContent post={post} />
 }
-

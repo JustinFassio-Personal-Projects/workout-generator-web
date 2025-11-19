@@ -1,14 +1,7 @@
 'use client'
 
 import React from 'react'
-import { 
-  Facebook, 
-  Twitter, 
-  Instagram, 
-  Linkedin,
-  Mail,
-  Send
-} from 'lucide-react'
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Send } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import styles from './Footer.module.scss'
 
@@ -168,4 +161,3 @@ export const Footer: React.FC = () => {
     </footer>
   )
 }
-

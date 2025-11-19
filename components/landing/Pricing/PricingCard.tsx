@@ -21,19 +21,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
       data-aos="fade-up"
       data-aos-delay={index * 100}
     >
-      {plan.popular && (
-        <div className={styles.badge}>Most Popular</div>
-      )}
+      {plan.popular && <div className={styles.badge}>Most Popular</div>}
       <div className={styles.header}>
         <h3 className={styles.planName}>{plan.name}</h3>
         <p className={styles.description}>{plan.description}</p>
         <div className={styles.price}>
-          <span className={styles.priceAmount}>
-            ${plan.price}
-          </span>
-          <span className={styles.pricePeriod}>
-            /{plan.period}
-          </span>
+          <span className={styles.priceAmount}>${plan.price}</span>
+          <span className={styles.pricePeriod}>/{plan.period}</span>
         </div>
       </div>
       <ul className={styles.featuresList}>
@@ -45,15 +39,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
         ))}
       </ul>
       <div className={styles.footer}>
-        <Button
-          variant={plan.ctaVariant}
-          size="lg"
-          className={styles.ctaButton}
-        >
+        <Button variant={plan.ctaVariant} size="lg" className={styles.ctaButton}>
           {plan.ctaText}
         </Button>
       </div>
     </Card>
   )
 }
-

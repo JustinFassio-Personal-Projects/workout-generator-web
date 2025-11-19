@@ -54,7 +54,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -63,7 +64,8 @@
 }
 
 @keyframes floatSlow {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -72,7 +74,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -81,7 +84,8 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(132, 204, 22, 0.3);
   }
   50% {
@@ -151,4 +155,3 @@
 .animate-pulse-glow {
   animation: pulseGlow 2s ease-in-out infinite;
 }
-

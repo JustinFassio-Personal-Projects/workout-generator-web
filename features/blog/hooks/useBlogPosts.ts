@@ -18,4 +18,3 @@ export function useBlogPosts() {
 
   return { posts, loading, error }
 }
-

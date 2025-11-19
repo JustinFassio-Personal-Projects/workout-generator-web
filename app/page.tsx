@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     // Initialize AOS globally
     if (typeof window !== 'undefined') {
-      import('aos').then((AOS) => {
+      import('aos').then(AOS => {
         AOS.default.init({
           duration: 800,
           easing: 'ease-out',
@@ -34,4 +34,3 @@ export default function Home() {
     </main>
   )
 }
-

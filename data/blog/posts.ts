@@ -5,7 +5,8 @@ export const blogPosts: BlogPost[] = [
     id: '1',
     slug: 'getting-started-with-ai-workouts',
     title: 'Getting Started with AI-Powered Workouts',
-    excerpt: 'Learn how to create your first personalized workout plan using our AI-powered platform. Discover the features that make fitness planning effortless.',
+    excerpt:
+      'Learn how to create your first personalized workout plan using our AI-powered platform. Discover the features that make fitness planning effortless.',
     content: `# Getting Started with AI-Powered Workouts
 
 Welcome to the future of fitness planning! Our AI-powered workout generator makes it easy to create personalized exercise routines tailored to your goals, fitness level, and available equipment.
@@ -32,13 +33,14 @@ Start your fitness journey today and experience the power of personalized traini
     date: '2025-01-15',
     author: 'Fitness Team',
     category: 'Getting Started',
-    tags: ['workouts', 'beginner', 'ai', 'fitness']
+    tags: ['workouts', 'beginner', 'ai', 'fitness'],
   },
   {
     id: '2',
     slug: 'maximizing-your-home-workout-space',
     title: 'Maximizing Your Home Workout Space',
-    excerpt: 'Transform any space into an effective workout area. Learn how to optimize your home gym setup for maximum results.',
+    excerpt:
+      'Transform any space into an effective workout area. Learn how to optimize your home gym setup for maximum results.',
     content: `# Maximizing Your Home Workout Space
 
 You don't need a full gym to achieve your fitness goals. With the right approach, any space can become your personal training ground.
@@ -72,13 +74,14 @@ Make the most of your space and achieve your fitness goals from home!`,
     date: '2025-01-10',
     author: 'Fitness Team',
     category: 'Home Fitness',
-    tags: ['home-workout', 'equipment', 'space', 'tips']
+    tags: ['home-workout', 'equipment', 'space', 'tips'],
   },
   {
     id: '3',
     slug: 'nutrition-tips-for-better-workout-results',
     title: 'Nutrition Tips for Better Workout Results',
-    excerpt: 'Discover how proper nutrition can amplify your workout results. Learn about pre and post-workout nutrition strategies.',
+    excerpt:
+      'Discover how proper nutrition can amplify your workout results. Learn about pre and post-workout nutrition strategies.',
     content: `# Nutrition Tips for Better Workout Results
 
 Exercise is only half the equation. Proper nutrition fuels your workouts and accelerates recovery.
@@ -115,7 +118,6 @@ Remember: Nutrition and exercise work together to help you achieve your fitness 
     date: '2025-01-05',
     author: 'Nutrition Expert',
     category: 'Nutrition',
-    tags: ['nutrition', 'recovery', 'health', 'diet']
-  }
+    tags: ['nutrition', 'recovery', 'health', 'diet'],
+  },
 ]
-

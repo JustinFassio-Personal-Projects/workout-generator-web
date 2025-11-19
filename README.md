@@ -23,17 +23,19 @@ A modern, single-page landing site built with Next.js 14 App Router featuring a 
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -67,6 +69,7 @@ Workout Generator/
 ## Design System
 
 The project uses a comprehensive design system with:
+
 - CSS custom properties for colors and tokens
 - Glass morphism effects throughout
 - Responsive breakpoints
@@ -83,4 +86,3 @@ The project is ready for deployment on Vercel:
 ## License
 
 ISC
-

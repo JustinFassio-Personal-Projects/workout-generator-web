@@ -42,11 +42,7 @@ jobs:
 
       - name: Generate test coverage
         run: npm run test:coverage
-
-      - name: Check test coverage thresholds
-        run: |
-          npm run test:coverage
-          # Coverage thresholds are enforced by vitest config
+        # Coverage thresholds are enforced by vitest config
 
       - name: Build application
         run: npm run build

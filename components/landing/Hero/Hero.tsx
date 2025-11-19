@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { ArrowRight, Play } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { Card } from '@/components/ui/Card/Card'
@@ -8,19 +8,6 @@ import { FloatingIcons } from './FloatingIcons'
 import styles from './Hero.module.scss'
 
 export const Hero: React.FC = () => {
-  useEffect(() => {
-    // Initialize AOS for this section
-    if (typeof window !== 'undefined') {
-      import('aos').then(AOS => {
-        AOS.default.init({
-          duration: 800,
-          easing: 'ease-out',
-          once: true,
-        })
-      })
-    }
-  }, [])
-
   return (
     <section id="hero" className={styles.hero}>
       <FloatingIcons />

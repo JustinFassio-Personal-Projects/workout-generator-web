@@ -1,20 +1,27 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { useBlogPosts } from '@/features/blog/hooks/useBlogPosts'
-import * as getBlogPostsModule from '@/features/blog/lib/getBlogPosts'
-
-// Mock the getBlogPosts module
-vi.mock('@/features/blog/lib/getBlogPosts', () => ({
-  getAllPosts: vi.fn(),
-}))
 
 describe('useBlogPosts', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    // Reset window.location.origin for tests
+    Object.defineProperty(window, 'location', {
+      value: { origin: 'http://localhost:3000' },
+      writable: true,
+    })
+    // Mock global fetch
+    global.fetch = vi.fn()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it('should initialize with loading state', () => {
-    vi.mocked(getBlogPostsModule.getAllPosts).mockResolvedValue([])
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => [],
+    } as Response)
 
     const { result } = renderHook(() => useBlogPosts())
 
@@ -38,7 +45,10 @@ describe('useBlogPosts', () => {
       },
     ]
 
-    vi.mocked(getBlogPostsModule.getAllPosts).mockResolvedValue(mockPosts)
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockPosts,
+    } as Response)
 
     const { result } = renderHook(() => useBlogPosts())
 
@@ -50,9 +60,8 @@ describe('useBlogPosts', () => {
     expect(result.current.error).toBeNull()
   })
 
-  it('should handle errors correctly', async () => {
-    const mockError = new Error('Failed to load posts')
-    vi.mocked(getBlogPostsModule.getAllPosts).mockRejectedValue(mockError)
+  it('should handle fetch errors correctly', async () => {
+    vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Failed to load posts'))
 
     const { result } = renderHook(() => useBlogPosts())
 
@@ -60,7 +69,25 @@ describe('useBlogPosts', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    expect(result.current.error).toBe(mockError)
+    expect(result.current.error).toBeInstanceOf(Error)
+    expect(result.current.posts).toEqual([])
+  })
+
+  it('should handle non-ok responses correctly', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      json: async () => ({ error: 'Server error' }),
+    } as Response)
+
+    const { result } = renderHook(() => useBlogPosts())
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    expect(result.current.error).toBeInstanceOf(Error)
+    expect(result.current.error?.message).toBe('Failed to fetch blog posts')
     expect(result.current.posts).toEqual([])
   })
 })

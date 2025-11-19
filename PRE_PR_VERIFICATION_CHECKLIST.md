@@ -23,7 +23,8 @@
 ### **2. Code Quality Baseline**
 
 - [ ] **Test coverage report**: `npm run test:coverage`
-- [ ] **Identify uncovered files/functions**
+- [ ] **Verify coverage thresholds**: All metrics (functions, statements, branches, lines) ≥ 80%
+- [ ] **Identify uncovered files/functions**: Focus on function coverage if below threshold
 - [ ] **Check for existing linting errors**
 - [ ] **Review TypeScript strict mode compliance**
 - [ ] **Verify Prettier formatting consistency**
@@ -138,6 +139,9 @@ describe('ComponentName', () => {
 - [ ] **User interactions**: Test clicks, form submissions, navigation
 - [ ] **Error states**: Test error handling and loading states
 - [ ] **Edge cases**: Test boundary conditions and error scenarios
+- [ ] **Function coverage**: Ensure all functions are tested (80% threshold required)
+- [ ] **Branch coverage**: Test all conditional paths (if/else, switch cases)
+- [ ] **Statement coverage**: Ensure all code statements are executed
 
 ### **8. Mocking Strategy**
 
@@ -159,7 +163,11 @@ describe('ComponentName', () => {
 - [ ] **Run full verification**: `npm run verify`
 - [ ] **Run critical path tests**: `npm run test:critical`
 - [ ] **Quick verification**: `npm run verify:quick`
-- [ ] **Test coverage check**: Ensure thresholds are met (`npm run test:coverage`)
+- [ ] **Test coverage check**: Ensure all thresholds are met (`npm run test:coverage`)
+  - [ ] **Function coverage ≥ 80%** (critical - CI will fail if below)
+  - [ ] **Statement coverage ≥ 80%**
+  - [ ] **Branch coverage ≥ 80%**
+  - [ ] **Line coverage ≥ 80%**
 - [ ] **Build verification**: Confirm production build succeeds
 - [ ] **Security scan**: Check for vulnerabilities
 
@@ -340,7 +348,12 @@ export default function Page() {
 
 ### **24. Quality Indicators**
 
-- [ ] **Test coverage > 80%**: For new code
+- [ ] **Test coverage thresholds met (80% minimum)**:
+  - [ ] **Function coverage ≥ 80%**: All functions must be tested
+  - [ ] **Statement coverage ≥ 80%**: All code statements executed
+  - [ ] **Branch coverage ≥ 80%**: All conditional branches tested
+  - [ ] **Line coverage ≥ 80%**: All lines of code executed
+  - [ ] **Run coverage check**: `npm run test:coverage` to verify thresholds
 - [ ] **Zero linting errors**: Clean codebase
 - [ ] **Zero TypeScript errors**: Type safety
 - [ ] **Build time < 60 seconds**: Performance

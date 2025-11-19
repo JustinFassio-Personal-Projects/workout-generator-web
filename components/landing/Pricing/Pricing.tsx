@@ -1,23 +1,11 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { pricingPlans } from '@/data/pricing'
 import { PricingCard } from './PricingCard'
 import styles from './Pricing.module.scss'
 
 export const Pricing: React.FC = () => {
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      import('aos').then(AOS => {
-        AOS.default.init({
-          duration: 800,
-          easing: 'ease-out',
-          once: true,
-        })
-      })
-    }
-  }, [])
-
   return (
     <section id="pricing" className={styles.pricing}>
       <div className={styles.container}>

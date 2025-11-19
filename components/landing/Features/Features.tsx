@@ -1,23 +1,11 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { features } from '@/data/features'
 import { FeatureCard } from './FeatureCard'
 import styles from './Features.module.scss'
 
 export const Features: React.FC = () => {
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      import('aos').then(AOS => {
-        AOS.default.init({
-          duration: 800,
-          easing: 'ease-out',
-          once: true,
-        })
-      })
-    }
-  }, [])
-
   return (
     <section id="features" className={styles.features}>
       <div className={styles.container}>

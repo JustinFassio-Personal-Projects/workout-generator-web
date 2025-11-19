@@ -29,7 +29,13 @@ jobs:
         run: npm run lint
 
       - name: Check code formatting
-        run: npm run format:check
+        run: |
+          if ! npm run format:check; then
+            echo "❌ Prettier formatting issues detected."
+            echo "💡 To fix locally, run: npm run format"
+            echo "💡 Or run: npx prettier --write ."
+            exit 1
+          fi
 
       - name: Type check
         run: npm run type-check
@@ -62,4 +68,5 @@ jobs:
         with:
           files: ./coverage/lcov.info
           fail_ci_if_error: false
-
+          token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true

@@ -5,6 +5,7 @@ import { Hero } from '@/components/landing/Hero/Hero'
 import { Features } from '@/components/landing/Features/Features'
 import { Journey } from '@/components/landing/Journey/Journey'
 import { Testimonials } from '@/components/landing/Testimonials/Testimonials'
+import { Blog } from '@/components/landing/Blog/Blog'
 import { Pricing } from '@/components/landing/Pricing/Pricing'
 import { Footer } from '@/components/landing/Footer/Footer'
 
@@ -29,6 +30,7 @@ export default function Home() {
       <Features />
       <Journey />
       <Testimonials />
+      <Blog />
       <Pricing />
       <Footer />
     </main>

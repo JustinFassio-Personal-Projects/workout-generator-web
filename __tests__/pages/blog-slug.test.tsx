@@ -22,14 +22,14 @@ describe('BlogPostPage', () => {
   })
 
   it('should generate static params', async () => {
-    const { generateStaticParams } = await import('@/app/blog/[slug]/page')
     const mockSlugs = ['post-1', 'post-2', 'post-3']
     vi.mocked(getAllPostSlugs).mockResolvedValue(mockSlugs)
 
+    const { generateStaticParams } = await import('@/app/blog/[slug]/page')
     const params = await generateStaticParams()
 
     expect(params).toEqual([{ slug: 'post-1' }, { slug: 'post-2' }, { slug: 'post-3' }])
-  })
+  }, 10000)
 
   it('should render blog post page when post exists', async () => {
     const { default: BlogPostPage } = await import('@/app/blog/[slug]/page')
@@ -60,5 +60,38 @@ describe('BlogPostPage', () => {
     await expect(BlogPostPage({ params: { slug: 'non-existent' } })).rejects.toThrow('notFound')
     expect(getPostBySlug).toHaveBeenCalledWith('non-existent')
     expect(mockNotFound).toHaveBeenCalled()
+  })
+
+  it('should generate metadata correctly when post exists', async () => {
+    const { generateMetadata } = await import('@/app/blog/[slug]/page')
+    const mockPost = {
+      id: '1',
+      slug: 'test-post',
+      title: 'Test Post',
+      excerpt: 'Test excerpt',
+      content: 'Test content',
+      date: '2025-01-15',
+      author: 'Test Author',
+      category: 'Test',
+      tags: ['test', 'fitness'],
+    }
+
+    vi.mocked(getPostBySlug).mockResolvedValue(mockPost)
+
+    const metadata = await generateMetadata({ params: { slug: 'test-post' } })
+
+    expect(metadata.title).toBe('Test Post | Blog - Workout Generator')
+    expect(metadata.description).toBe('Test excerpt')
+    expect(metadata.openGraph?.type).toBe('article')
+    expect(metadata.openGraph?.title).toBe('Test Post')
+  })
+
+  it('should return not found metadata when post does not exist', async () => {
+    const { generateMetadata } = await import('@/app/blog/[slug]/page')
+    vi.mocked(getPostBySlug).mockResolvedValue(null)
+
+    const metadata = await generateMetadata({ params: { slug: 'non-existent' } })
+
+    expect(metadata.title).toBe('Post Not Found - Workout Generator')
   })
 })

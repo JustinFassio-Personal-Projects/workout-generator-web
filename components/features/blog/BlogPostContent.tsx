@@ -8,20 +8,30 @@ interface BlogPostContentProps {
 }
 
 export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post }) => {
+  const publishedDate = new Date(post.date)
+  const isoDate = publishedDate.toISOString()
+
   return (
     <article className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-6">
+      <header className="mb-6">
         <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-4">
           {post.category}
         </span>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
         <div className="flex items-center gap-4 text-gray-600 mb-6">
-          <span>{formatDate(post.date)}</span>
-          <span>•</span>
-          <span>By {post.author}</span>
+          <time dateTime={isoDate} itemProp="datePublished">
+            {formatDate(post.date)}
+          </time>
+          <span aria-hidden="true">•</span>
+          <span>
+            By{' '}
+            <span itemProp="author" itemScope itemType="https://schema.org/Person">
+              <span itemProp="name">{post.author}</span>
+            </span>
+          </span>
         </div>
         {post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-8">
+          <div className="flex flex-wrap gap-2 mb-8" itemProp="keywords">
             {post.tags.map(tag => (
               <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">
                 #{tag}
@@ -29,10 +39,21 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post }) => {
             ))}
           </div>
         )}
-      </div>
-      <div className="prose prose-lg max-w-none">
+      </header>
+      <div className="prose prose-lg max-w-none" itemProp="articleBody">
         <div className="text-gray-700 leading-relaxed">
-          <ReactMarkdown>{post.content}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              h1: ({ node, ...props }) => <h2 {...props} />,
+              h2: ({ node, ...props }) => <h2 {...props} />,
+              h3: ({ node, ...props }) => <h3 {...props} />,
+              h4: ({ node, ...props }) => <h4 {...props} />,
+              h5: ({ node, ...props }) => <h5 {...props} />,
+              h6: ({ node, ...props }) => <h6 {...props} />,
+            }}
+          >
+            {post.content}
+          </ReactMarkdown>
         </div>
       </div>
     </article>

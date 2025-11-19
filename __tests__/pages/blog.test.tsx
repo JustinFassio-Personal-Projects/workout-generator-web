@@ -65,4 +65,14 @@ describe('Blog Page', () => {
     // The actual rendering will be tested in component tests
     expect(screen.getByText('Blog')).toBeInTheDocument()
   })
+
+  it('should generate metadata correctly', async () => {
+    const { generateMetadata } = await import('@/app/blog/page')
+    const metadata = await generateMetadata()
+
+    expect(metadata.title).toBe('Blog - Workout Generator | Fitness Tips & Workout Strategies')
+    expect(metadata.description).toContain('Discover fitness tips')
+    expect(metadata.openGraph?.type).toBe('website')
+    expect(metadata.openGraph?.url).toContain('/blog')
+  })
 })

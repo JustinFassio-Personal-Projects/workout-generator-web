@@ -152,14 +152,18 @@ describe('ComponentName', () => {
 
 ## 🔧 **Pre-Commit Verification**
 
-### **9. Automated Checks**
+### **9. Automated Checks** ⚠️ **MANDATORY BEFORE COMMIT**
 
+- [ ] **Format code**: `npm run format` (auto-fix formatting issues)
+- [ ] **Check formatting**: `npm run format:check` (verify all files are formatted)
 - [ ] **Run full verification**: `npm run verify`
 - [ ] **Run critical path tests**: `npm run test:critical`
 - [ ] **Quick verification**: `npm run verify:quick`
 - [ ] **Test coverage check**: Ensure thresholds are met (`npm run test:coverage`)
 - [ ] **Build verification**: Confirm production build succeeds
 - [ ] **Security scan**: Check for vulnerabilities
+
+**⚠️ CRITICAL**: Always run `npm run format` before committing new files to avoid CI failures!
 
 ### **10. Manual Quality Checks**
 

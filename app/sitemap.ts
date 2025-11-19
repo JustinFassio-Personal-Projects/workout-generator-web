@@ -4,7 +4,6 @@ import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-
   // Get all blog posts
   const posts = await getAllPosts()
 

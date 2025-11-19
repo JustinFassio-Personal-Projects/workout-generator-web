@@ -5,7 +5,6 @@ import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
 
 export async function generateMetadata(): Promise<Metadata> {
-
   return {
     title: 'Blog - Workout Generator | Fitness Tips & Workout Strategies',
     description:

@@ -8,7 +8,6 @@ import { FloatingIcons } from './FloatingIcons'
 import styles from './Hero.module.scss'
 
 export const Hero: React.FC = () => {
-
   return (
     <section id="hero" className={styles.hero}>
       <FloatingIcons />

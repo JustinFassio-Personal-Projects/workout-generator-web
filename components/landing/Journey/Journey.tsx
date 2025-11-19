@@ -6,7 +6,6 @@ import { JourneyStepCard } from './JourneyStepCard'
 import styles from './Journey.module.scss'
 
 export const Journey: React.FC = () => {
-
   return (
     <section id="journey" className={styles.journey}>
       <div className={styles.container}>

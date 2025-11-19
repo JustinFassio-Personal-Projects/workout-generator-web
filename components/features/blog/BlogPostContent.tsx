@@ -19,13 +19,9 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post }) => {
         </span>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
         <div className="flex items-center gap-4 text-gray-600 mb-6">
-          <time dateTime={isoDate}>
-            {formatDate(post.date)}
-          </time>
+          <time dateTime={isoDate}>{formatDate(post.date)}</time>
           <span aria-hidden="true">•</span>
-          <span>
-            By {post.author}
-          </span>
+          <span>By {post.author}</span>
         </div>
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-8">

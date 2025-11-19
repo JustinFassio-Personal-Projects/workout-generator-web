@@ -6,7 +6,6 @@ import { PricingCard } from './PricingCard'
 import styles from './Pricing.module.scss'
 
 export const Pricing: React.FC = () => {
-
   return (
     <section id="pricing" className={styles.pricing}>
       <div className={styles.container}>

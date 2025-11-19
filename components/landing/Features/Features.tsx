@@ -6,7 +6,6 @@ import { FeatureCard } from './FeatureCard'
 import styles from './Features.module.scss'
 
 export const Features: React.FC = () => {
-
   return (
     <section id="features" className={styles.features}>
       <div className={styles.container}>

@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { BlogPostCard } from './BlogPostCard'
 import { BlogPost } from '@/features/blog/types'

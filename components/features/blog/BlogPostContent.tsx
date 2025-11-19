@@ -1,6 +1,5 @@
-'use client'
-
 import React from 'react'
+import ReactMarkdown from 'react-markdown'
 import { BlogPost } from '@/features/blog/types'
 import { formatDate } from '@/features/blog/lib/formatDate'
 
@@ -37,8 +36,8 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post }) => {
         )}
       </div>
       <div className="prose prose-lg max-w-none">
-        <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-          {post.content}
+        <div className="text-gray-700 leading-relaxed">
+          <ReactMarkdown>{post.content}</ReactMarkdown>
         </div>
       </div>
     </article>

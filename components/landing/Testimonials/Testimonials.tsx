@@ -27,18 +27,6 @@ export const Testimonials: React.FC = () => {
   const totalPages = Math.ceil(testimonials.length / itemsPerPage)
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      import('aos').then(AOS => {
-        AOS.default.init({
-          duration: 800,
-          easing: 'ease-out',
-          once: true,
-        })
-      })
-    }
-  }, [])
-
-  useEffect(() => {
     if (isAutoPlaying) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex(prev => (prev + 1) % totalPages)

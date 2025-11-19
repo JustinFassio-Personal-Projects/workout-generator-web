@@ -3,6 +3,8 @@ import { BlogPostContent } from '@/components/features/blog/BlogPostContent'
 import { getPostBySlug, getAllPostSlugs } from '@/features/blog/lib/getBlogPosts'
 import { notFound } from 'next/navigation'
 
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
+
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs()
   return slugs.map(slug => ({ slug }))
@@ -14,7 +16,6 @@ export async function generateMetadata({
   params: { slug: string }
 }): Promise<Metadata> {
   const post = await getPostBySlug(params.slug)
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
 
   if (!post) {
     return {
@@ -58,7 +59,6 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     notFound()
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
   const publishedTime = new Date(post.date).toISOString()
   const modifiedTime = publishedTime // Assuming no modification tracking yet
 

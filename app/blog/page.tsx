@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
 import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
 
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
+
 export async function generateMetadata(): Promise<Metadata> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
 
   return {
     title: 'Blog - Workout Generator | Fitness Tips & Workout Strategies',
@@ -41,7 +42,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function BlogPage() {
   const posts = await getAllPosts()
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
 
   // Blog/CollectionPage structured data (JSON-LD)
   const blogSchema = {

@@ -1,28 +1,15 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { BlogPostCard } from '@/components/features/blog/BlogPostCard'
-import { BlogPost } from '@/features/blog/types'
 import { useBlogPosts } from '@/features/blog/hooks/useBlogPosts'
 import styles from './Blog.module.scss'
 
 export const Blog: React.FC = () => {
   const { posts, loading } = useBlogPosts()
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      import('aos').then(AOS => {
-        AOS.default.init({
-          duration: 800,
-          easing: 'ease-out',
-          once: true,
-        })
-      })
-    }
-  }, [])
 
   // Show only the 3 most recent posts on landing page
   const recentPosts = posts.slice(0, 3)

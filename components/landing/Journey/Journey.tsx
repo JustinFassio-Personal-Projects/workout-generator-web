@@ -1,22 +1,11 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { journeySteps } from '@/data/journey'
 import { JourneyStepCard } from './JourneyStepCard'
 import styles from './Journey.module.scss'
 
 export const Journey: React.FC = () => {
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      import('aos').then(AOS => {
-        AOS.default.init({
-          duration: 800,
-          easing: 'ease-out',
-          once: true,
-        })
-      })
-    }
-  }, [])
 
   return (
     <section id="journey" className={styles.journey}>

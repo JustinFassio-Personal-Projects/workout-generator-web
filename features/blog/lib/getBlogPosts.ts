@@ -3,7 +3,7 @@ import { blogPosts } from '@/data/blog/posts'
 
 export async function getAllPosts(): Promise<BlogPost[]> {
   // In a real app, this might fetch from an API or CMS
-  return blogPosts.sort((a, b) => 
+  return [...blogPosts].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 }

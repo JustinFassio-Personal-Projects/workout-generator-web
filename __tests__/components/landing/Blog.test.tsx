@@ -148,4 +148,3 @@ describe('Blog Component', () => {
     expect(screen.queryByText('Test Post 4')).not.toBeInTheDocument()
   })
 })
-

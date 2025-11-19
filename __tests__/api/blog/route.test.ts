@@ -51,4 +51,3 @@ describe('Blog API Route', () => {
     consoleErrorSpy.mockRestore()
   })
 })
-

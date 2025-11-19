@@ -88,4 +88,3 @@ describe('sitemap.ts', () => {
     expect(result[1].lastModified).toBeInstanceOf(Date)
   })
 })
-

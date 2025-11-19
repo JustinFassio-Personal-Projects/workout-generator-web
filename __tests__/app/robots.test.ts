@@ -22,4 +22,3 @@ describe('robots.ts', () => {
     expect(result.sitemap).toBe(`${baseUrl}/sitemap.xml`)
   })
 })
-

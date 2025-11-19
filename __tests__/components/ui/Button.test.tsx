@@ -55,6 +55,39 @@ describe('Button', () => {
     expect(button.querySelector('svg')).toBeInTheDocument()
   })
 
+  it('should render icon with correct size for small button', () => {
+    render(
+      <Button icon={ArrowRight} iconPosition="left" size="sm">
+        Small
+      </Button>
+    )
+    const button = screen.getByRole('button')
+    const icon = button.querySelector('svg')
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('should render icon with correct size for medium button', () => {
+    render(
+      <Button icon={ArrowRight} iconPosition="right" size="md">
+        Medium
+      </Button>
+    )
+    const button = screen.getByRole('button')
+    const icon = button.querySelector('svg')
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('should render icon with correct size for large button', () => {
+    render(
+      <Button icon={ArrowRight} iconPosition="left" size="lg">
+        Large
+      </Button>
+    )
+    const button = screen.getByRole('button')
+    const icon = button.querySelector('svg')
+    expect(icon).toBeInTheDocument()
+  })
+
   it('should apply variant classes', () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>)
     let button = screen.getByRole('button')

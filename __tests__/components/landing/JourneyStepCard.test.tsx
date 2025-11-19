@@ -82,4 +82,3 @@ describe('JourneyStepCard', () => {
     expect(connector).toBeInTheDocument()
   })
 })
-

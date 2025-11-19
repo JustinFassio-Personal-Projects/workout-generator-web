@@ -77,4 +77,3 @@ describe('Testimonials', () => {
     expect(nextButton).toBeInTheDocument()
   })
 })
-

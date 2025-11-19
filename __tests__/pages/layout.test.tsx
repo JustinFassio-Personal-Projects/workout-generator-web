@@ -32,4 +32,3 @@ describe('RootLayout', () => {
     expect(getByText('Test Content')).toBeInTheDocument()
   })
 })
-

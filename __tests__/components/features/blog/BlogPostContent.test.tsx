@@ -58,4 +58,3 @@ describe('BlogPostContent', () => {
     expect(article?.className).toContain('max-w-4xl')
   })
 })
-

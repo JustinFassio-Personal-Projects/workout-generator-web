@@ -28,11 +28,7 @@ describe('BlogPostPage', () => {
 
     const params = await generateStaticParams()
 
-    expect(params).toEqual([
-      { slug: 'post-1' },
-      { slug: 'post-2' },
-      { slug: 'post-3' },
-    ])
+    expect(params).toEqual([{ slug: 'post-1' }, { slug: 'post-2' }, { slug: 'post-3' }])
   })
 
   it('should render blog post page when post exists', async () => {
@@ -66,4 +62,3 @@ describe('BlogPostPage', () => {
     expect(mockNotFound).toHaveBeenCalled()
   })
 })
-

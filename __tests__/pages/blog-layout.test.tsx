@@ -25,4 +25,3 @@ describe('BlogLayout', () => {
     expect(getByText('Blog Content')).toBeInTheDocument()
   })
 })
-

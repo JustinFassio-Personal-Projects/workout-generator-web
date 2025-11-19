@@ -34,7 +34,11 @@ export const FloatingIcons: React.FC = () => {
   }
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+    <div
+      className="absolute inset-0 pointer-events-none overflow-hidden z-0"
+      aria-hidden="true"
+      role="presentation"
+    >
       {icons.map((Icon, index) => {
         const position = iconPositions[index]
 

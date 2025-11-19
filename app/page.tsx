@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Hero } from '@/components/sections/Hero/Hero'
-import { Features } from '@/components/sections/Features/Features'
-import { Journey } from '@/components/sections/Journey/Journey'
-import { Testimonials } from '@/components/sections/Testimonials/Testimonials'
-import { Pricing } from '@/components/sections/Pricing/Pricing'
-import { Footer } from '@/components/sections/Footer/Footer'
+import { Hero } from '@/components/landing/Hero/Hero'
+import { Features } from '@/components/landing/Features/Features'
+import { Journey } from '@/components/landing/Journey/Journey'
+import { Testimonials } from '@/components/landing/Testimonials/Testimonials'
+import { Pricing } from '@/components/landing/Pricing/Pricing'
+import { Footer } from '@/components/landing/Footer/Footer'
 
 export default function Home() {
   useEffect(() => {

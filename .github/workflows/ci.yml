@@ -33,14 +33,12 @@ jobs:
       - name: Type check
         run: npm run type-check
 
-      - name: Run tests
-        run: npm run test:run
-
       - name: Run critical path tests
         run: npm run test:critical
 
       - name: Generate test coverage
         run: npm run test:coverage
+        # Runs all tests with coverage (includes critical tests)
 
       - name: Build application
         run: npm run build

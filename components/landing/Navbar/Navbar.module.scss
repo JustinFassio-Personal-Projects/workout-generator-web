@@ -1,0 +1,140 @@
+@import '../../../styles/design-system/animations.scss';
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-fixed);
+  background: rgba(10, 14, 26, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border-base);
+  transition: all var(--transition-base);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-md);
+  }
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity var(--transition-fast);
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.logoImage {
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
+
+  @media (max-width: 640px) {
+    font-size: var(--font-size-base);
+  }
+}
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.menuButton {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+.navLink {
+  text-decoration: none;
+  display: inline-block;
+}
+
+.signInButton {
+  text-decoration: none;
+  display: inline-block;
+}
+
+.button {
+  @include shimmer-effect;
+}
+
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.drawerSignIn {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+
+  .signInButton {
+    width: 100%;
+    display: block;
+
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+.drawerDivider {
+  height: 1px;
+  background: var(--glass-border-base);
+  margin: var(--spacing-md) 0;
+}
+
+.drawerNavLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+
+  .navLink {
+    width: 100%;
+
+    .button {
+      width: 100%;
+    }
+  }
+}

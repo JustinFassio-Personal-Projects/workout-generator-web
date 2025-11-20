@@ -60,3 +60,12 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }))
+
+// Mock global fetch to prevent network errors in CI
+// Individual tests can override this mock as needed
+global.fetch = vi.fn().mockResolvedValue({
+  ok: true,
+  status: 200,
+  json: async () => ({}),
+  text: async () => '',
+} as Response)

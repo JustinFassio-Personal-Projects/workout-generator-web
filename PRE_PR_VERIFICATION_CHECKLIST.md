@@ -6,19 +6,78 @@
 
 ---
 
+## 🚨 **MANDATORY PRE-PUSH CHECKLIST** ⚠️ **RUN BEFORE EVERY PUSH**
+
+**Before pushing ANY code, you MUST run these commands in order and verify ALL pass:**
+
+```bash
+# 1. Format all files and verify
+npm run format
+npm run format:check  # MUST show "All matched files use Prettier code style!"
+
+# 2. Lint and type check
+npm run lint  # MUST show "✔ No ESLint warnings or errors"
+npm run type-check  # MUST complete without errors
+
+# 3. Run all tests
+npm run test:run  # ALL tests must pass
+
+# 4. Verify test coverage (CRITICAL - MUST be ≥ 80%)
+npm run test:coverage  # MUST NOT show "ERROR: Coverage for functions"
+# Verify function coverage is ≥ 80% in output
+
+# 5. Security checks
+npm audit --audit-level=moderate  # Review moderate+ vulnerabilities
+grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"
+# MUST return empty or only show safe patterns (process.env references)
+
+# 6. Build verification
+npm run build  # MUST succeed
+
+# 7. Check for React act() warnings in test output
+# Review test output - MUST NOT have "not wrapped in act(...)" warnings
+
+# 8. Full verification (optional but recommended)
+npm run verify  # Runs all checks above
+```
+
+**⚠️ CRITICAL**: If ANY of these checks fail, DO NOT push. Fix the issue first!
+
+**Common CI Failures to Prevent:**
+
+1. ❌ Prettier formatting errors → Run `npm run format` and `npm run format:check`
+2. ❌ Test coverage below 80% → Add tests to reach ≥ 80% function coverage
+3. ❌ Secrets in code → Remove hardcoded secrets, use `process.env` only
+4. ❌ React act() warnings → Fix async test patterns using `waitFor()`
+5. ❌ Security vulnerabilities → Review `npm audit` output
+6. ❌ Build failures → Fix TypeScript/linting errors before pushing
+
+---
+
 ## 🔍 **Pre-Change Diagnostics**
 
-### **1. Project Health Assessment**
+### **1. Project Health Assessment** ⚠️ **MANDATORY BEFORE ANY CHANGES**
 
 - [ ] **Check current test status**: `npm run test:run`
+  - ⚠️ **CRITICAL**: All tests must pass before making changes
 - [ ] **Run critical path tests**: `npm run test:critical`
+  - ⚠️ **CRITICAL**: Critical path tests must pass
 - [ ] **Verify linting status**: `npm run lint`
+  - ⚠️ **CRITICAL**: Must show "✔ No ESLint warnings or errors"
 - [ ] **Check formatting**: `npm run format:check`
+  - ⚠️ **CRITICAL**: Must show "All matched files use Prettier code style!"
+  - If not, run `npm run format` and verify again
 - [ ] **TypeScript compilation**: `npm run type-check`
+  - ⚠️ **CRITICAL**: Must complete without errors
 - [ ] **Build verification**: `npm run build`
-- [ ] **Security audit**: `npm audit`
-- [ ] **Security scan for secrets**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" src/ app/ components/ features/ --exclude-dir=node_modules`
+  - ⚠️ **CRITICAL**: Production build must succeed
+- [ ] **Security audit**: `npm audit --audit-level=moderate`
+  - ⚠️ **CRITICAL**: Review moderate+ vulnerabilities - document or fix before pushing
+- [ ] **Security scan for secrets**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" src/ app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"`
+  - ⚠️ **CRITICAL**: Must return empty or only show safe patterns (process.env references)
+  - No hardcoded secrets allowed - only environment variable references
 - [ ] **Environment variable exposure check**: Verify no service keys in client-accessible code
+  - ⚠️ **CRITICAL**: Only `NEXT_PUBLIC_*` vars in client code, server-only vars in API routes
 
 ### **2. Code Quality Baseline**
 
@@ -142,8 +201,13 @@ describe('ComponentName', () => {
 - [ ] **Error states**: Test error handling and loading states
 - [ ] **Edge cases**: Test boundary conditions and error scenarios
 - [ ] **Function coverage**: Ensure all functions are tested (80% threshold required)
+  - ⚠️ **CRITICAL**: Function coverage MUST be ≥ 80% or CI will fail
+  - Run `npm run test:coverage` and verify no "ERROR: Coverage for functions" message
 - [ ] **Branch coverage**: Test all conditional paths (if/else, switch cases)
 - [ ] **Statement coverage**: Ensure all code statements are executed
+- [ ] **React act() compliance**: Ensure all async state updates in tests use proper patterns
+  - Use `waitFor()` for async assertions instead of `act()` when possible
+  - Verify test output has no "not wrapped in act(...)" warnings
 
 ### **8. Mocking Strategy**
 
@@ -175,6 +239,7 @@ describe('ComponentName', () => {
 - [ ] **Check formatting**: `npm run format:check` (verify all files are formatted)
   - ⚠️ **CRITICAL**: This check is included in `npm run verify` and CI will fail if formatting is incorrect
   - Must pass before committing - CI will reject PRs with formatting issues
+  - **MUST RUN BEFORE EVERY COMMIT**: `npm run format:check` must show "All matched files use Prettier code style!"
 - [ ] **Run full verification**: `npm run verify` (includes lint, type-check, format:check, tests, and build)
 - [ ] **Run critical path tests**: `npm run test:critical`
 - [ ] **Quick verification**: `npm run verify:quick`
@@ -184,16 +249,61 @@ describe('ComponentName', () => {
   - [ ] **Branch coverage ≥ 80%**
   - [ ] **Line coverage ≥ 80%**
   - ⚠️ **CRITICAL**: Function coverage must be ≥ 80% or CI will fail
-- [ ] **Build verification**: Confirm production build succeeds
-- [ ] **Security scan**: Check for vulnerabilities
+  - **MUST VERIFY**: Check output for "ERROR: Coverage for functions" - must not appear
+- [ ] **Build verification**: Confirm production build succeeds (`npm run build`)
+- [ ] **Security audit**: `npm audit --audit-level=moderate`
+  - ⚠️ **CRITICAL**: Review and address moderate+ vulnerabilities before pushing
+  - If vulnerabilities exist, document why they're acceptable or fix them
+- [ ] **Secret scanning**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"`
+  - ⚠️ **CRITICAL**: No hardcoded secrets allowed - only `process.env.VAR_NAME` or `NEXT_PUBLIC_*` patterns
+  - Must return empty or only show safe patterns (process.env references, NEXT*PUBLIC* vars)
+- [ ] **React act() warnings check**: Run tests and verify no act() warnings in output
+  - ⚠️ **CRITICAL**: All React state updates in tests must be properly handled
+  - If warnings appear, wrap async operations in `waitFor()` or use proper async test patterns
+  - Check test output for: "An update to ... inside a test was not wrapped in act(...)"
 
-**⚠️ CRITICAL**:
+**⚠️ CRITICAL - MANDATORY CHECKS BEFORE EVERY PUSH**:
 
-- Git pre-commit hook automatically formats files before commit (prevents CI failures)
-- Still run `npm run format` manually during development to catch issues early
-- If pre-commit hook fails, fix issues and commit again
-- **Format check is mandatory**: `npm run format:check` must pass - CI will reject PRs with formatting issues
-- **Test coverage is mandatory**: Function coverage must be ≥ 80% - CI will reject PRs below threshold
+1. **Formatting**: `npm run format:check` MUST pass - CI will fail otherwise
+2. **Test Coverage**: `npm run test:coverage` MUST show function coverage ≥ 80%
+3. **Secrets**: No hardcoded API keys, passwords, or secrets in code
+4. **Security**: `npm audit` should be reviewed for moderate+ vulnerabilities
+5. **React Tests**: No act() warnings in test output
+6. **Build**: `npm run build` MUST succeed
+
+**Pre-Push Checklist** (run these in order):
+
+```bash
+# 1. Format all files
+npm run format
+
+# 2. Verify formatting
+npm run format:check
+
+# 3. Run linting
+npm run lint
+
+# 4. Type check
+npm run type-check
+
+# 5. Run all tests
+npm run test:run
+
+# 6. Check coverage (MUST be ≥ 80% for functions)
+npm run test:coverage
+
+# 7. Security audit
+npm audit --audit-level=moderate
+
+# 8. Secret scan
+grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"
+
+# 9. Build verification
+npm run build
+
+# 10. Full verification (runs all above)
+npm run verify
+```
 
 ### **10. Manual Quality Checks**
 
@@ -282,6 +392,82 @@ export default function Page() {
 
 ---
 
+## 🚨 **Common CI Failures & How to Prevent Them**
+
+### **14.1. Prettier Formatting Errors** ⚠️ **MOST COMMON FAILURE**
+
+**Symptom**: CI shows "❌ Prettier formatting issues detected"
+
+**Prevention**:
+
+- [ ] **ALWAYS run before push**: `npm run format` then `npm run format:check`
+- [ ] **Verify output**: Must show "All matched files use Prettier code style!"
+- [ ] **If formatting fails**: Run `npm run format` again, then verify with `npm run format:check`
+
+**Fix**: `npm run format` or `npx prettier --write .`
+
+### **14.2. Test Coverage Below 80%** ⚠️ **CRITICAL FAILURE**
+
+**Symptom**: CI shows "ERROR: Coverage for functions (XX.XX%) does not meet global threshold (80%)"
+
+**Prevention**:
+
+- [ ] **ALWAYS check before push**: `npm run test:coverage`
+- [ ] **Verify function coverage**: Must be ≥ 80% (check the "% Funcs" column)
+- [ ] **If below threshold**: Add tests for uncovered functions, especially in new files
+
+**Fix**: Add tests for uncovered functions, focus on function coverage
+
+### **14.3. Secrets in Code** ⚠️ **SECURITY FAILURE**
+
+**Symptom**: CI shows "⚠️ Warning: Potential secrets found in code"
+
+**Prevention**:
+
+- [ ] **ALWAYS scan before push**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"`
+- [ ] **Must return empty**: Only `process.env.VAR_NAME` or `NEXT_PUBLIC_*` patterns allowed
+- [ ] **No hardcoded values**: Never hardcode API keys, passwords, or secrets
+
+**Fix**: Move hardcoded secrets to environment variables using `process.env.VAR_NAME`
+
+### **14.4. React act() Warnings** ⚠️ **TEST QUALITY ISSUE**
+
+**Symptom**: Test output shows "An update to ... inside a test was not wrapped in act(...)"
+
+**Prevention**:
+
+- [ ] **Review test output**: Check for act() warnings after running tests
+- [ ] **Use proper async patterns**: Use `waitFor()` for async assertions instead of `act()`
+- [ ] **Fix async state updates**: Ensure all React state updates in tests are properly handled
+
+**Fix**: Wrap async operations in `waitFor()` or use proper async test patterns
+
+### **14.5. Security Vulnerabilities** ⚠️ **SECURITY ISSUE**
+
+**Symptom**: CI shows vulnerabilities from `npm audit`
+
+**Prevention**:
+
+- [ ] **ALWAYS check before push**: `npm audit --audit-level=moderate`
+- [ ] **Review vulnerabilities**: Document why moderate+ vulnerabilities are acceptable or fix them
+- [ ] **Update dependencies**: Use `npm audit fix` when safe, or document why not updating
+
+**Fix**: Run `npm audit fix` or document why vulnerabilities are acceptable
+
+### **14.6. Build Failures** ⚠️ **CRITICAL FAILURE**
+
+**Symptom**: CI build fails with TypeScript or compilation errors
+
+**Prevention**:
+
+- [ ] **ALWAYS build before push**: `npm run build`
+- [ ] **Fix all errors**: Build must complete successfully
+- [ ] **Check TypeScript**: `npm run type-check` must pass
+
+**Fix**: Resolve TypeScript errors, linting issues, or build configuration problems
+
+---
+
 ## 🚨 **Common Issues to Avoid**
 
 ### **15. Testing Pitfalls**
@@ -347,15 +533,30 @@ export default function Page() {
 
 ## 🔄 **Post-Change Verification**
 
-### **22. Final Checks**
+### **22. Final Checks** ⚠️ **MANDATORY BEFORE PUSH**
 
 - [ ] **All tests pass**: `npm run test:run`
+  - ⚠️ **CRITICAL**: Must show "Test Files X passed" with no failures
 - [ ] **Critical path tests pass**: `npm run test:critical`
+  - ⚠️ **CRITICAL**: All critical path tests must pass
 - [ ] **No linting errors**: `npm run lint`
+  - ⚠️ **CRITICAL**: Must show "✔ No ESLint warnings or errors"
 - [ ] **Formatting is correct**: `npm run format:check`
+  - ⚠️ **CRITICAL**: Must show "All matched files use Prettier code style!"
+  - If not, run `npm run format` and verify again
 - [ ] **TypeScript compiles**: `npm run type-check`
+  - ⚠️ **CRITICAL**: Must complete without errors
 - [ ] **Build succeeds**: `npm run build`
-- [ ] **Coverage maintained**: Check coverage report
+  - ⚠️ **CRITICAL**: Production build must complete successfully
+- [ ] **Coverage maintained**: `npm run test:coverage`
+  - ⚠️ **CRITICAL**: Function coverage MUST be ≥ 80%
+  - Verify no "ERROR: Coverage for functions" message appears
+- [ ] **No secrets in code**: Secret scan returns empty or only safe patterns
+  - ⚠️ **CRITICAL**: No hardcoded API keys, passwords, or secrets
+- [ ] **Security audit reviewed**: `npm audit --audit-level=moderate`
+  - ⚠️ **CRITICAL**: Review moderate+ vulnerabilities before pushing
+- [ ] **No React act() warnings**: Test output has no act() warnings
+  - ⚠️ **CRITICAL**: All async state updates properly handled in tests
 
 ### **23. Documentation Updates**
 
@@ -430,10 +631,41 @@ npm run build
 1. **Before making changes**: Run sections 1-2 (including critical path tests)
 2. **During implementation**: Follow sections 3-8 (with critical path validation)
 3. **Before committing**: Complete sections 9-21 (mandatory critical path tests)
-4. **After changes**: Verify sections 22-25 (final critical path validation)
-5. **If issues arise**: Use section 26-27 (including critical path debugging)
+4. **Before pushing**: ⚠️ **MANDATORY** - Run section 22 Final Checks in order:
+   - `npm run format` → `npm run format:check` → `npm run lint` → `npm run type-check`
+   - `npm run test:run` → `npm run test:coverage` → `npm audit --audit-level=moderate`
+   - Secret scan → `npm run build` → `npm run verify`
+5. **After changes**: Verify sections 22-25 (final critical path validation)
+6. **If issues arise**: Use section 26-27 (including critical path debugging)
+
+**⚠️ CRITICAL PRE-PUSH CHECKLIST** (run these commands in order before EVERY push):
+
+```bash
+# 1. Format and verify
+npm run format && npm run format:check
+
+# 2. Lint and type check
+npm run lint && npm run type-check
+
+# 3. Run all tests
+npm run test:run
+
+# 4. Verify coverage (MUST be ≥ 80%)
+npm run test:coverage
+
+# 5. Security checks
+npm audit --audit-level=moderate
+grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"
+
+# 6. Build verification
+npm run build
+
+# 7. Full verification (runs all above)
+npm run verify
+```
 
 **⚠️ CRITICAL**: Always run `npm run test:critical` before any production deployment!
+**⚠️ CRITICAL**: If ANY check fails, DO NOT push - fix the issue first!
 
 ### **For Human Developers:**
 

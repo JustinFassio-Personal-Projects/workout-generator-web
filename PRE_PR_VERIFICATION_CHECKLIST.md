@@ -159,6 +159,8 @@ describe('ComponentName', () => {
 ### **9. Automated Checks** ⚠️ **MANDATORY BEFORE COMMIT**
 
 - [ ] **Format code**: `npm run format` (auto-fix formatting issues)
+  - ⚡ **AUTOMATIC**: Git pre-commit hook will auto-format files before commit (via husky)
+  - Still recommended to run manually before final commit to catch issues early
 - [ ] **Check formatting**: `npm run format:check` (verify all files are formatted)
 - [ ] **Run full verification**: `npm run verify`
 - [ ] **Run critical path tests**: `npm run test:critical`
@@ -171,7 +173,11 @@ describe('ComponentName', () => {
 - [ ] **Build verification**: Confirm production build succeeds
 - [ ] **Security scan**: Check for vulnerabilities
 
-**⚠️ CRITICAL**: Always run `npm run format` before committing new files to avoid CI failures!
+**⚠️ CRITICAL**:
+
+- Git pre-commit hook automatically formats files before commit (prevents CI failures)
+- Still run `npm run format` manually during development to catch issues early
+- If pre-commit hook fails, fix issues and commit again
 
 ### **10. Manual Quality Checks**
 

@@ -41,4 +41,3 @@ export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post }) => {
     </section>
   )
 }
-

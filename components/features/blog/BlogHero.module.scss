@@ -1,7 +1,7 @@
 .hero {
   position: relative;
   padding: var(--spacing-5xl) var(--spacing-lg);
-  padding-top: calc(var(--spacing-5xl) + 80px); /* Account for sticky navbar */
+  padding-top: calc(var(--spacing-5xl) + var(--navbar-height)); /* Account for sticky navbar */
   overflow: hidden;
   background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-gradient-end) 100%);
 

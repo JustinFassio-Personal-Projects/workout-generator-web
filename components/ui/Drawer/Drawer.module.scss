@@ -83,7 +83,9 @@
 
   span {
     display: block;
-    margin-top: -4px;
+    // Visual centering adjustment: The × symbol sits slightly high in most fonts,
+    // so we offset it down by 4px to achieve visual vertical centering within the button
+    margin-top: calc(-1 * var(--spacing-xs));
   }
 }
 

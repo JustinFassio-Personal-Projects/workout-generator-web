@@ -165,8 +165,8 @@
   animation: pulseGlow 2s ease-in-out infinite;
 }
 
-// Shimmer effect for glass morphism buttons
-.shimmer-effect {
+// Shimmer effect mixin for glass morphism buttons
+@mixin shimmer-effect {
   position: relative;
   overflow: hidden;
 
@@ -184,4 +184,9 @@
   &:hover::before {
     left: 100%;
   }
+}
+
+// Utility class for global use (if needed)
+.shimmer-effect {
+  @include shimmer-effect;
 }

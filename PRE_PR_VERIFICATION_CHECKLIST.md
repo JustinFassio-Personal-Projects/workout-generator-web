@@ -25,9 +25,11 @@
 - [ ] **Test coverage report**: `npm run test:coverage`
 - [ ] **Verify coverage thresholds**: All metrics (functions, statements, branches, lines) ≥ 80%
 - [ ] **Identify uncovered files/functions**: Focus on function coverage if below threshold
+  - ⚠️ **CRITICAL**: Function coverage must be ≥ 80% or CI will fail
 - [ ] **Check for existing linting errors**
 - [ ] **Review TypeScript strict mode compliance**
-- [ ] **Verify Prettier formatting consistency**
+- [ ] **Verify Prettier formatting consistency**: `npm run format:check`
+  - ⚠️ **CRITICAL**: Formatting check must pass or CI will fail
 
 ---
 
@@ -150,7 +152,16 @@ describe('ComponentName', () => {
 - Next.js router (useRouter, usePathname, useSearchParams)
 - AOS animations
 - Window APIs (matchMedia, ResizeObserver, IntersectionObserver)
+- Global fetch (to prevent network errors in CI)
+  - ⚠️ **CRITICAL**: Tests must mock fetch to avoid "ECONNREFUSED" errors in CI
+  - Use vi.fn() to mock fetch in test setup or individual test files
 ```
+
+**⚠️ Network Request Mocking**:
+
+- [ ] **Mock fetch globally**: Add fetch mock to `src/test/setup.ts` to prevent network errors
+- [ ] **Mock API endpoints**: Ensure all API calls are mocked in tests
+- [ ] **Avoid real network calls**: Tests should never make real HTTP requests (causes CI failures)
 
 ---
 
@@ -162,7 +173,9 @@ describe('ComponentName', () => {
   - ⚡ **AUTOMATIC**: Git pre-commit hook will auto-format files before commit (via husky)
   - Still recommended to run manually before final commit to catch issues early
 - [ ] **Check formatting**: `npm run format:check` (verify all files are formatted)
-- [ ] **Run full verification**: `npm run verify`
+  - ⚠️ **CRITICAL**: This check is included in `npm run verify` and CI will fail if formatting is incorrect
+  - Must pass before committing - CI will reject PRs with formatting issues
+- [ ] **Run full verification**: `npm run verify` (includes lint, type-check, format:check, tests, and build)
 - [ ] **Run critical path tests**: `npm run test:critical`
 - [ ] **Quick verification**: `npm run verify:quick`
 - [ ] **Test coverage check**: Ensure all thresholds are met (`npm run test:coverage`)
@@ -170,6 +183,7 @@ describe('ComponentName', () => {
   - [ ] **Statement coverage ≥ 80%**
   - [ ] **Branch coverage ≥ 80%**
   - [ ] **Line coverage ≥ 80%**
+  - ⚠️ **CRITICAL**: Function coverage must be ≥ 80% or CI will fail
 - [ ] **Build verification**: Confirm production build succeeds
 - [ ] **Security scan**: Check for vulnerabilities
 
@@ -178,6 +192,8 @@ describe('ComponentName', () => {
 - Git pre-commit hook automatically formats files before commit (prevents CI failures)
 - Still run `npm run format` manually during development to catch issues early
 - If pre-commit hook fails, fix issues and commit again
+- **Format check is mandatory**: `npm run format:check` must pass - CI will reject PRs with formatting issues
+- **Test coverage is mandatory**: Function coverage must be ≥ 80% - CI will reject PRs below threshold
 
 ### **10. Manual Quality Checks**
 

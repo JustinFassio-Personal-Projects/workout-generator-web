@@ -85,3 +85,8 @@
   --z-popover: 1060;
   --z-tooltip: 1070;
 }
+
+// Layout Components
+:root {
+  --navbar-height: 80px; // Height of sticky navbar (includes padding and content)
+}

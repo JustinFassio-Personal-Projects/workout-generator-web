@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AOSInitializer } from './AOSInitializer'
 
 export const metadata: Metadata = {
   title: {
@@ -10,5 +11,10 @@ export const metadata: Metadata = {
 }
 
 export default function BlogLayout({ children }: { children: React.ReactNode }) {
-  return <div className="blog-layout min-h-screen">{children}</div>
+  return (
+    <div className="blog-layout min-h-screen">
+      <AOSInitializer />
+      {children}
+    </div>
+  )
 }

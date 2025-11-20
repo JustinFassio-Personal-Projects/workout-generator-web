@@ -21,6 +21,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@openai/chatkit-react": "^1.2.3",
     "aos": "^3.0.0-beta.6",
     "classnames": "^2.5.1",
     "lucide-react": "^0.263.1",

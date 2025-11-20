@@ -1,0 +1,24 @@
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-3xl) 0;
+}
+
+.emptyStateText {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--spacing-xl);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { BlogPostHero } from '@/components/features/blog/BlogPostHero'
 import { BlogPostContent } from '@/components/features/blog/BlogPostContent'
 import { getPostBySlug, getAllPostSlugs } from '@/features/blog/lib/getBlogPosts'
 import { notFound } from 'next/navigation'
@@ -97,6 +98,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
+      <BlogPostHero post={post} />
       <BlogPostContent post={post} />
     </>
   )

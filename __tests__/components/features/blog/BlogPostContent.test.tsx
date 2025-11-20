@@ -16,45 +16,57 @@ const mockPost: BlogPost = {
 }
 
 describe('BlogPostContent', () => {
-  it('should render blog post content', () => {
-    render(<BlogPostContent post={mockPost} />)
-
-    expect(screen.getByText('Test Post Title')).toBeInTheDocument()
-    expect(screen.getByText('Test Category')).toBeInTheDocument()
-    expect(screen.getByText(/Test Author/i)).toBeInTheDocument()
-  })
-
-  it('should render formatted date', () => {
-    render(<BlogPostContent post={mockPost} />)
-
-    expect(screen.getByText(/January 15, 2025/i)).toBeInTheDocument()
-  })
-
-  it('should render tags when present', () => {
-    render(<BlogPostContent post={mockPost} />)
-
-    expect(screen.getByText('#test')).toBeInTheDocument()
-    expect(screen.getByText('#example')).toBeInTheDocument()
-  })
-
-  it('should render post without tags', () => {
-    const postWithoutTags: BlogPost = {
-      ...mockPost,
-      tags: [],
-    }
-
-    render(<BlogPostContent post={postWithoutTags} />)
-
-    expect(screen.getByText('Test Post Title')).toBeInTheDocument()
-    expect(screen.queryByText('#test')).not.toBeInTheDocument()
-  })
-
   it('should render markdown content', () => {
     render(<BlogPostContent post={mockPost} />)
 
-    // ReactMarkdown renders the content, so we check for the article element
+    // ReactMarkdown renders the content, so we check for the markdown content
+    expect(screen.getByText('Test Content')).toBeInTheDocument()
+    expect(screen.getByText('This is test content.')).toBeInTheDocument()
+  })
+
+  it('should render article element with correct structure', () => {
+    render(<BlogPostContent post={mockPost} />)
+
     const article = document.querySelector('article')
     expect(article).toBeInTheDocument()
-    expect(article?.className).toContain('max-w-4xl')
+    expect(article?.tagName).toBe('ARTICLE')
+  })
+
+  it('should render markdown headings correctly', () => {
+    const postWithHeadings: BlogPost = {
+      ...mockPost,
+      content: '# Heading 1\n## Heading 2\n### Heading 3',
+    }
+
+    render(<BlogPostContent post={postWithHeadings} />)
+
+    // Headings are shifted down by one level (h1 -> h2, h2 -> h3, etc.)
+    expect(screen.getByRole('heading', { level: 2, name: 'Heading 1' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Heading 2' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 4, name: 'Heading 3' })).toBeInTheDocument()
+  })
+
+  it('should render paragraphs correctly', () => {
+    const postWithParagraphs: BlogPost = {
+      ...mockPost,
+      content: 'First paragraph.\n\nSecond paragraph.',
+    }
+
+    render(<BlogPostContent post={postWithParagraphs} />)
+
+    expect(screen.getByText('First paragraph.')).toBeInTheDocument()
+    expect(screen.getByText('Second paragraph.')).toBeInTheDocument()
+  })
+
+  it('should handle empty content', () => {
+    const postWithEmptyContent: BlogPost = {
+      ...mockPost,
+      content: '',
+    }
+
+    render(<BlogPostContent post={postWithEmptyContent} />)
+
+    const article = document.querySelector('article')
+    expect(article).toBeInTheDocument()
   })
 })

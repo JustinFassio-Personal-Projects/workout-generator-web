@@ -1,6 +1,7 @@
 import React from 'react'
 import { BlogPostCard } from './BlogPostCard'
 import { BlogPost } from '@/features/blog/types'
+import styles from './BlogPostList.module.scss'
 
 interface BlogPostListProps {
   posts: BlogPost[]
@@ -9,14 +10,14 @@ interface BlogPostListProps {
 export const BlogPostList: React.FC<BlogPostListProps> = ({ posts }) => {
   if (posts.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">No blog posts found.</p>
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateText}>No blog posts found.</p>
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className={styles.grid}>
       {posts.map(post => (
         <BlogPostCard key={post.id} post={post} />
       ))}

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { BlogHero } from '@/components/features/blog/BlogHero'
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
 import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
+import styles from './blog-page.module.scss'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
 
@@ -78,14 +80,8 @@ export default async function BlogPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
       />
-      <div className="container mx-auto px-4 py-16">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-gray-900">Blog</h1>
-          <p className="text-lg text-gray-600">
-            Discover fitness tips, workout strategies, and expert advice to help you achieve your
-            goals.
-          </p>
-        </div>
+      <BlogHero />
+      <div className={styles.blogContainer}>
         <BlogPostList posts={posts} />
       </div>
     </>

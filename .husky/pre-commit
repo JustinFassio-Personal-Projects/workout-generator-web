@@ -1,0 +1,5 @@
+# Auto-format code before commit
+npm run format
+
+# Stage the formatted files
+git add -A

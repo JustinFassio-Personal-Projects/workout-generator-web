@@ -17,7 +17,8 @@
     "test:critical": "vitest run --config vitest.config.critical.ts",
     "test:ui": "vitest --ui",
     "verify": "npm run lint && npm run type-check && npm run test:run && npm run build",
-    "verify:quick": "npm run lint && npm run type-check"
+    "verify:quick": "npm run lint && npm run type-check",
+    "prepare": "husky"
   },
   "dependencies": {
     "aos": "^3.0.0-beta.6",
@@ -44,6 +45,7 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.0",
     "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.7",
     "jsdom": "^23.0.1",
     "postcss": "^8.4.27",
     "prettier": "^3.2.4",

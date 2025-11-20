@@ -69,4 +69,21 @@ describe('BlogPostContent', () => {
     const article = document.querySelector('article')
     expect(article).toBeInTheDocument()
   })
+
+  it('should render all heading levels correctly', () => {
+    const postWithAllHeadings: BlogPost = {
+      ...mockPost,
+      content: '# H1\n## H2\n### H3\n#### H4\n##### H5\n###### H6',
+    }
+
+    render(<BlogPostContent post={postWithAllHeadings} />)
+
+    // All headings are shifted down by one level
+    expect(screen.getByRole('heading', { level: 2, name: 'H1' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'H2' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 4, name: 'H3' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 5, name: 'H4' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 6, name: 'H5' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 6, name: 'H6' })).toBeInTheDocument()
+  })
 })

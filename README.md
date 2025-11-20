@@ -53,7 +53,7 @@ NEXT_PUBLIC_CHATKIT_WORKFLOW_ID=wf_691f16921c608190858a647f4c8459b60da29e275dd77
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-**Note**: The ChatWidget component will not display if `NEXT_PUBLIC_CHATKIT_CLIENT_TOKEN` is not set. You can get your credentials from [ChatKit Studio](https://widgets.chatkit.studio).
+**Note**: The ChatWidget component will not display if `NEXT_PUBLIC_CHATKIT_WORKFLOW_ID` is not set. You can get your credentials from [ChatKit Studio](https://widgets.chatkit.studio).
 
 3. Run the development server:
 

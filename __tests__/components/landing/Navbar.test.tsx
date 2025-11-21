@@ -118,4 +118,38 @@ describe('Navbar', () => {
     // Logo text should always be visible
     expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
   })
+
+  it('should handle logo image error event', () => {
+    render(<Navbar />)
+    const logoImage = document.querySelector('img[alt=""]')
+    expect(logoImage).toBeInTheDocument()
+
+    // Simulate error event
+    if (logoImage) {
+      const errorEvent = new Event('error')
+      logoImage.dispatchEvent(errorEvent)
+    }
+
+    // Logo text should still be visible
+    expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+  })
+
+  it('should handle logo image load event with zero width', () => {
+    render(<Navbar />)
+    const logoImage = document.querySelector('img[alt=""]') as HTMLImageElement
+    expect(logoImage).toBeInTheDocument()
+
+    // Simulate load event with zero width
+    if (logoImage) {
+      Object.defineProperty(logoImage, 'naturalWidth', {
+        value: 0,
+        writable: true,
+      })
+      const loadEvent = new Event('load')
+      logoImage.dispatchEvent(loadEvent)
+    }
+
+    // Logo text should still be visible
+    expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+  })
 })

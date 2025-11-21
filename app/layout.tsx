@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import 'aos/dist/aos.css'
 import './globals.scss'
 import { Navbar } from '@/components/landing/Navbar/Navbar'
+import { ChatWidget } from '@/components/ui/ChatWidget/ChatWidget'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -62,8 +64,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
+        {/* ChatKit web component script - required for ChatKit to work */}
+        <Script
+          src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
+          strategy="afterInteractive"
+        />
         <Navbar />
         {children}
+        <ChatWidget />
       </body>
     </html>
   )

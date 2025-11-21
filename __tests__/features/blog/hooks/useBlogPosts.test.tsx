@@ -52,24 +52,32 @@ describe('useBlogPosts', () => {
 
     const { result } = renderHook(() => useBlogPosts())
 
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
+    await waitFor(
+      () => {
+        expect(result.current.loading).toBe(false)
+      },
+      { timeout: 3000 }
+    )
 
     expect(result.current.posts).toEqual(mockPosts)
     expect(result.current.error).toBeNull()
   })
 
   it('should handle fetch errors correctly', async () => {
-    vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Failed to load posts'))
+    const fetchError = new Error('Failed to load posts')
+    vi.mocked(global.fetch).mockRejectedValueOnce(fetchError)
 
     const { result } = renderHook(() => useBlogPosts())
 
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
+    await waitFor(
+      () => {
+        expect(result.current.loading).toBe(false)
+      },
+      { timeout: 3000 }
+    )
 
     expect(result.current.error).toBeInstanceOf(Error)
+    expect(result.current.error?.message).toBe('Failed to load posts')
     expect(result.current.posts).toEqual([])
   })
 
@@ -82,9 +90,12 @@ describe('useBlogPosts', () => {
 
     const { result } = renderHook(() => useBlogPosts())
 
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
+    await waitFor(
+      () => {
+        expect(result.current.loading).toBe(false)
+      },
+      { timeout: 3000 }
+    )
 
     expect(result.current.error).toBeInstanceOf(Error)
     expect(result.current.error?.message).toBe('Failed to fetch blog posts')

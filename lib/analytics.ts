@@ -145,7 +145,7 @@ export const analytics = {
 
   // Chat widget interactions
   trackChatOpen: () => {
-    trackEvent('chat_open', {})
+    trackEvent('chat_open')
   },
 
   trackChatMessage: (messageLength: number) => {

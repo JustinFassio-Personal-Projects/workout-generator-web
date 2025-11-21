@@ -235,10 +235,18 @@
   background: var(--glass-bg-base);
   border-radius: var(--radius-md);
   border: 1px solid var(--glass-border-base);
+  flex-wrap: wrap;
 }
 
 .checkmark {
   color: var(--color-accent);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
+}
+
+.comingSoon {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-left: var(--spacing-xs);
 }

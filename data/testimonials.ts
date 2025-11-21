@@ -3,88 +3,51 @@ export interface Testimonial {
   name: string
   role: string
   company?: string
-  avatar: string
+  avatar?: string // Optional field, will be implemented later
   quote: string
+  title?: string // Optional title/headline for the testimonial
   rating: number
 }
 
 export const testimonials: Testimonial[] = [
   {
     id: '1',
-    name: 'Sarah Johnson',
-    role: 'Fitness Coach',
-    company: 'FitLife Studio',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    name: 'Don Murphy',
+    role: "Gold's Gym",
+    title: 'Transformational Technology',
+    // avatar: '', // Commented out for now, will add later
     quote:
-      'This platform has completely transformed how I create workout plans for my clients. The variety and customization options are incredible!',
+      'Without a doubt, this is the future of how workouts should be created for people of all fitness levels.',
     rating: 5,
   },
   {
     id: '2',
-    name: 'Michael Chen',
-    role: 'Personal Trainer',
-    company: 'Elite Fitness',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
-    quote:
-      'As a trainer, I love how easy it is to generate personalized workouts. My clients are seeing amazing results!',
+    name: 'Larry King',
+    role: 'Founder and CEO',
+    company: 'Shapenet',
+    title: 'This is a Home Run',
+    // avatar: '', // Commented out for now, will add later
+    quote: 'People should see this as an amazing way to get completely customized workout guidance',
     rating: 5,
   },
   {
     id: '3',
-    name: 'Emily Rodriguez',
-    role: 'Yoga Instructor',
-    company: 'Zen Wellness',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emily',
-    quote:
-      'The flexibility to create workouts for different fitness levels makes this tool invaluable. Highly recommend!',
+    name: 'Rick Eff',
+    role: 'Owner',
+    company: 'Sweat PT',
+    title: 'The New Standard',
+    // avatar: '', // Commented out for now, will add later
+    quote: 'The future of the fitness industry is bright when you can deliver workouts like this.',
     rating: 5,
   },
   {
     id: '4',
-    name: 'David Thompson',
-    role: 'Gym Owner',
-    company: 'PowerHouse Gym',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David',
+    name: 'Jamie Johnson',
+    role: 'Indigo Yoga',
+    title: 'Really Impressed',
+    // avatar: '', // Commented out for now, will add later
     quote:
-      'We use this for all our members. The interface is clean, and the workouts are always fresh and challenging.',
-    rating: 5,
-  },
-  {
-    id: '5',
-    name: 'Jessica Martinez',
-    role: 'Fitness Enthusiast',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica',
-    quote:
-      "I've tried many workout apps, but this one stands out. The variety keeps me motivated and engaged every day.",
-    rating: 5,
-  },
-  {
-    id: '6',
-    name: 'Robert Kim',
-    role: 'Strength Coach',
-    company: 'Iron Forge Training',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Robert',
-    quote:
-      'The ability to customize workouts based on equipment and goals is a game-changer. My athletes love it!',
-    rating: 5,
-  },
-  {
-    id: '7',
-    name: 'Amanda White',
-    role: 'Wellness Consultant',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Amanda',
-    quote:
-      'This platform makes fitness accessible to everyone. The guided approach helps beginners feel confident.',
-    rating: 5,
-  },
-  {
-    id: '8',
-    name: 'James Wilson',
-    role: 'CrossFit Coach',
-    company: 'BoxFit Academy',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James',
-    quote:
-      'The workout generator saves me hours every week. I can focus on coaching instead of planning.',
+      'Unfortunately, we drop the ball too often on great workouts. This product helps resolve that.',
     rating: 5,
   },
 ]

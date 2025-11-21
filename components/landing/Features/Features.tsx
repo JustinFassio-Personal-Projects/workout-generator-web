@@ -26,6 +26,7 @@ export const Features: React.FC = () => {
               title={feature.title}
               description={feature.description}
               icon={feature.icon}
+              comingSoon={feature.comingSoon}
               gradientColors={feature.gradientColors}
               index={index}
             />

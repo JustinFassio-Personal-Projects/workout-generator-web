@@ -87,6 +87,12 @@
 .navLink {
   text-decoration: none;
   display: inline-block;
+  cursor: pointer;
+
+  // Ensure the link is clickable and handles navigation
+  button {
+    pointer-events: none; // Let the link handle clicks, not the button
+  }
 }
 
 .signInButton {

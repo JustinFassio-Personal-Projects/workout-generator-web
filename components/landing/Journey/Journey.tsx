@@ -27,6 +27,7 @@ export const Journey: React.FC = () => {
               description={step.description}
               icon={step.icon}
               features={step.features}
+              comingSoonFeatures={step.comingSoonFeatures}
               accentColor={step.accentColor}
               index={index}
               isLast={index === journeySteps.length - 1}

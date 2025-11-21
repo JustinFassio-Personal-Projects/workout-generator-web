@@ -26,12 +26,12 @@ export const Navbar: React.FC = () => {
   const navLinks = (
     <>
       <Link href="/" className={styles.navLink} onClick={handleNavClick}>
-        <Button variant="secondary" size="md" className={styles.button}>
+        <Button variant="secondary" size="md" className={styles.button} type="button">
           Home
         </Button>
       </Link>
       <Link href="/blog" className={styles.navLink} onClick={handleNavClick}>
-        <Button variant="secondary" size="md" className={styles.button}>
+        <Button variant="secondary" size="md" className={styles.button} type="button">
           Blog
         </Button>
       </Link>

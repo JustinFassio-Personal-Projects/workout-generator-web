@@ -11,6 +11,7 @@ export interface JourneyStepCardProps {
   description: string
   icon: LucideIcon
   features: string[]
+  comingSoonFeatures?: string[]
   accentColor: string
   index: number
   isLast: boolean
@@ -22,6 +23,7 @@ export const JourneyStepCard: React.FC<JourneyStepCardProps> = ({
   description,
   icon: Icon,
   features,
+  comingSoonFeatures = [],
   accentColor,
   index,
   isLast,
@@ -62,12 +64,16 @@ export const JourneyStepCard: React.FC<JourneyStepCardProps> = ({
           className={`${styles.stepFeatures} ${isExpanded ? styles['stepFeatures--expanded'] : ''}`}
         >
           <ul className={styles.featuresList}>
-            {features.map((feature, idx) => (
-              <li key={idx} className={styles.featureItem}>
-                <span className={styles.checkmark}>✓</span>
-                {feature}
-              </li>
-            ))}
+            {features.map((feature, idx) => {
+              const isComingSoon = comingSoonFeatures.includes(feature)
+              return (
+                <li key={idx} className={styles.featureItem}>
+                  <span className={styles.checkmark}>✓</span>
+                  <span>{feature}</span>
+                  {isComingSoon && <span className={styles.comingSoon}>(Coming Soon)</span>}
+                </li>
+              )
+            })}
           </ul>
         </div>
       </Card>

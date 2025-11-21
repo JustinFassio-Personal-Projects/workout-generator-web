@@ -6,6 +6,7 @@ export interface Feature {
   title: string
   description: string
   icon: LucideIcon
+  comingSoon?: boolean
   gradientColors: {
     from: string
     to: string
@@ -30,6 +31,7 @@ export const features: Feature[] = [
     description:
       'Set and track your fitness goals with detailed analytics and progress reports to keep you motivated.',
     icon: Target,
+    comingSoon: true,
     gradientColors: {
       from: '#22c55e',
       to: '#16a34a',
@@ -41,6 +43,7 @@ export const features: Feature[] = [
     description:
       'Join a thriving community of fitness enthusiasts sharing workouts, tips, and celebrating achievements together.',
     icon: Users,
+    comingSoon: true,
     gradientColors: {
       from: '#16a34a',
       to: '#15803d',
@@ -52,6 +55,7 @@ export const features: Feature[] = [
     description:
       'Visualize your fitness journey with comprehensive charts and insights that show your improvement over time.',
     icon: BarChart3,
+    comingSoon: true,
     gradientColors: {
       from: '#84cc16',
       to: '#65a30d',

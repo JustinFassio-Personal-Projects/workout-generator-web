@@ -26,18 +26,11 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
         <h3 className={styles.planName}>{plan.name}</h3>
         <p className={styles.description}>{plan.description}</p>
         <div className={styles.price}>
-          {plan.originalPrice ? (
-            <div className={styles.priceWithOriginal}>
-              <span className={styles.originalPrice}>${plan.originalPrice}</span>
-              <span className={styles.priceAmount}>${plan.price}</span>
-              <span className={styles.pricePeriod}>/{plan.period}</span>
-            </div>
-          ) : (
-            <>
-              <span className={styles.priceAmount}>${plan.price}</span>
-              <span className={styles.pricePeriod}>/{plan.period}</span>
-            </>
+          {plan.originalPrice && (
+            <span className={styles.originalPrice}>${plan.originalPrice}</span>
           )}
+          <span className={styles.priceAmount}>${plan.price}</span>
+          <span className={styles.pricePeriod}>/{plan.period}</span>
         </div>
       </div>
       <ul className={styles.featuresList}>

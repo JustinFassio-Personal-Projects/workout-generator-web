@@ -3,7 +3,7 @@ export interface Testimonial {
   name: string
   role: string
   company?: string
-  avatar?: string // Commented out for now, will add later
+  avatar?: string // Optional field, will be implemented later
   quote: string
   title?: string // Optional title/headline for the testimonial
   rating: number

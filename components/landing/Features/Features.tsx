@@ -3,11 +3,13 @@
 import React from 'react'
 import { features } from '@/data/features'
 import { FeatureCard } from './FeatureCard'
+import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import styles from './Features.module.scss'
 
 export const Features: React.FC = () => {
   return (
     <section id="features" className={styles.features}>
+      <LogoWatermark position="top-left" opacity={0.05} size={350} rotation={10} />
       <div className={styles.container}>
         <div className={styles.header} data-aos="fade-up">
           <h2 className={styles.title}>

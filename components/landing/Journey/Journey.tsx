@@ -3,11 +3,13 @@
 import React from 'react'
 import { journeySteps } from '@/data/journey'
 import { JourneyStepCard } from './JourneyStepCard'
+import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import styles from './Journey.module.scss'
 
 export const Journey: React.FC = () => {
   return (
     <section id="journey" className={styles.journey}>
+      <LogoWatermark position="bottom-left" opacity={0.05} size={300} rotation={-10} />
       <div className={styles.container}>
         <div className={styles.header} data-aos="fade-up">
           <h2 className={styles.title}>

@@ -5,11 +5,13 @@ import { ArrowRight, Play } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { Card } from '@/components/ui/Card/Card'
 import { FloatingIcons } from './FloatingIcons'
+import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import styles from './Hero.module.scss'
 
 export const Hero: React.FC = () => {
   return (
     <section id="hero" className={styles.hero}>
+      <LogoWatermark position="bottom-right" opacity={0.06} size={400} rotation={-15} />
       <FloatingIcons />
       <div className={styles.heroContent}>
         <div className={styles.heroText} data-aos="fade-up">

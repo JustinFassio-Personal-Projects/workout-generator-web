@@ -59,13 +59,15 @@ export const Navbar: React.FC = () => {
           {/* Logo */}
           <Link href="/" className={styles.logoLink}>
             <div className={styles.logo}>
-              {!logoError && (
+              {!logoError ? (
                 <Image
                   src="/logo.png"
-                  alt=""
-                  width={32}
-                  height={32}
+                  alt="AI Workout Generator"
+                  width={80}
+                  height={80}
                   className={styles.logoImage}
+                  unoptimized
+                  style={{ backgroundColor: 'transparent' }}
                   onError={() => setLogoError(true)}
                   onLoad={e => {
                     const img = e.currentTarget
@@ -74,8 +76,9 @@ export const Navbar: React.FC = () => {
                     }
                   }}
                 />
+              ) : (
+                <span className={styles.logoText}>AI Workout Generator</span>
               )}
-              <span className={styles.logoText}>AI Workout Generator</span>
             </div>
           </Link>
 

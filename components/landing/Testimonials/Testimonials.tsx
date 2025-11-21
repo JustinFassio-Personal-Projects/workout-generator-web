@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { testimonials } from '@/data/testimonials'
 import { TestimonialCard } from './TestimonialCard'
+import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import styles from './Testimonials.module.scss'
 
 export const Testimonials: React.FC = () => {
@@ -56,6 +57,7 @@ export const Testimonials: React.FC = () => {
 
   return (
     <section id="testimonials" className={styles.testimonials}>
+      <LogoWatermark position="center" opacity={0.04} size={450} rotation={5} />
       <div className={styles.container}>
         <div className={styles.header} data-aos="fade-up">
           <h2 className={styles.title}>

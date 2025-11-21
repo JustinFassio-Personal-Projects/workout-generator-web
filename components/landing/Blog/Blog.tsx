@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { BlogPostCard } from '@/components/features/blog/BlogPostCard'
 import { useBlogPosts } from '@/features/blog/hooks/useBlogPosts'
+import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import styles from './Blog.module.scss'
 
 export const Blog: React.FC = () => {
@@ -24,6 +25,7 @@ export const Blog: React.FC = () => {
 
   return (
     <section id="blog" className={styles.blog}>
+      <LogoWatermark position="bottom-right" opacity={0.04} size={280} rotation={-8} />
       <div className={styles.container}>
         <div className={styles.header} data-aos="fade-up">
           <h2 className={styles.title}>

@@ -25,7 +25,9 @@ export async function generateMetadata({
   }
 
   const publishedTime = new Date(post.date).toISOString()
+  const modifiedTime = post.dateModified ? new Date(post.dateModified).toISOString() : publishedTime
   const url = `${baseUrl}/blog/${post.slug}`
+  const postImage = post.image ? `${baseUrl}${post.image}` : `${baseUrl}/og-image.jpg`
 
   return {
     title: `${post.title} | Blog - Workout Generator`,
@@ -38,14 +40,24 @@ export async function generateMetadata({
       type: 'article',
       url,
       publishedTime,
+      modifiedTime,
       authors: [post.author],
       section: post.category,
       tags: post.tags,
+      images: [
+        {
+          url: postImage,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
+      images: [postImage],
     },
     alternates: {
       canonical: url,
@@ -61,7 +73,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   }
 
   const publishedTime = new Date(post.date).toISOString()
-  const modifiedTime = publishedTime // Assuming no modification tracking yet
+  const modifiedTime = post.dateModified ? new Date(post.dateModified).toISOString() : publishedTime
+  const postImage = post.image ? `${baseUrl}${post.image}` : `${baseUrl}/og-image.jpg`
+
+  // Calculate word count from content (approximate)
+  const wordCount = post.content.split(/\s+/).filter(word => word.length > 0).length
 
   // Article structured data (JSON-LD)
   const articleSchema = {
@@ -69,9 +85,10 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
-    image: `${baseUrl}/og-image.jpg`, // Default OG image, can be customized per post
+    image: postImage,
     datePublished: publishedTime,
     dateModified: modifiedTime,
+    wordCount,
     author: {
       '@type': 'Person',
       name: post.author,

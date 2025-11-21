@@ -37,6 +37,7 @@ export const LogoWatermark: React.FC<LogoWatermarkProps> = ({
         opacity,
         transform: transformStyle,
       }}
+      aria-hidden="true"
     >
       <Image
         src="/logo.png"

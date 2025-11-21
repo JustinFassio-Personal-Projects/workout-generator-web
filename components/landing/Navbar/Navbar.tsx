@@ -63,8 +63,8 @@ export const Navbar: React.FC = () => {
                 <Image
                   src="/logo.png"
                   alt="AI Workout Generator"
-                  width={144}
-                  height={144}
+                  width={80}
+                  height={80}
                   className={styles.logoImage}
                   unoptimized
                   style={{ backgroundColor: 'transparent' }}

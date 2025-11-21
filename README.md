@@ -51,9 +51,21 @@ NEXT_PUBLIC_CHATKIT_WORKFLOW_ID=wf_691f16921c608190858a647f4c8459b60da29e275dd77
 # OpenAI API Configuration (required for ChatKit)
 # Get your API key from https://platform.openai.com/api-keys
 OPENAI_API_KEY=your_openai_api_key_here
+
+# Google Analytics & Tag Manager (optional)
+# Get your GA4 Measurement ID from https://analytics.google.com
+# Example: NEXT_PUBLIC_GA_ID=G-0ZT0ZEMBX5
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+# Get your GTM Container ID from https://tagmanager.google.com
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
+# Get your verification code from Google Search Console (optional)
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=xxxxx
 ```
 
-**Note**: The ChatWidget component will not display if `NEXT_PUBLIC_CHATKIT_WORKFLOW_ID` is not set. You can get your credentials from [ChatKit Studio](https://widgets.chatkit.studio).
+**Note**:
+
+- The ChatWidget component will not display if `NEXT_PUBLIC_CHATKIT_WORKFLOW_ID` is not set. You can get your credentials from [ChatKit Studio](https://widgets.chatkit.studio).
+- Google Analytics and Tag Manager are optional. If not configured, the site will function normally without analytics tracking.
 
 3. Run the development server:
 

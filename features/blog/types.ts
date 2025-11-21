@@ -8,6 +8,8 @@ export interface BlogPost {
   author: string
   category: string
   tags: string[]
+  image?: string
+  dateModified?: string
 }
 
 export interface BlogCategory {

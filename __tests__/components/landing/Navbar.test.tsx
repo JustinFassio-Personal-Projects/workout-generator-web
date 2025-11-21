@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Navbar } from '@/components/landing/Navbar/Navbar'
 
@@ -18,7 +18,9 @@ describe('Navbar', () => {
 
   it('should render navbar with logo', () => {
     render(<Navbar />)
-    expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+    // Logo image should be visible when logo loads successfully
+    const logoImage = screen.getByAltText('AI Workout Generator')
+    expect(logoImage).toBeInTheDocument()
   })
 
   it('should render navigation links', () => {
@@ -113,43 +115,65 @@ describe('Navbar', () => {
     expect(nav).toBeInTheDocument()
   })
 
-  it('should handle logo error and show fallback text', () => {
+  it('should handle logo error and show fallback text', async () => {
     render(<Navbar />)
-    // Logo text should always be visible
-    expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
-  })
-
-  it('should handle logo image error event', () => {
-    render(<Navbar />)
-    const logoImage = document.querySelector('img[alt=""]')
+    // Initially logo image should be visible
+    const logoImage = screen.getByAltText('AI Workout Generator')
     expect(logoImage).toBeInTheDocument()
 
     // Simulate error event
-    if (logoImage) {
-      const errorEvent = new Event('error')
-      logoImage.dispatchEvent(errorEvent)
-    }
+    const errorEvent = new Event('error')
+    logoImage.dispatchEvent(errorEvent)
 
-    // Logo text should still be visible
-    expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+    // After error, text should be visible instead
+    await waitFor(() => {
+      expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+    })
+    // Logo image should no longer be in document
+    await waitFor(() => {
+      expect(screen.queryByAltText('AI Workout Generator')).not.toBeInTheDocument()
+    })
   })
 
-  it('should handle logo image load event with zero width', () => {
+  it('should handle logo image error event', async () => {
     render(<Navbar />)
-    const logoImage = document.querySelector('img[alt=""]') as HTMLImageElement
+    const logoImage = screen.getByAltText('AI Workout Generator')
+    expect(logoImage).toBeInTheDocument()
+
+    // Simulate error event
+    const errorEvent = new Event('error')
+    logoImage.dispatchEvent(errorEvent)
+
+    // After error, text should be visible instead
+    await waitFor(() => {
+      expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+    })
+    // Logo image should no longer be in document
+    await waitFor(() => {
+      expect(screen.queryByAltText('AI Workout Generator')).not.toBeInTheDocument()
+    })
+  })
+
+  it('should handle logo image load event with zero width', async () => {
+    render(<Navbar />)
+    const logoImage = screen.getByAltText('AI Workout Generator') as HTMLImageElement
     expect(logoImage).toBeInTheDocument()
 
     // Simulate load event with zero width
-    if (logoImage) {
-      Object.defineProperty(logoImage, 'naturalWidth', {
-        value: 0,
-        writable: true,
-      })
-      const loadEvent = new Event('load')
-      logoImage.dispatchEvent(loadEvent)
-    }
+    Object.defineProperty(logoImage, 'naturalWidth', {
+      value: 0,
+      writable: true,
+    })
+    const loadEvent = new Event('load')
+    logoImage.dispatchEvent(loadEvent)
 
-    // Logo text should still be visible
-    expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+    // After zero width detected, text should be visible instead
+    await waitFor(() => {
+      expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+    })
+    // Logo image should no longer be in document
+    await waitFor(() => {
+      expect(screen.queryByAltText('AI Workout Generator')).not.toBeInTheDocument()
+    })
   })
 })

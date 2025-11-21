@@ -1,0 +1,39 @@
+.watermark {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+  overflow: hidden;
+
+  &--top-left {
+    top: var(--spacing-2xl);
+    left: var(--spacing-2xl);
+  }
+
+  &--top-right {
+    top: var(--spacing-2xl);
+    right: var(--spacing-2xl);
+  }
+
+  &--bottom-left {
+    bottom: var(--spacing-2xl);
+    left: var(--spacing-2xl);
+  }
+
+  &--bottom-right {
+    bottom: var(--spacing-2xl);
+    right: var(--spacing-2xl);
+  }
+
+  &--center {
+    top: 50%;
+    left: 50%;
+  }
+}
+
+.watermarkImage {
+  display: block;
+  object-fit: contain;
+  filter: blur(0.5px);
+  mix-blend-mode: overlay;
+}

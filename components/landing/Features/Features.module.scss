@@ -117,6 +117,14 @@
   margin: 0;
 }
 
+.comingSoon {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: var(--spacing-xs);
+  margin-bottom: 0;
+}
+
 .featureDescription {
   font-size: var(--font-size-base);
   color: var(--text-secondary);

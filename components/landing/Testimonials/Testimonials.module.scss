@@ -163,6 +163,14 @@
   fill: currentColor;
 }
 
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  line-height: var(--line-height-tight);
+}
+
 .quote {
   font-size: var(--font-size-lg);
   color: var(--text-secondary);

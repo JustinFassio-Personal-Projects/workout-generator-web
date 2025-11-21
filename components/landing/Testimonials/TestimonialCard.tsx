@@ -19,15 +19,19 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial })
           <Star key={i} size={16} fill="currentColor" className={styles.star} />
         ))}
       </div>
+      {testimonial.title && <h4 className={styles.title}>{testimonial.title}</h4>}
       <p className={styles.quote}>&ldquo;{testimonial.quote}&rdquo;</p>
       <div className={styles.author}>
-        <Image
-          src={testimonial.avatar}
-          alt={testimonial.name}
-          width={48}
-          height={48}
-          className={styles.avatar}
-        />
+        {/* Avatar commented out for now, will add later */}
+        {/* {testimonial.avatar && (
+          <Image
+            src={testimonial.avatar}
+            alt={testimonial.name}
+            width={48}
+            height={48}
+            className={styles.avatar}
+          />
+        )} */}
         <div className={styles.authorInfo}>
           <div className={styles.name}>{testimonial.name}</div>
           <div className={styles.role}>

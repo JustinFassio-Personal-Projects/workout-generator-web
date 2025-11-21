@@ -110,6 +110,7 @@
   display: flex;
   gap: var(--spacing-lg);
   flex-wrap: wrap;
+  align-items: flex-start;
 
   @media (max-width: 480px) {
     flex-direction: column;
@@ -119,6 +120,24 @@
       width: 100%;
     }
   }
+}
+
+.ctaLink {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.demoButtonWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.comingSoon {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  font-style: italic;
 }
 
 .heroCard {

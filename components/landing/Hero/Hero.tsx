@@ -22,37 +22,33 @@ export const Hero: React.FC = () => {
             equipment. Start your transformation today.
           </p>
           <div className={styles.heroActions}>
-            <Button
-              variant="primary"
-              size="lg"
-              icon={ArrowRight}
-              iconPosition="right"
+            <a
+              href="https://builder.fitcopilot.ai"
+              className={styles.ctaLink}
               data-aos="fade-up"
               data-aos-delay="100"
             >
-              Get Started Free
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              icon={Play}
-              iconPosition="left"
-              data-aos="fade-up"
-              data-aos-delay="200"
-            >
-              Watch Demo
-            </Button>
+              <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
+                Get Started Free
+              </Button>
+            </a>
+            <div className={styles.demoButtonWrapper} data-aos="fade-up" data-aos-delay="200">
+              <Button variant="secondary" size="lg" icon={Play} iconPosition="left">
+                Watch Demo
+              </Button>
+              <span className={styles.comingSoon}>(coming soon)</span>
+            </div>
           </div>
         </div>
         <div className={styles.heroCard} data-aos="fade-up" data-aos-delay="300">
           <Card variant="strong" hover={false}>
             <div className={styles.cardContent}>
               <div className={styles.stat}>
-                <span className={styles.statNumber}>50K+</span>
-                <span className={styles.statLabel}>Active Users</span>
+                <span className={styles.statNumber}>8K+</span>
+                <span className={styles.statLabel}>Users</span>
               </div>
               <div className={styles.stat}>
-                <span className={styles.statNumber}>1M+</span>
+                <span className={styles.statNumber}>50K+</span>
                 <span className={styles.statLabel}>Workouts Generated</span>
               </div>
               <div className={styles.stat}>

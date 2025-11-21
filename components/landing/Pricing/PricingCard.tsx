@@ -26,8 +26,18 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
         <h3 className={styles.planName}>{plan.name}</h3>
         <p className={styles.description}>{plan.description}</p>
         <div className={styles.price}>
-          <span className={styles.priceAmount}>${plan.price}</span>
-          <span className={styles.pricePeriod}>/{plan.period}</span>
+          {plan.originalPrice ? (
+            <div className={styles.priceWithOriginal}>
+              <span className={styles.originalPrice}>${plan.originalPrice}</span>
+              <span className={styles.priceAmount}>${plan.price}</span>
+              <span className={styles.pricePeriod}>/{plan.period}</span>
+            </div>
+          ) : (
+            <>
+              <span className={styles.priceAmount}>${plan.price}</span>
+              <span className={styles.pricePeriod}>/{plan.period}</span>
+            </>
+          )}
         </div>
       </div>
       <ul className={styles.featuresList}>
@@ -39,9 +49,17 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
         ))}
       </ul>
       <div className={styles.footer}>
-        <Button variant={plan.ctaVariant} size="lg" className={styles.ctaButton}>
-          {plan.ctaText}
-        </Button>
+        {plan.ctaLink ? (
+          <a href={plan.ctaLink} className={styles.ctaLink}>
+            <Button variant={plan.ctaVariant} size="lg" className={styles.ctaButton}>
+              {plan.ctaText}
+            </Button>
+          </a>
+        ) : (
+          <Button variant={plan.ctaVariant} size="lg" className={styles.ctaButton}>
+            {plan.ctaText}
+          </Button>
+        )}
       </div>
     </Card>
   )

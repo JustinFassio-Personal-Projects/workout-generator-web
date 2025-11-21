@@ -57,13 +57,14 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--spacing-xl);
+  max-width: 900px;
+  margin: 0 auto;
 
   @media (max-width: 968px) {
     grid-template-columns: 1fr;
     max-width: 500px;
-    margin: 0 auto;
   }
 }
 
@@ -133,6 +134,21 @@
   margin-bottom: var(--spacing-lg);
 }
 
+.priceWithOriginal {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.originalPrice {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-normal);
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+  margin-right: var(--spacing-sm);
+}
+
 .priceAmount {
   font-size: var(--font-size-5xl);
   font-weight: var(--font-weight-extrabold);
@@ -172,6 +188,12 @@
 
 .footer {
   margin-top: auto;
+}
+
+.ctaLink {
+  display: block;
+  width: 100%;
+  text-decoration: none;
 }
 
 .ctaButton {

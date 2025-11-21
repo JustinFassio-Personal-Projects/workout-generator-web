@@ -39,9 +39,9 @@ describe('Hero', () => {
 
   it('should render stats card', () => {
     render(<Hero />)
+    expect(screen.getByText(/8K\+/i)).toBeInTheDocument()
+    expect(screen.getByText(/Users/i)).toBeInTheDocument()
     expect(screen.getByText(/50K\+/i)).toBeInTheDocument()
-    expect(screen.getByText(/Active Users/i)).toBeInTheDocument()
-    expect(screen.getByText(/1M\+/i)).toBeInTheDocument()
     expect(screen.getByText(/Workouts Generated/i)).toBeInTheDocument()
   })
 })

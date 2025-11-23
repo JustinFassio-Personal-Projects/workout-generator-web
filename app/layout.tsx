@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
+import { Analytics } from '@vercel/analytics/next'
 import 'aos/dist/aos.css'
 import './globals.scss'
 import { Navbar } from '@/components/landing/Navbar/Navbar'
@@ -200,6 +201,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
         {children}
         <ChatWidget />
+        <Analytics />
       </body>
     </html>
   )

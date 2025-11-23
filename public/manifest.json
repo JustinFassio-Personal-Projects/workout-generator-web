@@ -10,13 +10,13 @@
   "icons": [
     {
       "src": "/favicon.ico",
-      "sizes": "any",
+      "sizes": "150x150",
       "type": "image/x-icon"
     },
     {
-      "src": "/AI-Workout-Generater-TransparentBG-150x150_dChzeef.ico",
+      "src": "/favicon.png",
       "sizes": "150x150",
-      "type": "image/x-icon"
+      "type": "image/png"
     },
     {
       "src": "/logo.png",

@@ -60,12 +60,8 @@ export const metadata: Metadata = {
     : undefined,
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      {
-        url: '/AI-Workout-Generater-TransparentBG-150x150_dChzeef.ico',
-        sizes: '150x150',
-        type: 'image/x-icon',
-      },
+      { url: '/favicon.ico', sizes: '150x150', type: 'image/x-icon' },
+      { url: '/favicon.png', sizes: '150x150', type: 'image/png' },
     ],
     apple: [{ url: '/logo.png', sizes: '180x180', type: 'image/png' }],
   },

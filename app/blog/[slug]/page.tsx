@@ -29,14 +29,18 @@ export async function generateMetadata({
   const url = `${baseUrl}/blog/${post.slug}`
   const postImage = post.image ? `${baseUrl}${post.image}` : `${baseUrl}/og-image.jpg`
 
+  // Optimize description to 150-160 characters for better SERP display
+  const optimizedDescription =
+    post.excerpt.length > 160 ? post.excerpt.substring(0, 157).trim() + '...' : post.excerpt
+
   return {
-    title: `${post.title} | Blog - Workout Generator`,
-    description: post.excerpt,
+    title: `${post.title} | Blog`,
+    description: optimizedDescription,
     keywords: post.tags,
     authors: [{ name: post.author }],
     openGraph: {
       title: post.title,
-      description: post.excerpt,
+      description: optimizedDescription,
       type: 'article',
       url,
       publishedTime,
@@ -56,7 +60,7 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       title: post.title,
-      description: post.excerpt,
+      description: optimizedDescription,
       images: [postImage],
     },
     alternates: {
@@ -74,10 +78,13 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   const publishedTime = new Date(post.date).toISOString()
   const modifiedTime = post.dateModified ? new Date(post.dateModified).toISOString() : publishedTime
+  const url = `${baseUrl}/blog/${post.slug}`
   const postImage = post.image ? `${baseUrl}${post.image}` : `${baseUrl}/og-image.jpg`
 
   // Calculate word count from content (approximate)
   const wordCount = post.content.split(/\s+/).filter(word => word.length > 0).length
+  // Calculate reading time (average reading speed: 200 words per minute)
+  const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200))
 
   // Article structured data (JSON-LD)
   const articleSchema = {
@@ -89,6 +96,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     datePublished: publishedTime,
     dateModified: modifiedTime,
     wordCount,
+    timeRequired: `PT${readingTimeMinutes}M`,
     author: {
       '@type': 'Person',
       name: post.author,
@@ -109,11 +117,41 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     keywords: post.tags.join(', '),
   }
 
+  // BreadcrumbList structured data (JSON-LD)
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: baseUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: `${baseUrl}/blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: url,
+      },
+    ],
+  }
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <BlogPostHero post={post} />
       <BlogPostContent post={post} />

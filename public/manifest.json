@@ -1,0 +1,31 @@
+{
+  "name": "Workout Generator - AI-Powered Fitness Plans",
+  "short_name": "Workout Generator",
+  "description": "Create personalized AI-powered workout plans tailored to your goals, fitness level, and equipment.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/AI-Workout-Generater-TransparentBG-150x150_dChzeef.ico",
+      "sizes": "150x150",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr"
+}

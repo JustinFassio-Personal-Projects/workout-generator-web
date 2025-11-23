@@ -62,7 +62,7 @@ export const videos: Video[] = [
   },
   // Future videos can be added here:
   // {
-  //   id: '5',
+  //   id: '6',
   //   title: 'Exercise of the Week: Push-ups',
   //   description: 'Master the perfect push-up form',
   //   videoUrl: '/videos/exercise-of-the-week/push-up-tutorial.mp4',
@@ -71,7 +71,7 @@ export const videos: Video[] = [
   //   duration: 60,
   // },
   // {
-  //   id: '6',
+  //   id: '7',
   //   title: 'Workout of the Week: HIIT Challenge',
   //   description: '20-minute high-intensity workout',
   //   videoUrl: '/videos/workout-of-the-week/hiit-challenge.mp4',

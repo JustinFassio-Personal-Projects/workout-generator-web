@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
+import { BotIdClient } from 'botid/client'
 import 'aos/dist/aos.css'
 import './globals.scss'
 import { Navbar } from '@/components/landing/Navbar/Navbar'
@@ -14,9 +15,12 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.co
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
 
 export const metadata: Metadata = {
-  title: 'Workout Generator - AI-Powered Fitness Plans',
+  title: {
+    default: 'Workout Generator - AI-Powered Fitness Plans',
+    template: '%s | Workout Generator',
+  },
   description:
-    'Transform your fitness journey with AI-powered workout plans tailored to your goals, fitness level, and available equipment.',
+    'Create personalized AI-powered workout plans tailored to your goals, fitness level, and equipment. Start your fitness journey today!',
   keywords: [
     'workout',
     'fitness',
@@ -34,6 +38,7 @@ export const metadata: Metadata = {
     'health and wellness',
   ],
   authors: [{ name: 'Workout Generator' }],
+  applicationName: 'Workout Generator',
   robots: {
     index: true,
     follow: true,
@@ -53,10 +58,18 @@ export const metadata: Metadata = {
         google: googleSiteVerification,
       }
     : undefined,
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '150x150', type: 'image/x-icon' },
+      { url: '/favicon.png', sizes: '150x150', type: 'image/png' },
+    ],
+    apple: [{ url: '/logo.png', sizes: '180x180', type: 'image/png' }],
+  },
+  manifest: '/manifest.json',
   openGraph: {
     title: 'Workout Generator - AI-Powered Fitness Plans',
     description:
-      'Transform your fitness journey with AI-powered workout plans tailored to your goals.',
+      'Create personalized AI-powered workout plans tailored to your goals, fitness level, and equipment. Start your fitness journey today!',
     type: 'website',
     url: baseUrl,
     siteName: 'Workout Generator',
@@ -72,8 +85,14 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Workout Generator - AI-Powered Fitness Plans',
-    description: 'Transform your fitness journey with AI-powered workout plans.',
+    description:
+      'Create personalized AI-powered workout plans tailored to your goals. Start your fitness journey today!',
     images: [`${baseUrl}/og-image.jpg`],
+  },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'format-detection': 'telephone=no',
   },
 }
 
@@ -81,6 +100,10 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -130,9 +153,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     },
   }
 
+  // Protected routes that need BotID protection
+  const protectedRoutes = [
+    {
+      path: '/api/chatkit-session',
+      method: 'POST',
+    },
+  ]
+
   return (
     <html lang="en">
       <body className={inter.className}>
+        <BotIdClient protect={protectedRoutes} />
         {/* Google Tag Manager */}
         {gtmId && (
           <Script

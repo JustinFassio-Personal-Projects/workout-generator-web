@@ -70,8 +70,8 @@ describe('Blog Page', () => {
     const { generateMetadata } = await import('@/app/blog/page')
     const metadata = await generateMetadata()
 
-    expect(metadata.title).toBe('Blog - Workout Generator | Fitness Tips & Workout Strategies')
-    expect(metadata.description).toContain('Discover fitness tips')
+    expect(metadata.title).toBe('Blog | Fitness Tips & Workout Strategies')
+    expect(metadata.description).toContain('Discover expert fitness tips')
     expect(metadata.openGraph?.type).toBe('website')
     expect(metadata.openGraph?.url).toContain('/blog')
   })

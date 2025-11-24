@@ -80,7 +80,7 @@ describe('BlogPostPage', () => {
 
     const metadata = await generateMetadata({ params: { slug: 'test-post' } })
 
-    expect(metadata.title).toBe('Test Post | Blog - Workout Generator')
+    expect(metadata.title).toBe('Test Post | Blog')
     expect(metadata.description).toBe('Test excerpt')
     expect(metadata.openGraph?.type).toBe('article')
     expect(metadata.openGraph?.title).toBe('Test Post')

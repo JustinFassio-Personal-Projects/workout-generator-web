@@ -111,7 +111,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${baseUrl}/blog/${post.slug}`,
+      '@id': url,
     },
     articleSection: post.category,
     keywords: post.tags.join(', '),

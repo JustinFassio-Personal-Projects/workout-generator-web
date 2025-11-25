@@ -4,7 +4,7 @@ import { BlogPostList } from '@/components/features/blog/BlogPostList'
 import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
 import styles from './blog-page.module.scss'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 export async function generateMetadata(): Promise<Metadata> {
   const description =

@@ -4,7 +4,7 @@ import { BlogPostContent } from '@/components/features/blog/BlogPostContent'
 import { getPostBySlug, getAllPostSlugs } from '@/features/blog/lib/getBlogPosts'
 import { notFound } from 'next/navigation'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs()

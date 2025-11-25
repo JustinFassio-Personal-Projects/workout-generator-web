@@ -10,7 +10,7 @@ import { Blog } from '@/components/landing/Blog/Blog'
 import { Pricing } from '@/components/landing/Pricing/Pricing'
 import { Footer } from '@/components/landing/Footer/Footer'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 export default function Home() {
   useEffect(() => {
@@ -41,8 +41,8 @@ export default function Home() {
         isMounted = false
         if (aosInstance && typeof window !== 'undefined') {
           try {
-            // Only refresh if document body still exists
-            if (document.body) {
+            // Only refresh if document body still exists and refresh method is available
+            if (document.body && aosInstance.refresh) {
               aosInstance.refresh()
             }
           } catch (error) {

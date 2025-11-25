@@ -44,7 +44,7 @@ describe('sitemap.ts', () => {
 
     expect(result).toHaveLength(4) // homepage + blog page + 2 blog posts
     expect(result[0]).toEqual({
-      url: expect.stringContaining('workoutgenerator.com'),
+      url: expect.stringContaining('aiworkoutgenerator.com'),
       lastModified: expect.any(Date),
       changeFrequency: 'weekly',
       priority: 1.0,
@@ -73,7 +73,7 @@ describe('sitemap.ts', () => {
     vi.mocked(getBlogPostsModule.getAllPosts).mockResolvedValue([])
 
     const result = await sitemap()
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
     expect(result[0].url).toBe(baseUrl)
     expect(result[1].url).toBe(`${baseUrl}/blog`)

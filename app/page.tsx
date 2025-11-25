@@ -31,7 +31,7 @@ export default function Home() {
             offset: 100,
           })
         } catch (error) {
-          // Silently handle initialization errors
+          // Handle initialization errors gracefully (log warning for debugging)
           console.warn('AOS initialization error:', error)
         }
       })
@@ -48,6 +48,7 @@ export default function Home() {
           } catch (error) {
             // Silently handle refresh errors during cleanup
             // This prevents errors when React has already removed DOM elements
+            // Intentionally ignored - errors during cleanup are non-critical
           }
         }
       }

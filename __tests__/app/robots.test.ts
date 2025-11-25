@@ -17,7 +17,7 @@ describe('robots.ts', () => {
 
   it('should include sitemap URL', () => {
     const result = robots()
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workoutgenerator.com'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
     expect(result.sitemap).toBe(`${baseUrl}/sitemap.xml`)
   })

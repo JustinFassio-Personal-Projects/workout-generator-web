@@ -12,42 +12,43 @@ export interface Testimonial {
 export const testimonials: Testimonial[] = [
   {
     id: '1',
-    name: 'Don Murphy',
-    role: "Gold's Gym",
-    title: 'Transformational Technology',
+    name: 'Toni L.',
+    role: 'Elite 25',
+    company: 'San Diego, CA',
+    title: 'Inspired by the Methods',
     // avatar: '', // Commented out for now, will add later
     quote:
-      'Without a doubt, this is the future of how workouts should be created for people of all fitness levels.',
+      'I was so impressed and inspired by the methods. Very passionate about fitness, health, and safety as well as progress. Thorough when explaining each exercise and its benefit, attentive in monitoring form and execution, and always remained positive and motivational.',
     rating: 5,
   },
   {
     id: '2',
-    name: 'Larry King',
-    role: 'Founder and CEO',
-    company: 'Shapenet',
-    title: 'This is a Home Run',
+    name: 'Danielle B.',
+    role: 'Honolulu, HI',
+    title: 'Never Gets Boring',
     // avatar: '', // Commented out for now, will add later
-    quote: 'People should see this as an amazing way to get completely customized workout guidance',
+    quote:
+      'I often get bored with workouts, especially in the gym, but for TWO YEARS I have been trained, challenged, encouraged, entertained and surprised by how enjoyable (but hard!) the workouts are. Not only do I feel strong and amazing after every workout, but the variety keeps me coming back.',
     rating: 5,
   },
   {
     id: '3',
-    name: 'Rick Eff',
-    role: 'Owner',
-    company: 'Sweat PT',
-    title: 'The New Standard',
+    name: 'Tanya C.',
+    role: 'San Diego, CA',
+    title: 'Life-Changing Results',
     // avatar: '', // Commented out for now, will add later
-    quote: 'The future of the fitness industry is bright when you can deliver workouts like this.',
+    quote:
+      "I've completely changed my life over the last ten months. Lost 20 lbs and am way more fit than I have been in a long time! The workouts are challenging and help you push and support yourself to reach new levels.",
     rating: 5,
   },
   {
     id: '4',
-    name: 'Jamie Johnson',
-    role: 'Indigo Yoga',
-    title: 'Really Impressed',
+    name: 'Dennis B.',
+    role: 'San Diego, CA',
+    title: 'Motivated Without Feeling Tortured',
     // avatar: '', // Commented out for now, will add later
     quote:
-      'Unfortunately, we drop the ball too often on great workouts. This product helps resolve that.',
+      "This is the first time I've attempted a boot-camp style workout program, and the coaching keeps the group motivated through the entire workout. The style keeps me focused without feeling like I'm being tortured. I believe in myself and my ability to stick with this program long-term.",
     rating: 5,
   },
 ]

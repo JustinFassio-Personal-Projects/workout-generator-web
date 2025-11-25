@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ChevronDown, ChevronUp, ArrowRight, DollarSign } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import {
   videos,
   getFeaturedVideo,
@@ -17,6 +17,7 @@ import styles from './Videos.module.scss'
 
 export const Videos: React.FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<VideoCategory>>(new Set())
+  const [isSubmitExplainerOpen, setIsSubmitExplainerOpen] = useState(false)
   const featuredVideo = getFeaturedVideo()
   const featuredExerciseVideos = getFeaturedExerciseVideos()
   const featuredWorkoutVideos = getFeaturedWorkoutVideos()
@@ -59,13 +60,71 @@ export const Videos: React.FC = () => {
             one-time fee for a single video or subscribe for multiple videos per month.
           </p>
           <div className={styles.ctaButtons} data-aos="fade-up" data-aos-delay="100">
-            <a href="#submit-workout" className={styles.ctaLink}>
-              <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
-                Submit Your Workout
-              </Button>
-            </a>
+            <div className={styles.submitWorkoutWrapper}>
+              <button
+                className={styles.submitWorkoutButton}
+                onClick={() => setIsSubmitExplainerOpen(!isSubmitExplainerOpen)}
+                aria-expanded={isSubmitExplainerOpen}
+              >
+                <span className={styles.buttonText}>Submit Your Workout</span>
+                {isSubmitExplainerOpen ? (
+                  <ChevronUp size={20} className={styles.chevronIcon} />
+                ) : (
+                  <ChevronDown size={20} className={styles.chevronIcon} />
+                )}
+              </button>
+              {isSubmitExplainerOpen && (
+                <div className={styles.submitExplainer}>
+                  <h4 className={styles.explainerTitle}>
+                    Welcome to the Future of Fitness Video Content
+                  </h4>
+                  <p className={styles.explainerIntro}>
+                    We&apos;re entering a revolutionary new era in AI-powered fitness. Now you can
+                    get personalized, on-demand workout videos that are life-like, feature perfect
+                    form, and are 100% AI-generated—all at a fraction of the cost of traditional
+                    video production.
+                  </p>
+                  <div className={styles.explainerList}>
+                    <p className={styles.explainerText}>
+                      <strong>How It Works:</strong>
+                    </p>
+                    <ul className={styles.bulletList}>
+                      <li>
+                        When you save a workout, you&apos;ll have the option to submit it for custom
+                        video creation
+                      </li>
+                      <li>
+                        Choose your preferred model characteristics (gender, age, body type) to
+                        match your preferences
+                      </li>
+                      <li>
+                        Our AI Workout Generator trainers and video prompt engineers personally
+                        review and create each video, ensuring perfect form and clarity
+                      </li>
+                      <li>
+                        Every exercise is demonstrated with precision, helping you understand proper
+                        form and intensity
+                      </li>
+                      <li>
+                        If an exercise can&apos;t be perfectly rendered, our team selects an equal
+                        alternative that maintains the workout&apos;s integrity
+                      </li>
+                      <li>
+                        Videos are concise (25 seconds) yet comprehensive, covering all exercises in
+                        your workout
+                      </li>
+                    </ul>
+                    <p className={styles.explainerText}>
+                      <strong>Why This Is Revolutionary:</strong> Get professional-quality workout
+                      videos tailored specifically to your routine, delivered instantly, and at a
+                      price point that makes personalized fitness content accessible to everyone.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
             <a href="#pricing" className={styles.ctaLink}>
-              <Button variant="secondary" size="lg" icon={DollarSign} iconPosition="left">
+              <Button variant="secondary" size="lg">
                 View Pricing
               </Button>
             </a>

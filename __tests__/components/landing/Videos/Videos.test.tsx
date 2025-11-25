@@ -50,10 +50,31 @@ describe('Videos', () => {
 
   it('should render CTA buttons with correct links', () => {
     render(<Videos />)
-    const submitLink = screen.getByText('Submit Your Workout').closest('a')
+    const submitButton = screen.getByText('Submit Your Workout').closest('button')
     const pricingLink = screen.getByText('View Pricing').closest('a')
-    expect(submitLink?.getAttribute('href')).toBe('#submit-workout')
+    expect(submitButton).toBeInTheDocument()
+    expect(submitButton?.getAttribute('aria-expanded')).toBe('false')
     expect(pricingLink?.getAttribute('href')).toBe('#pricing')
+  })
+
+  it('should toggle submit workout explainer on click', () => {
+    render(<Videos />)
+    const submitButton = screen.getByText('Submit Your Workout').closest('button')
+    expect(submitButton).toBeInTheDocument()
+
+    // Initially closed
+    expect(submitButton?.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByText(/When you save a workout/i)).not.toBeInTheDocument()
+
+    // Click to open
+    fireEvent.click(submitButton!)
+    expect(submitButton?.getAttribute('aria-expanded')).toBe('true')
+    expect(screen.getByText(/When you save a workout/i)).toBeInTheDocument()
+
+    // Click to close
+    fireEvent.click(submitButton!)
+    expect(submitButton?.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByText(/When you save a workout/i)).not.toBeInTheDocument()
   })
 
   it('should toggle category expansion on click', () => {

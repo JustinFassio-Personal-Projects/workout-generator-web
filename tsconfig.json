@@ -28,7 +28,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "__tests__/**/*.ts",
-    "__tests__/**/*.tsx"
+    "__tests__/**/*.tsx",
+    "vitest-setup.d.ts"
   ],
   "exclude": ["node_modules", "vitest.config.ts", "vitest.config.critical.ts", "src/test"]
 }

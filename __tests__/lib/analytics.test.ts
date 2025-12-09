@@ -6,8 +6,18 @@ import {
   trackGTMEvent,
   trackEvent,
   trackPageView,
+  trackVercelEvent,
+  trackButtonClick,
+  trackScrollDepth,
+  trackNavigationClick,
+  trackFormSubmission,
   analytics,
 } from '@/lib/analytics'
+
+// Mock @vercel/analytics
+vi.mock('@vercel/analytics', () => ({
+  track: vi.fn(),
+}))
 
 describe('analytics', () => {
   beforeEach(() => {
@@ -199,6 +209,94 @@ describe('analytics', () => {
       analytics.trackChatMessage(50)
       expect(window.gtag).toHaveBeenCalledWith('event', 'chat_message', {
         message_length: 50,
+      })
+    })
+  })
+
+  describe('Vercel Analytics tracking', () => {
+    beforeEach(() => {
+      // Mock window.location for trackScrollDepth
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/test-path' },
+        writable: true,
+      })
+    })
+
+    it('should track Vercel event when window is defined', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVercelEvent('Test Event', { key: 'value' })
+      expect(track).toHaveBeenCalledWith('Test Event', { key: 'value' })
+    })
+
+    it('should not track Vercel event when window is undefined', () => {
+      const originalWindow = global.window
+      // @ts-expect-error - intentionally removing window for test
+      delete global.window
+      const { track } = require('@vercel/analytics')
+      trackVercelEvent('Test Event')
+      // Should not throw, but track may not be called
+      global.window = originalWindow
+    })
+
+    it('should handle errors in trackVercelEvent gracefully', async () => {
+      const { track } = await import('@vercel/analytics')
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      vi.mocked(track).mockImplementationOnce(() => {
+        throw new Error('Tracking error')
+      })
+      trackVercelEvent('Test Event')
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to track Vercel Analytics event:',
+        expect.any(Error)
+      )
+      consoleSpy.mockRestore()
+    })
+
+    it('should track button click', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackButtonClick('Test Button', 'hero', { section: 'test' })
+      expect(track).toHaveBeenCalledWith('Button Click', {
+        button_name: 'Test Button',
+        location: 'hero',
+        section: 'test',
+      })
+    })
+
+    it('should track scroll depth with current path', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackScrollDepth(50)
+      expect(track).toHaveBeenCalledWith('Page Scroll', {
+        scroll_depth: 50,
+        page_path: '/test-path',
+      })
+    })
+
+    it('should track scroll depth with custom path', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackScrollDepth(75, '/custom-path')
+      expect(track).toHaveBeenCalledWith('Page Scroll', {
+        scroll_depth: 75,
+        page_path: '/custom-path',
+      })
+    })
+
+    it('should track navigation click', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackNavigationClick('/blog', 'nav_link', 'navbar', { link_label: 'Blog' })
+      expect(track).toHaveBeenCalledWith('Navigation Click', {
+        destination: '/blog',
+        type: 'nav_link',
+        location: 'navbar',
+        link_label: 'Blog',
+      })
+    })
+
+    it('should track form submission', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackFormSubmission('newsletter', { location: 'footer' })
+      expect(track).toHaveBeenCalledWith('Form Submission', {
+        form_name: 'newsletter',
+        location: 'footer',
       })
     })
   })

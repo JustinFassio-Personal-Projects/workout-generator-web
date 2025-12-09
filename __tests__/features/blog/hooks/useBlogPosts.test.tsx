@@ -65,6 +65,7 @@ describe('useBlogPosts', () => {
 
   it('should handle fetch errors correctly', async () => {
     const fetchError = new Error('Failed to load posts')
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     vi.mocked(global.fetch).mockRejectedValueOnce(fetchError)
 
     const { result } = renderHook(() => useBlogPosts())
@@ -79,9 +80,12 @@ describe('useBlogPosts', () => {
     expect(result.current.error).toBeInstanceOf(Error)
     expect(result.current.error?.message).toBe('Failed to load posts')
     expect(result.current.posts).toEqual([])
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching blog posts:', fetchError)
+    consoleErrorSpy.mockRestore()
   })
 
   it('should handle non-ok responses correctly', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: false,
       status: 500,
@@ -100,5 +104,7 @@ describe('useBlogPosts', () => {
     expect(result.current.error).toBeInstanceOf(Error)
     expect(result.current.error?.message).toBe('Failed to fetch blog posts')
     expect(result.current.posts).toEqual([])
+    expect(consoleErrorSpy).toHaveBeenCalled()
+    consoleErrorSpy.mockRestore()
   })
 })

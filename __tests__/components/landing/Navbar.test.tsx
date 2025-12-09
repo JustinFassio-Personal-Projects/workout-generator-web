@@ -98,6 +98,11 @@ describe('Navbar', () => {
     const menuButton = screen.getByRole('button', { name: /open menu/i })
     await user.click(menuButton)
 
+    // Wait for drawer to be open
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
     // Click Sign In button in drawer
     const signInLinks = screen.getAllByRole('link', { name: /sign in/i })
     const drawerSignInLink = signInLinks.find(link => link.closest('[role="dialog"]'))
@@ -105,8 +110,10 @@ describe('Navbar', () => {
       await user.click(drawerSignInLink)
     }
 
-    // Drawer should be closed
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    // Wait for drawer to be closed
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
   })
 
   it('should have correct navigation role and aria-label', () => {

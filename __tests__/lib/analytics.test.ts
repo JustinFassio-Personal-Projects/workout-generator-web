@@ -19,6 +19,14 @@ vi.mock('@vercel/analytics', () => ({
   track: vi.fn(),
 }))
 
+// Extend Window interface for tests
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void
+    dataLayer: unknown[]
+  }
+}
+
 describe('analytics', () => {
   beforeEach(() => {
     // Reset window mocks
@@ -163,7 +171,7 @@ describe('analytics', () => {
     })
 
     it('should handle page view when GA4 is not available', () => {
-      window.gtag = undefined
+      ;(window as any).gtag = undefined
       const dataLayer: any[] = []
       window.dataLayer = dataLayer
       trackPageView('/test-path', 'Test Title')

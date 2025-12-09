@@ -14,7 +14,13 @@ describe('POST /api/chatkit-session', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks()
+    // Reset process.env but ensure we can set test values
     process.env = { ...originalEnv }
+    // Set a default test API key for tests that need it
+    // This ensures tests work without requiring a real API key
+    if (!process.env.OPENAI_API_KEY) {
+      process.env.OPENAI_API_KEY = 'test-api-key-for-testing-only'
+    }
     global.fetch = vi.fn()
   })
 

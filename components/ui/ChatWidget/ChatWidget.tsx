@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { ChatKit, useChatKit } from '@openai/chatkit-react'
 import { MessageCircle, X, Minimize2 } from 'lucide-react'
 import classNames from 'classnames'
+import { trackVercelEvent } from '@/lib/analytics'
 import styles from './ChatWidget.module.scss'
 import type { ChatWidgetProps } from './types'
 
@@ -145,16 +146,29 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   })
 
   const toggleChat = () => {
-    setIsOpen(!isOpen)
+    const newState = !isOpen
+    setIsOpen(newState)
     setIsMinimized(false)
+    trackVercelEvent('Chat Widget Interaction', {
+      action: newState ? 'open' : 'close',
+      location: 'chat_widget',
+    })
   }
 
   const minimizeChat = () => {
     setIsMinimized(true)
+    trackVercelEvent('Chat Widget Interaction', {
+      action: 'minimize',
+      location: 'chat_widget',
+    })
   }
 
   const maximizeChat = () => {
     setIsMinimized(false)
+    trackVercelEvent('Chat Widget Interaction', {
+      action: 'maximize',
+      location: 'chat_widget',
+    })
   }
 
   // Prevent body scroll when chat is open (on mobile)

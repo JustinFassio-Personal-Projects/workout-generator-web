@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button/Button'
 import { Card } from '@/components/ui/Card/Card'
 import { FloatingIcons } from './FloatingIcons'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
+import { trackButtonClick } from '@/lib/analytics'
 import styles from './Hero.module.scss'
 
 export const Hero: React.FC = () => {
@@ -29,13 +30,24 @@ export const Hero: React.FC = () => {
               className={styles.ctaLink}
               data-aos="fade-up"
               data-aos-delay="100"
+              onClick={() => {
+                trackButtonClick('Get Started Free', 'hero', { section: 'hero' })
+              }}
             >
               <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
                 Get Started Free
               </Button>
             </a>
             <div className={styles.demoButtonWrapper} data-aos="fade-up" data-aos-delay="200">
-              <Button variant="secondary" size="lg" icon={Play} iconPosition="left">
+              <Button
+                variant="secondary"
+                size="lg"
+                icon={Play}
+                iconPosition="left"
+                onClick={() => {
+                  trackButtonClick('Watch Demo', 'hero', { section: 'hero' })
+                }}
+              >
                 Watch Demo
               </Button>
               <span className={styles.comingSoon}>(coming soon)</span>

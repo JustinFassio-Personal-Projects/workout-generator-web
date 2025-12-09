@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { LucideIcon, ChevronDown } from 'lucide-react'
 import { Card } from '@/components/ui/Card/Card'
+import { trackVercelEvent } from '@/lib/analytics'
 import styles from './Journey.module.scss'
 
 export interface JourneyStepCardProps {
@@ -30,6 +31,16 @@ export const JourneyStepCard: React.FC<JourneyStepCardProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
+  const handleToggle = () => {
+    const newState = !isExpanded
+    setIsExpanded(newState)
+    trackVercelEvent('Journey Step Expand', {
+      step_number: number,
+      step_title: title.substring(0, 255), // Ensure within limit
+      action: newState ? 'expand' : 'collapse',
+    })
+  }
+
   return (
     <div className={styles.stepWrapper} data-aos="fade-up" data-aos-delay={index * 100}>
       <div className={styles.stepNumber}>{number}</div>
@@ -38,7 +49,7 @@ export const JourneyStepCard: React.FC<JourneyStepCardProps> = ({
         variant="default"
         hover={true}
         className={`${styles.stepCard} ${isExpanded ? styles['stepCard--expanded'] : ''}`}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleToggle}
       >
         <div className={styles.stepHeader}>
           <div

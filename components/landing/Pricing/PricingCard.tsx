@@ -5,6 +5,7 @@ import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { Card } from '@/components/ui/Card/Card'
 import { PricingPlan } from '@/data/pricing'
+import { trackVercelEvent } from '@/lib/analytics'
 import styles from './Pricing.module.scss'
 
 export interface PricingCardProps {
@@ -43,13 +44,36 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
       </ul>
       <div className={styles.footer}>
         {plan.ctaLink ? (
-          <a href={plan.ctaLink} className={styles.ctaLink}>
+          <a
+            href={plan.ctaLink}
+            className={styles.ctaLink}
+            onClick={() => {
+              trackVercelEvent('Pricing Plan Click', {
+                plan_name: plan.name,
+                plan_price: plan.price,
+                plan_period: plan.period,
+                location: 'pricing',
+              })
+            }}
+          >
             <Button variant={plan.ctaVariant} size="lg" className={styles.ctaButton}>
               {plan.ctaText}
             </Button>
           </a>
         ) : (
-          <Button variant={plan.ctaVariant} size="lg" className={styles.ctaButton}>
+          <Button
+            variant={plan.ctaVariant}
+            size="lg"
+            className={styles.ctaButton}
+            onClick={() => {
+              trackVercelEvent('Pricing Plan Click', {
+                plan_name: plan.name,
+                plan_price: plan.price,
+                plan_period: plan.period,
+                location: 'pricing',
+              })
+            }}
+          >
             {plan.ctaText}
           </Button>
         )}

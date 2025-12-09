@@ -58,6 +58,7 @@ export const Navbar: React.FC = () => {
       rel="noopener noreferrer"
       className={styles.signInButton}
       onClick={() => {
+        closeDrawer()
         trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
       }}
     >

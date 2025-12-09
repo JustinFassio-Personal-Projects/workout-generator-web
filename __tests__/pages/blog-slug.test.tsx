@@ -82,7 +82,7 @@ describe('BlogPostPage', () => {
 
     expect(metadata.title).toBe('Test Post | Blog')
     expect(metadata.description).toBe('Test excerpt')
-    expect(metadata.openGraph?.type).toBe('article')
+    expect((metadata.openGraph as any)?.type).toBe('article')
     expect(metadata.openGraph?.title).toBe('Test Post')
   })
 

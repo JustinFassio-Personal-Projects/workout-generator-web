@@ -72,7 +72,7 @@ describe('Blog Page', () => {
 
     expect(metadata.title).toBe('Blog | Fitness Tips & Workout Strategies')
     expect(metadata.description).toContain('Discover expert fitness tips')
-    expect(metadata.openGraph?.type).toBe('website')
+    expect((metadata.openGraph as any)?.type).toBe('website')
     expect(metadata.openGraph?.url).toContain('/blog')
   })
 })

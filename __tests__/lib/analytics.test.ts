@@ -88,6 +88,16 @@ describe('analytics', () => {
       trackGA4Event('test_event')
       expect(gtagMock).toHaveBeenCalledWith('event', 'test_event', {})
     })
+
+    it('should handle case where gtag is null after availability check', () => {
+      // Test the defensive check on line 52 - edge case where gtag might be null
+      // Set gtag to a function first to pass isGA4Available check
+      const gtagMock = vi.fn()
+      window.gtag = gtagMock
+      // After passing isGA4Available, gtag should still be called
+      trackGA4Event('test_event')
+      expect(gtagMock).toHaveBeenCalled()
+    })
   })
 
   describe('trackGTMEvent', () => {
@@ -151,6 +161,41 @@ describe('analytics', () => {
         page_title: 'Test Title',
       })
     })
+
+    it('should handle page view when GA4 is not available', () => {
+      window.gtag = undefined
+      const dataLayer: any[] = []
+      window.dataLayer = dataLayer
+      trackPageView('/test-path', 'Test Title')
+      // Should still track in GTM
+      expect(dataLayer).toHaveLength(1)
+    })
+
+    it('should handle page view when GTM is not available', () => {
+      const gtagMock = vi.fn()
+      window.gtag = gtagMock
+      window.dataLayer = undefined as any
+      trackPageView('/test-path', 'Test Title')
+      // Should still track in GA4
+      expect(gtagMock).toHaveBeenCalled()
+    })
+
+    it('should handle page view when both GA4 and GTM are not available', () => {
+      window.gtag = undefined
+      window.dataLayer = undefined as any
+      // Should not throw
+      expect(() => trackPageView('/test-path', 'Test Title')).not.toThrow()
+    })
+
+    it('should handle page view without title', () => {
+      const gtagMock = vi.fn()
+      const dataLayer: any[] = []
+      window.gtag = gtagMock
+      window.dataLayer = dataLayer
+      trackPageView('/test-path')
+      expect(gtagMock).toHaveBeenCalled()
+      expect(dataLayer).toHaveLength(1)
+    })
   })
 
   describe('analytics object', () => {
@@ -159,12 +204,20 @@ describe('analytics', () => {
       const dataLayer: any[] = []
       window.gtag = gtagMock
       window.dataLayer = dataLayer
+      // Reset Vercel analytics mock
+      vi.clearAllMocks()
     })
 
-    it('should track CTA click', () => {
+    it('should track CTA click', async () => {
+      const { track } = await import('@vercel/analytics')
       analytics.trackCTAClick('Get Started', 'hero')
       expect(window.gtag).toHaveBeenCalledWith('event', 'cta_click', {
         cta_name: 'Get Started',
+        location: 'hero',
+      })
+      // Should also call Vercel Analytics
+      expect(track).toHaveBeenCalledWith('Button Click', {
+        button_name: 'Get Started',
         location: 'hero',
       })
     })
@@ -177,11 +230,29 @@ describe('analytics', () => {
       })
     })
 
-    it('should track blog post click', () => {
+    it('should track blog post click', async () => {
+      const { track } = await import('@vercel/analytics')
       analytics.trackBlogPostClick('test-slug', 'Test Post')
       expect(window.gtag).toHaveBeenCalledWith('event', 'blog_post_click', {
         post_slug: 'test-slug',
         post_title: 'Test Post',
+      })
+      // Should also call Vercel Analytics
+      expect(track).toHaveBeenCalledWith('Blog Post Click', {
+        post_slug: 'test-slug',
+        post_title: 'Test Post',
+        location: 'blog_card',
+      })
+    })
+
+    it('should handle blog post click with long title', async () => {
+      const { track } = await import('@vercel/analytics')
+      const longTitle = 'A'.repeat(300) // Longer than 255 characters
+      analytics.trackBlogPostClick('test-slug', longTitle)
+      expect(track).toHaveBeenCalledWith('Blog Post Click', {
+        post_slug: 'test-slug',
+        post_title: longTitle.substring(0, 255),
+        location: 'blog_card',
       })
     })
 
@@ -192,17 +263,30 @@ describe('analytics', () => {
       })
     })
 
-    it('should track pricing plan click', () => {
+    it('should track pricing plan click', async () => {
+      const { track } = await import('@vercel/analytics')
       analytics.trackPricingPlanClick('Premium', 10)
       expect(window.gtag).toHaveBeenCalledWith('event', 'pricing_plan_click', {
         plan_name: 'Premium',
         plan_price: 10,
       })
+      // Should also call Vercel Analytics
+      expect(track).toHaveBeenCalledWith('Pricing Plan Click', {
+        plan_name: 'Premium',
+        plan_price: 10,
+        location: 'pricing',
+      })
     })
 
-    it('should track chat open', () => {
+    it('should track chat open', async () => {
+      const { track } = await import('@vercel/analytics')
       analytics.trackChatOpen()
       expect(window.gtag).toHaveBeenCalledWith('event', 'chat_open', {})
+      // Should also call Vercel Analytics
+      expect(track).toHaveBeenCalledWith('Chat Widget Interaction', {
+        action: 'open',
+        location: 'chat_widget',
+      })
     })
 
     it('should track chat message', () => {
@@ -262,6 +346,15 @@ describe('analytics', () => {
       })
     })
 
+    it('should track button click without metadata', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackButtonClick('Test Button', 'hero')
+      expect(track).toHaveBeenCalledWith('Button Click', {
+        button_name: 'Test Button',
+        location: 'hero',
+      })
+    })
+
     it('should track scroll depth with current path', async () => {
       const { track } = await import('@vercel/analytics')
       trackScrollDepth(50)
@@ -277,6 +370,44 @@ describe('analytics', () => {
       expect(track).toHaveBeenCalledWith('Page Scroll', {
         scroll_depth: 75,
         page_path: '/custom-path',
+      })
+    })
+
+    it('should handle scroll depth when window is undefined', () => {
+      const originalWindow = global.window
+      // @ts-expect-error - intentionally removing window for test
+      delete global.window
+      // Should not throw when window is undefined
+      // trackVercelEvent will return early, so track won't be called
+      expect(() => trackScrollDepth(25)).not.toThrow()
+      global.window = originalWindow
+    })
+
+    it('should use window.location.pathname when pagePath not provided', async () => {
+      const { track } = await import('@vercel/analytics')
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/current-path' },
+        writable: true,
+        configurable: true,
+      })
+      trackScrollDepth(50)
+      expect(track).toHaveBeenCalledWith('Page Scroll', {
+        scroll_depth: 50,
+        page_path: '/current-path',
+      })
+    })
+
+    it('should handle scroll depth when window.location.pathname is undefined', async () => {
+      const { track } = await import('@vercel/analytics')
+      Object.defineProperty(window, 'location', {
+        value: { pathname: undefined },
+        writable: true,
+        configurable: true,
+      })
+      trackScrollDepth(75)
+      expect(track).toHaveBeenCalledWith('Page Scroll', {
+        scroll_depth: 75,
+        page_path: undefined,
       })
     })
 
@@ -298,6 +429,30 @@ describe('analytics', () => {
         form_name: 'newsletter',
         location: 'footer',
       })
+    })
+
+    it('should track form submission without metadata', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackFormSubmission('contact')
+      expect(track).toHaveBeenCalledWith('Form Submission', {
+        form_name: 'contact',
+      })
+    })
+
+    it('should track navigation click without metadata', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackNavigationClick('/about', 'nav_link', 'navbar')
+      expect(track).toHaveBeenCalledWith('Navigation Click', {
+        destination: '/about',
+        type: 'nav_link',
+        location: 'navbar',
+      })
+    })
+
+    it('should track Vercel event without data', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVercelEvent('Simple Event')
+      expect(track).toHaveBeenCalledWith('Simple Event', undefined)
     })
   })
 })

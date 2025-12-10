@@ -12,6 +12,11 @@ import { POST } from '@/app/api/chatkit-session/route'
 describe('POST /api/chatkit-session', () => {
   const originalEnv = process.env
 
+  beforeAll(() => {
+    // Set test API key before all tests
+    process.env.OPENAI_API_KEY = 'test-api-key-for-testing-only'
+  })
+
   beforeEach(() => {
     vi.restoreAllMocks()
     // Reset process.env but ensure we can set test values
@@ -24,6 +29,11 @@ describe('POST /api/chatkit-session', () => {
   afterEach(() => {
     process.env = originalEnv
     vi.restoreAllMocks()
+  })
+
+  afterAll(() => {
+    // Restore original env
+    process.env = originalEnv
   })
 
   it('should create a ChatKit session successfully', async () => {

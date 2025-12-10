@@ -17,11 +17,11 @@ const nextConfig = {
   // Improve CSS compilation stability during Fast Refresh
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
-      // Reduce CSS rebuild frequency during development
+      // Ensure proper chunk resolution
       config.optimization = {
         ...config.optimization,
-        removeAvailableModules: false,
-        removeEmptyChunks: false,
+        moduleIds: 'deterministic',
+        chunkIds: 'deterministic',
       }
     }
     return config

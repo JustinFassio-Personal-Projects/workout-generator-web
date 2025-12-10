@@ -45,12 +45,15 @@ export const Hero: React.FC = () => {
                 icon={Play}
                 iconPosition="left"
                 onClick={() => {
-                  trackButtonClick('Watch Demo', 'hero')
+                  trackButtonClick('Watch Videos', 'hero')
+                  const videosSection = document.getElementById('videos')
+                  if (videosSection) {
+                    videosSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
                 }}
               >
-                Watch Demo
+                Watch Videos
               </Button>
-              <span className={styles.comingSoon}>(coming soon)</span>
             </div>
           </div>
         </div>

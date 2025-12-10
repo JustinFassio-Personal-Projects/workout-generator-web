@@ -191,6 +191,150 @@ export const trackFormSubmission = (
 }
 
 /**
+ * Track when a video starts playing
+ * @param videoId - The unique identifier of the video
+ * @param videoTitle - The title of the video
+ * @param videoCategory - The category of the video
+ * @param location - Where the video is located (e.g., 'videos_section')
+ */
+export const trackVideoStart = (
+  videoId: string,
+  videoTitle: string,
+  videoCategory: string,
+  location: string = 'videos_section'
+): void => {
+  trackVercelEvent('Video Start', {
+    video_id: videoId,
+    video_title: videoTitle.substring(0, 255), // Ensure within limit
+    video_category: videoCategory,
+    location,
+  })
+}
+
+/**
+ * Track when a video enters viewport (becomes visible)
+ * @param videoId - The unique identifier of the video
+ * @param videoTitle - The title of the video
+ * @param videoCategory - The category of the video
+ * @param location - Where the video is located (e.g., 'videos_section')
+ */
+export const trackVideoView = (
+  videoId: string,
+  videoTitle: string,
+  videoCategory: string,
+  location: string = 'videos_section'
+): void => {
+  trackVercelEvent('Video View', {
+    video_id: videoId,
+    video_title: videoTitle.substring(0, 255), // Ensure within limit
+    video_category: videoCategory,
+    location,
+  })
+}
+
+/**
+ * Track video progress milestones (25%, 50%, 75%, 100%)
+ * @param videoId - The unique identifier of the video
+ * @param videoTitle - The title of the video
+ * @param videoCategory - The category of the video
+ * @param progressPercentage - The progress percentage (25, 50, 75, or 100)
+ * @param durationWatched - Duration watched in seconds
+ * @param totalDuration - Total duration in seconds (optional)
+ */
+export const trackVideoProgress = (
+  videoId: string,
+  videoTitle: string,
+  videoCategory: string,
+  progressPercentage: number,
+  durationWatched: number,
+  totalDuration?: number
+): void => {
+  const metadata: Record<string, string | number | boolean | null> = {
+    video_id: videoId,
+    video_title: videoTitle.substring(0, 255), // Ensure within limit
+    video_category: videoCategory,
+    progress_percentage: Math.round(progressPercentage),
+    duration_watched: Math.round(durationWatched),
+  }
+
+  if (totalDuration !== undefined) {
+    metadata.total_duration = Math.round(totalDuration)
+  }
+
+  trackVercelEvent('Video Progress', metadata)
+}
+
+/**
+ * Track when a video completes
+ * @param videoId - The unique identifier of the video
+ * @param videoTitle - The title of the video
+ * @param videoCategory - The category of the video
+ * @param totalDuration - Total duration in seconds
+ */
+export const trackVideoComplete = (
+  videoId: string,
+  videoTitle: string,
+  videoCategory: string,
+  totalDuration: number
+): void => {
+  trackVercelEvent('Video Complete', {
+    video_id: videoId,
+    video_title: videoTitle.substring(0, 255), // Ensure within limit
+    video_category: videoCategory,
+    total_duration: Math.round(totalDuration),
+    completion_percentage: 100,
+  })
+}
+
+/**
+ * Track when a video is paused
+ * @param videoId - The unique identifier of the video
+ * @param videoTitle - The title of the video
+ * @param videoCategory - The category of the video
+ * @param pauseTime - Time when paused in seconds
+ * @param progressPercentage - Progress percentage when paused
+ */
+export const trackVideoPause = (
+  videoId: string,
+  videoTitle: string,
+  videoCategory: string,
+  pauseTime: number,
+  progressPercentage: number
+): void => {
+  trackVercelEvent('Video Pause', {
+    video_id: videoId,
+    video_title: videoTitle.substring(0, 255), // Ensure within limit
+    video_category: videoCategory,
+    pause_time: Math.round(pauseTime),
+    progress_percentage: Math.round(progressPercentage),
+  })
+}
+
+/**
+ * Track when a video resumes after pause
+ * @param videoId - The unique identifier of the video
+ * @param videoTitle - The title of the video
+ * @param videoCategory - The category of the video
+ * @param resumeTime - Time when resumed in seconds
+ * @param progressPercentage - Progress percentage when resumed
+ */
+export const trackVideoResume = (
+  videoId: string,
+  videoTitle: string,
+  videoCategory: string,
+  resumeTime: number,
+  progressPercentage: number
+): void => {
+  trackVercelEvent('Video Resume', {
+    video_id: videoId,
+    video_title: videoTitle.substring(0, 255), // Ensure within limit
+    video_category: videoCategory,
+    resume_time: Math.round(resumeTime),
+    progress_percentage: Math.round(progressPercentage),
+  })
+}
+
+/**
  * Common event tracking functions for common use cases
  */
 export const analytics = {
@@ -256,5 +400,71 @@ export const analytics = {
     trackEvent('chat_message', {
       message_length: messageLength,
     })
+  },
+
+  // Video interactions
+  trackVideoStart: (
+    videoId: string,
+    videoTitle: string,
+    videoCategory: string,
+    location?: string
+  ) => {
+    trackVideoStart(videoId, videoTitle, videoCategory, location)
+  },
+
+  trackVideoView: (
+    videoId: string,
+    videoTitle: string,
+    videoCategory: string,
+    location?: string
+  ) => {
+    trackVideoView(videoId, videoTitle, videoCategory, location)
+  },
+
+  trackVideoProgress: (
+    videoId: string,
+    videoTitle: string,
+    videoCategory: string,
+    progressPercentage: number,
+    durationWatched: number,
+    totalDuration?: number
+  ) => {
+    trackVideoProgress(
+      videoId,
+      videoTitle,
+      videoCategory,
+      progressPercentage,
+      durationWatched,
+      totalDuration
+    )
+  },
+
+  trackVideoComplete: (
+    videoId: string,
+    videoTitle: string,
+    videoCategory: string,
+    totalDuration: number
+  ) => {
+    trackVideoComplete(videoId, videoTitle, videoCategory, totalDuration)
+  },
+
+  trackVideoPause: (
+    videoId: string,
+    videoTitle: string,
+    videoCategory: string,
+    pauseTime: number,
+    progressPercentage: number
+  ) => {
+    trackVideoPause(videoId, videoTitle, videoCategory, pauseTime, progressPercentage)
+  },
+
+  trackVideoResume: (
+    videoId: string,
+    videoTitle: string,
+    videoCategory: string,
+    resumeTime: number,
+    progressPercentage: number
+  ) => {
+    trackVideoResume(videoId, videoTitle, videoCategory, resumeTime, progressPercentage)
   },
 }

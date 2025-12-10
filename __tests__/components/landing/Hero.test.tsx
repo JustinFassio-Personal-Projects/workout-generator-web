@@ -40,7 +40,7 @@ describe('Hero', () => {
   it('should render CTA buttons', () => {
     render(<Hero />)
     expect(screen.getByRole('button', { name: /Get Started Free/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Watch Demo/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Watch Videos/i })).toBeInTheDocument()
   })
 
   it('should render stats card', () => {
@@ -61,13 +61,22 @@ describe('Hero', () => {
     expect(trackButtonClick).toHaveBeenCalledWith('Get Started Free', 'hero')
   })
 
-  it('should call trackButtonClick when Watch Demo button is clicked', () => {
+  it('should call trackButtonClick and scroll to videos section when Watch Videos button is clicked', () => {
     const { trackButtonClick } = analyticsModule
+
+    // Mock getElementById and scrollIntoView
+    const mockScrollIntoView = vi.fn()
+    const mockElement = document.createElement('div')
+    mockElement.scrollIntoView = mockScrollIntoView
+    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement)
+
     render(<Hero />)
 
-    const watchDemoButton = screen.getByRole('button', { name: /Watch Demo/i })
-    fireEvent.click(watchDemoButton)
+    const watchVideosButton = screen.getByRole('button', { name: /Watch Videos/i })
+    fireEvent.click(watchVideosButton)
 
-    expect(trackButtonClick).toHaveBeenCalledWith('Watch Demo', 'hero')
+    expect(trackButtonClick).toHaveBeenCalledWith('Watch Videos', 'hero')
+    expect(document.getElementById).toHaveBeenCalledWith('videos')
+    expect(mockScrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
   })
 })

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest'
 import { NextRequest } from 'next/server'
 
 // Mock BotID before importing the route
@@ -12,21 +12,28 @@ import { POST } from '@/app/api/chatkit-session/route'
 describe('POST /api/chatkit-session', () => {
   const originalEnv = process.env
 
+  beforeAll(() => {
+    // Set test API key before all tests
+    process.env.OPENAI_API_KEY = 'test-api-key-for-testing-only'
+  })
+
   beforeEach(() => {
     vi.restoreAllMocks()
     // Reset process.env but ensure we can set test values
     process.env = { ...originalEnv }
-    // Set a default test API key for tests that need it
-    // This ensures tests work without requiring a real API key
-    if (!process.env.OPENAI_API_KEY) {
-      process.env.OPENAI_API_KEY = 'test-api-key-for-testing-only'
-    }
+    // Always set a default test API key for tests
+    process.env.OPENAI_API_KEY = 'test-api-key-for-testing-only'
     global.fetch = vi.fn()
   })
 
   afterEach(() => {
     process.env = originalEnv
     vi.restoreAllMocks()
+  })
+
+  afterAll(() => {
+    // Restore original env
+    process.env = originalEnv
   })
 
   it('should create a ChatKit session successfully', async () => {
@@ -81,6 +88,8 @@ describe('POST /api/chatkit-session', () => {
   })
 
   it('should return 500 if OPENAI_API_KEY is not set', async () => {
+    // Temporarily remove the API key for this test
+    const originalKey = process.env.OPENAI_API_KEY
     delete process.env.OPENAI_API_KEY
 
     const request = new NextRequest('http://localhost:3000/api/chatkit-session', {
@@ -96,6 +105,11 @@ describe('POST /api/chatkit-session', () => {
 
     expect(response.status).toBe(500)
     expect(data.error).toBe('Server configuration error')
+
+    // Restore the API key
+    if (originalKey) {
+      process.env.OPENAI_API_KEY = originalKey
+    }
   })
 
   it('should handle OpenAI API errors', async () => {
@@ -104,6 +118,7 @@ describe('POST /api/chatkit-session', () => {
     vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: false,
       status: 401,
+      statusText: 'Unauthorized',
       text: async () => 'Unauthorized',
     } as Response)
 

@@ -14,14 +14,14 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  // Improve CSS compilation stability during Fast Refresh
-  webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      // Reduce CSS rebuild frequency during development
+  // Fix webpack chunk resolution issues in development
+  webpack: (config, { dev }) => {
+    if (dev) {
+      // Use deterministic IDs for both client and server to prevent missing chunk errors
       config.optimization = {
         ...config.optimization,
-        removeAvailableModules: false,
-        removeEmptyChunks: false,
+        moduleIds: 'deterministic',
+        chunkIds: 'deterministic',
       }
     }
     return config

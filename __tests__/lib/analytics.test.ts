@@ -11,6 +11,12 @@ import {
   trackScrollDepth,
   trackNavigationClick,
   trackFormSubmission,
+  trackVideoStart,
+  trackVideoView,
+  trackVideoProgress,
+  trackVideoComplete,
+  trackVideoPause,
+  trackVideoResume,
   analytics,
 } from '@/lib/analytics'
 
@@ -303,6 +309,129 @@ describe('analytics', () => {
         message_length: 50,
       })
     })
+
+    it('should track video start', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoStart } = await import('@/lib/analytics')
+      analytics.trackVideoStart('video-1', 'Test Video', 'featured-exercise', 'videos_section')
+      expect(track).toHaveBeenCalledWith('Video Start', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        location: 'videos_section',
+      })
+      // Verify the underlying function is also called
+      trackVideoStart('video-1', 'Test Video', 'featured-exercise', 'videos_section')
+      expect(track).toHaveBeenCalledTimes(2)
+    })
+
+    it('should track video view', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoView } = await import('@/lib/analytics')
+      analytics.trackVideoView('video-1', 'Test Video', 'featured-exercise', 'videos_section')
+      expect(track).toHaveBeenCalledWith('Video View', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        location: 'videos_section',
+      })
+      // Verify the underlying function is also called
+      trackVideoView('video-1', 'Test Video', 'featured-exercise', 'videos_section')
+      expect(track).toHaveBeenCalledTimes(2)
+    })
+
+    it('should track video progress with total duration', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoProgress } = await import('@/lib/analytics')
+      analytics.trackVideoProgress('video-1', 'Test Video', 'featured-exercise', 50, 30.5, 60.0)
+      expect(track).toHaveBeenCalledWith('Video Progress', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        progress_percentage: 50,
+        duration_watched: 31,
+        total_duration: 60,
+      })
+      // Verify the underlying function is also called
+      trackVideoProgress('video-1', 'Test Video', 'featured-exercise', 50, 30.5, 60.0)
+      expect(track).toHaveBeenCalledTimes(2)
+    })
+
+    it('should track video progress without total duration', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoProgress } = await import('@/lib/analytics')
+      analytics.trackVideoProgress('video-1', 'Test Video', 'featured-exercise', 25, 15.2)
+      expect(track).toHaveBeenCalledWith('Video Progress', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        progress_percentage: 25,
+        duration_watched: 15,
+      })
+      // Verify the underlying function is also called
+      trackVideoProgress('video-1', 'Test Video', 'featured-exercise', 25, 15.2)
+      expect(track).toHaveBeenCalledTimes(2)
+    })
+
+    it('should track video complete', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoComplete } = await import('@/lib/analytics')
+      analytics.trackVideoComplete('video-1', 'Test Video', 'featured-exercise', 120.5)
+      expect(track).toHaveBeenCalledWith('Video Complete', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        total_duration: 121,
+        completion_percentage: 100,
+      })
+      // Verify the underlying function is also called
+      trackVideoComplete('video-1', 'Test Video', 'featured-exercise', 120.5)
+      expect(track).toHaveBeenCalledTimes(2)
+    })
+
+    it('should track video pause', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoPause } = await import('@/lib/analytics')
+      analytics.trackVideoPause('video-1', 'Test Video', 'featured-exercise', 10.5, 50)
+      expect(track).toHaveBeenCalledWith('Video Pause', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        pause_time: 11,
+        progress_percentage: 50,
+      })
+      // Verify the underlying function is also called
+      trackVideoPause('video-1', 'Test Video', 'featured-exercise', 10.5, 50)
+      expect(track).toHaveBeenCalledTimes(2)
+    })
+
+    it('should track video resume', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoResume } = await import('@/lib/analytics')
+      analytics.trackVideoResume('video-1', 'Test Video', 'featured-exercise', 15.3, 75)
+      expect(track).toHaveBeenCalledWith('Video Resume', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        resume_time: 15,
+        progress_percentage: 75,
+      })
+      // Verify the underlying function is also called
+      trackVideoResume('video-1', 'Test Video', 'featured-exercise', 15.3, 75)
+      expect(track).toHaveBeenCalledTimes(2)
+    })
+
+    it('should truncate long video titles to 255 characters', async () => {
+      const { track } = await import('@vercel/analytics')
+      const longTitle = 'A'.repeat(300)
+      analytics.trackVideoStart('video-1', longTitle, 'featured-exercise')
+      expect(track).toHaveBeenCalledWith('Video Start', {
+        video_id: 'video-1',
+        video_title: 'A'.repeat(255),
+        video_category: 'featured-exercise',
+        location: 'videos_section',
+      })
+    })
   })
 
   describe('Vercel Analytics tracking', () => {
@@ -461,6 +590,111 @@ describe('analytics', () => {
       const { track } = await import('@vercel/analytics')
       trackVercelEvent('Simple Event')
       expect(track).toHaveBeenCalledWith('Simple Event', undefined)
+    })
+
+    it('should track video start directly', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoStart('video-1', 'Test Video', 'featured-exercise', 'custom_location')
+      expect(track).toHaveBeenCalledWith('Video Start', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        location: 'custom_location',
+      })
+    })
+
+    it('should track video start with default location', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoStart('video-1', 'Test Video', 'featured-exercise')
+      expect(track).toHaveBeenCalledWith('Video Start', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        location: 'videos_section',
+      })
+    })
+
+    it('should track video view directly', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoView('video-1', 'Test Video', 'featured-exercise', 'custom_location')
+      expect(track).toHaveBeenCalledWith('Video View', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        location: 'custom_location',
+      })
+    })
+
+    it('should track video view with default location', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoView('video-1', 'Test Video', 'featured-exercise')
+      expect(track).toHaveBeenCalledWith('Video View', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        location: 'videos_section',
+      })
+    })
+
+    it('should track video progress directly with total duration', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoProgress('video-1', 'Test Video', 'featured-exercise', 75, 45.7, 60.0)
+      expect(track).toHaveBeenCalledWith('Video Progress', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        progress_percentage: 75,
+        duration_watched: 46,
+        total_duration: 60,
+      })
+    })
+
+    it('should track video progress directly without total duration', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoProgress('video-1', 'Test Video', 'featured-exercise', 25, 12.3)
+      expect(track).toHaveBeenCalledWith('Video Progress', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        progress_percentage: 25,
+        duration_watched: 12,
+      })
+    })
+
+    it('should track video complete directly', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoComplete('video-1', 'Test Video', 'featured-exercise', 90.8)
+      expect(track).toHaveBeenCalledWith('Video Complete', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        total_duration: 91,
+        completion_percentage: 100,
+      })
+    })
+
+    it('should track video pause directly', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoPause('video-1', 'Test Video', 'featured-exercise', 20.7, 65)
+      expect(track).toHaveBeenCalledWith('Video Pause', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        pause_time: 21,
+        progress_percentage: 65,
+      })
+    })
+
+    it('should track video resume directly', async () => {
+      const { track } = await import('@vercel/analytics')
+      trackVideoResume('video-1', 'Test Video', 'featured-exercise', 25.9, 80)
+      expect(track).toHaveBeenCalledWith('Video Resume', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        resume_time: 26,
+        progress_percentage: 80,
+      })
     })
   })
 })

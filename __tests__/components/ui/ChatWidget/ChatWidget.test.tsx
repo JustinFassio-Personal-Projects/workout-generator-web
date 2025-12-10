@@ -86,4 +86,47 @@ describe('ChatWidget', () => {
     render(<ChatWidget userId="user123" />)
     expect(screen.getByLabelText('Open chat')).toBeInTheDocument()
   })
+
+  it('should minimize chat when minimize button is clicked', async () => {
+    process.env.NEXT_PUBLIC_CHATKIT_WORKFLOW_ID = 'wf_test123'
+
+    render(<ChatWidget defaultOpen={true} />)
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Chat assistant')).toBeInTheDocument()
+    })
+
+    const minimizeButton = screen.getByLabelText('Minimize chat')
+    minimizeButton.click()
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Maximize chat')).toBeInTheDocument()
+    })
+  })
+
+  it('should maximize chat when maximize button is clicked', async () => {
+    process.env.NEXT_PUBLIC_CHATKIT_WORKFLOW_ID = 'wf_test123'
+
+    render(<ChatWidget defaultOpen={true} />)
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Chat assistant')).toBeInTheDocument()
+    })
+
+    // Minimize first
+    const minimizeButton = screen.getByLabelText('Minimize chat')
+    minimizeButton.click()
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Maximize chat')).toBeInTheDocument()
+    })
+
+    // Then maximize
+    const maximizeButton = screen.getByLabelText('Maximize chat')
+    maximizeButton.click()
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Minimize chat')).toBeInTheDocument()
+    })
+  })
 })

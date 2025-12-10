@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button/Button'
 import { Drawer } from '@/components/ui/Drawer/Drawer'
+import { trackButtonClick, trackNavigationClick, trackVercelEvent } from '@/lib/analytics'
 import styles from './Navbar.module.scss'
 
 export const Navbar: React.FC = () => {
@@ -12,25 +13,37 @@ export const Navbar: React.FC = () => {
   const [logoError, setLogoError] = useState(false)
 
   const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen)
+    const newState = !isDrawerOpen
+    setIsDrawerOpen(newState)
+    trackVercelEvent('Menu Toggle', {
+      action: newState ? 'open' : 'close',
+      location: 'navbar',
+    })
   }
 
   const closeDrawer = () => {
     setIsDrawerOpen(false)
+    trackVercelEvent('Menu Toggle', {
+      action: 'close',
+      location: 'navbar',
+    })
   }
 
-  const handleNavClick = () => {
+  const handleNavClick = (destination: string, label: string) => {
     closeDrawer()
+    trackNavigationClick(destination, 'nav_link', 'navbar', {
+      link_label: label,
+    })
   }
 
   const navLinks = (
     <>
-      <Link href="/" className={styles.navLink} onClick={handleNavClick}>
+      <Link href="/" className={styles.navLink} onClick={() => handleNavClick('/', 'Home')}>
         <Button variant="secondary" size="md" className={styles.button} type="button">
           Home
         </Button>
       </Link>
-      <Link href="/blog" className={styles.navLink} onClick={handleNavClick}>
+      <Link href="/blog" className={styles.navLink} onClick={() => handleNavClick('/blog', 'Blog')}>
         <Button variant="secondary" size="md" className={styles.button} type="button">
           Blog
         </Button>
@@ -44,7 +57,10 @@ export const Navbar: React.FC = () => {
       target="_blank"
       rel="noopener noreferrer"
       className={styles.signInButton}
-      onClick={handleNavClick}
+      onClick={() => {
+        closeDrawer()
+        trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
+      }}
     >
       <Button variant="primary" size="md">
         Sign In

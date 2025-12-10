@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button/Button'
 import { BlogPostCard } from '@/components/features/blog/BlogPostCard'
 import { useBlogPosts } from '@/features/blog/hooks/useBlogPosts'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
+import { trackButtonClick } from '@/lib/analytics'
 import styles from './Blog.module.scss'
 
 export const Blog: React.FC = () => {
@@ -45,7 +46,12 @@ export const Blog: React.FC = () => {
           ))}
         </div>
         <div className={styles.cta} data-aos="fade-up" data-aos-delay="300">
-          <Link href="/blog">
+          <Link
+            href="/blog"
+            onClick={() => {
+              trackButtonClick('View All Posts', 'blog', { section: 'landing' })
+            }}
+          >
             <Button variant="secondary" size="lg" icon={ArrowRight} iconPosition="right">
               View All Posts
             </Button>

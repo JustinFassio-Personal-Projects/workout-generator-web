@@ -9,10 +9,14 @@ import { Videos } from '@/components/landing/Videos/Videos'
 import { Blog } from '@/components/landing/Blog/Blog'
 import { Pricing } from '@/components/landing/Pricing/Pricing'
 import { Footer } from '@/components/landing/Footer/Footer'
+import { useScrollTracking } from '@/features/analytics/hooks/useScrollTracking'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 export default function Home() {
+  // Track scroll depth milestones
+  useScrollTracking()
+
   useEffect(() => {
     // Initialize AOS globally
     if (typeof window !== 'undefined') {

@@ -1,13 +1,26 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { POST } from '@/app/api/chatkit-session/route'
 import { NextRequest } from 'next/server'
+
+// Mock BotID before importing the route
+vi.mock('botid/server', () => ({
+  checkBotId: vi.fn(async () => ({ isBot: false })),
+}))
+
+// Import after mock
+import { POST } from '@/app/api/chatkit-session/route'
 
 describe('POST /api/chatkit-session', () => {
   const originalEnv = process.env
 
   beforeEach(() => {
     vi.restoreAllMocks()
+    // Reset process.env but ensure we can set test values
     process.env = { ...originalEnv }
+    // Set a default test API key for tests that need it
+    // This ensures tests work without requiring a real API key
+    if (!process.env.OPENAI_API_KEY) {
+      process.env.OPENAI_API_KEY = 'test-api-key-for-testing-only'
+    }
     global.fetch = vi.fn()
   })
 

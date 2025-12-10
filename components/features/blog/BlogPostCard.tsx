@@ -1,8 +1,11 @@
+'use client'
+
 import React from 'react'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card/Card'
 import { BlogPost } from '@/features/blog/types'
 import { formatDate } from '@/features/blog/lib/formatDate'
+import { trackVercelEvent } from '@/lib/analytics'
 import styles from './BlogPostCard.module.scss'
 
 interface BlogPostCardProps {
@@ -10,9 +13,18 @@ interface BlogPostCardProps {
 }
 
 export const BlogPostCard: React.FC<BlogPostCardProps> = ({ post }) => {
+  const handleClick = () => {
+    trackVercelEvent('Blog Post Click', {
+      post_slug: post.slug,
+      post_title: post.title.substring(0, 255), // Ensure within limit
+      post_category: post.category,
+      location: 'blog_card',
+    })
+  }
+
   return (
     <Card hover={true}>
-      <Link href={`/blog/${post.slug}`} className={styles.cardLink}>
+      <Link href={`/blog/${post.slug}`} className={styles.cardLink} onClick={handleClick}>
         <div className={styles.cardContent}>
           <div>
             <span className={styles.category}>{post.category}</span>

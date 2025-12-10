@@ -1,12 +1,40 @@
 'use client'
 
-import React from 'react'
+import React, { FormEvent } from 'react'
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Send } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
+import { trackVercelEvent, trackNavigationClick } from '@/lib/analytics'
 import styles from './Footer.module.scss'
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear()
+
+  const handleNewsletterSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    trackVercelEvent('Newsletter Subscribe', {
+      location: 'footer',
+      form_type: 'newsletter',
+    })
+    // Form submission logic would go here
+  }
+
+  const handleSocialLinkClick = (platform: string) => {
+    trackVercelEvent('Social Link Click', {
+      platform,
+      location: 'footer',
+    })
+  }
+
+  const handleFooterLinkClick = (
+    href: string,
+    category: 'product' | 'company' | 'resources' | 'legal',
+    label: string
+  ) => {
+    trackNavigationClick(href, 'footer_link', 'footer', {
+      category,
+      link_label: label,
+    })
+  }
 
   const navigationLinks = {
     product: [
@@ -61,6 +89,7 @@ export const Footer: React.FC = () => {
                     href={social.href}
                     aria-label={social.label}
                     className={styles.socialLink}
+                    onClick={() => handleSocialLinkClick(social.label)}
                   >
                     <Icon size={20} />
                   </a>
@@ -75,7 +104,11 @@ export const Footer: React.FC = () => {
               <ul className={styles.linksList}>
                 {navigationLinks.product.map((link, index) => (
                   <li key={index}>
-                    <a href={link.href} className={styles.link}>
+                    <a
+                      href={link.href}
+                      className={styles.link}
+                      onClick={() => handleFooterLinkClick(link.href, 'product', link.label)}
+                    >
                       {link.label}
                     </a>
                   </li>
@@ -88,7 +121,11 @@ export const Footer: React.FC = () => {
               <ul className={styles.linksList}>
                 {navigationLinks.company.map((link, index) => (
                   <li key={index}>
-                    <a href={link.href} className={styles.link}>
+                    <a
+                      href={link.href}
+                      className={styles.link}
+                      onClick={() => handleFooterLinkClick(link.href, 'company', link.label)}
+                    >
                       {link.label}
                     </a>
                   </li>
@@ -101,7 +138,11 @@ export const Footer: React.FC = () => {
               <ul className={styles.linksList}>
                 {navigationLinks.resources.map((link, index) => (
                   <li key={index}>
-                    <a href={link.href} className={styles.link}>
+                    <a
+                      href={link.href}
+                      className={styles.link}
+                      onClick={() => handleFooterLinkClick(link.href, 'resources', link.label)}
+                    >
                       {link.label}
                     </a>
                   </li>
@@ -114,7 +155,11 @@ export const Footer: React.FC = () => {
               <ul className={styles.linksList}>
                 {navigationLinks.legal.map((link, index) => (
                   <li key={index}>
-                    <a href={link.href} className={styles.link}>
+                    <a
+                      href={link.href}
+                      className={styles.link}
+                      onClick={() => handleFooterLinkClick(link.href, 'legal', link.label)}
+                    >
                       {link.label}
                     </a>
                   </li>
@@ -128,7 +173,7 @@ export const Footer: React.FC = () => {
             <p className={styles.newsletterText}>
               Stay updated with the latest fitness tips and features.
             </p>
-            <form className={styles.newsletterForm}>
+            <form className={styles.newsletterForm} onSubmit={handleNewsletterSubmit}>
               <div className={styles.inputWrapper}>
                 <Mail size={20} className={styles.inputIcon} />
                 <input

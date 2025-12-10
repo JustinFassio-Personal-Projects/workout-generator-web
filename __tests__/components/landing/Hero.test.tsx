@@ -1,12 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { Hero } from '@/components/landing/Hero/Hero'
+import * as analyticsModule from '@/lib/analytics'
 
 // Mock AOS
 vi.mock('aos', () => ({
   default: {
     init: vi.fn(),
   },
+}))
+
+// Mock analytics
+vi.mock('@/lib/analytics', () => ({
+  trackButtonClick: vi.fn(),
 }))
 
 describe('Hero', () => {
@@ -43,5 +49,29 @@ describe('Hero', () => {
     expect(screen.getByText(/Users/i)).toBeInTheDocument()
     expect(screen.getByText(/50K\+/i)).toBeInTheDocument()
     expect(screen.getByText(/Workouts Generated/i)).toBeInTheDocument()
+  })
+
+  it('should call trackButtonClick when Get Started Free button is clicked', () => {
+    const { trackButtonClick } = analyticsModule
+    render(<Hero />)
+
+    const getStartedButton = screen.getByRole('button', { name: /Get Started Free/i })
+    fireEvent.click(getStartedButton)
+
+    expect(trackButtonClick).toHaveBeenCalledWith('Get Started Free', 'hero', {
+      section: 'hero',
+    })
+  })
+
+  it('should call trackButtonClick when Watch Demo button is clicked', () => {
+    const { trackButtonClick } = analyticsModule
+    render(<Hero />)
+
+    const watchDemoButton = screen.getByRole('button', { name: /Watch Demo/i })
+    fireEvent.click(watchDemoButton)
+
+    expect(trackButtonClick).toHaveBeenCalledWith('Watch Demo', 'hero', {
+      section: 'hero',
+    })
   })
 })

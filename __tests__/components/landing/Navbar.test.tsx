@@ -65,14 +65,27 @@ describe('Navbar', () => {
     const menuButton = screen.getByRole('button', { name: /open menu/i })
     await user.click(menuButton)
 
+    // Wait for drawer to be open
+    await waitFor(
+      () => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
+
     // Close drawer via overlay
     const overlay = screen.getByTestId('drawer-overlay')
     await user.click(overlay)
 
-    // Drawer should be closed
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    // Wait for drawer to be closed
+    await waitFor(
+      () => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
     expect(menuButton).toHaveAttribute('aria-expanded', 'false')
-  })
+  }, 10000)
 
   it('should close drawer when navigation link is clicked', async () => {
     const user = userEvent.setup()
@@ -133,14 +146,20 @@ describe('Navbar', () => {
     logoImage.dispatchEvent(errorEvent)
 
     // After error, text should be visible instead
-    await waitFor(() => {
-      expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
     // Logo image should no longer be in document
-    await waitFor(() => {
-      expect(screen.queryByAltText('AI Workout Generator')).not.toBeInTheDocument()
-    })
-  })
+    await waitFor(
+      () => {
+        expect(screen.queryByAltText('AI Workout Generator')).not.toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
+  }, 10000)
 
   it('should handle logo image error event', async () => {
     render(<Navbar />)

@@ -58,9 +58,7 @@ describe('Hero', () => {
     const getStartedButton = screen.getByRole('button', { name: /Get Started Free/i })
     fireEvent.click(getStartedButton)
 
-    expect(trackButtonClick).toHaveBeenCalledWith('Get Started Free', 'hero', {
-      section: 'hero',
-    })
+    expect(trackButtonClick).toHaveBeenCalledWith('Get Started Free', 'hero')
   })
 
   it('should call trackButtonClick when Watch Demo button is clicked', () => {
@@ -70,8 +68,6 @@ describe('Hero', () => {
     const watchDemoButton = screen.getByRole('button', { name: /Watch Demo/i })
     fireEvent.click(watchDemoButton)
 
-    expect(trackButtonClick).toHaveBeenCalledWith('Watch Demo', 'hero', {
-      section: 'hero',
-    })
+    expect(trackButtonClick).toHaveBeenCalledWith('Watch Demo', 'hero')
   })
 })

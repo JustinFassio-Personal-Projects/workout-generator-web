@@ -31,7 +31,7 @@ export const Hero: React.FC = () => {
               data-aos="fade-up"
               data-aos-delay="100"
               onClick={() => {
-                trackButtonClick('Get Started Free', 'hero', { section: 'hero' })
+                trackButtonClick('Get Started Free', 'hero')
               }}
             >
               <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
@@ -45,7 +45,7 @@ export const Hero: React.FC = () => {
                 icon={Play}
                 iconPosition="left"
                 onClick={() => {
-                  trackButtonClick('Watch Demo', 'hero', { section: 'hero' })
+                  trackButtonClick('Watch Demo', 'hero')
                 }}
               >
                 Watch Demo

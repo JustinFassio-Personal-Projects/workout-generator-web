@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Navbar } from '@/components/landing/Navbar/Navbar'
 
@@ -50,10 +50,14 @@ describe('Navbar', () => {
     render(<Navbar />)
 
     const menuButton = screen.getByRole('button', { name: /open menu/i })
-    await user.click(menuButton)
+    await act(async () => {
+      await user.click(menuButton)
+    })
 
     // Drawer should be open (check for drawer content)
-    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
     expect(menuButton).toHaveAttribute('aria-expanded', 'true')
   })
 
@@ -63,7 +67,9 @@ describe('Navbar', () => {
 
     // Open drawer
     const menuButton = screen.getByRole('button', { name: /open menu/i })
-    await user.click(menuButton)
+    await act(async () => {
+      await user.click(menuButton)
+    })
 
     // Wait for drawer to be open
     await waitFor(
@@ -75,7 +81,9 @@ describe('Navbar', () => {
 
     // Close drawer via overlay
     const overlay = screen.getByTestId('drawer-overlay')
-    await user.click(overlay)
+    await act(async () => {
+      await user.click(overlay)
+    })
 
     // Wait for drawer to be closed
     await waitFor(
@@ -93,14 +101,25 @@ describe('Navbar', () => {
 
     // Open drawer
     const menuButton = screen.getByRole('button', { name: /open menu/i })
-    await user.click(menuButton)
+    await act(async () => {
+      await user.click(menuButton)
+    })
+
+    // Wait for drawer to be open
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
 
     // Click navigation link
     const homeLink = screen.getAllByRole('link', { name: /home/i })[0]
-    await user.click(homeLink)
+    await act(async () => {
+      await user.click(homeLink)
+    })
 
     // Drawer should be closed
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
   })
 
   it('should close drawer when Sign In button is clicked', async () => {
@@ -109,7 +128,9 @@ describe('Navbar', () => {
 
     // Open drawer
     const menuButton = screen.getByRole('button', { name: /open menu/i })
-    await user.click(menuButton)
+    await act(async () => {
+      await user.click(menuButton)
+    })
 
     // Wait for drawer to be open
     await waitFor(() => {
@@ -120,7 +141,9 @@ describe('Navbar', () => {
     const signInLinks = screen.getAllByRole('link', { name: /sign in/i })
     const drawerSignInLink = signInLinks.find(link => link.closest('[role="dialog"]'))
     if (drawerSignInLink) {
-      await user.click(drawerSignInLink)
+      await act(async () => {
+        await user.click(drawerSignInLink)
+      })
     }
 
     // Wait for drawer to be closed
@@ -142,8 +165,10 @@ describe('Navbar', () => {
     expect(logoImage).toBeInTheDocument()
 
     // Simulate error event
-    const errorEvent = new Event('error')
-    logoImage.dispatchEvent(errorEvent)
+    await act(async () => {
+      const errorEvent = new Event('error')
+      logoImage.dispatchEvent(errorEvent)
+    })
 
     // After error, text should be visible instead
     await waitFor(
@@ -167,8 +192,10 @@ describe('Navbar', () => {
     expect(logoImage).toBeInTheDocument()
 
     // Simulate error event
-    const errorEvent = new Event('error')
-    logoImage.dispatchEvent(errorEvent)
+    await act(async () => {
+      const errorEvent = new Event('error')
+      logoImage.dispatchEvent(errorEvent)
+    })
 
     // After error, text should be visible instead
     await waitFor(() => {
@@ -186,12 +213,14 @@ describe('Navbar', () => {
     expect(logoImage).toBeInTheDocument()
 
     // Simulate load event with zero width
-    Object.defineProperty(logoImage, 'naturalWidth', {
-      value: 0,
-      writable: true,
+    await act(async () => {
+      Object.defineProperty(logoImage, 'naturalWidth', {
+        value: 0,
+        writable: true,
+      })
+      const loadEvent = new Event('load')
+      logoImage.dispatchEvent(loadEvent)
     })
-    const loadEvent = new Event('load')
-    logoImage.dispatchEvent(loadEvent)
 
     // After zero width detected, text should be visible instead
     await waitFor(() => {

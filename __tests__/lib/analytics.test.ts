@@ -303,6 +303,38 @@ describe('analytics', () => {
         message_length: 50,
       })
     })
+
+    it('should track video pause', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoPause } = await import('@/lib/analytics')
+      analytics.trackVideoPause('video-1', 'Test Video', 'featured-exercise', 10.5, 50)
+      expect(track).toHaveBeenCalledWith('Video Pause', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        pause_time: 11,
+        progress_percentage: 50,
+      })
+      // Verify the underlying function is also called
+      trackVideoPause('video-1', 'Test Video', 'featured-exercise', 10.5, 50)
+      expect(track).toHaveBeenCalledTimes(2)
+    })
+
+    it('should track video resume', async () => {
+      const { track } = await import('@vercel/analytics')
+      const { trackVideoResume } = await import('@/lib/analytics')
+      analytics.trackVideoResume('video-1', 'Test Video', 'featured-exercise', 15.3, 75)
+      expect(track).toHaveBeenCalledWith('Video Resume', {
+        video_id: 'video-1',
+        video_title: 'Test Video',
+        video_category: 'featured-exercise',
+        resume_time: 15,
+        progress_percentage: 75,
+      })
+      // Verify the underlying function is also called
+      trackVideoResume('video-1', 'Test Video', 'featured-exercise', 15.3, 75)
+      expect(track).toHaveBeenCalledTimes(2)
+    })
   })
 
   describe('Vercel Analytics tracking', () => {

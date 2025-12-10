@@ -112,10 +112,12 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video, index = 0 }) => {
     }
 
     // Helper function to check and track milestones
+    // Note: 100% milestone is not tracked here as handleEnded fires before timeupdate reaches 100%
+    // Completion is tracked separately via trackVideoComplete
     const checkMilestones = () => {
       try {
         const progress = getProgressPercentage()
-        const milestones = [25, 50, 75, 100]
+        const milestones = [25, 50, 75]
 
         milestones.forEach(milestone => {
           if (progress >= milestone && !trackedMilestonesRef.current.has(milestone)) {

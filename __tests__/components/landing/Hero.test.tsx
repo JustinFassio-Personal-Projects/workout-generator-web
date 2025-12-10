@@ -66,10 +66,9 @@ describe('Hero', () => {
 
     // Mock getElementById and scrollIntoView
     const mockScrollIntoView = vi.fn()
-    const mockElement = {
-      scrollIntoView: mockScrollIntoView,
-    }
-    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement as HTMLElement)
+    const mockElement = document.createElement('div')
+    mockElement.scrollIntoView = mockScrollIntoView
+    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement)
 
     render(<Hero />)
 

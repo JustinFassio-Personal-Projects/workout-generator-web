@@ -26,7 +26,7 @@ export const journeySteps: JourneyStep[] = [
       'Fitness level assessment',
       'Equipment preferences',
     ],
-    accentColor: '#84cc16',
+    accentColor: '#f0dc7a',
   },
   {
     id: '2',
@@ -41,7 +41,7 @@ export const journeySteps: JourneyStep[] = [
       'Adaptive difficulty',
       'Equipment-based options',
     ],
-    accentColor: '#22c55e',
+    accentColor: '#f4e59c',
   },
   {
     id: '3',
@@ -57,7 +57,7 @@ export const journeySteps: JourneyStep[] = [
       'Rest timer included',
     ],
     comingSoonFeatures: ['Video demonstrations', 'Rest timer included'],
-    accentColor: '#16a34a',
+    accentColor: '#e6d185',
   },
   {
     id: '4',
@@ -68,7 +68,7 @@ export const journeySteps: JourneyStep[] = [
     icon: TrendingUp,
     features: ['Progress charts', 'Workout history', 'Achievement badges', 'Performance insights'],
     comingSoonFeatures: ['Progress charts', 'Achievement badges', 'Performance insights'],
-    accentColor: '#15803d',
+    accentColor: '#d4c469',
   },
   {
     id: '5',
@@ -84,6 +84,6 @@ export const journeySteps: JourneyStep[] = [
       'Continuous improvement',
     ],
     comingSoonFeatures: ['Goal completion', 'Community recognition'],
-    accentColor: '#84cc16',
+    accentColor: '#f0dc7a',
   },
 ]

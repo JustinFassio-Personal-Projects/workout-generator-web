@@ -21,8 +21,8 @@ export const features: Feature[] = [
       'Create personalized workouts instantly with our advanced AI algorithm that adapts to your fitness level and goals.',
     icon: Zap,
     gradientColors: {
-      from: '#84cc16',
-      to: '#22c55e',
+      from: '#f0dc7a',
+      to: '#f4e59c',
     },
   },
   {
@@ -33,8 +33,8 @@ export const features: Feature[] = [
     icon: Target,
     comingSoon: true,
     gradientColors: {
-      from: '#22c55e',
-      to: '#16a34a',
+      from: '#f4e59c',
+      to: '#e6d185',
     },
   },
   {
@@ -45,8 +45,8 @@ export const features: Feature[] = [
     icon: Users,
     comingSoon: true,
     gradientColors: {
-      from: '#16a34a',
-      to: '#15803d',
+      from: '#e6d185',
+      to: '#d4c469',
     },
   },
   {
@@ -57,8 +57,8 @@ export const features: Feature[] = [
     icon: BarChart3,
     comingSoon: true,
     gradientColors: {
-      from: '#84cc16',
-      to: '#65a30d',
+      from: '#f0dc7a',
+      to: '#d4c469',
     },
   },
   {
@@ -68,8 +68,8 @@ export const features: Feature[] = [
       'Access your workouts anywhere, anytime with our fully responsive design that works perfectly on all devices.',
     icon: Smartphone,
     gradientColors: {
-      from: '#a3e635',
-      to: '#84cc16',
+      from: '#f4e59c',
+      to: '#f0dc7a',
     },
   },
   {
@@ -79,8 +79,8 @@ export const features: Feature[] = [
       'Tailor every workout to your preferences, equipment availability, and schedule with our flexible customization options.',
     icon: Sparkles,
     gradientColors: {
-      from: '#4ade80',
-      to: '#22c55e',
+      from: '#f0dc7a',
+      to: '#f4e59c',
     },
   },
 ]

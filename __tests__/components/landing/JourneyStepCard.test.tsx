@@ -18,7 +18,7 @@ describe('JourneyStepCard', () => {
     description: 'Test description',
     icon: Target,
     features: ['Feature 1', 'Feature 2'],
-    accentColor: '#84cc16',
+    accentColor: '#f0dc7a',
     index: 0,
     isLast: false,
   }

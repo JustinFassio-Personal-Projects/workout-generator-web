@@ -13,8 +13,8 @@
     right: 0;
     bottom: 0;
     background:
-      radial-gradient(circle at 20% 50%, rgba(132, 204, 22, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.1) 0%, transparent 50%);
+      radial-gradient(circle at 20% 50%, rgba(240, 220, 122, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(244, 229, 156, 0.1) 0%, transparent 50%);
     pointer-events: none;
   }
 
@@ -61,7 +61,7 @@
 
 .gradientText {
   display: block;
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-400) 100%);
+  background: linear-gradient(135deg, var(--gold-main) 0%, var(--gold-dark-1) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

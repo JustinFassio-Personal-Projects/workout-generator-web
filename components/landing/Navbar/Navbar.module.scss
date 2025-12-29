@@ -4,7 +4,7 @@
   position: sticky;
   top: 0;
   z-index: var(--z-fixed);
-  background: rgba(10, 14, 26, 0.7);
+  background: rgba(125, 111, 84, 0.85); /* earth-brown with transparency for glass effect */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--glass-border-base);

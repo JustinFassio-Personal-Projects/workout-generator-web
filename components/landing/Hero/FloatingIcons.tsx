@@ -51,10 +51,10 @@ export const FloatingIcons: React.FC = () => {
               left: `${position.left}%`,
               animationDelay: `${position.animationDelay}s`,
               animationDuration: `${position.duration}s`,
-              color: '#84cc16', // accent color
+              color: '#f0dc7a', // accent color
             }}
           >
-            <Icon size={24} className="drop-shadow-[0_0_10px_rgba(132,204,22,0.3)]" />
+            <Icon size={24} className="drop-shadow-[0_0_10px_rgba(240,220,122,0.3)]" />
           </div>
         )
       })}

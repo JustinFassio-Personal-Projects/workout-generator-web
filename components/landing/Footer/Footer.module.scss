@@ -1,6 +1,6 @@
 .footer {
   padding: var(--spacing-5xl) 0 var(--spacing-xl) 0;
-  background: var(--bg-dark-secondary);
+  background: var(--earth-brown);
   border-top: 1px solid var(--glass-border-base);
   position: relative;
 
@@ -68,7 +68,7 @@
 .logoAccent {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-400) 100%);
+  background: linear-gradient(135deg, var(--gold-main) 0%, var(--gold-dark-1) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -209,7 +209,7 @@
   &:focus {
     outline: none;
     border-color: var(--glass-border-hover);
-    box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.1);
+    box-shadow: 0 0 0 3px rgba(240, 220, 122, 0.1);
   }
 }
 

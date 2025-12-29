@@ -1,51 +1,79 @@
 // Color System - CSS Custom Properties
 :root {
-  // Primary Colors (Green scale)
-  --color-primary-50: #f0fdf4;
-  --color-primary-100: #dcfce7;
-  --color-primary-200: #bbf7d0;
-  --color-primary-300: #86efac;
-  --color-primary-400: #4ade80;
-  --color-primary-500: #22c55e;
-  --color-primary-600: #16a34a;
-  --color-primary-700: #15803d;
-  --color-primary-800: #166534;
-  --color-primary-900: #14532d;
+  // Gold Colors (Primary Brand Colors)
+  --gold-main: #f0dc7a;
+  --gold-light: #f4e59c;
+  --gold-medium: #e6d185;
+  --gold-dark-1: #d4c469;
+  --gold-dark-2: #b8a85e;
+  --gold-dark-3: #9c8c53;
+  --gold-dark-4: #807048;
+  --gold-dark-5: #6b5d3c;
+  --gold-light-1: #faf5e1;
+  --gold-light-2: #fdfaf0;
 
-  // Accent Colors (Lime scale)
-  --color-accent: #84cc16;
-  --color-accent-light: #a3e635;
-  --color-accent-dark: #65a30d;
+  // Legacy Primary Color Mappings (for backward compatibility)
+  --color-primary-50: #fdfaf0;
+  --color-primary-100: #faf5e1;
+  --color-primary-200: #f4e59c;
+  --color-primary-300: #f0dc7a;
+  --color-primary-400: #e6d185;
+  --color-primary-500: #f0dc7a;
+  --color-primary-600: #d4c469;
+  --color-primary-700: #b8a85e;
+  --color-primary-800: #9c8c53;
+  --color-primary-900: #807048;
 
-  // Gray Scale
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-  --color-gray-950: #030712;
+  // Accent Colors (Gold scale - replacing lime)
+  --color-accent: #f0dc7a;
+  --color-accent-light: #f4e59c;
+  --color-accent-dark: #d4c469;
 
-  // Glass Morphism Colors
-  --glass-bg-base: rgba(25, 33, 51, 0.6);
-  --glass-bg-hover: rgba(25, 33, 51, 0.8);
-  --glass-border-base: rgba(132, 204, 22, 0.15);
-  --glass-border-hover: rgba(132, 204, 22, 0.3);
-  --glass-border-accent: rgba(132, 204, 22, 0.5);
+  // Earth Tone
+  --earth-brown: #7d6f54;
 
-  // Background Colors
-  --bg-dark: #0a0e1a;
-  --bg-dark-secondary: #111827;
-  --bg-gradient-start: #0a0e1a;
-  --bg-gradient-end: #1a1f35;
+  // Slate Colors (Dark Colors - replacing gray)
+  --slate-950: #0f172a;
+  --slate-900: #1e293b;
+  --slate-800: #1e293b;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-50: #f8fafc;
+
+  // Legacy Gray Scale Mappings (for backward compatibility)
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f8fafc;
+  --color-gray-200: #94a3b8;
+  --color-gray-300: #94a3b8;
+  --color-gray-400: #64748b;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #1e293b;
+  --color-gray-950: #0f172a;
+
+  // Glass Morphism Colors (updated to use pure black for true black look)
+  --glass-bg-base: rgba(0, 0, 0, 0.6);
+  --glass-bg-hover: rgba(0, 0, 0, 0.8);
+  --glass-border-base: rgba(240, 220, 122, 0.15);
+  --glass-border-hover: rgba(240, 220, 122, 0.3);
+  --glass-border-accent: rgba(240, 220, 122, 0.5);
+
+  // Background Colors (using pure black for true black look)
+  --bg-dark: #000000;
+  --bg-dark-secondary: #0a0a0a;
+  --bg-gradient-start: #000000;
+  --bg-gradient-end: #0a0a0a;
 
   // Text Colors
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.8);
-  --text-tertiary: rgba(255, 255, 255, 0.6);
-  --text-muted: rgba(255, 255, 255, 0.4);
+  --text-primary: #f8fafc;
+  --text-secondary: rgba(248, 250, 252, 0.8);
+  --text-tertiary: rgba(248, 250, 252, 0.6);
+  --text-muted: rgba(248, 250, 252, 0.4);
+
+  // Functional Colors
+  --error-red: #ef4444;
 }

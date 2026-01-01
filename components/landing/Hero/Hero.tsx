@@ -33,7 +33,6 @@ export const Hero: React.FC = () => {
                 iconPosition="right"
                 onClick={() => {
                   trackButtonClick('Get Started Free', 'hero')
-                  alert('This function is coming soon!')
                 }}
               >
                 Get Started Free

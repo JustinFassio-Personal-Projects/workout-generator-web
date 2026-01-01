@@ -59,7 +59,6 @@ export const Navbar: React.FC = () => {
         onClick={() => {
           closeDrawer()
           trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
-          alert('This function is coming soon!')
         }}
       >
         Sign In

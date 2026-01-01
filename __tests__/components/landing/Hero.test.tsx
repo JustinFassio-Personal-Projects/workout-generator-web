@@ -18,6 +18,8 @@ vi.mock('@/lib/analytics', () => ({
 describe('Hero', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Mock window.alert
+    global.alert = vi.fn()
   })
 
   it('should render hero section', () => {

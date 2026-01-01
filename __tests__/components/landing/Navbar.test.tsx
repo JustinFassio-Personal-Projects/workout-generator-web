@@ -14,6 +14,8 @@ vi.mock('next/image', () => ({
 describe('Navbar', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Mock window.alert
+    global.alert = vi.fn()
   })
 
   it('should render navbar with logo', () => {
@@ -31,11 +33,8 @@ describe('Navbar', () => {
 
   it('should render Sign In button', () => {
     render(<Navbar />)
-    const signInLink = screen.getByRole('link', { name: /sign in/i })
-    expect(signInLink).toBeInTheDocument()
-    expect(signInLink).toHaveAttribute('href', 'https://members.fitcopilot.ai')
-    expect(signInLink).toHaveAttribute('target', '_blank')
-    expect(signInLink).toHaveAttribute('rel', 'noopener noreferrer')
+    const signInButton = screen.getByRole('button', { name: /sign in/i })
+    expect(signInButton).toBeInTheDocument()
   })
 
   it('should render mobile menu button', () => {
@@ -138,11 +137,11 @@ describe('Navbar', () => {
     })
 
     // Click Sign In button in drawer
-    const signInLinks = screen.getAllByRole('link', { name: /sign in/i })
-    const drawerSignInLink = signInLinks.find(link => link.closest('[role="dialog"]'))
-    if (drawerSignInLink) {
+    const signInButtons = screen.getAllByRole('button', { name: /sign in/i })
+    const drawerSignInButton = signInButtons.find(button => button.closest('[role="dialog"]'))
+    if (drawerSignInButton) {
       await act(async () => {
-        await user.click(drawerSignInLink)
+        await user.click(drawerSignInButton)
       })
     }
 

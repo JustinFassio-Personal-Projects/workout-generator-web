@@ -52,20 +52,19 @@ export const Navbar: React.FC = () => {
   )
 
   const signInButton = (
-    <a
-      href="https://members.fitcopilot.ai"
-      target="_blank"
-      rel="noopener noreferrer"
-      className={styles.signInButton}
-      onClick={() => {
-        closeDrawer()
-        trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
-      }}
-    >
-      <Button variant="primary" size="md">
+    <div className={styles.signInButton}>
+      <Button
+        variant="primary"
+        size="md"
+        onClick={() => {
+          closeDrawer()
+          trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
+          alert('This function is coming soon!')
+        }}
+      >
         Sign In
       </Button>
-    </a>
+    </div>
   )
 
   return (

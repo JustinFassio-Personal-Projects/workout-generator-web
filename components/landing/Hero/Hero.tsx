@@ -25,19 +25,20 @@ export const Hero: React.FC = () => {
             equipment. Start your transformation today.
           </p>
           <div className={styles.heroActions}>
-            <a
-              href="https://builder.fitcopilot.ai"
-              className={styles.ctaLink}
-              data-aos="fade-up"
-              data-aos-delay="100"
-              onClick={() => {
-                trackButtonClick('Get Started Free', 'hero')
-              }}
-            >
-              <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
+            <div className={styles.ctaLink} data-aos="fade-up" data-aos-delay="100">
+              <Button
+                variant="primary"
+                size="lg"
+                icon={ArrowRight}
+                iconPosition="right"
+                onClick={() => {
+                  trackButtonClick('Get Started Free', 'hero')
+                  alert('This function is coming soon!')
+                }}
+              >
                 Get Started Free
               </Button>
-            </a>
+            </div>
             <div className={styles.demoButtonWrapper} data-aos="fade-up" data-aos-delay="200">
               <Button
                 variant="secondary"

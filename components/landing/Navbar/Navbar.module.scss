@@ -106,8 +106,11 @@
 }
 
 .signInButton {
-  text-decoration: none;
   display: inline-block;
+
+  a {
+    text-decoration: none;
+  }
 }
 
 .button {

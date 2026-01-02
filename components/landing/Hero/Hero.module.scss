@@ -7,6 +7,10 @@
   padding: var(--spacing-5xl) var(--spacing-lg);
   overflow: hidden;
   background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-gradient-end) 100%);
+  background-image: url('/ai_workout_generator_hero_1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
   &::before {
     content: '';
@@ -16,6 +20,12 @@
     right: 0;
     bottom: 0;
     background:
+      linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.7) 0%,
+        rgba(15, 23, 42, 0.85) 50%,
+        rgba(15, 23, 42, 0.9) 100%
+      ),
       radial-gradient(circle at 20% 50%, rgba(132, 204, 22, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.1) 0%, transparent 50%);
     pointer-events: none;
@@ -124,7 +134,10 @@
 
 .ctaLink {
   display: inline-block;
-  text-decoration: none;
+
+  a {
+    text-decoration: none;
+  }
 }
 
 .demoButtonWrapper {

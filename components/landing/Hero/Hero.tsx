@@ -26,17 +26,17 @@ export const Hero: React.FC = () => {
           </p>
           <div className={styles.heroActions}>
             <div className={styles.ctaLink} data-aos="fade-up" data-aos-delay="100">
-              <Button
-                variant="primary"
-                size="lg"
-                icon={ArrowRight}
-                iconPosition="right"
+              <a
+                href="https://aiworkoutgen.app/login"
                 onClick={() => {
                   trackButtonClick('Get Started Free', 'hero')
                 }}
+                style={{ textDecoration: 'none' }}
               >
-                Get Started Free
-              </Button>
+                <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
+                  Get Started Free
+                </Button>
+              </a>
             </div>
             <div className={styles.demoButtonWrapper} data-aos="fade-up" data-aos-delay="200">
               <Button

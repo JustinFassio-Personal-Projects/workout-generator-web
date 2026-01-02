@@ -53,16 +53,18 @@ export const Navbar: React.FC = () => {
 
   const signInButton = (
     <div className={styles.signInButton}>
-      <Button
-        variant="primary"
-        size="md"
+      <a
+        href="https://aiworkoutgen.app/login"
         onClick={() => {
           closeDrawer()
           trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
         }}
+        style={{ textDecoration: 'none' }}
       >
-        Sign In
-      </Button>
+        <Button variant="primary" size="md">
+          Sign In
+        </Button>
+      </a>
     </div>
   )
 

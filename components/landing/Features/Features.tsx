@@ -18,7 +18,6 @@ export const Features: React.FC = () => {
           quality={85}
           className={styles.featureImage}
           sizes="100vw"
-          style={{ objectFit: 'cover', objectPosition: 'center' }}
         />
       </div>
       <LogoWatermark position="top-left" opacity={0.05} size={350} rotation={10} />

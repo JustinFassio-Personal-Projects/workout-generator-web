@@ -134,7 +134,10 @@
 
 .ctaLink {
   display: inline-block;
-  text-decoration: none;
+
+  a {
+    text-decoration: none;
+  }
 }
 
 .demoButtonWrapper {

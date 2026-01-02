@@ -31,7 +31,6 @@ export const Hero: React.FC = () => {
                 onClick={() => {
                   trackButtonClick('Get Started Free', 'hero')
                 }}
-                style={{ textDecoration: 'none' }}
               >
                 <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
                   Get Started Free

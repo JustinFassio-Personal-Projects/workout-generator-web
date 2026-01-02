@@ -59,7 +59,6 @@ export const Navbar: React.FC = () => {
           closeDrawer()
           trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
         }}
-        style={{ textDecoration: 'none' }}
       >
         <Button variant="primary" size="md">
           Sign In

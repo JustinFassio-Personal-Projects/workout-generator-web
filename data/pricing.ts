@@ -12,6 +12,9 @@ export interface PricingPlan {
   ctaLink?: string // Optional link for CTA button
 }
 
+// Fallback URL for payment links if environment variables are not set
+const FALLBACK_LOGIN_URL = 'https://aiworkoutgen.app/login'
+
 export const pricingPlans: PricingPlan[] = [
   {
     id: 'free',
@@ -27,7 +30,7 @@ export const pricingPlans: PricingPlan[] = [
     ],
     ctaText: 'Get Started',
     ctaVariant: 'secondary',
-    ctaLink: 'https://aiworkoutgen.app/login',
+    ctaLink: FALLBACK_LOGIN_URL,
   },
   {
     id: 'basic',
@@ -43,7 +46,7 @@ export const pricingPlans: PricingPlan[] = [
     ],
     ctaText: 'Subscribe',
     ctaVariant: 'secondary',
-    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_BASIC || '',
+    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_BASIC || FALLBACK_LOGIN_URL,
   },
   {
     id: 'pro',
@@ -62,7 +65,7 @@ export const pricingPlans: PricingPlan[] = [
     ],
     ctaText: 'Get Pro',
     ctaVariant: 'primary',
-    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PRO || '',
+    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PRO || FALLBACK_LOGIN_URL,
   },
   {
     id: 'elite',
@@ -82,6 +85,6 @@ export const pricingPlans: PricingPlan[] = [
     ],
     ctaText: 'Go Elite',
     ctaVariant: 'secondary',
-    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_ELITE || '',
+    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_ELITE || FALLBACK_LOGIN_URL,
   },
 ]

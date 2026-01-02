@@ -45,7 +45,8 @@ export const LogoWatermark: React.FC<LogoWatermarkProps> = ({
         width={size}
         height={size}
         className={styles.watermarkImage}
-        unoptimized
+        sizes={`${size}px`}
+        quality={85}
         style={{ backgroundColor: 'transparent' }}
         onError={() => setLogoError(true)}
       />

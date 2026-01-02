@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { features } from '@/data/features'
 import { FeatureCard } from './FeatureCard'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
@@ -9,6 +10,17 @@ import styles from './Features.module.scss'
 export const Features: React.FC = () => {
   return (
     <section id="features" className={styles.features}>
+      <div className={styles.featureBackground}>
+        <Image
+          src="/feature_background.jpg"
+          alt=""
+          fill
+          quality={85}
+          className={styles.featureImage}
+          sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+        />
+      </div>
       <LogoWatermark position="top-left" opacity={0.05} size={350} rotation={10} />
       <div className={styles.container}>
         <div className={styles.header} data-aos="fade-up">

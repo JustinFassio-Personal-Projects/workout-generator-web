@@ -18,13 +18,16 @@ export const FAQ: React.FC = () => {
   }
 
   // Map FAQ items to Accordion items with button handlers
-  const accordionItems: AccordionItem[] = faqItems.map(item => ({
-    id: item.id,
-    question: item.question,
-    answer: item.answer,
-    buttonText: item.buttonText,
-    onButtonClick: item.buttonText ? () => handleButtonClick(item.buttonText) : undefined,
-  }))
+  const accordionItems: AccordionItem[] = faqItems.map(item => {
+    const buttonText = item.buttonText
+    return {
+      id: item.id,
+      question: item.question,
+      answer: item.answer,
+      buttonText,
+      onButtonClick: buttonText ? () => handleButtonClick(buttonText) : undefined,
+    }
+  })
 
   return (
     <section id="faq" className={styles.faq}>

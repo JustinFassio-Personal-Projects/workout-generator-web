@@ -9,7 +9,6 @@ export interface FeatureCardProps {
   title: string
   description: string
   icon: LucideIcon
-  comingSoon?: boolean
   gradientColors: {
     from: string
     to: string
@@ -21,7 +20,6 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
   title,
   description,
   icon: Icon,
-  comingSoon,
   gradientColors,
   index,
 }) => {

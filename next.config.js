@@ -320,11 +320,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/blog',
-        destination: '/blog',
-        permanent: true,
-      },
-      {
         source: '/blog/',
         destination: '/blog',
         permanent: true,
@@ -383,11 +378,6 @@ const nextConfig = {
       {
         source: '/membership-account/:path*',
         destination: '/',
-        permanent: true,
-      },
-      {
-        source: '/favicon.ico',
-        destination: '/favicon.ico',
         permanent: true,
       },
     ]

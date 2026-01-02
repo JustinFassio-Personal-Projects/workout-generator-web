@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
+import { videos } from '@/data/videos'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
@@ -31,5 +32,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [homepage, blogPage, ...blogPosts]
+  // Videos section (videos are on homepage with anchor)
+  const videosPage: MetadataRoute.Sitemap[0] = {
+    url: `${baseUrl}#videos`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }
+
+  return [homepage, blogPage, videosPage, ...blogPosts]
 }

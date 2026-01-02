@@ -42,7 +42,7 @@ describe('sitemap.ts', () => {
 
     const result = await sitemap()
 
-    expect(result).toHaveLength(4) // homepage + blog page + 2 blog posts
+    expect(result).toHaveLength(5) // homepage + blog page + videos page + 2 blog posts
     expect(result[0]).toEqual({
       url: expect.stringContaining('aiworkoutgenerator.com'),
       lastModified: expect.any(Date),
@@ -56,12 +56,18 @@ describe('sitemap.ts', () => {
       priority: 0.8,
     })
     expect(result[2]).toEqual({
+      url: expect.stringContaining('#videos'),
+      lastModified: expect.any(Date),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    })
+    expect(result[3]).toEqual({
       url: expect.stringContaining('/blog/test-post-1'),
       lastModified: expect.any(Date),
       changeFrequency: 'monthly',
       priority: 0.7,
     })
-    expect(result[3]).toEqual({
+    expect(result[4]).toEqual({
       url: expect.stringContaining('/blog/test-post-2'),
       lastModified: expect.any(Date),
       changeFrequency: 'monthly',
@@ -77,6 +83,7 @@ describe('sitemap.ts', () => {
 
     expect(result[0].url).toBe(baseUrl)
     expect(result[1].url).toBe(`${baseUrl}/blog`)
+    expect(result[2].url).toBe(`${baseUrl}#videos`)
   })
 
   it('should handle empty posts list', async () => {
@@ -84,7 +91,7 @@ describe('sitemap.ts', () => {
 
     const result = await sitemap()
 
-    expect(result).toHaveLength(2) // homepage + blog page
+    expect(result).toHaveLength(3) // homepage + blog page + videos page
     expect(result[1].lastModified).toBeInstanceOf(Date)
   })
 })

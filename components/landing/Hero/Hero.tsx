@@ -57,16 +57,21 @@ export const Hero: React.FC = () => {
           </div>
           <div className={styles.heroActions}>
             <div className={styles.ctaLink} data-aos="fade-up" data-aos-delay="100">
-              <a
-                href="https://aiworkoutgen.app/login"
+              <Button
+                variant="primary"
+                size="lg"
+                icon={ArrowRight}
+                iconPosition="right"
                 onClick={() => {
                   trackButtonClick('Generate My AI Workout', 'hero')
+                  const workoutBuilderSection = document.getElementById('workout-builder')
+                  if (workoutBuilderSection) {
+                    workoutBuilderSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
                 }}
               >
-                <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
-                  Generate My AI Workout
-                </Button>
-              </a>
+                Generate My AI Workout
+              </Button>
             </div>
             <div className={styles.demoButtonWrapper} data-aos="fade-up" data-aos-delay="200">
               <Button

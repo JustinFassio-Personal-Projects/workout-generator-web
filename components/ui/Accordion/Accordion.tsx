@@ -8,6 +8,8 @@ export interface AccordionItem {
   id: string
   question: string
   answer: string
+  buttonText?: string
+  onButtonClick?: () => void
 }
 
 interface AccordionProps {
@@ -47,7 +49,20 @@ export const Accordion: React.FC<AccordionProps> = ({ items, defaultOpenId }) =>
               role="region"
               aria-labelledby={`accordion-trigger-${item.id}`}
             >
-              <div className={styles.answer}>{item.answer}</div>
+              <div className={styles.answerWrapper}>
+                <div className={styles.answer}>{item.answer}</div>
+                {item.buttonText && item.onButtonClick && (
+                  <div className={styles.buttonWrapper}>
+                    <button
+                      type="button"
+                      className={styles.actionButton}
+                      onClick={item.onButtonClick}
+                    >
+                      {item.buttonText}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )

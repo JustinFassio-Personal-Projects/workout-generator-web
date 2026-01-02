@@ -29,6 +29,7 @@ export const Accordion: React.FC<AccordionProps> = ({ items, defaultOpenId }) =>
         return (
           <div key={item.id} className={styles.item} data-aos="fade-up" data-aos-delay={index * 50}>
             <button
+              id={`accordion-trigger-${item.id}`}
               className={styles.trigger}
               onClick={() => toggleItem(item.id)}
               aria-expanded={isOpen}

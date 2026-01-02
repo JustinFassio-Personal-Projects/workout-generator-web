@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { VideoCard } from '@/components/landing/Videos/VideoCard'
 import { Video } from '@/data/videos'
+import * as analytics from '@/lib/analytics'
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(callback => {
@@ -87,5 +88,42 @@ describe('VideoCard', () => {
     videoElement.dispatchEvent(errorEvent)
     expect(consoleErrorSpy).toHaveBeenCalled()
     consoleErrorSpy.mockRestore()
+  })
+
+  it('should handle video play events', () => {
+    const trackVideoStartSpy = vi.spyOn(analytics, 'trackVideoStart').mockImplementation(() => {})
+
+    render(<VideoCard video={mockVideo} />)
+    const videoElement = document.querySelector('video') as HTMLVideoElement
+
+    // Simulate play event
+    const playEvent = new Event('play')
+    videoElement.dispatchEvent(playEvent)
+
+    // Function should be called (may be async)
+    expect(trackVideoStartSpy).toHaveBeenCalled()
+
+    trackVideoStartSpy.mockRestore()
+  })
+
+  it('should handle video ended events', () => {
+    const trackVideoCompleteSpy = vi
+      .spyOn(analytics, 'trackVideoComplete')
+      .mockImplementation(() => {})
+
+    render(<VideoCard video={mockVideo} />)
+    const videoElement = document.querySelector('video') as HTMLVideoElement
+
+    // Set up video duration
+    Object.defineProperty(videoElement, 'duration', { value: 100, writable: true })
+
+    // Simulate ended event
+    const endedEvent = new Event('ended')
+    videoElement.dispatchEvent(endedEvent)
+
+    // Function should be called
+    expect(trackVideoCompleteSpy).toHaveBeenCalled()
+
+    trackVideoCompleteSpy.mockRestore()
   })
 })

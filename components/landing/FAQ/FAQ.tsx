@@ -23,7 +23,7 @@ export const FAQ: React.FC = () => {
     question: item.question,
     answer: item.answer,
     buttonText: item.buttonText,
-    onButtonClick: item.buttonText ? () => handleButtonClick(item.buttonText!) : undefined,
+    onButtonClick: item.buttonText ? () => handleButtonClick(item.buttonText) : undefined,
   }))
 
   return (

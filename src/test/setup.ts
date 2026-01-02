@@ -69,3 +69,8 @@ global.fetch = vi.fn().mockResolvedValue({
   json: async () => ({}),
   text: async () => '',
 } as Response)
+
+// Set default test environment variables to prevent API key errors
+if (!process.env.OPENAI_API_KEY) {
+  process.env.OPENAI_API_KEY = 'test-api-key-for-testing-only'
+}

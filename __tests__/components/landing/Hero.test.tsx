@@ -30,40 +30,53 @@ describe('Hero', () => {
 
   it('should render hero title', () => {
     render(<Hero />)
-    expect(screen.getByText(/Transform Your Fitness Journey/i)).toBeInTheDocument()
-    expect(screen.getByText(/AI-Powered Workouts/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/AI Workout Generator for Personalized Strength & Conditioning/i)
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Built by Certified Trainers/i)).toBeInTheDocument()
+  })
+
+  it('should render hero H2', () => {
+    render(<Hero />)
+    expect(
+      screen.getByText(/Smart, safe workout plans powered by adaptive AI and human expertise/i)
+    ).toBeInTheDocument()
   })
 
   it('should render hero subtitle', () => {
     render(<Hero />)
-    expect(screen.getByText(/Generate personalized workout plans/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Create adaptive workout plans that evolve with your progress/i)
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/using real training principles, not random AI guesses/i)
+    ).toBeInTheDocument()
   })
 
   it('should render CTA buttons', () => {
     render(<Hero />)
-    expect(screen.getByRole('button', { name: /Get Started Free/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Watch Videos/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Generate My AI Workout/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Watch How It Works/i })).toBeInTheDocument()
   })
 
-  it('should render stats card', () => {
+  it('should render stats', () => {
     render(<Hero />)
-    expect(screen.getByText(/8K\+/i)).toBeInTheDocument()
-    expect(screen.getByText(/Users/i)).toBeInTheDocument()
-    expect(screen.getByText(/50K\+/i)).toBeInTheDocument()
-    expect(screen.getByText(/Workouts Generated/i)).toBeInTheDocument()
+    expect(screen.getByText(/8,000\+ athletes/i)).toBeInTheDocument()
+    expect(screen.getByText(/50,000\+ workouts generated/i)).toBeInTheDocument()
+    expect(screen.getByText(/4\.9★ average rating/i)).toBeInTheDocument()
   })
 
-  it('should call trackButtonClick when Get Started Free button is clicked', () => {
+  it('should call trackButtonClick when Generate My AI Workout button is clicked', () => {
     const { trackButtonClick } = analyticsModule
     render(<Hero />)
 
-    const getStartedButton = screen.getByRole('button', { name: /Get Started Free/i })
-    fireEvent.click(getStartedButton)
+    const generateButton = screen.getByRole('button', { name: /Generate My AI Workout/i })
+    fireEvent.click(generateButton)
 
-    expect(trackButtonClick).toHaveBeenCalledWith('Get Started Free', 'hero')
+    expect(trackButtonClick).toHaveBeenCalledWith('Generate My AI Workout', 'hero')
   })
 
-  it('should call trackButtonClick and scroll to videos section when Watch Videos button is clicked', () => {
+  it('should call trackButtonClick and scroll to videos section when Watch How It Works button is clicked', () => {
     const { trackButtonClick } = analyticsModule
 
     // Mock getElementById and scrollIntoView
@@ -74,10 +87,10 @@ describe('Hero', () => {
 
     render(<Hero />)
 
-    const watchVideosButton = screen.getByRole('button', { name: /Watch Videos/i })
-    fireEvent.click(watchVideosButton)
+    const watchButton = screen.getByRole('button', { name: /Watch How It Works/i })
+    fireEvent.click(watchButton)
 
-    expect(trackButtonClick).toHaveBeenCalledWith('Watch Videos', 'hero')
+    expect(trackButtonClick).toHaveBeenCalledWith('Watch How It Works', 'hero')
     expect(document.getElementById).toHaveBeenCalledWith('videos')
     expect(mockScrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
   })

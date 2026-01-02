@@ -4,7 +4,6 @@ import React from 'react'
 import Image from 'next/image'
 import { ArrowRight, Play } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
-import { Card } from '@/components/ui/Card/Card'
 import { FloatingIcons } from './FloatingIcons'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import { trackButtonClick } from '@/lib/analytics'
@@ -29,26 +28,43 @@ export const Hero: React.FC = () => {
       </div>
       <LogoWatermark position="bottom-right" opacity={0.06} size={400} rotation={-15} />
       <FloatingIcons />
+      <div className={styles.heroLogo}>
+        <Image
+          src="/logo.png"
+          alt="AI Workout Generator"
+          width={200}
+          height={80}
+          className={styles.logoImage}
+          priority
+        />
+      </div>
       <div className={styles.heroContent}>
         <div className={styles.heroText} data-aos="fade-up">
+          <div className={styles.heroBrandMark}>AIWorkoutGenerator™</div>
           <h1 className={styles.heroTitle}>
-            Transform Your Fitness Journey with
-            <span className={styles.gradientText}> AI-Powered Workouts</span>
+            AI Workout Generator for Personalized Strength & Conditioning —{' '}
+            <span className={styles.gradientText}>Built by Certified Trainers</span>
           </h1>
+          <h2 className={styles.heroH2}>
+            Smart, safe workout plans powered by adaptive AI and human expertise
+          </h2>
           <p className={styles.heroSubtitle}>
-            Generate personalized workout plans tailored to your goals, fitness level, and available
-            equipment. Start your transformation today.
+            Create adaptive workout plans that evolve with your progress, goals, and equipment —
+            using real training principles, not random AI guesses.
           </p>
+          <div className={styles.heroStats}>
+            Used by 8,000+ athletes • 50,000+ workouts generated • 4.9★ average rating
+          </div>
           <div className={styles.heroActions}>
             <div className={styles.ctaLink} data-aos="fade-up" data-aos-delay="100">
               <a
                 href="https://aiworkoutgen.app/login"
                 onClick={() => {
-                  trackButtonClick('Get Started Free', 'hero')
+                  trackButtonClick('Generate My AI Workout', 'hero')
                 }}
               >
                 <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
-                  Get Started Free
+                  Generate My AI Workout
                 </Button>
               </a>
             </div>
@@ -59,35 +75,17 @@ export const Hero: React.FC = () => {
                 icon={Play}
                 iconPosition="left"
                 onClick={() => {
-                  trackButtonClick('Watch Videos', 'hero')
+                  trackButtonClick('Watch How It Works', 'hero')
                   const videosSection = document.getElementById('videos')
                   if (videosSection) {
                     videosSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }
                 }}
               >
-                Watch Videos
+                Watch How It Works
               </Button>
             </div>
           </div>
-        </div>
-        <div className={styles.heroCard} data-aos="fade-up" data-aos-delay="300">
-          <Card variant="strong" hover={false}>
-            <div className={styles.cardContent}>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>8K+</span>
-                <span className={styles.statLabel}>Users</span>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>50K+</span>
-                <span className={styles.statLabel}>Workouts Generated</span>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>4.9/5</span>
-                <span className={styles.statLabel}>User Rating</span>
-              </div>
-            </div>
-          </Card>
         </div>
       </div>
     </section>

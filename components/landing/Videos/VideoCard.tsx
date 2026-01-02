@@ -243,7 +243,11 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video, index = 0 }) => {
           playsInline
           onError={handleVideoError}
           suppressHydrationWarning
+          poster={video.thumbnailUrl}
+          title={video.title}
+          aria-label={video.title}
         >
+          <track kind="captions" />
           Your browser does not support the video tag.
         </video>
       </div>

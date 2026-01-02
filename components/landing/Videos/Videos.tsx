@@ -9,11 +9,37 @@ import {
   getFeaturedWorkoutVideos,
   getVideosByCategory,
   VideoCategory,
+  Video,
 } from '@/data/videos'
 import { VideoCard } from './VideoCard'
 import { Button } from '@/components/ui/Button/Button'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import styles from './Videos.module.scss'
+
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
+
+// Generate VideoObject structured data for SEO
+const generateVideoStructuredData = (video: Video) => {
+  const videoUrl = video.videoUrl.startsWith('http')
+    ? video.videoUrl
+    : `${baseUrl}${video.videoUrl}`
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: video.title,
+    description: video.description || video.title,
+    thumbnailUrl: video.thumbnailUrl
+      ? video.thumbnailUrl.startsWith('http')
+        ? video.thumbnailUrl
+        : `${baseUrl}${video.thumbnailUrl}`
+      : undefined,
+    uploadDate: new Date().toISOString(),
+    contentUrl: videoUrl,
+    embedUrl: videoUrl,
+    duration: video.duration ? `PT${video.duration}S` : undefined,
+  }
+}
 
 export const Videos: React.FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<VideoCategory>>(new Set())
@@ -46,8 +72,27 @@ export const Videos: React.FC = () => {
     })
   }
 
+  // Generate structured data for all videos
+  const allVideosForSEO = [
+    ...(featuredVideo ? [featuredVideo] : []),
+    ...featuredVideos,
+    ...categories.flatMap(category => getVideosByCategory(category.key)),
+  ]
+
+  // Remove duplicates by ID
+  const uniqueVideos = Array.from(new Map(allVideosForSEO.map(video => [video.id, video])).values())
+
   return (
     <section id="videos" className={styles.videos}>
+      {/* VideoObject structured data for SEO */}
+      {uniqueVideos.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(uniqueVideos.map(video => generateVideoStructuredData(video))),
+          }}
+        />
+      )}
       <LogoWatermark position="top-right" opacity={0.05} size={350} rotation={-10} />
       <div className={styles.container}>
         <div className={styles.header} data-aos="fade-up">

@@ -14,16 +14,18 @@ export const Hero: React.FC = () => {
   return (
     <section id="hero" className={styles.hero}>
       <div className={styles.heroBackground}>
-        <Image
-          src="/ai_workout_generator_hero_1.png"
-          alt=""
-          fill
-          priority
-          quality={85}
-          className={styles.heroImage}
-          sizes="100vw"
-          style={{ objectFit: 'cover', objectPosition: 'center' }}
-        />
+        <div className={styles.heroImageWrapper}>
+          <Image
+            src="/ai_workout_generator_hero_1.png"
+            alt=""
+            fill
+            priority
+            quality={85}
+            className={styles.heroImage}
+            sizes="100vw"
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+          />
+        </div>
       </div>
       <LogoWatermark position="bottom-right" opacity={0.06} size={400} rotation={-15} />
       <FloatingIcons />

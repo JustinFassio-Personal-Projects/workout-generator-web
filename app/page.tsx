@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { Hero } from '@/components/landing/Hero/Hero'
 import { FAQ } from '@/components/landing/FAQ/FAQ'
+import { WorkoutPlanBuilder } from '@/components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder'
 import { Features } from '@/components/landing/Features/Features'
 import { Journey } from '@/components/landing/Journey/Journey'
 import { Testimonials } from '@/components/landing/Testimonials/Testimonials'
@@ -153,6 +154,7 @@ export default function Home() {
       <main className="min-h-screen">
         <Hero />
         <FAQ />
+        <WorkoutPlanBuilder />
         <Features />
         <Journey />
         <Testimonials />

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { Hero } from '@/components/landing/Hero/Hero'
+import { FAQ } from '@/components/landing/FAQ/FAQ'
 import { Features } from '@/components/landing/Features/Features'
 import { Journey } from '@/components/landing/Journey/Journey'
 import { Testimonials } from '@/components/landing/Testimonials/Testimonials'
@@ -10,6 +11,7 @@ import { Blog } from '@/components/landing/Blog/Blog'
 import { Pricing } from '@/components/landing/Pricing/Pricing'
 import { Footer } from '@/components/landing/Footer/Footer'
 import { useScrollTracking } from '@/features/analytics/hooks/useScrollTracking'
+import { faqItems } from '@/data/faq'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
@@ -120,6 +122,20 @@ export default function Home() {
     ],
   }
 
+  // FAQPage structured data (JSON-LD) for SEO
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map(item => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  }
+
   return (
     <>
       <script
@@ -130,8 +146,13 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <main className="min-h-screen">
         <Hero />
+        <FAQ />
         <Features />
         <Journey />
         <Testimonials />

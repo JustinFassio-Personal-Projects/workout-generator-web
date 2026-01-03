@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { GET } from '@/app/feed.xml/route'
 import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
 

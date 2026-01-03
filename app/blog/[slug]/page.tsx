@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { BlogPostHero } from '@/components/features/blog/BlogPostHero'
 import { BlogPostContent } from '@/components/features/blog/BlogPostContent'
-import { getPostBySlug, getAllPostSlugs } from '@/features/blog/lib/getBlogPosts'
+import { RelatedPosts } from '@/components/features/blog/RelatedPosts'
+import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/features/blog/lib/getBlogPosts'
 import { notFound } from 'next/navigation'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
@@ -65,6 +66,9 @@ export async function generateMetadata({
     },
     alternates: {
       canonical: url,
+      types: {
+        'application/rss+xml': `${baseUrl}/feed.xml`,
+      },
     },
   }
 }
@@ -75,6 +79,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   if (!post) {
     notFound()
   }
+
+  // Get related posts
+  const relatedPosts = await getRelatedPosts(post, 3)
 
   const publishedTime = new Date(post.date).toISOString()
   const modifiedTime = post.dateModified ? new Date(post.dateModified).toISOString() : publishedTime
@@ -155,6 +162,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       />
       <BlogPostHero post={post} />
       <BlogPostContent post={post} />
+      <RelatedPosts posts={relatedPosts} />
     </>
   )
 }

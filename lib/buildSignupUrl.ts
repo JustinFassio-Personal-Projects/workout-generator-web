@@ -30,5 +30,8 @@ export function buildSignupUrl(data: WebsiteOnboardingData): string {
     params.set('age', String(data.age))
   }
 
+  // Analytics tracking
+  params.set('source', 'website_builder')
+
   return `${SIGNUP_BASE_URL}?${params.toString()}`
 }

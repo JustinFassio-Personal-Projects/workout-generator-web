@@ -225,4 +225,22 @@ describe('buildSignupUrl', () => {
     const url = buildSignupUrl(data)
     expect(url).toContain('age=120')
   })
+
+  it('should include source parameter for analytics tracking', () => {
+    const data: WebsiteOnboardingData = {
+      fitness_level: 'beginner',
+      current_activity_level: 'moderately_active',
+      fitness_goals: ['Build muscle'],
+      equipment_access: 'home',
+      preferred_units: {
+        weight: 'lb',
+        height: 'in',
+        distance: 'mi',
+        temperature: 'f',
+      },
+    }
+
+    const url = buildSignupUrl(data)
+    expect(url).toContain('source=website_builder')
+  })
 })

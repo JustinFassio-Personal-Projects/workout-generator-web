@@ -61,12 +61,14 @@ export const Footer: React.FC = () => {
     ],
   }
 
-  const socialLinks = [
-    { icon: Facebook, href: '#', label: 'Facebook' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Instagram, href: '#', label: 'Instagram' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  ]
+  // Social links - uncomment and add real URLs when available
+  // const socialLinks = [
+  //   { icon: Facebook, href: 'https://facebook.com/yourpage', label: 'Facebook' },
+  //   { icon: Twitter, href: 'https://twitter.com/yourhandle', label: 'Twitter' },
+  //   { icon: Instagram, href: 'https://instagram.com/yourhandle', label: 'Instagram' },
+  //   { icon: Linkedin, href: 'https://linkedin.com/company/yourcompany', label: 'LinkedIn' },
+  // ]
+  const socialLinks: { icon: typeof Facebook; href: string; label: string }[] = []
 
   return (
     <footer id="footer" className={styles.footer}>

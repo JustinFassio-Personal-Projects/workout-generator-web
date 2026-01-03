@@ -60,10 +60,12 @@ export const metadata: Metadata = {
     : undefined,
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '150x150', type: 'image/x-icon' },
-      { url: '/favicon.png', sizes: '150x150', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
     ],
-    apple: [{ url: '/logo.png', sizes: '180x180', type: 'image/png' }],
+    apple: [{ url: '/favicon-192.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/manifest.json',
   openGraph: {
@@ -164,6 +166,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
+        {/* Skip to Content Link - Accessibility */}
+        <a href="#main-content" className="skip-to-content">
+          Skip to main content
+        </a>
         <AOSStyles />
         <BotIdClient protect={protectedRoutes} />
         {/* Google Tag Manager */}
@@ -232,7 +238,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="afterInteractive"
         />
         <Navbar />
-        {children}
+        <div id="main-content">{children}</div>
         <ChatWidget />
         <Analytics />
       </body>

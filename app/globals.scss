@@ -158,6 +158,27 @@ a {
   outline-offset: 2px;
 }
 
+// Skip to Content Link (Accessibility)
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-accent);
+  color: var(--bg-dark);
+  padding: var(--spacing-sm) var(--spacing-md);
+  z-index: 9999;
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  border-radius: 0 0 var(--radius-md) 0;
+  transition: top var(--transition-fast);
+
+  &:focus {
+    top: 0;
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+}
+
 // Utility Classes
 .container-custom {
   width: 100%;

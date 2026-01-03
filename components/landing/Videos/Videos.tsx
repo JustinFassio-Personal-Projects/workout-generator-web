@@ -18,6 +18,9 @@ import styles from './Videos.module.scss'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
+// Static upload date for structured data to prevent hydration mismatch
+const STATIC_UPLOAD_DATE = '2024-01-01T00:00:00.000Z'
+
 // Generate VideoObject structured data for SEO
 const generateVideoStructuredData = (video: Video) => {
   const videoUrl = video.videoUrl.startsWith('http')
@@ -29,15 +32,16 @@ const generateVideoStructuredData = (video: Video) => {
     '@type': 'VideoObject',
     name: video.title,
     description: video.description || video.title,
-    thumbnailUrl: video.thumbnailUrl
-      ? video.thumbnailUrl.startsWith('http')
+    // Only include thumbnailUrl if it exists and is valid
+    ...(video.thumbnailUrl && {
+      thumbnailUrl: video.thumbnailUrl.startsWith('http')
         ? video.thumbnailUrl
-        : `${baseUrl}${video.thumbnailUrl}`
-      : undefined,
-    uploadDate: new Date().toISOString(),
+        : `${baseUrl}${video.thumbnailUrl}`,
+    }),
+    uploadDate: STATIC_UPLOAD_DATE,
     contentUrl: videoUrl,
     embedUrl: videoUrl,
-    duration: video.duration ? `PT${video.duration}S` : undefined,
+    ...(video.duration && { duration: `PT${video.duration}S` }),
   }
 }
 

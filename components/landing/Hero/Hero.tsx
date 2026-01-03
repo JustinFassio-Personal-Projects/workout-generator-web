@@ -16,7 +16,7 @@ export const Hero: React.FC = () => {
         <div className={styles.heroImageWrapper}>
           <Image
             src="/ai_workout_generator_hero_1.png"
-            alt=""
+            alt="AI-powered workout generator showing personalized fitness plan interface"
             fill
             priority
             quality={85}

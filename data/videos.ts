@@ -23,7 +23,7 @@ export const videos: Video[] = [
     title: 'Brand Video',
     description: 'Experience our mission and vision',
     videoUrl: '/videos/brand-video.mp4', // Add your brand video file to public/videos/
-    thumbnailUrl: '/videos/brand-video.jpg', // Optional: add a thumbnail image
+    // thumbnailUrl: '/videos/brand-video.jpg', // Uncomment when thumbnail is available
     category: 'brand',
     duration: 10,
     featured: true,

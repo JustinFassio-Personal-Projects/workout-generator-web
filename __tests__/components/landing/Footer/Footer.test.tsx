@@ -37,13 +37,15 @@ describe('Footer', () => {
     expect(screen.getByText('Blog')).toBeInTheDocument()
   })
 
-  it('should render social links', () => {
-    render(<Footer />)
-    expect(screen.getByLabelText('Facebook')).toBeInTheDocument()
-    expect(screen.getByLabelText('Twitter')).toBeInTheDocument()
-    expect(screen.getByLabelText('Instagram')).toBeInTheDocument()
-    expect(screen.getByLabelText('LinkedIn')).toBeInTheDocument()
-  })
+  // Social links are currently disabled until real URLs are available
+  // Uncomment this test when social links are re-enabled
+  // it('should render social links', () => {
+  //   render(<Footer />)
+  //   expect(screen.getByLabelText('Facebook')).toBeInTheDocument()
+  //   expect(screen.getByLabelText('Twitter')).toBeInTheDocument()
+  //   expect(screen.getByLabelText('Instagram')).toBeInTheDocument()
+  //   expect(screen.getByLabelText('LinkedIn')).toBeInTheDocument()
+  // })
 
   it('should render newsletter form', () => {
     render(<Footer />)
@@ -52,18 +54,20 @@ describe('Footer', () => {
     expect(screen.getByRole('button', { name: /Subscribe/i })).toBeInTheDocument()
   })
 
-  it('should call trackVercelEvent when social link is clicked', () => {
-    const { trackVercelEvent } = analyticsModule
-    render(<Footer />)
-
-    const facebookLink = screen.getByLabelText('Facebook')
-    fireEvent.click(facebookLink)
-
-    expect(trackVercelEvent).toHaveBeenCalledWith('Social Link Click', {
-      platform: 'Facebook',
-      location: 'footer',
-    })
-  })
+  // Social links are currently disabled until real URLs are available
+  // Uncomment this test when social links are re-enabled
+  // it('should call trackVercelEvent when social link is clicked', () => {
+  //   const { trackVercelEvent } = analyticsModule
+  //   render(<Footer />)
+  //
+  //   const facebookLink = screen.getByLabelText('Facebook')
+  //   fireEvent.click(facebookLink)
+  //
+  //   expect(trackVercelEvent).toHaveBeenCalledWith('Social Link Click', {
+  //     platform: 'Facebook',
+  //     location: 'footer',
+  //   })
+  // })
 
   it('should call trackNavigationClick when footer link is clicked', () => {
     const { trackNavigationClick } = analyticsModule

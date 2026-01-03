@@ -7,6 +7,8 @@ export const blogPosts: BlogPost[] = [
     title: 'Getting Started with AI-Powered Workouts',
     excerpt:
       'Learn how to create your first personalized workout plan using our AI-powered platform. Discover the features that make fitness planning effortless.',
+    image: '/ai_workout_generator_hero_1.png',
+    dateModified: '2025-01-15',
     content: `# Getting Started with AI-Powered Workouts
 
 Welcome to the future of fitness planning! Our AI-powered workout generator makes it easy to create personalized exercise routines tailored to your goals, fitness level, and available equipment.
@@ -41,6 +43,8 @@ Start your fitness journey today and experience the power of personalized traini
     title: 'Maximizing Your Home Workout Space',
     excerpt:
       'Transform any space into an effective workout area. Learn how to optimize your home gym setup for maximum results.',
+    image: '/HIIT_Workout.png',
+    dateModified: '2025-01-10',
     content: `# Maximizing Your Home Workout Space
 
 You don't need a full gym to achieve your fitness goals. With the right approach, any space can become your personal training ground.
@@ -82,6 +86,8 @@ Make the most of your space and achieve your fitness goals from home!`,
     title: 'Nutrition Tips for Better Workout Results',
     excerpt:
       'Discover how proper nutrition can amplify your workout results. Learn about pre and post-workout nutrition strategies.',
+    image: '/Girl Post Training.jpg',
+    dateModified: '2025-01-05',
     content: `# Nutrition Tips for Better Workout Results
 
 Exercise is only half the equation. Proper nutrition fuels your workouts and accelerates recovery.

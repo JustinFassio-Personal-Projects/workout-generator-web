@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { WorkoutPlanBuilder } from '@/components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder'
 
@@ -70,10 +70,14 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should show error when continuing without selecting fitness goals', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText(/Please select at least one fitness goal/i)).toBeInTheDocument()
@@ -82,21 +86,29 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should navigate back to step 1 from step 2', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
     // Go to step 2
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
     })
 
     // Go back to step 1
-    const backButton = screen.getByRole('button', { name: /back/i })
-    await user.click(backButton)
+    await act(async () => {
+      const backButton = screen.getByRole('button', { name: /back/i })
+      await user.click(backButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 1 of 2')).toBeInTheDocument()
@@ -106,21 +118,29 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should show preview when See My Plan is clicked with valid data', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
     // Complete step 1
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
     })
 
     // Complete step 2
-    const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
-    await user.click(seeMyPlanButton)
+    await act(async () => {
+      const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
+      await user.click(seeMyPlanButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
@@ -130,25 +150,35 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should show error when age is invalid', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
     // Go to step 2
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
     })
 
     // Enter invalid age
-    const ageInput = screen.getByLabelText(/Age/i)
-    await user.type(ageInput, '200')
+    await act(async () => {
+      const ageInput = screen.getByLabelText(/Age/i)
+      await user.type(ageInput, '200')
+    })
 
     // Try to submit
-    const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
-    await user.click(seeMyPlanButton)
+    await act(async () => {
+      const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
+      await user.click(seeMyPlanButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText(/Age must be between 13 and 120/i)).toBeInTheDocument()
@@ -157,30 +187,40 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should redirect to signup URL when create account is clicked', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
     // Complete the form
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
     })
 
-    const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
-    await user.click(seeMyPlanButton)
+    await act(async () => {
+      const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
+      await user.click(seeMyPlanButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
     })
 
     // Click create account
-    const createAccountButton = screen.getByRole('button', {
-      name: /create account to generate workout/i,
+    await act(async () => {
+      const createAccountButton = screen.getByRole('button', {
+        name: /create account to generate workout/i,
+      })
+      await user.click(createAccountButton)
     })
-    await user.click(createAccountButton)
 
     await waitFor(() => {
       expect(mockLocation.href).toContain('https://aiworkoutgen.app/signup?')
@@ -192,28 +232,38 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should return to step 1 when edit answers is clicked from preview', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
     // Complete form to get to preview
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
     })
 
-    const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
-    await user.click(seeMyPlanButton)
+    await act(async () => {
+      const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
+      await user.click(seeMyPlanButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
     })
 
     // Click edit answers
-    const editButton = screen.getByRole('button', { name: /edit answers/i })
-    await user.click(editButton)
+    await act(async () => {
+      const editButton = screen.getByRole('button', { name: /edit answers/i })
+      await user.click(editButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 1 of 2')).toBeInTheDocument()
@@ -223,38 +273,52 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should include optional fields in URL when provided', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
     // Complete step 1
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
     })
 
     // Add optional fields
-    const genderSelect = screen.getByLabelText(/Gender/i)
-    await user.selectOptions(genderSelect, 'male')
+    await act(async () => {
+      const genderSelect = screen.getByLabelText(/Gender/i)
+      await user.selectOptions(genderSelect, 'male')
+    })
 
-    const ageInput = screen.getByLabelText(/Age/i)
-    await user.type(ageInput, '28')
+    await act(async () => {
+      const ageInput = screen.getByLabelText(/Age/i)
+      await user.type(ageInput, '28')
+    })
 
     // Submit
-    const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
-    await user.click(seeMyPlanButton)
+    await act(async () => {
+      const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
+      await user.click(seeMyPlanButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
     })
 
     // Click create account
-    const createAccountButton = screen.getByRole('button', {
-      name: /create account to generate workout/i,
+    await act(async () => {
+      const createAccountButton = screen.getByRole('button', {
+        name: /create account to generate workout/i,
+      })
+      await user.click(createAccountButton)
     })
-    await user.click(createAccountButton)
 
     await waitFor(() => {
       expect(mockLocation.href).toContain('gender=male')
@@ -273,12 +337,18 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should update progress bar when moving to step 2', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
@@ -291,28 +361,40 @@ describe('WorkoutPlanBuilder', () => {
 
   it('should handle unit preference changes', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
 
     // Go to step 2
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
     })
 
     // Change weight unit
-    const kgButton = screen.getByText('kg')
-    await user.click(kgButton)
+    await act(async () => {
+      const kgButton = screen.getByText('kg')
+      await user.click(kgButton)
+    })
 
     // Change height unit
-    const cmButton = screen.getByText('cm')
-    await user.click(cmButton)
+    await act(async () => {
+      const cmButton = screen.getByText('cm')
+      await user.click(cmButton)
+    })
 
     // Verify units are updated (they should be active)
     await waitFor(() => {
+      const kgButton = screen.getByText('kg')
+      const cmButton = screen.getByText('cm')
       expect(kgButton.closest('button')).toHaveClass(/toggleActive/)
       expect(cmButton.closest('button')).toHaveClass(/toggleActive/)
     })

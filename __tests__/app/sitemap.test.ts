@@ -5,6 +5,10 @@ import * as getBlogPostsModule from '@/features/blog/lib/getBlogPosts'
 // Mock the getBlogPosts module
 vi.mock('@/features/blog/lib/getBlogPosts', () => ({
   getAllPosts: vi.fn(),
+  getAllAuthors: vi.fn(),
+  getAllCategories: vi.fn(),
+  authorToSlug: vi.fn((author: string) => author.toLowerCase().replace(/\s+/g, '-')),
+  categoryToSlug: vi.fn((category: string) => category.toLowerCase().replace(/\s+/g, '-')),
 }))
 
 describe('sitemap.ts', () => {
@@ -39,10 +43,12 @@ describe('sitemap.ts', () => {
     ]
 
     vi.mocked(getBlogPostsModule.getAllPosts).mockResolvedValue(mockPosts)
+    vi.mocked(getBlogPostsModule.getAllAuthors).mockResolvedValue(['Test Author'])
+    vi.mocked(getBlogPostsModule.getAllCategories).mockResolvedValue(['Test'])
 
     const result = await sitemap()
 
-    expect(result).toHaveLength(5) // homepage + blog page + videos page + 2 blog posts
+    expect(result).toHaveLength(7) // homepage + blog page + videos page + 2 blog posts + 1 author + 1 category
     expect(result[0]).toEqual({
       url: expect.stringContaining('aiworkoutgenerator.com'),
       lastModified: expect.any(Date),
@@ -77,6 +83,8 @@ describe('sitemap.ts', () => {
 
   it('should use correct base URL from environment', async () => {
     vi.mocked(getBlogPostsModule.getAllPosts).mockResolvedValue([])
+    vi.mocked(getBlogPostsModule.getAllAuthors).mockResolvedValue([])
+    vi.mocked(getBlogPostsModule.getAllCategories).mockResolvedValue([])
 
     const result = await sitemap()
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
@@ -88,6 +96,8 @@ describe('sitemap.ts', () => {
 
   it('should handle empty posts list', async () => {
     vi.mocked(getBlogPostsModule.getAllPosts).mockResolvedValue([])
+    vi.mocked(getBlogPostsModule.getAllAuthors).mockResolvedValue([])
+    vi.mocked(getBlogPostsModule.getAllCategories).mockResolvedValue([])
 
     const result = await sitemap()
 

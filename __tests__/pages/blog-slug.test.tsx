@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getAllPostSlugs, getPostBySlug } from '@/features/blog/lib/getBlogPosts'
+import { getAllPostSlugs, getPostBySlug, getRelatedPosts } from '@/features/blog/lib/getBlogPosts'
 
 // Mock the blog post functions
 vi.mock('@/features/blog/lib/getBlogPosts', () => ({
   getAllPostSlugs: vi.fn(),
   getPostBySlug: vi.fn(),
+  getRelatedPosts: vi.fn(),
 }))
 
 // Mock notFound
@@ -46,10 +47,12 @@ describe('BlogPostPage', () => {
     }
 
     vi.mocked(getPostBySlug).mockResolvedValue(mockPost)
+    vi.mocked(getRelatedPosts).mockResolvedValue([])
 
     const result = await BlogPostPage({ params: { slug: 'test-post' } })
 
     expect(getPostBySlug).toHaveBeenCalledWith('test-post')
+    expect(getRelatedPosts).toHaveBeenCalled()
     expect(result).toBeDefined()
   })
 

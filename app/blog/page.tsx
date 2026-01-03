@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { BlogHero } from '@/components/features/blog/BlogHero'
-import { BlogPostList } from '@/components/features/blog/BlogPostList'
+import { BlogPageClient } from '@/components/features/blog/BlogPageClient'
 import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
 import styles from './blog-page.module.scss'
 
@@ -49,6 +49,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     alternates: {
       canonical: `${baseUrl}/blog`,
+      types: {
+        'application/rss+xml': `${baseUrl}/feed.xml`,
+      },
     },
   }
 }
@@ -118,7 +121,7 @@ export default async function BlogPage() {
       />
       <BlogHero />
       <div className={styles.blogContainer}>
-        <BlogPostList posts={posts} />
+        <BlogPageClient posts={posts} />
       </div>
     </>
   )

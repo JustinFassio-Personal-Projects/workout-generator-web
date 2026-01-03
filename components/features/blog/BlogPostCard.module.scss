@@ -4,11 +4,28 @@
   text-decoration: none;
 }
 
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform var(--transition-normal);
+
+  .cardLink:hover & {
+    transform: scale(1.05);
+  }
+}
+
 .cardContent {
   padding: var(--spacing-xl);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
 }
 
 .category {

@@ -39,6 +39,44 @@ export function BlogEditor({ post, categories, authors }: BlogEditorProps) {
   // Auto-save timer ref
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Reinitialize state when post prop changes (e.g., navigating between posts)
+  useEffect(() => {
+    if (post) {
+      setTitle(post.title || '')
+      setSlug(post.slug || '')
+      setExcerpt(post.excerpt || '')
+      setContent(post.content || '')
+      setCategoryId(post.category_id || categories[0]?.id || '')
+      setAuthorId(post.author_id || authors[0]?.id || '')
+      setTags(post.tags || [])
+      setFeaturedImage(post.featured_image || '')
+      setStatus(post.status || 'draft')
+      setSeoTitle(post.seo_title || '')
+      setSeoDescription(post.seo_description || '')
+      setTagInput('')
+      setError(null)
+      setHasChanges(false)
+      setLastSaved(null)
+    } else {
+      // Reset to empty state for new post
+      setTitle('')
+      setSlug('')
+      setExcerpt('')
+      setContent('')
+      setCategoryId(categories[0]?.id || '')
+      setAuthorId(authors[0]?.id || '')
+      setTags([])
+      setTagInput('')
+      setFeaturedImage('')
+      setStatus('draft')
+      setSeoTitle('')
+      setSeoDescription('')
+      setError(null)
+      setHasChanges(false)
+      setLastSaved(null)
+    }
+  }, [post, categories, authors])
+
   // Track changes
   useEffect(() => {
     if (isEditing) {

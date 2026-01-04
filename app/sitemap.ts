@@ -1,6 +1,10 @@
 import type { MetadataRoute } from 'next'
 import { createPublicClient } from '@/lib/supabase/public'
 
+// ISR: Revalidate every 60 seconds (fallback)
+// Primary revalidation happens on-demand when admin publishes
+export const revalidate = 60
+
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

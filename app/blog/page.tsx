@@ -4,9 +4,8 @@ import { BlogPageClient } from '@/components/features/blog/BlogPageClient'
 import { getAllPublishedPosts } from '@/lib/blog/queries'
 import styles from './blog-page.module.scss'
 
-// ISR: Revalidate every 60 seconds (fallback)
-// Primary revalidation happens on-demand when admin publishes
-export const revalidate = 60
+// Mark as dynamic since we use cookies() via createServerSupabaseClient() in getAllPublishedPosts()
+export const dynamic = 'force-dynamic'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 

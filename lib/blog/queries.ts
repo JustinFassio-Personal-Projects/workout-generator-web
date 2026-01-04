@@ -1,5 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { PostWithRelations, Category, Author } from '@/types/blog'
+import { blogPosts } from '@/data/blog/posts'
+import type { BlogPost } from '@/features/blog/types'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
@@ -33,29 +35,93 @@ function transformPosts(posts: Record<string, unknown>[]): PostWithRelations[] {
 }
 
 /**
+ * Convert static blog posts to PostWithRelations format (fallback when Supabase is unavailable)
+ */
+function convertStaticPostsToSupabaseFormat(staticPosts: BlogPost[]): PostWithRelations[] {
+  return staticPosts.map(post => {
+    const publishedDate = post.date || new Date().toISOString()
+    const categorySlug = post.category.toLowerCase().replace(/\s+/g, '-')
+    const authorSlug = post.author.toLowerCase().replace(/\s+/g, '-')
+
+    const category: Category = {
+      id: `category-${categorySlug}`,
+      name: post.category,
+      slug: categorySlug,
+      description: null,
+      created_at: publishedDate,
+    }
+
+    const author: Author = {
+      id: `author-${authorSlug}`,
+      name: post.author,
+      slug: authorSlug,
+      bio: null,
+      avatar: null,
+      created_at: publishedDate,
+    }
+
+    const converted = {
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      category_id: category.id,
+      author_id: author.id,
+      tags: post.tags || [],
+      featured_image: post.image || null,
+      status: 'published' as const,
+      published_at: publishedDate,
+      seo_title: null,
+      seo_description: null,
+      created_at: publishedDate,
+      updated_at: post.dateModified || publishedDate,
+      category,
+      author,
+    }
+    return converted
+  })
+}
+
+/**
  * Get all published posts with their relations
+ * Falls back to static data if Supabase is unavailable or returns no results
  */
 export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
+        *,
+        category:categories(*),
+        author:authors(*)
       `
-      *,
-      category:categories(*),
-      author:authors(*)
-    `
-    )
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
+      )
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching posts:', error)
-    return []
+    if (error) {
+      console.error('Error fetching posts from Supabase, using fallback data:', error)
+      // Fall back to static data when Supabase fails
+      return convertStaticPostsToSupabaseFormat(blogPosts)
+    }
+
+    // If Supabase returns data, use it; otherwise fall back to static data
+    if (data && data.length > 0) {
+      return transformPosts(data)
+    }
+
+    // No data in Supabase, use static fallback
+    console.warn('No posts found in Supabase, using static fallback data')
+    return convertStaticPostsToSupabaseFormat(blogPosts)
+  } catch (error) {
+    // If Supabase client creation fails, use static data
+    console.error('Failed to connect to Supabase, using fallback data:', error)
+    return convertStaticPostsToSupabaseFormat(blogPosts)
   }
-
-  return transformPosts(data || [])
 }
 
 /**

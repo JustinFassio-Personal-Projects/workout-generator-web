@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
 import { getAllAuthors, getPostsByAuthor, getAuthorBySlug, authorToSlug } from '@/lib/blog/queries'
@@ -157,9 +158,9 @@ export default async function AuthorPage({ params }: PageProps) {
       <section className={styles.authorHeader}>
         <div className={styles.container}>
           <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-            <a href="/">Home</a>
+            <Link href="/">Home</Link>
             <span className={styles.separator}>/</span>
-            <a href="/blog">Blog</a>
+            <Link href="/blog">Blog</Link>
             <span className={styles.separator}>/</span>
             <span aria-current="page">{author.name}</span>
           </nav>

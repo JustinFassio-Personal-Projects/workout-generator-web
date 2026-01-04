@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getAllPublishedPosts } from '@/lib/blog/queries'
 
+// Explicit caching: revalidate every 60 seconds (matching blog pages)
+// Next.js 15 changed GET route handlers to be uncached by default
+export const revalidate = 60
+
 export async function GET() {
   try {
     const posts = await getAllPublishedPosts()

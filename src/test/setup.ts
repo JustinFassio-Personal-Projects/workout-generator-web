@@ -26,15 +26,15 @@ vi.mock('next/link', () => ({
 
 // Mock Next.js Image
 vi.mock('next/image', () => ({
-  default: ({ src, alt, width, height, ...props }: any) => {
-    // eslint-disable-next-line @next/next/no-img-element
+  default: ({ src, alt, width, height, unoptimized, ...props }: any) => {
+    // Note: unoptimized is a Next.js Image prop, not an HTML attribute, so we don't pass it to img
+    // Using img element in tests is acceptable for mocking Next.js Image
     return React.createElement('img', {
       src: typeof src === 'string' && src.startsWith('/') ? `http://localhost:3000${src}` : src,
       alt,
       width,
       height,
       ...props,
-      unoptimized: true,
     })
   },
 }))

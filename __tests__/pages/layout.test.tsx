@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render } from '@testing-library/react'
 import RootLayout from '@/app/layout'
 
@@ -10,6 +10,30 @@ vi.mock('next/font/google', () => ({
 }))
 
 describe('RootLayout', () => {
+  let originalConsoleError: typeof console.error
+
+  beforeEach(() => {
+    // Suppress the validateDOMNesting warning for this test suite
+    // since we're testing a Next.js layout that returns <html> which
+    // React Testing Library wraps in a div (this is expected behavior)
+    originalConsoleError = console.error
+    console.error = vi.fn(message => {
+      // Suppress only the validateDOMNesting warning for html/div nesting
+      if (
+        typeof message === 'string' &&
+        message.includes('validateDOMNesting') &&
+        message.includes('<html>')
+      ) {
+        return
+      }
+      originalConsoleError(message)
+    })
+  })
+
+  afterEach(() => {
+    console.error = originalConsoleError
+  })
+
   it('should render root layout with children', () => {
     const { container } = render(
       <RootLayout>
@@ -17,9 +41,11 @@ describe('RootLayout', () => {
       </RootLayout>
     )
 
-    expect(container.querySelector('html')).toBeInTheDocument()
-    expect(container.querySelector('body')).toBeInTheDocument()
-    expect(container.querySelector('html')?.getAttribute('lang')).toBe('en')
+    // Check the container structure (html is wrapped in div by React Testing Library)
+    const htmlElement = container.querySelector('html')
+    expect(htmlElement).toBeInTheDocument()
+    expect(htmlElement?.querySelector('body')).toBeInTheDocument()
+    expect(htmlElement?.getAttribute('lang')).toBe('en')
   })
 
   it('should render children inside body', () => {

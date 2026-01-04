@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getAllPublishedPosts } from '@/lib/blog/queries'
 
-// Explicit caching: revalidate every 60 seconds (matching blog pages)
-// Next.js 15 changed GET route handlers to be uncached by default
-export const revalidate = 60
+// Mark as dynamic since we use cookies() via createServerSupabaseClient()
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
@@ -24,6 +23,12 @@ export async function GET() {
     return NextResponse.json(transformedPosts)
   } catch (error) {
     console.error('Error fetching blog posts:', error)
-    return NextResponse.json({ error: 'Failed to fetch blog posts' }, { status: 500 })
+    // Log the full error for debugging in production
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Error details:', errorMessage)
+    return NextResponse.json(
+      { error: 'Failed to fetch blog posts', details: errorMessage },
+      { status: 500 }
+    )
   }
 }

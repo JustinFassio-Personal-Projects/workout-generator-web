@@ -1,63 +1,65 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
-import {
-  getAllCategories,
-  getPostsByCategory,
-  categoryToSlug,
-} from '@/features/blog/lib/getBlogPosts'
+import { getAllCategories, getPostsByCategory, getCategoryBySlug } from '@/lib/blog/queries'
 import styles from './category-page.module.scss'
+
+// ISR: Revalidate every 60 seconds
+export const revalidate = 60
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
+// Dynamic generation - categories are fetched at request time with ISR
 export async function generateStaticParams() {
-  const categories = await getAllCategories()
-  return categories.map(category => ({ slug: categoryToSlug(category) }))
+  // Return empty array for dynamic generation
+  // Pages will be generated on-demand and cached via ISR
+  return []
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string }
-}): Promise<Metadata> {
-  const posts = await getPostsByCategory(params.slug)
+interface PageProps {
+  params: Promise<{ slug: string }>
+}
 
-  if (posts.length === 0) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const category = await getCategoryBySlug(slug)
+
+  if (!category) {
     return {
       title: 'Category Not Found - Workout Generator',
     }
   }
 
-  // Get the original category name from the first post
-  const categoryName = posts[0].category
-  const description = `Browse all ${categoryName.toLowerCase()} articles on the Workout Generator blog. Fitness tips, workout strategies, and expert advice.`
+  const description =
+    category.description ||
+    `Browse all ${category.name.toLowerCase()} articles on the Workout Generator blog. Fitness tips, workout strategies, and expert advice.`
 
   return {
-    title: `${categoryName} | Blog`,
+    title: `${category.name} | Blog`,
     description,
     openGraph: {
-      title: `${categoryName} Articles`,
+      title: `${category.name} Articles`,
       description,
       type: 'website',
-      url: `${baseUrl}/blog/category/${params.slug}`,
+      url: `${baseUrl}/blog/category/${slug}`,
       siteName: 'Workout Generator',
       images: [
         {
           url: `${baseUrl}/og-image.jpg`,
           width: 1200,
           height: 630,
-          alt: `${categoryName} Articles`,
+          alt: `${category.name} Articles`,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${categoryName} Articles`,
+      title: `${category.name} Articles`,
       description,
       images: [`${baseUrl}/og-image.jpg`],
     },
     alternates: {
-      canonical: `${baseUrl}/blog/category/${params.slug}`,
+      canonical: `${baseUrl}/blog/category/${slug}`,
       types: {
         'application/rss+xml': `${baseUrl}/feed.xml`,
       },
@@ -65,14 +67,28 @@ export async function generateMetadata({
   }
 }
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const posts = await getPostsByCategory(params.slug)
+export default async function CategoryPage({ params }: PageProps) {
+  const { slug } = await params
+  const [category, posts] = await Promise.all([getCategoryBySlug(slug), getPostsByCategory(slug)])
 
-  if (posts.length === 0) {
+  if (!category) {
     notFound()
   }
 
-  const categoryName = posts[0].category
+  // Transform posts for BlogPostList
+  const transformedPosts = posts.map(post => ({
+    id: post.id,
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    date: post.published_at || post.created_at,
+    dateModified: post.updated_at,
+    author: post.author?.name || 'Unknown',
+    category: post.category?.name || 'Uncategorized',
+    tags: post.tags || [],
+    image: post.featured_image || undefined,
+  }))
 
   // BreadcrumbList structured data (JSON-LD)
   const breadcrumbSchema = {
@@ -94,8 +110,8 @@ export default async function CategoryPage({ params }: { params: { slug: string 
       {
         '@type': 'ListItem',
         position: 3,
-        name: categoryName,
-        item: `${baseUrl}/blog/category/${params.slug}`,
+        name: category.name,
+        item: `${baseUrl}/blog/category/${slug}`,
       },
     ],
   }
@@ -104,9 +120,11 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   const collectionSchema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: `${categoryName} Articles`,
-    description: `Browse all ${categoryName.toLowerCase()} articles on the Workout Generator blog.`,
-    url: `${baseUrl}/blog/category/${params.slug}`,
+    name: `${category.name} Articles`,
+    description:
+      category.description ||
+      `Browse all ${category.name.toLowerCase()} articles on the Workout Generator blog.`,
+    url: `${baseUrl}/blog/category/${slug}`,
     mainEntity: {
       '@type': 'ItemList',
       itemListElement: posts.map((post, index) => ({
@@ -138,16 +156,17 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             <span className={styles.separator}>/</span>
             <a href="/blog">Blog</a>
             <span className={styles.separator}>/</span>
-            <span aria-current="page">{categoryName}</span>
+            <span aria-current="page">{category.name}</span>
           </nav>
-          <h1 className={styles.title}>{categoryName}</h1>
+          <h1 className={styles.title}>{category.name}</h1>
+          {category.description && <p className={styles.description}>{category.description}</p>}
           <p className={styles.postCount}>
             {posts.length} {posts.length === 1 ? 'article' : 'articles'}
           </p>
         </div>
       </section>
       <div className={styles.postsContainer}>
-        <BlogPostList posts={posts} />
+        <BlogPostList posts={transformedPosts} />
       </div>
     </>
   )

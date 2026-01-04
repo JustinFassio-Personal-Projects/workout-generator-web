@@ -202,6 +202,9 @@ export const Footer: React.FC = () => {
         <div className={styles.bottomSection}>
           <p className={styles.copyright}>
             © {currentYear} Workout Generator. All rights reserved.
+            <a href="/admin" className={styles.adminAccess} aria-label="Admin">
+              ◆
+            </a>
           </p>
         </div>
       </div>

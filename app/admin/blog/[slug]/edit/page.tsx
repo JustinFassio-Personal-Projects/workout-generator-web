@@ -6,7 +6,7 @@ import { BlogEditor } from '@/components/admin/BlogEditor'
 async function getPost(slug: string) {
   const supabase = await createServerSupabaseClient()
 
-  const { data: post } = await supabase
+  const { data: post, error } = await supabase
     .from('posts')
     .select(
       `
@@ -18,7 +18,15 @@ async function getPost(slug: string) {
     .eq('slug', slug)
     .single()
 
-  return post
+  if (error) {
+    console.error('Error fetching post:', error)
+    return null
+  }
+
+  // Note: We intentionally don't filter by status here to allow admins
+  // to edit both draft and published posts. Public queries filter for
+  // status = 'published' only.
+  return post || null
 }
 
 async function getFormData() {

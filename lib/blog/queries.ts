@@ -18,12 +18,10 @@ function transformPost(post: Record<string, unknown>): PostWithRelations {
     ? (post.author[0] as Author | null)
     : (post.author as Author | null)
 
-  // PostWithRelations requires both category and author, but in practice they might be null
-  // We'll cast to satisfy the type, but consumers should handle nulls
   return {
     ...post,
-    category: category || ({} as Category),
-    author: author || ({} as Author),
+    category,
+    author,
   } as PostWithRelations
 }
 
@@ -84,7 +82,11 @@ export async function getPostBySlug(slug: string): Promise<PostWithRelations | n
     return null
   }
 
-  return data as PostWithRelations
+  if (!data) {
+    return null
+  }
+
+  return transformPost(data)
 }
 
 /**
@@ -172,7 +174,7 @@ export async function getPostsByAuthor(authorSlug: string): Promise<PostWithRela
     return []
   }
 
-  return (data as PostWithRelations[]) || []
+  return transformPosts(data || [])
 }
 
 /**

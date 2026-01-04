@@ -106,7 +106,11 @@ export default async function BlogPage() {
         name: post.author?.name || 'Unknown',
       },
       articleSection: post.category?.name || 'Uncategorized',
-      image: post.featured_image ? `${baseUrl}${post.featured_image}` : `${baseUrl}/og-image.jpg`,
+      image: post.featured_image
+        ? post.featured_image.startsWith('http')
+          ? post.featured_image
+          : `${baseUrl}${post.featured_image}`
+        : `${baseUrl}/og-image.jpg`,
     })),
   }
 

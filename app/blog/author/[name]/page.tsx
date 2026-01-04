@@ -45,7 +45,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'Workout Generator',
       images: [
         {
-          url: author.avatar || `${baseUrl}/og-image.jpg`,
+          url: author.avatar
+            ? author.avatar.startsWith('http')
+              ? author.avatar
+              : `${baseUrl}${author.avatar}`
+            : `${baseUrl}/og-image.jpg`,
           width: 1200,
           height: 630,
           alt: `Articles by ${author.name}`,
@@ -56,7 +60,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: `Articles by ${author.name}`,
       description,
-      images: [author.avatar || `${baseUrl}/og-image.jpg`],
+      images: [
+        author.avatar
+          ? author.avatar.startsWith('http')
+            ? author.avatar
+            : `${baseUrl}${author.avatar}`
+          : `${baseUrl}/og-image.jpg`,
+      ],
     },
     alternates: {
       canonical: `${baseUrl}/blog/author/${name}`,
@@ -87,7 +97,11 @@ export default async function AuthorPage({ params }: PageProps) {
     author: post.author?.name || 'Unknown',
     category: post.category?.name || 'Uncategorized',
     tags: post.tags || [],
-    image: post.featured_image || undefined,
+    image: post.featured_image
+      ? post.featured_image.startsWith('http')
+        ? post.featured_image
+        : `${baseUrl}${post.featured_image}`
+      : undefined,
   }))
 
   // BreadcrumbList structured data (JSON-LD)
@@ -123,7 +137,11 @@ export default async function AuthorPage({ params }: PageProps) {
     name: author.name,
     url: `${baseUrl}/blog/author/${name}`,
     description: author.bio,
-    image: author.avatar,
+    image: author.avatar
+      ? author.avatar.startsWith('http')
+        ? author.avatar
+        : `${baseUrl}${author.avatar}`
+      : undefined,
   }
 
   return (

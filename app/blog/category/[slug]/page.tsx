@@ -87,7 +87,11 @@ export default async function CategoryPage({ params }: PageProps) {
     author: post.author?.name || 'Unknown',
     category: post.category?.name || 'Uncategorized',
     tags: post.tags || [],
-    image: post.featured_image || undefined,
+    image: post.featured_image
+      ? post.featured_image.startsWith('http')
+        ? post.featured_image
+        : `${baseUrl}${post.featured_image}`
+      : undefined,
   }))
 
   // BreadcrumbList structured data (JSON-LD)

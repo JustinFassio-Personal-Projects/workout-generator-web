@@ -1,4 +1,4 @@
-@import '../../../styles/design-system/animations.scss';
+@use '../../../styles/design-system/animations.scss' as *;
 
 .navbar {
   position: sticky;

@@ -366,7 +366,8 @@ describe('Blog API Route', () => {
     const data = await response.json()
 
     expect(response.status).toBe(500)
-    expect(data).toEqual({ error: 'Failed to fetch blog posts' })
+    expect(data).toHaveProperty('error', 'Failed to fetch blog posts')
+    expect(data).toHaveProperty('details')
     expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching blog posts:', expect.any(Error))
 
     consoleErrorSpy.mockRestore()

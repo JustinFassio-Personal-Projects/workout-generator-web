@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
+import { Zap, LayoutDashboard, FileText, ChevronLeft, ChevronRight, LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import styles from './AdminLayout.module.scss'
 
@@ -30,9 +31,13 @@ export function AdminLayout({ children, user, role }: AdminLayoutProps) {
     router.refresh()
   }
 
-  const navItems = [
-    { href: '/admin', label: 'Dashboard', icon: '📊' },
-    { href: '/admin/blog', label: 'Blog Posts', icon: '📝' },
+  const navItems: Array<{
+    href: string
+    label: string
+    icon: typeof LayoutDashboard
+  }> = [
+    { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/blog', label: 'Blog Posts', icon: FileText },
   ]
 
   return (
@@ -40,7 +45,9 @@ export function AdminLayout({ children, user, role }: AdminLayoutProps) {
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.open : styles.closed}`}>
         <div className={styles.sidebarHeader}>
           <Link href="/admin" className={styles.logo}>
-            <span className={styles.logoIcon}>⚡</span>
+            <span className={styles.logoIcon}>
+              <Zap size={20} />
+            </span>
             {sidebarOpen && <span className={styles.logoText}>Admin</span>}
           </Link>
           <button
@@ -48,21 +55,26 @@ export function AdminLayout({ children, user, role }: AdminLayoutProps) {
             onClick={() => setSidebarOpen(!sidebarOpen)}
             aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
           >
-            {sidebarOpen ? '◀' : '▶'}
+            {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
           </button>
         </div>
 
         <nav className={styles.nav}>
-          {navItems.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}
-            >
-              <span className={styles.navIcon}>{item.icon}</span>
-              {sidebarOpen && <span className={styles.navLabel}>{item.label}</span>}
-            </Link>
-          ))}
+          {navItems.map(item => {
+            const IconComponent = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}
+              >
+                <span className={styles.navIcon}>
+                  <IconComponent size={20} />
+                </span>
+                {sidebarOpen && <span className={styles.navLabel}>{item.label}</span>}
+              </Link>
+            )
+          })}
         </nav>
 
         <div className={styles.sidebarFooter}>
@@ -73,7 +85,7 @@ export function AdminLayout({ children, user, role }: AdminLayoutProps) {
             </div>
           )}
           <button onClick={handleLogout} className={styles.logoutButton}>
-            {sidebarOpen ? 'Sign Out' : '🚪'}
+            {sidebarOpen ? 'Sign Out' : <LogOut size={18} />}
           </button>
         </div>
       </aside>

@@ -290,7 +290,7 @@ describe('Blog API Route', () => {
           description: null,
           created_at: '2025-01-01T00:00:00Z',
         },
-        tags: null,
+        tags: [],
         featured_image: null,
         category_id: '1',
         author_id: '1',

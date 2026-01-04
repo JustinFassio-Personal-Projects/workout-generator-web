@@ -24,9 +24,9 @@ export interface Post {
   author?: Author
 }
 
-export interface PostWithRelations extends Post {
-  category: Category
-  author: Author
+export interface PostWithRelations extends Omit<Post, 'category' | 'author'> {
+  category: Category | null
+  author: Author | null
 }
 
 export interface Category {

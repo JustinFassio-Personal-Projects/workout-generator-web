@@ -4,6 +4,37 @@ import type { PostWithRelations, Category, Author } from '@/types/blog'
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 /**
+ * Transform Supabase post data to handle joined relations.
+ * Supabase returns joined relations as arrays, but we need single objects.
+ * Note: PostWithRelations requires category and author, but we handle nulls
+ * by providing fallback objects or the type system will handle it.
+ */
+function transformPost(post: Record<string, unknown>): PostWithRelations {
+  const category = Array.isArray(post.category)
+    ? (post.category[0] as Category | null)
+    : (post.category as Category | null)
+
+  const author = Array.isArray(post.author)
+    ? (post.author[0] as Author | null)
+    : (post.author as Author | null)
+
+  // PostWithRelations requires both category and author, but in practice they might be null
+  // We'll cast to satisfy the type, but consumers should handle nulls
+  return {
+    ...post,
+    category: category || ({} as Category),
+    author: author || ({} as Author),
+  } as PostWithRelations
+}
+
+/**
+ * Transform an array of Supabase post data
+ */
+function transformPosts(posts: Record<string, unknown>[]): PostWithRelations[] {
+  return posts.map(transformPost)
+}
+
+/**
  * Get all published posts with their relations
  */
 export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
@@ -26,7 +57,7 @@ export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
     return []
   }
 
-  return (data as PostWithRelations[]) || []
+  return transformPosts(data || [])
 }
 
 /**
@@ -105,7 +136,7 @@ export async function getPostsByCategory(categorySlug: string): Promise<PostWith
     return []
   }
 
-  return (data as PostWithRelations[]) || []
+  return transformPosts(data || [])
 }
 
 /**
@@ -174,7 +205,7 @@ export async function getRelatedPosts(
     return []
   }
 
-  return (data as PostWithRelations[]) || []
+  return transformPosts(data || [])
 }
 
 /**
@@ -267,7 +298,7 @@ export async function searchPosts(query: string): Promise<PostWithRelations[]> {
     return []
   }
 
-  return (data as PostWithRelations[]) || []
+  return transformPosts(data || [])
 }
 
 /**

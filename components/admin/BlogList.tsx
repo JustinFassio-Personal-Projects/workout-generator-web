@@ -73,10 +73,6 @@ export function BlogList({ initialPosts, categories }: BlogListProps) {
     })
   }
 
-  function getWordCount(content: string) {
-    return content.split(/\s+/).filter(w => w.length > 0).length
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>

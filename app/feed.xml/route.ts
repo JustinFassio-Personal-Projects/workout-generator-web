@@ -95,6 +95,16 @@ export async function GET() {
           return mimeTypes[ext] || 'image/jpeg'
         }
 
+        // Escape XML special characters for safe interpolation
+        const escapeXml = (text: string): string => {
+          return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;')
+        }
+
         const authorName = post.author?.name || 'Workout Generator'
         const categoryName = post.category?.name || 'Uncategorized'
 
@@ -105,8 +115,8 @@ export async function GET() {
       <link>${postUrl}</link>
       <guid isPermaLink="true">${postUrl}</guid>
       <pubDate>${new Date(pubDate).toUTCString()}</pubDate>
-      <author>contact@aiworkoutgenerator.com (${authorName})</author>
-      <category>${categoryName}</category>${
+      <author>contact@aiworkoutgenerator.com (${escapeXml(authorName)})</author>
+      <category>${escapeXml(categoryName)}</category>${
         post.featured_image
           ? `
       <enclosure url="${postImage}" type="${getImageMimeType(postImage)}" length="0"/>`

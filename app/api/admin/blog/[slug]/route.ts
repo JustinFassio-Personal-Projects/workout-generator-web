@@ -91,9 +91,23 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     const rawData = await request.json()
 
-    // Validate required fields
-    if (!rawData.title || !rawData.slug || !rawData.excerpt || !rawData.content) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    // Validate required fields with type and emptiness checks
+    if (
+      typeof rawData.title !== 'string' ||
+      rawData.title.trim().length === 0 ||
+      typeof rawData.slug !== 'string' ||
+      rawData.slug.trim().length === 0 ||
+      typeof rawData.excerpt !== 'string' ||
+      rawData.excerpt.trim().length === 0 ||
+      typeof rawData.content !== 'string' ||
+      rawData.content.trim().length === 0
+    ) {
+      return NextResponse.json({ error: 'Missing or invalid required fields' }, { status: 400 })
+    }
+
+    // Validate status field
+    if (rawData.status && rawData.status !== 'draft' && rawData.status !== 'published') {
+      return NextResponse.json({ error: 'Invalid status value' }, { status: 400 })
     }
 
     const adminClient = createAdminClient()

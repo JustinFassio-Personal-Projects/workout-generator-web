@@ -55,7 +55,7 @@ async function setupAdminUser() {
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Auto-confirm email so user can login immediately
+      email_confirm: true, // Auto-confirm email so user can log in immediately
     })
 
     if (authError) {
@@ -92,7 +92,7 @@ async function setupAdminUser() {
     console.log(`Email: ${email}`)
     console.log(`Role: ${role}`)
     console.log(`User ID: ${authData.user.id}`)
-    console.log('\nYou can now login at /admin/login')
+    console.log('\nYou can now log in at /admin/login')
   } catch (error) {
     console.error('Unexpected error:', error)
     process.exit(1)

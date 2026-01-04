@@ -47,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Update blog page with most recent post date
   const mostRecentPostDate =
     posts && posts.length > 0
-      ? new Date(posts[0].updated_at || posts[0].published_at || new Date())
+      ? new Date(posts[0].updated_at || posts[0].published_at || posts[0].created_at || Date.now())
       : new Date()
 
   blogPage.lastModified = mostRecentPostDate

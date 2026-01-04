@@ -4,9 +4,8 @@ import { BlogPageClient } from '@/components/features/blog/BlogPageClient'
 import { getAllPublishedPosts } from '@/lib/blog/queries'
 import styles from './blog-page.module.scss'
 
-// ISR: Revalidate every 60 seconds (fallback)
-// Primary revalidation happens on-demand when admin publishes
-export const revalidate = 60
+// Mark as dynamic since we use cookies() via createServerSupabaseClient() in getAllPublishedPosts()
+export const dynamic = 'force-dynamic'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
@@ -64,19 +63,21 @@ export default async function BlogPage() {
   const posts = await getAllPublishedPosts()
 
   // Transform posts to match the expected format for BlogPageClient
-  const transformedPosts = posts.map(post => ({
-    id: post.id,
-    slug: post.slug,
-    title: post.title,
-    excerpt: post.excerpt,
-    content: post.content,
-    date: post.published_at || post.created_at,
-    dateModified: post.updated_at,
-    author: post.author?.name || 'Unknown',
-    category: post.category?.name || 'Uncategorized',
-    tags: post.tags || [],
-    image: post.featured_image || undefined,
-  }))
+  const transformedPosts = posts.map(post => {
+    return {
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      date: post.published_at || post.created_at,
+      dateModified: post.updated_at,
+      author: post.author?.name || 'Unknown',
+      category: post.category?.name || 'Uncategorized',
+      tags: post.tags || [],
+      image: post.featured_image || undefined,
+    }
+  })
 
   // Blog/CollectionPage structured data (JSON-LD)
   const blogSchema = {

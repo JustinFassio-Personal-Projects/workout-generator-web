@@ -5,8 +5,8 @@ import { RelatedPosts } from '@/components/features/blog/RelatedPosts'
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/lib/blog/queries'
 import { notFound } from 'next/navigation'
 
-// ISR: Revalidate every 60 seconds (fallback)
-export const revalidate = 60
+// Mark as dynamic since we use cookies() via createServerSupabaseClient() in getPostBySlug() and getRelatedPosts()
+export const dynamic = 'force-dynamic'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 

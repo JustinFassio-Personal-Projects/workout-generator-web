@@ -6,7 +6,8 @@ import { getAllCategories, getPostsByCategory, getCategoryBySlug } from '@/lib/b
 import styles from './category-page.module.scss'
 
 // ISR: Revalidate every 60 seconds
-export const revalidate = 60
+// Mark as dynamic since we use cookies() via createServerSupabaseClient() in getCategoryBySlug() and getPostsByCategory()
+export const dynamic = 'force-dynamic'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 

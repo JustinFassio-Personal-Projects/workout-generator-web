@@ -1,10 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Force Node.js runtime for middleware to avoid Edge runtime issues with Supabase
-export const runtime = 'nodejs'
-
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Only protect /admin routes

@@ -115,7 +115,7 @@ export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
     }
 
     // No data in Supabase, use static fallback
-    console.log('No posts found in Supabase, using static fallback data')
+    console.warn('No posts found in Supabase, using static fallback data')
     return convertStaticPostsToSupabaseFormat(blogPosts)
   } catch (error) {
     // If Supabase client creation fails, use static data

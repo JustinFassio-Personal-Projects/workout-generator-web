@@ -23,12 +23,13 @@ export async function GET() {
     return NextResponse.json(transformedPosts)
   } catch (error) {
     console.error('Error fetching blog posts:', error)
-    // Log the full error for debugging in production
+    // Log the full error for debugging; only expose limited details to clients
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Error details:', errorMessage)
-    return NextResponse.json(
-      { error: 'Failed to fetch blog posts', details: errorMessage },
-      { status: 500 }
-    )
+    const isDev = process.env.NODE_ENV !== 'production'
+    const responseBody = isDev
+      ? { error: 'Failed to fetch blog posts', details: errorMessage }
+      : { error: 'Failed to fetch blog posts' }
+    return NextResponse.json(responseBody, { status: 500 })
   }
 }

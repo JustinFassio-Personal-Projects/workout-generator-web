@@ -1,17 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-// Use admin client to bypass RLS
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!url || !serviceKey) {
-    return null
-  }
-
-  return createClient(url, serviceKey)
-}
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: Request) {
   try {
@@ -21,11 +9,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 })
     }
 
-    const adminClient = getAdminClient()
-
-    if (!adminClient) {
-      // Fallback: If no service key, try direct query (less secure but works for dev)
-      // In production, service role key should always be set
+    let adminClient
+    try {
+      adminClient = createAdminClient()
+    } catch (error) {
+      // Missing Supabase admin credentials
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 

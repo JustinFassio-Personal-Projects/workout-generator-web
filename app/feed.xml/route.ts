@@ -1,22 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createPublicClient } from '@/lib/supabase/public'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
-// Create a simple Supabase client for RSS feed (no cookies needed for public data)
-function getSupabaseClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!url || !key) {
-    return null
-  }
-
-  return createClient(url, key)
-}
-
 export async function GET() {
-  const supabase = getSupabaseClient()
+  const supabase = createPublicClient()
 
   let posts: Array<{
     slug: string

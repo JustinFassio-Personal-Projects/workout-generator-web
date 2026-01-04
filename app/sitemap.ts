@@ -1,22 +1,10 @@
 import type { MetadataRoute } from 'next'
-import { createClient } from '@supabase/supabase-js'
+import { createPublicClient } from '@/lib/supabase/public'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
-// Create a simple Supabase client for sitemap generation (no cookies needed for public data)
-function getSupabaseClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!url || !key) {
-    return null
-  }
-
-  return createClient(url, key)
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = getSupabaseClient()
+  const supabase = createPublicClient()
 
   // Static pages - always included
   const homepage: MetadataRoute.Sitemap[0] = {

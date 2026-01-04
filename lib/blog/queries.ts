@@ -11,11 +11,11 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.
  */
 function transformPost(post: Record<string, unknown>): PostWithRelations {
   const category = Array.isArray(post.category)
-    ? (post.category[0] as Category | null)
+    ? ((post.category[0] as Category | undefined) ?? null)
     : (post.category as Category | null)
 
   const author = Array.isArray(post.author)
-    ? (post.author[0] as Author | null)
+    ? ((post.author[0] as Author | undefined) ?? null)
     : (post.author as Author | null)
 
   return {
@@ -185,6 +185,11 @@ export async function getRelatedPosts(
   limit: number = 3
 ): Promise<PostWithRelations[]> {
   const supabase = await createServerSupabaseClient()
+
+  // If post has no category, return empty array (can't find related posts by category)
+  if (!currentPost.category_id) {
+    return []
+  }
 
   // Get posts from same category, excluding current post
   const { data, error } = await supabase

@@ -81,6 +81,20 @@ export async function GET() {
             : `${baseUrl}${post.featured_image}`
         }
 
+        // Detect MIME type from image URL extension
+        const getImageMimeType = (imageUrl: string): string => {
+          const ext = imageUrl.split('.').pop()?.toLowerCase() || ''
+          const mimeTypes: Record<string, string> = {
+            jpg: 'image/jpeg',
+            jpeg: 'image/jpeg',
+            png: 'image/png',
+            webp: 'image/webp',
+            gif: 'image/gif',
+            svg: 'image/svg+xml',
+          }
+          return mimeTypes[ext] || 'image/jpeg'
+        }
+
         const authorName = post.author?.name || 'Workout Generator'
         const categoryName = post.category?.name || 'Uncategorized'
 
@@ -95,7 +109,7 @@ export async function GET() {
       <category>${categoryName}</category>${
         post.featured_image
           ? `
-      <enclosure url="${postImage}" type="image/jpeg" length="0"/>`
+      <enclosure url="${postImage}" type="${getImageMimeType(postImage)}" length="0"/>`
           : ''
       }
     </item>`

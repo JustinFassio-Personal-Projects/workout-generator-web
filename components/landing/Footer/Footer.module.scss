@@ -228,3 +228,16 @@
   color: var(--text-tertiary);
   margin: 0;
 }
+
+.adminAccess {
+  color: var(--text-tertiary);
+  opacity: 0.25;
+  font-size: 0.5rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  margin-left: 0.5rem;
+
+  &:hover {
+    opacity: 0.5;
+  }
+}

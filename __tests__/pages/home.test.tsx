@@ -1,16 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render } from '@testing-library/react'
 import Home from '@/app/page'
 import * as useBlogPostsModule from '@/features/blog/hooks/useBlogPosts'
 
 // Mock AOS
-const mockAOS = {
-  init: vi.fn(),
-  refresh: vi.fn(),
-}
-
 vi.mock('aos', () => ({
-  default: mockAOS,
+  default: {
+    init: vi.fn(),
+    refresh: vi.fn(),
+  },
 }))
 
 // Mock useBlogPosts hook
@@ -18,11 +16,14 @@ vi.mock('@/features/blog/hooks/useBlogPosts', () => ({
   useBlogPosts: vi.fn(),
 }))
 
+// Mock useScrollTracking
+vi.mock('@/features/analytics/hooks/useScrollTracking', () => ({
+  useScrollTracking: vi.fn(),
+}))
+
 describe('Home Page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Reset window flags
-    delete (window as any).__AOS_CSS_LOADED__
     // Mock useBlogPosts to return empty array
     vi.mocked(useBlogPostsModule.useBlogPosts).mockReturnValue({
       posts: [],
@@ -40,9 +41,39 @@ describe('Home Page', () => {
   it('should render all main sections', () => {
     render(<Home />)
 
-    // Check that main sections are rendered (they may not have text content visible without data)
     const main = document.querySelector('main')
     expect(main).toBeInTheDocument()
     expect(main?.className).toContain('min-h-screen')
+  })
+
+  it('should render structured data scripts', () => {
+    render(<Home />)
+
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]')
+    expect(scripts.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('should include homepage schema in structured data', () => {
+    render(<Home />)
+
+    const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+    const homepageScript = scripts.find(script => script.textContent?.includes('WebPage'))
+    expect(homepageScript).toBeInTheDocument()
+  })
+
+  it('should include breadcrumb schema in structured data', () => {
+    render(<Home />)
+
+    const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+    const breadcrumbScript = scripts.find(script => script.textContent?.includes('BreadcrumbList'))
+    expect(breadcrumbScript).toBeInTheDocument()
+  })
+
+  it('should include FAQ schema in structured data', () => {
+    render(<Home />)
+
+    const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+    const faqScript = scripts.find(script => script.textContent?.includes('FAQPage'))
+    expect(faqScript).toBeInTheDocument()
   })
 })

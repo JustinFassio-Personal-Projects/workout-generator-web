@@ -2,22 +2,28 @@ import type { Metadata } from 'next'
 import { BlogPostHero } from '@/components/features/blog/BlogPostHero'
 import { BlogPostContent } from '@/components/features/blog/BlogPostContent'
 import { RelatedPosts } from '@/components/features/blog/RelatedPosts'
-import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/features/blog/lib/getBlogPosts'
+import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/lib/blog/queries'
 import { notFound } from 'next/navigation'
+
+// ISR: Revalidate every 60 seconds (fallback)
+export const revalidate = 60
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
+// Dynamic generation - posts are fetched at request time with ISR
 export async function generateStaticParams() {
-  const slugs = await getAllPostSlugs()
-  return slugs.map(slug => ({ slug }))
+  // Return empty array for dynamic generation
+  // Pages will be generated on-demand and cached via ISR
+  return []
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string }
-}): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug)
+interface PageProps {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post) {
     return {
@@ -25,29 +31,37 @@ export async function generateMetadata({
     }
   }
 
-  const publishedTime = new Date(post.date).toISOString()
-  const modifiedTime = post.dateModified ? new Date(post.dateModified).toISOString() : publishedTime
+  const publishedTime = post.published_at || post.created_at
+  const modifiedTime = post.updated_at
   const url = `${baseUrl}/blog/${post.slug}`
-  const postImage = post.image ? `${baseUrl}${post.image}` : `${baseUrl}/og-image.jpg`
 
-  // Optimize description to 150-160 characters for better SERP display
-  const optimizedDescription =
-    post.excerpt.length > 160 ? post.excerpt.substring(0, 157).trim() + '...' : post.excerpt
+  // Handle both absolute URLs and relative paths for images
+  const postImage = post.featured_image
+    ? post.featured_image.startsWith('http')
+      ? post.featured_image
+      : `${baseUrl}${post.featured_image}`
+    : `${baseUrl}/og-image.jpg`
+
+  // Use SEO overrides if available
+  const title = post.seo_title || `${post.title} | Blog`
+  const description =
+    post.seo_description ||
+    (post.excerpt.length > 160 ? post.excerpt.substring(0, 157).trim() + '...' : post.excerpt)
 
   return {
-    title: `${post.title} | Blog`,
-    description: optimizedDescription,
+    title,
+    description,
     keywords: post.tags,
-    authors: [{ name: post.author }],
+    authors: [{ name: post.author?.name || 'Unknown' }],
     openGraph: {
-      title: post.title,
-      description: optimizedDescription,
+      title: post.seo_title || post.title,
+      description,
       type: 'article',
       url,
       publishedTime,
       modifiedTime,
-      authors: [post.author],
-      section: post.category,
+      authors: [post.author?.name || 'Unknown'],
+      section: post.category?.name || 'Uncategorized',
       tags: post.tags,
       images: [
         {
@@ -60,8 +74,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: optimizedDescription,
+      title: post.seo_title || post.title,
+      description,
       images: [postImage],
     },
     alternates: {
@@ -73,8 +87,9 @@ export async function generateMetadata({
   }
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug)
+export default async function BlogPostPage({ params }: PageProps) {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post) {
     notFound()
@@ -83,12 +98,18 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   // Get related posts
   const relatedPosts = await getRelatedPosts(post, 3)
 
-  const publishedTime = new Date(post.date).toISOString()
-  const modifiedTime = post.dateModified ? new Date(post.dateModified).toISOString() : publishedTime
+  const publishedTime = post.published_at || post.created_at
+  const modifiedTime = post.updated_at
   const url = `${baseUrl}/blog/${post.slug}`
-  const postImage = post.image ? `${baseUrl}${post.image}` : `${baseUrl}/og-image.jpg`
 
-  // Calculate word count from content (approximate)
+  // Handle both absolute URLs and relative paths for images
+  const postImage = post.featured_image
+    ? post.featured_image.startsWith('http')
+      ? post.featured_image
+      : `${baseUrl}${post.featured_image}`
+    : `${baseUrl}/og-image.jpg`
+
+  // Calculate word count from content
   const wordCount = post.content.split(/\s+/).filter(word => word.length > 0).length
   // Calculate reading time (average reading speed: 200 words per minute)
   const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200))
@@ -106,7 +127,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     timeRequired: `PT${readingTimeMinutes}M`,
     author: {
       '@type': 'Person',
-      name: post.author,
+      name: post.author?.name || 'Unknown',
     },
     publisher: {
       '@type': 'Organization',
@@ -120,7 +141,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       '@type': 'WebPage',
       '@id': url,
     },
-    articleSection: post.category,
+    articleSection: post.category?.name || 'Uncategorized',
     keywords: post.tags.join(', '),
   }
 
@@ -150,6 +171,36 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     ],
   }
 
+  // Transform post for components that expect the old format
+  const transformedPost = {
+    id: post.id,
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    date: post.published_at || post.created_at,
+    dateModified: post.updated_at,
+    author: post.author?.name || 'Unknown',
+    category: post.category?.name || 'Uncategorized',
+    tags: post.tags || [],
+    image: post.featured_image || undefined,
+  }
+
+  // Transform related posts
+  const transformedRelatedPosts = relatedPosts.map(p => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    excerpt: p.excerpt,
+    content: p.content,
+    date: p.published_at || p.created_at,
+    dateModified: p.updated_at,
+    author: p.author?.name || 'Unknown',
+    category: p.category?.name || 'Uncategorized',
+    tags: p.tags || [],
+    image: p.featured_image || undefined,
+  }))
+
   return (
     <>
       <script
@@ -160,9 +211,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <BlogPostHero post={post} />
-      <BlogPostContent post={post} />
-      <RelatedPosts posts={relatedPosts} />
+      <BlogPostHero post={transformedPost} />
+      <BlogPostContent post={transformedPost} />
+      <RelatedPosts posts={transformedRelatedPosts} />
     </>
   )
 }

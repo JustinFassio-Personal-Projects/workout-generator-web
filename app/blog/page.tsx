@@ -1,8 +1,12 @@
 import type { Metadata } from 'next'
 import { BlogHero } from '@/components/features/blog/BlogHero'
 import { BlogPageClient } from '@/components/features/blog/BlogPageClient'
-import { getAllPosts } from '@/features/blog/lib/getBlogPosts'
+import { getAllPublishedPosts } from '@/lib/blog/queries'
 import styles from './blog-page.module.scss'
+
+// ISR: Revalidate every 60 seconds (fallback)
+// Primary revalidation happens on-demand when admin publishes
+export const revalidate = 60
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
@@ -57,7 +61,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BlogPage() {
-  const posts = await getAllPosts()
+  const posts = await getAllPublishedPosts()
+
+  // Transform posts to match the expected format for BlogPageClient
+  const transformedPosts = posts.map(post => ({
+    id: post.id,
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    date: post.published_at || post.created_at,
+    dateModified: post.updated_at,
+    author: post.author?.name || 'Unknown',
+    category: post.category?.name || 'Uncategorized',
+    tags: post.tags || [],
+    image: post.featured_image || undefined,
+  }))
 
   // Blog/CollectionPage structured data (JSON-LD)
   const blogSchema = {
@@ -80,12 +99,18 @@ export default async function BlogPage() {
       headline: post.title,
       description: post.excerpt,
       url: `${baseUrl}/blog/${post.slug}`,
-      datePublished: new Date(post.date).toISOString(),
+      datePublished: post.published_at || post.created_at,
+      dateModified: post.updated_at,
       author: {
         '@type': 'Person',
-        name: post.author,
+        name: post.author?.name || 'Unknown',
       },
-      articleSection: post.category,
+      articleSection: post.category?.name || 'Uncategorized',
+      image: post.featured_image
+        ? post.featured_image.startsWith('http')
+          ? post.featured_image
+          : `${baseUrl}${post.featured_image}`
+        : `${baseUrl}/og-image.jpg`,
     })),
   }
 
@@ -121,7 +146,7 @@ export default async function BlogPage() {
       />
       <BlogHero />
       <div className={styles.blogContainer}>
-        <BlogPageClient posts={posts} />
+        <BlogPageClient posts={transformedPosts} />
       </div>
     </>
   )

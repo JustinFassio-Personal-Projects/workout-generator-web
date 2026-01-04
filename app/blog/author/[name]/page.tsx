@@ -1,59 +1,75 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
-import { getAllAuthors, getPostsByAuthor, authorToSlug } from '@/features/blog/lib/getBlogPosts'
+import { getAllAuthors, getPostsByAuthor, getAuthorBySlug, authorToSlug } from '@/lib/blog/queries'
 import styles from './author-page.module.scss'
+
+// ISR: Revalidate every 60 seconds
+export const revalidate = 60
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
+// Dynamic generation - authors are fetched at request time with ISR
 export async function generateStaticParams() {
-  const authors = await getAllAuthors()
-  return authors.map(author => ({ name: authorToSlug(author) }))
+  // Return empty array for dynamic generation
+  // Pages will be generated on-demand and cached via ISR
+  return []
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { name: string }
-}): Promise<Metadata> {
-  const posts = await getPostsByAuthor(params.name)
+interface PageProps {
+  params: Promise<{ name: string }>
+}
 
-  if (posts.length === 0) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { name } = await params
+  const author = await getAuthorBySlug(name)
+
+  if (!author) {
     return {
       title: 'Author Not Found - Workout Generator',
     }
   }
 
-  // Get the original author name from the first post
-  const authorName = posts[0].author
-  const description = `Read all articles by ${authorName} on the Workout Generator blog. Fitness tips, workout strategies, and expert advice.`
+  const description =
+    author.bio ||
+    `Read all articles by ${author.name} on the Workout Generator blog. Fitness tips, workout strategies, and expert advice.`
 
   return {
-    title: `Articles by ${authorName} | Blog`,
+    title: `Articles by ${author.name} | Blog`,
     description,
     openGraph: {
-      title: `Articles by ${authorName}`,
+      title: `Articles by ${author.name}`,
       description,
       type: 'website',
-      url: `${baseUrl}/blog/author/${params.name}`,
+      url: `${baseUrl}/blog/author/${name}`,
       siteName: 'Workout Generator',
       images: [
         {
-          url: `${baseUrl}/og-image.jpg`,
+          url: author.avatar
+            ? author.avatar.startsWith('http')
+              ? author.avatar
+              : `${baseUrl}${author.avatar}`
+            : `${baseUrl}/og-image.jpg`,
           width: 1200,
           height: 630,
-          alt: `Articles by ${authorName}`,
+          alt: `Articles by ${author.name}`,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Articles by ${authorName}`,
+      title: `Articles by ${author.name}`,
       description,
-      images: [`${baseUrl}/og-image.jpg`],
+      images: [
+        author.avatar
+          ? author.avatar.startsWith('http')
+            ? author.avatar
+            : `${baseUrl}${author.avatar}`
+          : `${baseUrl}/og-image.jpg`,
+      ],
     },
     alternates: {
-      canonical: `${baseUrl}/blog/author/${params.name}`,
+      canonical: `${baseUrl}/blog/author/${name}`,
       types: {
         'application/rss+xml': `${baseUrl}/feed.xml`,
       },
@@ -61,14 +77,32 @@ export async function generateMetadata({
   }
 }
 
-export default async function AuthorPage({ params }: { params: { name: string } }) {
-  const posts = await getPostsByAuthor(params.name)
+export default async function AuthorPage({ params }: PageProps) {
+  const { name } = await params
+  const [author, posts] = await Promise.all([getAuthorBySlug(name), getPostsByAuthor(name)])
 
-  if (posts.length === 0) {
+  if (!author) {
     notFound()
   }
 
-  const authorName = posts[0].author
+  // Transform posts for BlogPostList
+  const transformedPosts = posts.map(post => ({
+    id: post.id,
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    date: post.published_at || post.created_at,
+    dateModified: post.updated_at,
+    author: post.author?.name || 'Unknown',
+    category: post.category?.name || 'Uncategorized',
+    tags: post.tags || [],
+    image: post.featured_image
+      ? post.featured_image.startsWith('http')
+        ? post.featured_image
+        : `${baseUrl}${post.featured_image}`
+      : undefined,
+  }))
 
   // BreadcrumbList structured data (JSON-LD)
   const breadcrumbSchema = {
@@ -90,8 +124,8 @@ export default async function AuthorPage({ params }: { params: { name: string } 
       {
         '@type': 'ListItem',
         position: 3,
-        name: authorName,
-        item: `${baseUrl}/blog/author/${params.name}`,
+        name: author.name,
+        item: `${baseUrl}/blog/author/${name}`,
       },
     ],
   }
@@ -100,8 +134,14 @@ export default async function AuthorPage({ params }: { params: { name: string } 
   const authorSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: authorName,
-    url: `${baseUrl}/blog/author/${params.name}`,
+    name: author.name,
+    url: `${baseUrl}/blog/author/${name}`,
+    description: author.bio,
+    image: author.avatar
+      ? author.avatar.startsWith('http')
+        ? author.avatar
+        : `${baseUrl}${author.avatar}`
+      : undefined,
   }
 
   return (
@@ -121,16 +161,17 @@ export default async function AuthorPage({ params }: { params: { name: string } 
             <span className={styles.separator}>/</span>
             <a href="/blog">Blog</a>
             <span className={styles.separator}>/</span>
-            <span aria-current="page">{authorName}</span>
+            <span aria-current="page">{author.name}</span>
           </nav>
-          <h1 className={styles.title}>Articles by {authorName}</h1>
+          <h1 className={styles.title}>Articles by {author.name}</h1>
+          {author.bio && <p className={styles.bio}>{author.bio}</p>}
           <p className={styles.postCount}>
             {posts.length} {posts.length === 1 ? 'article' : 'articles'}
           </p>
         </div>
       </section>
       <div className={styles.postsContainer}>
-        <BlogPostList posts={posts} />
+        <BlogPostList posts={transformedPosts} />
       </div>
     </>
   )

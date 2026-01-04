@@ -115,11 +115,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Revalidate pages
+    // Revalidate blog listing and the page for the current (original) slug
     revalidatePath('/blog')
     revalidatePath(`/blog/${slug}`)
 
-    // If slug changed, revalidate old slug too
+    // If slug changed, also revalidate the page for the new slug
+    // This ensures both the old and new paths are updated in the cache
     if (data.slug && data.slug !== slug) {
       revalidatePath(`/blog/${data.slug}`)
     }

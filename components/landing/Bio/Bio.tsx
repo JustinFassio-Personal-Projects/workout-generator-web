@@ -74,7 +74,9 @@ export const Bio: React.FC = () => {
             </div>
 
             <div className={styles.credentials} data-aos="fade-up" data-aos-delay="100">
-              <h3 className={styles.credentialsTitle}>Credibility in 10 seconds:</h3>
+              <h3 className={styles.credentialsTitle}>
+                Expertise and Experience Behind Every Workout:
+              </h3>
               <ul className={styles.credentialsList}>
                 {credentials.map((credential, index) => (
                   <li key={index} className={styles.credentialItem}>

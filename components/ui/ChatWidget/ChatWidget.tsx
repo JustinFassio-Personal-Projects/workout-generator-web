@@ -226,9 +226,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
   // Don't render if no workflow ID is provided
   if (!chatkitWorkflowId) {
-    if (process.env.NODE_ENV === 'development') {
+    // Log in both development and production for troubleshooting
+    if (typeof window !== 'undefined') {
       console.warn(
-        'ChatWidget: NEXT_PUBLIC_CHATKIT_WORKFLOW_ID is not set. Chat widget will not be displayed.'
+        '[ChatWidget] NEXT_PUBLIC_CHATKIT_WORKFLOW_ID is not set. Chat widget will not be displayed.'
       )
     }
     return null

@@ -63,10 +63,12 @@ NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=xxxxx
 
 # Support Ticket System (optional)
 # Firebase Cloud Function URL for creating support tickets
-# This should point to your Firebase Cloud Function endpoint that creates tickets in Firestore
-FIREBASE_CLOUD_FUNCTION_URL=https://your-region-your-project.cloudfunctions.net/createSupportTicket
-# Alternative: If using Supabase Edge Functions
-# NEXT_PUBLIC_SUPABASE_SUPPORT_FUNCTION_URL=https://your-project.supabase.co/functions/v1/create-support-ticket
+# Format: https://us-central1-YOUR-PROJECT-ID.cloudfunctions.net/createSupportTicketFromWebsite
+FIREBASE_CLOUD_FUNCTION_URL=https://us-central1-YOUR-PROJECT-ID.cloudfunctions.net/createSupportTicketFromWebsite
+# Optional: Function key for authentication (if configured)
+# NEXT_PUBLIC_FIREBASE_FUNCTION_KEY=your-function-key
+# Alternative: Bearer token authentication
+# FIREBASE_FUNCTION_SECRET=your-bearer-token
 ```
 
 **Note**:

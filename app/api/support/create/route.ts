@@ -86,8 +86,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Validate required fields
-    const { subject, description, category, email, source, current_url, utm_params, device_type } =
-      body
+    const {
+      subject,
+      description,
+      category,
+      priority,
+      email,
+      source_url,
+      device_type,
+      subscription_tier,
+      utm_params,
+    } = body
 
     if (!subject || typeof subject !== 'string' || subject.trim().length === 0) {
       return NextResponse.json({ error: 'Subject is required' }, { status: 400 })
@@ -97,8 +106,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Description is required' }, { status: 400 })
     }
 
-    if (!category || typeof category !== 'string') {
-      return NextResponse.json({ error: 'Category is required' }, { status: 400 })
+    // Validate category matches admin's expected values
+    const validCategories = ['billing', 'technical', 'feature_request', 'bug', 'other']
+    if (!category || !validCategories.includes(category)) {
+      return NextResponse.json(
+        { error: 'Category must be one of: billing, technical, feature_request, bug, other' },
+        { status: 400 }
+      )
+    }
+
+    // Validate priority matches admin's expected values
+    const validPriorities = ['low', 'medium', 'high', 'urgent']
+    if (!priority || !validPriorities.includes(priority)) {
+      return NextResponse.json(
+        { error: 'Priority must be one of: low, medium, high, urgent' },
+        { status: 400 }
+      )
     }
 
     // Email validation
@@ -125,35 +148,45 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Prepare ticket payload
+    // Prepare ticket payload according to admin's Cloud Function spec
+    // Build metadata object (only include defined fields)
+    const metadata: {
+      source: 'website'
+      source_url?: string
+      device_type?: 'mobile' | 'desktop' | 'tablet'
+      subscription_tier?: string
+      utm_params?: Record<string, string>
+    } = {
+      source: 'website',
+    }
+
+    if (source_url) {
+      metadata.source_url = source_url
+    }
+    if (device_type && ['mobile', 'desktop', 'tablet'].includes(device_type)) {
+      metadata.device_type = device_type as 'mobile' | 'desktop' | 'tablet'
+    }
+    if (subscription_tier) {
+      metadata.subscription_tier = subscription_tier
+    }
+    if (utm_params && typeof utm_params === 'object' && Object.keys(utm_params).length > 0) {
+      metadata.utm_params = utm_params
+    }
+
     const ticketPayload = {
-      user_id: user?.id || null,
       subject: subject.trim(),
       description: description.trim(),
-      status: 'open',
-      priority: 'normal',
-      category: category.trim(),
-      source: source || 'website',
-      current_url: current_url || '',
-      utm_params: utm_params || {},
-      device_type: device_type || 'unknown',
-      user_email: userEmail,
-      messages: [
-        {
-          role: 'user',
-          content: description.trim(),
-          timestamp: new Date().toISOString(),
-        },
-      ],
-      tags: [],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      priority: priority as 'low' | 'medium' | 'high' | 'urgent',
+      category: category as 'billing' | 'technical' | 'feature_request' | 'bug' | 'other',
+      user_id: user?.id || null, // Firebase UID if authenticated, null for anonymous
+      metadata,
+      website: '', // Honeypot field (must be empty)
     }
 
     // Get Firebase Cloud Function URL from environment
+    // Expected format: https://us-central1-YOUR-PROJECT-ID.cloudfunctions.net/createSupportTicketFromWebsite
     const firebaseFunctionUrl =
-      process.env.FIREBASE_CLOUD_FUNCTION_URL ||
-      process.env.NEXT_PUBLIC_SUPABASE_SUPPORT_FUNCTION_URL
+      process.env.FIREBASE_CLOUD_FUNCTION_URL || process.env.NEXT_PUBLIC_FIREBASE_CLOUD_FUNCTION_URL
 
     if (!firebaseFunctionUrl) {
       console.error('Firebase Cloud Function URL not configured')
@@ -167,6 +200,11 @@ export async function POST(request: NextRequest) {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     }
+    // Optional: Add function key if configured
+    if (process.env.NEXT_PUBLIC_FIREBASE_FUNCTION_KEY) {
+      headers['x-function-key'] = process.env.NEXT_PUBLIC_FIREBASE_FUNCTION_KEY
+    }
+    // Alternative: Bearer token authentication
     if (process.env.FIREBASE_FUNCTION_SECRET) {
       headers['Authorization'] = `Bearer ${process.env.FIREBASE_FUNCTION_SECRET}`
     }

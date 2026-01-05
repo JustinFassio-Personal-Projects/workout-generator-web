@@ -13,22 +13,26 @@ export interface TicketSubmissionFormProps {
   onClose: () => void
 }
 
-type TicketCategory = 'Support' | 'Bug Report' | 'Feature Request' | 'Other'
+// Admin-expected category values
+type TicketCategory = 'billing' | 'technical' | 'feature_request' | 'bug' | 'other'
+
+// Admin-expected priority values
+type TicketPriority = 'low' | 'medium' | 'high' | 'urgent'
 
 interface FormData {
   subject: string
   description: string
   category: TicketCategory
+  priority: TicketPriority
   email: string
 }
 
 interface Metadata {
-  source: string
-  current_url: string
-  utm_params: Record<string, string>
-  device_type: string
-  user_email: string | null
-  supabase_user_id: string | null
+  source: 'website'
+  source_url?: string // Current page URL
+  device_type?: 'mobile' | 'desktop' | 'tablet'
+  subscription_tier?: string // If user is authenticated
+  utm_params?: Record<string, string> // From URL query params
 }
 
 export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOpen, onClose }) => {
@@ -36,7 +40,8 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
   const [formData, setFormData] = useState<FormData>({
     subject: '',
     description: '',
-    category: 'Support',
+    category: 'technical',
+    priority: 'medium',
     email: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -105,8 +110,8 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
   }
 
   // Detect device type from user agent
-  const detectDeviceType = (): string => {
-    if (typeof window === 'undefined') return 'unknown'
+  const detectDeviceType = (): 'mobile' | 'desktop' | 'tablet' => {
+    if (typeof window === 'undefined') return 'desktop'
 
     const ua = navigator.userAgent.toLowerCase()
     // Check for tablets first (before mobile) to correctly categorize iPads
@@ -123,11 +128,10 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
   const collectMetadata = (): Metadata => {
     return {
       source: 'website',
-      current_url: typeof window !== 'undefined' ? window.location.href : '',
-      utm_params: parseUTMParams(),
+      source_url: typeof window !== 'undefined' ? window.location.href : undefined,
       device_type: detectDeviceType(),
-      user_email: user?.email || null,
-      supabase_user_id: user?.id || null,
+      subscription_tier: undefined, // TODO: Get from user profile if available
+      utm_params: Object.keys(parseUTMParams()).length > 0 ? parseUTMParams() : undefined,
     }
   }
 
@@ -184,6 +188,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
           subject: formData.subject.trim(),
           description: formData.description.trim(),
           category: formData.category,
+          priority: formData.priority,
           email: formData.email.trim() || user?.email || '',
           ...metadata,
         }),
@@ -200,7 +205,8 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       setFormData({
         subject: '',
         description: '',
-        category: 'Support',
+        category: 'technical',
+        priority: 'medium',
         email: user?.email || '',
       })
 
@@ -300,10 +306,31 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
               required
               disabled={isSubmitting}
             >
-              <option value="Support">Support</option>
-              <option value="Bug Report">Bug Report</option>
-              <option value="Feature Request">Feature Request</option>
-              <option value="Other">Other</option>
+              <option value="technical">Technical Support</option>
+              <option value="bug">Bug Report</option>
+              <option value="feature_request">Feature Request</option>
+              <option value="billing">Billing</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="priority" className={styles.label}>
+              Priority <span className={styles.required}>*</span>
+            </label>
+            <select
+              id="priority"
+              name="priority"
+              value={formData.priority}
+              onChange={handleInputChange}
+              className={styles.select}
+              required
+              disabled={isSubmitting}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
             </select>
           </div>
 

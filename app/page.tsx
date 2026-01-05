@@ -9,6 +9,7 @@ import { Journey } from '@/components/landing/Journey/Journey'
 import { Testimonials } from '@/components/landing/Testimonials/Testimonials'
 import { Videos } from '@/components/landing/Videos/Videos'
 import { Blog } from '@/components/landing/Blog/Blog'
+import { Bio } from '@/components/landing/Bio/Bio'
 import { Pricing } from '@/components/landing/Pricing/Pricing'
 import { Footer } from '@/components/landing/Footer/Footer'
 import { useScrollTracking } from '@/features/analytics/hooks/useScrollTracking'
@@ -160,6 +161,7 @@ export default function Home() {
         <Testimonials />
         <Videos />
         <Blog />
+        <Bio />
         <Pricing />
         <Footer />
       </main>

@@ -43,6 +43,7 @@ export const Footer: React.FC = () => {
       { label: 'Testimonials', href: '#testimonials' },
     ],
     company: [
+      { label: 'Founder Story', href: '/founder-story' },
       { label: 'About Us', href: '#' },
       { label: 'Blog', href: '/blog' },
       { label: 'Careers', href: '#' },

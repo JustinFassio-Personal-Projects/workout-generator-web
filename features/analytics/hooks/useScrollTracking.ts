@@ -42,13 +42,17 @@ export const useScrollTracking = () => {
 
     window.addEventListener('scroll', handleScroll, { passive: true })
 
+    // Capture ref values for cleanup
+    const timeoutRef = scrollTimeoutRef.current
+    const milestonesRef = trackedMilestones.current
+
     return () => {
       window.removeEventListener('scroll', handleScroll)
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
+      if (timeoutRef) {
+        clearTimeout(timeoutRef)
       }
       // Reset tracked milestones on unmount
-      trackedMilestones.current.clear()
+      milestonesRef.clear()
     }
   }, [])
 }

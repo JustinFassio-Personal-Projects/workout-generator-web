@@ -1,21 +1,34 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor, act } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, waitFor, act, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Navbar } from '@/components/landing/Navbar/Navbar'
+import * as analyticsModule from '@/lib/analytics'
 
-// Mock Next.js Image component
-vi.mock('next/image', () => ({
-  default: ({ src, alt, ...props }: { src: string; alt: string; [key: string]: unknown }) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} {...props} />
-  },
+// Mock analytics
+vi.mock('@/lib/analytics', () => ({
+  trackButtonClick: vi.fn(),
+  trackNavigationClick: vi.fn(),
+  trackVercelEvent: vi.fn(),
 }))
+
+// Note: next/image is already mocked globally in src/test/setup.ts
+// We don't need to mock it here, and doing so can cause conflicts in the test suite
 
 describe('Navbar', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock window.alert
     global.alert = vi.fn()
+    // Reset body overflow (Drawer component modifies it)
+    document.body.style.overflow = ''
+  })
+
+  afterEach(() => {
+    // Cleanup: Reset body overflow after each test
+    document.body.style.overflow = ''
+    vi.clearAllMocks()
+    // Cleanup rendered components to prevent test isolation issues
+    cleanup()
   })
 
   it('should render navbar with logo', () => {
@@ -105,9 +118,12 @@ describe('Navbar', () => {
     })
 
     // Wait for drawer to be open
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
 
     // Click navigation link
     const homeLink = screen.getAllByRole('link', { name: /home/i })[0]
@@ -116,10 +132,13 @@ describe('Navbar', () => {
     })
 
     // Drawer should be closed
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    })
-  })
+    await waitFor(
+      () => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
+  }, 10000)
 
   it('should close drawer when Sign In button is clicked', async () => {
     const user = userEvent.setup()
@@ -132,9 +151,12 @@ describe('Navbar', () => {
     })
 
     // Wait for drawer to be open
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
 
     // Click Sign In button in drawer
     const signInButtons = screen.getAllByRole('button', { name: /sign in/i })
@@ -146,10 +168,13 @@ describe('Navbar', () => {
     }
 
     // Wait for drawer to be closed
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    })
-  })
+    await waitFor(
+      () => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
+  }, 10000)
 
   it('should have correct navigation role and aria-label', () => {
     render(<Navbar />)

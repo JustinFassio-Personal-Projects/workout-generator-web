@@ -173,7 +173,14 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(payload),
     })
 
-    const data = await response.json()
+    // Parse JSON response with error handling
+    let data: any
+    try {
+      data = await response.json()
+    } catch (parseError) {
+      logError('Parsing Firebase Cloud Function response JSON', parseError)
+      data = {}
+    }
 
     if (!response.ok) {
       console.error('Firebase Cloud Function error:', {
@@ -186,7 +193,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json(data, { status: response.status })
   } catch (error) {
     logError('Support ticket creation', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'

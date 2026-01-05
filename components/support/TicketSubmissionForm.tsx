@@ -108,11 +108,12 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
     if (typeof window === 'undefined') return 'unknown'
 
     const ua = navigator.userAgent.toLowerCase()
-    if (/mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua)) {
-      return 'mobile'
-    }
+    // Check for tablets first (before mobile) to correctly categorize iPads
     if (/tablet|ipad|playbook|silk/i.test(ua)) {
       return 'tablet'
+    }
+    if (/mobile|android|iphone|ipod|blackberry|iemobile|opera mini/i.test(ua)) {
+      return 'mobile'
     }
     return 'desktop'
   }

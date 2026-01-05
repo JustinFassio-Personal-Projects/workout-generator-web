@@ -27,6 +27,10 @@ const rateLimitStore = new Map<string, RateLimitEntry>()
 // Rate limit: 5 submissions per hour per IP/user
 const RATE_LIMIT_MAX = 5
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000 // 1 hour in milliseconds
+const RATE_LIMIT_STORE_MAX_SIZE = 1000 // Maximum entries before cleanup
+
+// Maximum length for error text in logs (truncate longer errors to prevent log bloat)
+const MAX_ERROR_LOG_LENGTH = 200
 
 function getRateLimitKey(request: NextRequest, userId: string | null): string {
   // Use user ID if authenticated, otherwise use IP
@@ -48,7 +52,7 @@ function checkRateLimit(key: string): { allowed: boolean; remaining: number } {
       resetTime: now + RATE_LIMIT_WINDOW,
     })
     // Clean up old entries periodically
-    if (rateLimitStore.size > 1000) {
+    if (rateLimitStore.size > RATE_LIMIT_STORE_MAX_SIZE) {
       for (const [k, v] of rateLimitStore.entries()) {
         if (now > v.resetTime) {
           rateLimitStore.delete(k)
@@ -78,7 +82,7 @@ export async function POST(request: NextRequest) {
       user = await getServerUser()
     } catch (error) {
       // User not authenticated is fine for anonymous submissions
-      console.error('No authenticated user for support ticket submission')
+      console.log('Support ticket submitted without authentication (anonymous submission)')
     }
 
     // Parse request body
@@ -180,7 +184,9 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text()
       const sanitizedError =
-        errorText?.length > 200 ? errorText.substring(0, 200) + '...' : errorText
+        errorText?.length > MAX_ERROR_LOG_LENGTH
+          ? errorText.substring(0, MAX_ERROR_LOG_LENGTH) + '...'
+          : errorText
       console.error('Firebase Cloud Function error:', {
         status: response.status,
         error: sanitizedError?.replace(/Bearer\s+[\w-]+/gi, '[REDACTED]'), // Remove any tokens

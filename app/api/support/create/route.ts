@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerUser } from '@/lib/supabase/server'
+import { validateEmail } from '@/lib/validation'
 
 // Simple in-memory rate limiting store
 // In production, consider using Redis or Vercel Edge Config
@@ -68,10 +69,6 @@ function checkRateLimit(key: string): { allowed: boolean; remaining: number } {
 
   entry.count++
   return { allowed: true, remaining: RATE_LIMIT_MAX - entry.count }
-}
-
-function validateEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
 export async function POST(request: NextRequest) {

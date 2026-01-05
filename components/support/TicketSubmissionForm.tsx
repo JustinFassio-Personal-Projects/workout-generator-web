@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import classNames from 'classnames'
 import { useSupabaseUser } from '@/hooks/useSupabaseUser'
 import { Button } from '@/components/ui/Button/Button'
+import { validateEmail } from '@/lib/validation'
 import styles from './TicketSubmissionForm.module.scss'
 
 export interface TicketSubmissionFormProps {
@@ -164,7 +165,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       return
     }
 
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (formData.email && !validateEmail(formData.email)) {
       setError('Please enter a valid email address')
       return
     }

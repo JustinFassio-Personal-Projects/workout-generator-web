@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Validate required fields
-    const { subject, description, category, priority, email, metadata: incomingMetadata } = body
+    const { subject, description, category, priority, email } = body
 
     if (!subject || typeof subject !== 'string' || subject.trim().length === 0) {
       return NextResponse.json({ error: 'Subject is required' }, { status: 400 })
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Email validation
+    // Email validation - use email from body or fallback to user email
     const userEmail = email || user?.email
     if (!userEmail || !validateEmail(userEmail)) {
       return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })
@@ -138,108 +138,55 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Prepare ticket payload according to admin's Cloud Function spec
-    // Extract and validate metadata from incoming request
-    const metadata: {
-      source: 'website'
-      source_url?: string
-      device_type?: 'mobile' | 'desktop' | 'tablet'
-      subscription_tier?: string
-      utm_params?: Record<string, string>
-    } = {
-      source: incomingMetadata?.source || 'website',
-    }
-
-    if (incomingMetadata?.source_url) {
-      metadata.source_url = incomingMetadata.source_url
-    }
-    if (
-      incomingMetadata?.device_type &&
-      ['mobile', 'desktop', 'tablet'].includes(incomingMetadata.device_type)
-    ) {
-      metadata.device_type = incomingMetadata.device_type as 'mobile' | 'desktop' | 'tablet'
-    }
-    if (incomingMetadata?.subscription_tier) {
-      metadata.subscription_tier = incomingMetadata.subscription_tier
-    }
-    if (
-      incomingMetadata?.utm_params &&
-      typeof incomingMetadata.utm_params === 'object' &&
-      Object.keys(incomingMetadata.utm_params).length > 0
-    ) {
-      metadata.utm_params = incomingMetadata.utm_params
-    }
-
-    const ticketPayload = {
-      subject: subject.trim(),
-      description: description.trim(),
-      priority: priority as 'low' | 'medium' | 'high' | 'urgent',
-      category: category as 'billing' | 'technical' | 'feature_request' | 'bug' | 'other',
-      user_id: user?.id || null, // Firebase UID if authenticated, null for anonymous
-      email: userEmail, // Email for contacting the user (required for anonymous submissions)
-      metadata,
-      website: '', // Honeypot field (must be empty)
-    }
-
     // Get Firebase Cloud Function URL from environment
-    // Expected format: https://us-central1-YOUR-PROJECT-ID.cloudfunctions.net/createSupportTicketFromWebsite
-    const firebaseFunctionUrl =
-      process.env.FIREBASE_CLOUD_FUNCTION_URL || process.env.NEXT_PUBLIC_FIREBASE_CLOUD_FUNCTION_URL
+    const firebaseFunctionUrl = process.env.FIREBASE_CLOUD_FUNCTION_URL
 
     if (!firebaseFunctionUrl) {
       console.error('Firebase Cloud Function URL not configured')
-      return NextResponse.json(
-        { error: 'Support service is temporarily unavailable' },
-        { status: 503 }
-      )
+      return NextResponse.json({ error: 'Cloud Function URL not configured' }, { status: 500 })
     }
 
-    // Prepare headers with optional authentication
+    // Prepare payload - pass through body with honeypot field ensured
+    // Ensure email and user_id are set correctly
+    const payload = {
+      ...body,
+      email: userEmail, // Use validated email
+      website: '', // Honeypot field - must be empty
+      ...(user?.id && { user_id: user.id }), // Add user_id if authenticated
+    }
+
+    // Prepare headers
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     }
-    // Optional: Add function key if configured (server-only env var)
-    if (process.env.FIREBASE_FUNCTION_KEY) {
-      headers['x-function-key'] = process.env.FIREBASE_FUNCTION_KEY
-    }
-    // Alternative: Bearer token authentication
-    if (process.env.FIREBASE_FUNCTION_SECRET) {
-      headers['Authorization'] = `Bearer ${process.env.FIREBASE_FUNCTION_SECRET}`
+
+    // Add function key if configured
+    const functionKey = process.env.FIREBASE_FUNCTION_KEY
+    if (functionKey) {
+      headers['x-function-key'] = functionKey
     }
 
     // Call Firebase Cloud Function
     const response = await fetch(firebaseFunctionUrl, {
       method: 'POST',
       headers,
-      body: JSON.stringify(ticketPayload),
+      body: JSON.stringify(payload),
     })
 
+    const data = await response.json()
+
     if (!response.ok) {
-      const errorText = await response.text()
-      const sanitizedError =
-        errorText?.length > MAX_ERROR_LOG_LENGTH
-          ? errorText.substring(0, MAX_ERROR_LOG_LENGTH) + '...'
-          : errorText
       console.error('Firebase Cloud Function error:', {
         status: response.status,
-        error: sanitizedError?.replace(/Bearer\s+[\w-]+/gi, '[REDACTED]'), // Remove any tokens
+        error: data.error || 'Unknown error',
       })
       return NextResponse.json(
-        { error: 'Failed to create support ticket. Please try again later.' },
-        { status: 502 }
+        { error: data.error || 'Failed to create support ticket' },
+        { status: response.status }
       )
     }
 
-    const result = await response.json().catch(() => ({ success: true }))
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: 'Support ticket created successfully',
-        ticketId: result.id || result.ticketId || null,
-      },
-      { status: 201 }
-    )
+    return NextResponse.json(data)
   } catch (error) {
     logError('Support ticket creation', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'

@@ -9,6 +9,30 @@ vi.mock('next/font/google', () => ({
   })),
 }))
 
+// Mock Supabase client
+vi.mock('@/lib/supabase/client', () => ({
+  createClient: vi.fn(() => ({
+    auth: {
+      getUser: vi.fn().mockResolvedValue({
+        data: { user: null },
+        error: null,
+      }),
+      onAuthStateChange: vi.fn(() => ({
+        data: { subscription: { unsubscribe: vi.fn() } },
+      })),
+    },
+  })),
+}))
+
+// Mock useSupabaseUser hook
+vi.mock('@/hooks/useSupabaseUser', () => ({
+  useSupabaseUser: vi.fn(() => ({
+    user: null,
+    loading: false,
+    error: null,
+  })),
+}))
+
 describe('RootLayout', () => {
   let originalConsoleError: typeof console.error
 

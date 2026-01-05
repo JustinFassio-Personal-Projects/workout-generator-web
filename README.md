@@ -60,12 +60,20 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
 # Get your verification code from Google Search Console (optional)
 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=xxxxx
+
+# Support Ticket System (optional)
+# Firebase Cloud Function URL for creating support tickets
+# This should point to your Firebase Cloud Function endpoint that creates tickets in Firestore
+FIREBASE_CLOUD_FUNCTION_URL=https://your-region-your-project.cloudfunctions.net/createSupportTicket
+# Alternative: If using Supabase Edge Functions
+# NEXT_PUBLIC_SUPABASE_SUPPORT_FUNCTION_URL=https://your-project.supabase.co/functions/v1/create-support-ticket
 ```
 
 **Note**:
 
 - The ChatWidget component will not display if `NEXT_PUBLIC_CHATKIT_WORKFLOW_ID` is not set. You can get your credentials from [ChatKit Studio](https://widgets.chatkit.studio).
 - Google Analytics and Tag Manager are optional. If not configured, the site will function normally without analytics tracking.
+- The Support FAB (Feedback button) will display, but ticket submission will fail if `FIREBASE_CLOUD_FUNCTION_URL` is not configured. The API route will return a 503 error if the function URL is missing.
 
 3. Run the development server:
 

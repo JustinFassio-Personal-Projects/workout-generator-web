@@ -138,7 +138,7 @@ describe('MilestonePage', () => {
 
       expect(metadata.openGraph).toBeDefined()
       expect(metadata.openGraph?.title).toBe('Custom SEO Title')
-      expect(metadata.openGraph?.type).toBe('article')
+      expect((metadata.openGraph as any)?.type).toBe('article')
     })
 
     it('should include Twitter metadata', async () => {
@@ -150,7 +150,7 @@ describe('MilestonePage', () => {
       })
 
       expect(metadata.twitter).toBeDefined()
-      expect(metadata.twitter?.card).toBe('summary_large_image')
+      expect((metadata.twitter as any)?.card).toBe('summary_large_image')
     })
   })
 
@@ -172,7 +172,6 @@ describe('MilestonePage', () => {
         params: Promise.resolve({ slug: 'test-milestone' }),
       })
 
-      const { container } = await import('@testing-library/react')
       const { render } = await import('@testing-library/react')
       const rendered = render(result as any)
 

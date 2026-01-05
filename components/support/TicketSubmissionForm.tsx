@@ -190,7 +190,8 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
           category: formData.category,
           priority: formData.priority,
           email: formData.email.trim() || user?.email || '',
-          ...metadata,
+          metadata,
+          website: '', // Honeypot field (must be empty for spam protection)
         }),
       })
 

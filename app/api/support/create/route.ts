@@ -86,17 +86,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Validate required fields
-    const {
-      subject,
-      description,
-      category,
-      priority,
-      email,
-      source_url,
-      device_type,
-      subscription_tier,
-      utm_params,
-    } = body
+    const { subject, description, category, priority, email, metadata: incomingMetadata } = body
 
     if (!subject || typeof subject !== 'string' || subject.trim().length === 0) {
       return NextResponse.json({ error: 'Subject is required' }, { status: 400 })
@@ -149,7 +139,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare ticket payload according to admin's Cloud Function spec
-    // Build metadata object (only include defined fields)
+    // Extract and validate metadata from incoming request
     const metadata: {
       source: 'website'
       source_url?: string
@@ -157,20 +147,27 @@ export async function POST(request: NextRequest) {
       subscription_tier?: string
       utm_params?: Record<string, string>
     } = {
-      source: 'website',
+      source: incomingMetadata?.source || 'website',
     }
 
-    if (source_url) {
-      metadata.source_url = source_url
+    if (incomingMetadata?.source_url) {
+      metadata.source_url = incomingMetadata.source_url
     }
-    if (device_type && ['mobile', 'desktop', 'tablet'].includes(device_type)) {
-      metadata.device_type = device_type as 'mobile' | 'desktop' | 'tablet'
+    if (
+      incomingMetadata?.device_type &&
+      ['mobile', 'desktop', 'tablet'].includes(incomingMetadata.device_type)
+    ) {
+      metadata.device_type = incomingMetadata.device_type as 'mobile' | 'desktop' | 'tablet'
     }
-    if (subscription_tier) {
-      metadata.subscription_tier = subscription_tier
+    if (incomingMetadata?.subscription_tier) {
+      metadata.subscription_tier = incomingMetadata.subscription_tier
     }
-    if (utm_params && typeof utm_params === 'object' && Object.keys(utm_params).length > 0) {
-      metadata.utm_params = utm_params
+    if (
+      incomingMetadata?.utm_params &&
+      typeof incomingMetadata.utm_params === 'object' &&
+      Object.keys(incomingMetadata.utm_params).length > 0
+    ) {
+      metadata.utm_params = incomingMetadata.utm_params
     }
 
     const ticketPayload = {
@@ -179,6 +176,7 @@ export async function POST(request: NextRequest) {
       priority: priority as 'low' | 'medium' | 'high' | 'urgent',
       category: category as 'billing' | 'technical' | 'feature_request' | 'bug' | 'other',
       user_id: user?.id || null, // Firebase UID if authenticated, null for anonymous
+      email: userEmail, // Email for contacting the user (required for anonymous submissions)
       metadata,
       website: '', // Honeypot field (must be empty)
     }
@@ -200,9 +198,9 @@ export async function POST(request: NextRequest) {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     }
-    // Optional: Add function key if configured
-    if (process.env.NEXT_PUBLIC_FIREBASE_FUNCTION_KEY) {
-      headers['x-function-key'] = process.env.NEXT_PUBLIC_FIREBASE_FUNCTION_KEY
+    // Optional: Add function key if configured (server-only env var)
+    if (process.env.FIREBASE_FUNCTION_KEY) {
+      headers['x-function-key'] = process.env.FIREBASE_FUNCTION_KEY
     }
     // Alternative: Bearer token authentication
     if (process.env.FIREBASE_FUNCTION_SECRET) {

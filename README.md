@@ -66,7 +66,8 @@ NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=xxxxx
 # Format: https://us-central1-YOUR-PROJECT-ID.cloudfunctions.net/createSupportTicketFromWebsite
 FIREBASE_CLOUD_FUNCTION_URL=https://us-central1-YOUR-PROJECT-ID.cloudfunctions.net/createSupportTicketFromWebsite
 # Optional: Function key for authentication (if configured)
-# NEXT_PUBLIC_FIREBASE_FUNCTION_KEY=your-function-key
+# Note: Use FIREBASE_FUNCTION_KEY (not NEXT_PUBLIC_) to keep it server-only
+# FIREBASE_FUNCTION_KEY=your-function-key
 # Alternative: Bearer token authentication
 # FIREBASE_FUNCTION_SECRET=your-bearer-token
 ```

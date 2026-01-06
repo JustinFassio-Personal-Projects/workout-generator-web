@@ -210,6 +210,24 @@ describe('analytics', () => {
       expect(gtagMock).toHaveBeenCalled()
       expect(dataLayer).toHaveLength(1)
     })
+
+    it('should handle page view when isGA4Available returns true but gtag is falsy', () => {
+      // Test the branch: if (isGA4Available() && window.gtag)
+      // When isGA4Available() is true but window.gtag is falsy, the GA4 block should not execute
+      const dataLayer: any[] = []
+      window.gtag = vi.fn() // Set to function first to make isGA4Available() return true
+      // Then set to undefined to test the && window.gtag check
+      window.gtag = undefined
+      window.dataLayer = dataLayer
+      trackPageView('/test-path', 'Test Title')
+      // GA4 should not be called, but GTM should still work
+      expect(dataLayer).toHaveLength(1)
+      expect(dataLayer[0]).toEqual({
+        event: 'page_view',
+        page_path: '/test-path',
+        page_title: 'Test Title',
+      })
+    })
   })
 
   describe('analytics object', () => {
@@ -791,6 +809,33 @@ describe('analytics', () => {
       // Restore window properties for other tests
       window.gtag = gtagMock
       window.dataLayer = dataLayer
+    })
+
+    it('should track vision lead gate opened with window.location.pathname when path is undefined and window exists', async () => {
+      const { track } = await import('@vercel/analytics')
+      const gtagMock = vi.fn()
+      const dataLayer: any[] = []
+      window.gtag = gtagMock
+      window.dataLayer = dataLayer
+
+      // Test the branch where path is undefined but window exists and has pathname
+      // This covers: path || (typeof window !== 'undefined' ? window.location.pathname : '')
+      // When path is undefined and window exists, it should use window.location.pathname
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/test-path-from-window' },
+        writable: true,
+        configurable: true,
+      })
+      analytics.trackVisionLeadGateOpened()
+
+      expect(track).toHaveBeenCalledWith('Vision Lead Gate Opened', {
+        location: 'vision_lab',
+        path: '/test-path-from-window',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_lead_gate_opened', {
+        location: 'vision_lab',
+        path: '/test-path-from-window',
+      })
     })
 
     it('should track vision lead submitted', async () => {

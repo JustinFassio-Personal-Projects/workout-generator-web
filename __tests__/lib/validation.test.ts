@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { validateEmail } from '@/lib/validation'
+import {
+  validateEmail,
+  validateNotEmpty,
+  validateArrayNotEmpty,
+  validateEnum,
+  validateExerciseName,
+  validateTechniqueCues,
+} from '@/lib/validation'
 
 describe('validateEmail', () => {
   describe('valid email addresses', () => {
@@ -160,5 +167,134 @@ describe('validateEmail', () => {
       const result = validateEmail('user[name]@example.com')
       expect(typeof result).toBe('boolean')
     })
+  })
+})
+
+describe('validateNotEmpty', () => {
+  it('should return true for non-empty string', () => {
+    expect(validateNotEmpty('hello')).toBe(true)
+  })
+
+  it('should return true for string with only spaces after trim', () => {
+    expect(validateNotEmpty('  hello  ')).toBe(true)
+  })
+
+  it('should return false for empty string', () => {
+    expect(validateNotEmpty('')).toBe(false)
+  })
+
+  it('should return false for whitespace-only string', () => {
+    expect(validateNotEmpty('   ')).toBe(false)
+  })
+
+  it('should return false for non-string value', () => {
+    expect(validateNotEmpty(null as any)).toBe(false)
+    expect(validateNotEmpty(undefined as any)).toBe(false)
+    expect(validateNotEmpty(123 as any)).toBe(false)
+  })
+})
+
+describe('validateArrayNotEmpty', () => {
+  it('should return true for array with elements', () => {
+    expect(validateArrayNotEmpty([1, 2, 3])).toBe(true)
+    expect(validateArrayNotEmpty(['a'])).toBe(true)
+  })
+
+  it('should return false for empty array', () => {
+    expect(validateArrayNotEmpty([])).toBe(false)
+  })
+
+  it('should return false for non-array value', () => {
+    expect(validateArrayNotEmpty(null as any)).toBe(false)
+    expect(validateArrayNotEmpty(undefined as any)).toBe(false)
+    expect(validateArrayNotEmpty('string' as any)).toBe(false)
+    expect(validateArrayNotEmpty(123 as any)).toBe(false)
+  })
+})
+
+describe('validateEnum', () => {
+  const allowedValues = ['option1', 'option2', 'option3'] as const
+
+  it('should return true for valid enum value', () => {
+    expect(validateEnum('option1', allowedValues)).toBe(true)
+    expect(validateEnum('option2', allowedValues)).toBe(true)
+  })
+
+  it('should return false for invalid enum value', () => {
+    expect(validateEnum('invalid', allowedValues)).toBe(false)
+    expect(validateEnum('', allowedValues)).toBe(false)
+  })
+
+  it('should handle numeric enum values', () => {
+    const numericValues = [1, 2, 3] as const
+    expect(validateEnum(1, numericValues)).toBe(true)
+    expect(validateEnum(4, numericValues)).toBe(false)
+  })
+})
+
+describe('validateExerciseName', () => {
+  it('should return true for valid exercise name (1 character)', () => {
+    expect(validateExerciseName('A')).toBe(true)
+  })
+
+  it('should return true for valid exercise name (100 characters)', () => {
+    expect(validateExerciseName('A'.repeat(100))).toBe(true)
+  })
+
+  it('should return true for valid exercise name with spaces', () => {
+    expect(validateExerciseName('Bench Press')).toBe(true)
+  })
+
+  it('should return false for empty string', () => {
+    expect(validateExerciseName('')).toBe(false)
+  })
+
+  it('should return false for whitespace-only string', () => {
+    expect(validateExerciseName('   ')).toBe(false)
+  })
+
+  it('should return false for exercise name exceeding 100 characters', () => {
+    expect(validateExerciseName('A'.repeat(101))).toBe(false)
+  })
+
+  it('should handle trimmed strings correctly', () => {
+    expect(validateExerciseName('  Squat  ')).toBe(true)
+    expect(validateExerciseName('  ')).toBe(false)
+  })
+})
+
+describe('validateTechniqueCues', () => {
+  it('should return true for valid technique cues (10 characters)', () => {
+    expect(validateTechniqueCues('A'.repeat(10))).toBe(true)
+  })
+
+  it('should return true for valid technique cues (2000 characters)', () => {
+    expect(validateTechniqueCues('A'.repeat(2000))).toBe(true)
+  })
+
+  it('should return true for valid technique cues with content', () => {
+    expect(validateTechniqueCues('Keep your back straight and core engaged.')).toBe(true)
+  })
+
+  it('should return false for empty string', () => {
+    expect(validateTechniqueCues('')).toBe(false)
+  })
+
+  it('should return false for whitespace-only string', () => {
+    expect(validateTechniqueCues('   ')).toBe(false)
+  })
+
+  it('should return false for technique cues less than 10 characters', () => {
+    expect(validateTechniqueCues('Short')).toBe(false)
+    expect(validateTechniqueCues('A'.repeat(9))).toBe(false)
+  })
+
+  it('should return false for technique cues exceeding 2000 characters', () => {
+    expect(validateTechniqueCues('A'.repeat(2001))).toBe(false)
+  })
+
+  it('should handle trimmed strings correctly', () => {
+    expect(validateTechniqueCues('  Keep your back straight  ')).toBe(true)
+    expect(validateTechniqueCues('  ')).toBe(false)
   })
 })

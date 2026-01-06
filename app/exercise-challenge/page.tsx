@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { LeadGate } from '@/components/landing/ExerciseChallenge/LeadGate'
 import { VisionLabIframe } from '@/components/landing/ExerciseChallenge/VisionLabIframe'
 import { MicroInterview } from '@/components/landing/ExerciseChallenge/MicroInterview'
@@ -10,6 +11,7 @@ import { analytics } from '@/lib/analytics'
 import styles from './page.module.scss'
 
 export default function ExerciseChallengePage() {
+  const router = useRouter()
   const [leadId, setLeadId] = useState<string | null>(null)
   const [microInterviewComplete, setMicroInterviewComplete] = useState(false)
   const [showMicroInterview, setShowMicroInterview] = useState(false)
@@ -61,7 +63,14 @@ export default function ExerciseChallengePage() {
       analytics.trackVisionCtaGenerateWorkoutClicked(leadId)
     }
     // Navigate to workout plan builder section on landing page
-    window.location.href = '/#workout-builder'
+    router.push('/#workout-builder')
+    // Scroll to element after navigation completes (Next.js router handles hash but we ensure smooth scroll)
+    setTimeout(() => {
+      const element = document.getElementById('workout-builder')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 150)
   }
 
   const handleCtaViewPricing = () => {
@@ -69,7 +78,14 @@ export default function ExerciseChallengePage() {
       analytics.trackVisionCtaViewPricingClicked(leadId)
     }
     // Navigate to pricing section
-    window.location.href = '/#pricing'
+    router.push('/#pricing')
+    // Scroll to element after navigation completes (Next.js router handles hash but we ensure smooth scroll)
+    setTimeout(() => {
+      const element = document.getElementById('pricing')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 150)
   }
 
   return (

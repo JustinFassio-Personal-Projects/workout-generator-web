@@ -72,7 +72,10 @@ describe('StoryChapterCard', () => {
     render(<StoryChapterCard chapter={mockChapter} index={0} />)
 
     const link = screen.getByRole('link')
-    fireEvent.click(link)
+    // Prevent navigation to avoid jsdom errors
+    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true })
+    vi.spyOn(clickEvent, 'preventDefault')
+    fireEvent.click(link, clickEvent)
 
     expect(trackNavigationClick).toHaveBeenCalledWith(
       '/story/test-chapter',

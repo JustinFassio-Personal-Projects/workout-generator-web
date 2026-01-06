@@ -68,7 +68,8 @@ describe('StoryCTASection', () => {
     render(<StoryCTASection />)
 
     const primaryLink = screen.getByText('Generate Your First Workout').closest('a')
-    fireEvent.click(primaryLink!)
+    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true })
+    fireEvent.click(primaryLink!, clickEvent)
 
     expect(trackButtonClick).toHaveBeenCalledWith('Generate Your First Workout', 'story_cta')
   })
@@ -78,7 +79,8 @@ describe('StoryCTASection', () => {
     render(<StoryCTASection />)
 
     const secondaryLink = screen.getByText('See Example Workouts').closest('a')
-    fireEvent.click(secondaryLink!)
+    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true })
+    fireEvent.click(secondaryLink!, clickEvent)
 
     expect(trackButtonClick).toHaveBeenCalledWith('See Example Workouts', 'story_cta')
   })
@@ -88,7 +90,8 @@ describe('StoryCTASection', () => {
     render(<StoryCTASection onPrimaryClick={mockPrimaryClick} />)
 
     const primaryLink = screen.getByText('Generate Your First Workout').closest('a')
-    fireEvent.click(primaryLink!)
+    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true })
+    fireEvent.click(primaryLink!, clickEvent)
 
     expect(mockPrimaryClick).toHaveBeenCalledTimes(1)
     expect(analyticsModule.trackButtonClick).not.toHaveBeenCalled()
@@ -99,7 +102,8 @@ describe('StoryCTASection', () => {
     render(<StoryCTASection onSecondaryClick={mockSecondaryClick} />)
 
     const secondaryLink = screen.getByText('See Example Workouts').closest('a')
-    fireEvent.click(secondaryLink!)
+    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true })
+    fireEvent.click(secondaryLink!, clickEvent)
 
     expect(mockSecondaryClick).toHaveBeenCalledTimes(1)
     expect(analyticsModule.trackButtonClick).not.toHaveBeenCalled()

@@ -12,38 +12,44 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   workflowId,
   userId,
   defaultOpen = false,
+  showButton = true,
+  onClose,
   className,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen)
+
+  // Sync with defaultOpen prop changes
+  useEffect(() => {
+    setIsOpen(defaultOpen)
+  }, [defaultOpen])
   const [isMinimized, setIsMinimized] = useState(false)
   const [isChatKitReady, setIsChatKitReady] = useState(false)
   const [isWebComponentLoaded, setIsWebComponentLoaded] = useState(false)
 
   // Get configuration from props or environment variables
+  // Note: NEXT_PUBLIC_ vars are embedded at BUILD TIME, not runtime
+  // If this is empty in production, the env var was missing during build
   const chatkitWorkflowId = workflowId || process.env.NEXT_PUBLIC_CHATKIT_WORKFLOW_ID || ''
 
   // Wait for ChatKit web component to be defined
   // The ChatKit React library should automatically load the web component
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !chatkitWorkflowId) return
 
     const checkWebComponent = async () => {
       // Check if already defined
       if (customElements.get('openai-chatkit')) {
-        console.log('ChatKit web component already defined')
         setIsWebComponentLoaded(true)
         return
       }
 
       // Wait for it to be defined (ChatKit React should load it automatically)
-      console.log('Waiting for ChatKit web component to be defined...')
       try {
         // Wait up to 5 seconds for the web component to be defined
         await Promise.race([
           customElements.whenDefined('openai-chatkit'),
           new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000)),
         ])
-        console.log('ChatKit web component defined!')
         setIsWebComponentLoaded(true)
       } catch (err) {
         console.warn('ChatKit web component not defined after waiting:', err)
@@ -57,29 +63,23 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
     const timeout = setTimeout(checkWebComponent, 500)
 
     return () => clearTimeout(timeout)
-  }, [])
+  }, [chatkitWorkflowId])
 
   // Initialize ChatKit hook with HostedApiConfig
+  // Use a dummy config if no workflow ID to satisfy hooks rules
   const chatKit = useChatKit({
     api: {
       getClientSecret: async (currentClientSecret: string | null) => {
-        console.log('ChatKit getClientSecret called', {
-          currentClientSecret: currentClientSecret ? 'exists' : 'null',
-        })
-
         // If we have a current secret and it's still valid, return it
         if (currentClientSecret) {
-          console.log('Using existing client secret')
           return currentClientSecret
         }
 
         // Create a new session by calling our API endpoint with the workflow ID
         if (!chatkitWorkflowId) {
-          console.error('Workflow ID is missing!')
           throw new Error('Workflow ID is required')
         }
 
-        console.log('Fetching new client secret for workflow:', chatkitWorkflowId)
         try {
           const res = await fetch('/api/chatkit-session', {
             method: 'POST',
@@ -90,25 +90,17 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
             }),
           })
 
-          console.log('ChatKit session API response status:', res.status)
-
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({}))
-            console.error('ChatKit session API error:', errorData)
             throw new Error(errorData.error || `Failed to create ChatKit session: ${res.status}`)
           }
 
           const data = await res.json()
-          console.log(
-            'ChatKit client secret received:',
-            data.client_secret ? 'Secret received (hidden)' : 'No secret in response'
-          )
           if (!data.client_secret) {
             throw new Error('No client_secret in response')
           }
           return data.client_secret
         } catch (error) {
-          console.error('Error fetching ChatKit client secret:', error)
           setIsChatKitReady(false)
           throw error
         }
@@ -131,17 +123,15 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       },
     },
     onError: (event: { error: Error }) => {
-      // Handle errors
+      // Handle errors silently - ChatKit will display error UI
       console.error('ChatKit error:', event.error)
-      console.error('ChatKit error details:', JSON.stringify(event, null, 2))
     },
     onReady: () => {
       // ChatKit is ready
-      console.log('ChatKit ready', chatkitWorkflowId ? `(Workflow: ${chatkitWorkflowId})` : '')
       setIsChatKitReady(true)
     },
-    onThreadChange: (event: { threadId: string | null }) => {
-      console.log('ChatKit thread changed:', event.threadId)
+    onThreadChange: () => {
+      // Thread changed - no action needed
     },
   })
 
@@ -153,6 +143,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       action: newState ? 'open' : 'close',
       location: 'chat_widget',
     })
+    // Notify parent when chat is closed
+    if (!newState && onClose) {
+      onClose()
+    }
   }
 
   const minimizeChat = () => {
@@ -183,48 +177,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
     }
   }, [isOpen, isMinimized])
 
-  // Debug: Log when chat opens and check if web component is mounted
-  useEffect(() => {
-    if (isOpen && !isMinimized && chatKit.control) {
-      console.log('Chat widget opened, workflow ID:', chatkitWorkflowId)
-      console.log('ChatKit control:', chatKit.control)
-      console.log('Web component defined?', customElements.get('openai-chatkit') ? 'YES' : 'NO')
-
-      // Check if the web component is in the DOM and properly initialized
-      const checkInitialization = () => {
-        const webComponent = document.querySelector('openai-chatkit')
-        if (webComponent) {
-          const hasShadowRoot = !!webComponent.shadowRoot
-          const hasContent =
-            webComponent.children.length > 0 || (webComponent.shadowRoot?.children.length ?? 0) > 0
-
-          console.log('Web component status:', {
-            found: true,
-            hasShadowRoot,
-            hasContent,
-            children: webComponent.children.length,
-            shadowChildren: webComponent.shadowRoot?.children.length ?? 0,
-          })
-
-          // If web component exists but isn't initialized, the ChatKit React component should handle it
-          // But we can log for debugging
-          if (!hasShadowRoot && !hasContent) {
-            console.warn(
-              'Web component found but not initialized - ChatKit React should handle this'
-            )
-          }
-        } else {
-          console.warn('openai-chatkit element not found in DOM')
-        }
-      }
-
-      // Check after a short delay to allow ChatKit to initialize
-      setTimeout(checkInitialization, 500)
-      setTimeout(checkInitialization, 2000)
-    }
-  }, [isOpen, isMinimized, chatkitWorkflowId, chatKit.control])
-
-  // Don't render if no workflow ID is provided
+  // Don't render if no workflow ID is provided (check after all hooks)
   if (!chatkitWorkflowId) {
     // Log in both development and production for troubleshooting
     if (typeof window !== 'undefined') {
@@ -237,8 +190,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
   return (
     <div className={classNames(styles.chatWidget, className)}>
-      {/* Floating Button */}
-      {!isOpen && (
+      {/* Floating Button - only show if showButton prop is true */}
+      {showButton && !isOpen && (
         <button
           className={styles.chatButton}
           onClick={toggleChat}

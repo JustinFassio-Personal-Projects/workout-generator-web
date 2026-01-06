@@ -765,6 +765,34 @@ describe('analytics', () => {
       })
     })
 
+    it('should track vision lead gate opened with empty path when window is undefined', async () => {
+      const { track } = await import('@vercel/analytics')
+      const originalWindow = global.window
+      const gtagMock = vi.fn()
+      const dataLayer: any[] = []
+
+      // @ts-expect-error - intentionally removing window for test
+      delete global.window
+
+      // When window is undefined, trackVercelEvent returns early (so track won't be called),
+      // but the path calculation is still executed before the function call:
+      // path || (typeof window !== 'undefined' ? window.location.pathname : '') = '' (when window is undefined)
+      // This covers the branch in lines 551 and 555 where window is undefined
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      analytics.trackVisionLeadGateOpened(undefined) // Explicitly pass undefined to test the path || branch
+
+      // trackVercelEvent returns early, so track is not called
+      // But trackEvent is called and will warn, which we verify
+      expect(consoleSpy).toHaveBeenCalledWith('Google Analytics 4 is not available')
+      expect(consoleSpy).toHaveBeenCalledWith('Google Tag Manager is not available')
+
+      consoleSpy.mockRestore()
+      global.window = originalWindow
+      // Restore window properties for other tests
+      window.gtag = gtagMock
+      window.dataLayer = dataLayer
+    })
+
     it('should track vision lead submitted', async () => {
       const { track } = await import('@vercel/analytics')
       analytics.trackVisionLeadSubmitted('lead-123', 'example.com', true)

@@ -85,25 +85,29 @@ vi.mock('@/components/ui/Button/Button', () => ({
 describe('ExerciseChallengePage', () => {
   let timers: NodeJS.Timeout[]
   let mockGetElementById: any
+  let setTimeoutSpy: ReturnType<typeof vi.spyOn>
+  let clearTimeoutSpy: ReturnType<typeof vi.spyOn>
+  let originalSetTimeout: typeof global.setTimeout
+  let originalClearTimeout: typeof global.clearTimeout
 
   beforeEach(() => {
     vi.clearAllMocks()
     timers = []
 
-    // Store original setTimeout/clearTimeout
-    const originalSetTimeout = global.setTimeout
-    const originalClearTimeout = global.clearTimeout
+    // Store original implementations
+    originalSetTimeout = global.setTimeout
+    originalClearTimeout = global.clearTimeout
 
-    // Mock setTimeout to track calls
-    global.setTimeout = vi.fn((fn: () => void, delay?: number) => {
+    // Use vi.spyOn to safely mock setTimeout and clearTimeout
+    setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation((fn, delay) => {
       const timer = originalSetTimeout(fn, delay || 0) as unknown as NodeJS.Timeout
       timers.push(timer)
       return timer
-    }) as typeof setTimeout
+    })
 
-    global.clearTimeout = vi.fn((timer: NodeJS.Timeout) => {
+    clearTimeoutSpy = vi.spyOn(global, 'clearTimeout').mockImplementation(timer => {
       originalClearTimeout(timer)
-    }) as typeof clearTimeout
+    })
 
     // Mock document.getElementById
     mockGetElementById = vi.fn()
@@ -128,6 +132,8 @@ describe('ExerciseChallengePage', () => {
   afterEach(() => {
     timers.forEach(timer => clearTimeout(timer))
     timers = []
+    setTimeoutSpy.mockRestore()
+    clearTimeoutSpy.mockRestore()
   })
 
   it('should render hero section on initial load', () => {

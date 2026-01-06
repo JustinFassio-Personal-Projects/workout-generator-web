@@ -23,6 +23,18 @@ describe('POST /api/support/create', () => {
       ok: true,
       status: 200,
       json: async () => ({ success: true, ticketId: 'ticket-123' }),
+      headers: new Headers(),
+      redirected: false,
+      statusText: '',
+      type: 'default',
+      url: '',
+      body: null,
+      bodyUsed: false,
+      clone: () => ({}) as Response,
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob: async () => new Blob(),
+      formData: async () => new FormData(),
+      text: async () => '',
     } as Response)
   })
 
@@ -217,6 +229,18 @@ describe('POST /api/support/create', () => {
       ok: false,
       status: 500,
       json: async () => ({ error: 'Firebase error' }),
+      headers: new Headers(),
+      redirected: false,
+      statusText: '',
+      type: 'default',
+      url: '',
+      body: null,
+      bodyUsed: false,
+      clone: () => ({}) as Response,
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob: async () => new Blob(),
+      formData: async () => new FormData(),
+      text: async () => '',
     } as Response)
 
     const request = new NextRequest('http://localhost:3000/api/support/create', {
@@ -262,6 +286,18 @@ describe('POST /api/support/create', () => {
         ok: true,
         status: 200,
         json: async () => ({ success: true, ticketId: `ticket-${i}` }),
+        headers: new Headers(),
+        redirected: false,
+        statusText: '',
+        type: 'default',
+        url: '',
+        body: null,
+        bodyUsed: false,
+        clone: () => ({}) as Response,
+        arrayBuffer: async () => new ArrayBuffer(0),
+        blob: async () => new Blob(),
+        formData: async () => new FormData(),
+        text: async () => '',
       } as Response)
 
       const response = await POST(request)
@@ -301,6 +337,18 @@ describe('POST /api/support/create', () => {
       json: async () => {
         throw new Error('Invalid JSON')
       },
+      headers: new Headers(),
+      redirected: false,
+      statusText: '',
+      type: 'default',
+      url: '',
+      body: null,
+      bodyUsed: false,
+      clone: () => ({}) as Response,
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob: async () => new Blob(),
+      formData: async () => new FormData(),
+      text: async () => '',
     } as Response)
 
     const request = new NextRequest('http://localhost:3000/api/support/create', {

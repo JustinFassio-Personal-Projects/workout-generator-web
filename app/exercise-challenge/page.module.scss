@@ -1,0 +1,157 @@
+.main {
+  min-height: 100vh;
+  padding: var(--spacing-4xl) 0;
+  background: var(--bg-dark);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+
+  @media (max-width: 768px) {
+    padding: 0 var(--spacing-md);
+  }
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-4xl);
+  padding: var(--spacing-3xl) 0;
+}
+
+.heroTitle {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-400) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @media (max-width: 768px) {
+    font-size: var(--font-size-3xl);
+  }
+}
+
+.heroSubtitle {
+  font-size: var(--font-size-xl);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+
+  @media (max-width: 768px) {
+    font-size: var(--font-size-lg);
+  }
+}
+
+.rewards {
+  margin-bottom: var(--spacing-4xl);
+}
+
+.rewardCard {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--spacing-3xl);
+}
+
+.rewardContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.rewardTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0;
+}
+
+.rewardList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.rewardItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--glass-bg-base);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border-base);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+}
+
+.rewardLabel {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+
+.rewardValue {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+}
+
+.leadGateSection,
+.visionLabSection,
+.microInterviewSection,
+.submissionSection,
+.successSection {
+  margin-bottom: var(--spacing-4xl);
+}
+
+.successCard {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-3xl);
+}
+
+.successContent {
+  text-align: center;
+}
+
+.successTitle {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.successMessage {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-xl) 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.successActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.ctaButton {
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: auto;
+    min-width: 200px;
+  }
+}

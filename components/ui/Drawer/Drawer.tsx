@@ -21,7 +21,9 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title
       previousFocusRef.current = document.activeElement as HTMLElement
 
       // Focus the drawer when it opens
-      drawerRef.current?.focus()
+      setTimeout(() => {
+        drawerRef.current?.focus()
+      }, 100)
 
       // Prevent body scroll when drawer is open
       const originalOverflow = document.body.style.overflow
@@ -42,18 +44,21 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title
         // Restore focus when drawer closes
         previousFocusRef.current?.focus()
       }
+    } else {
+      // Restore body scroll when drawer closes
+      document.body.style.overflow = ''
     }
   }, [isOpen, onClose])
-
-  if (!isOpen) return null
 
   return (
     <>
       {/* Overlay backdrop */}
       <div
-        className={styles.overlay}
+        className={classNames(styles.overlay, {
+          [styles['overlay--visible']]: isOpen,
+        })}
         onClick={onClose}
-        aria-hidden="true"
+        aria-hidden={!isOpen}
         data-testid="drawer-overlay"
       />
 
@@ -66,6 +71,7 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'drawer-title' : undefined}
+        aria-hidden={!isOpen}
         tabIndex={-1}
       >
         {title && (

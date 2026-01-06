@@ -8,7 +8,18 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: var(--z-modal-backdrop);
-  animation: fadeIn var(--transition-base);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-base),
+    visibility var(--transition-base);
+
+  &--visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
 }
 
 .drawer {
@@ -29,10 +40,17 @@
   transform: translateX(-100%);
   transition: transform var(--transition-base);
   outline: none;
+  visibility: hidden;
+  pointer-events: none;
 
   &--open {
     transform: translateX(0);
-    animation: slideInLeft var(--transition-base);
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  @media (min-width: 640px) {
+    max-width: 360px;
   }
 
   @media (min-width: 768px) {

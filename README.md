@@ -70,6 +70,13 @@ FIREBASE_CLOUD_FUNCTION_URL=https://us-central1-YOUR-PROJECT-ID.cloudfunctions.n
 # FIREBASE_FUNCTION_KEY=your-function-key
 # Alternative: Bearer token authentication
 # FIREBASE_FUNCTION_SECRET=your-bearer-token
+
+# Cloudflare Turnstile (required for Exercise Challenge feature)
+# Get your keys from https://dash.cloudflare.com/?to=/:account/turnstile
+# Site key is public and can be exposed in client-side code
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key_here
+# Secret key is server-only and must be kept private
+TURNSTILE_SECRET_KEY=your_turnstile_secret_key_here
 ```
 
 **Note**:
@@ -77,6 +84,7 @@ FIREBASE_CLOUD_FUNCTION_URL=https://us-central1-YOUR-PROJECT-ID.cloudfunctions.n
 - The ChatWidget component will not display if `NEXT_PUBLIC_CHATKIT_WORKFLOW_ID` is not set. You can get your credentials from [ChatKit Studio](https://widgets.chatkit.studio).
 - Google Analytics and Tag Manager are optional. If not configured, the site will function normally without analytics tracking.
 - The Support FAB (Feedback button) will display, but ticket submission will fail if `FIREBASE_CLOUD_FUNCTION_URL` is not configured. The API route will return a 503 error if the function URL is missing.
+- **Cloudflare Turnstile is required for the Exercise Challenge feature.** The lead capture form will show an error if Turnstile keys are not configured. Get your free keys from [Cloudflare Turnstile Dashboard](https://dash.cloudflare.com/?to=/:account/turnstile).
 
 3. Run the development server:
 

@@ -18,6 +18,12 @@ vi.mock('@/lib/supabase/server', () => ({
 describe('POST /api/exercise-submissions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Reset all mock implementations to return the chain
+    mockSupabaseClient.from.mockReturnValue(mockSupabaseClient)
+    mockSupabaseClient.select.mockReturnValue(mockSupabaseClient)
+    mockSupabaseClient.insert.mockReturnValue(mockSupabaseClient)
+    mockSupabaseClient.eq.mockReturnValue(mockSupabaseClient)
+    mockSupabaseClient.single.mockReset()
   })
 
   it('should return 400 if lead_id is missing', async () => {
@@ -150,6 +156,8 @@ describe('POST /api/exercise-submissions', () => {
   })
 
   it('should return 400 if lead does not exist', async () => {
+    // Mock the lead check to return error (lead doesn't exist)
+    // This is the first .single() call (checking if lead exists)
     mockSupabaseClient.single.mockResolvedValueOnce({
       data: null,
       error: { message: 'Not found' },
@@ -174,13 +182,18 @@ describe('POST /api/exercise-submissions', () => {
 
     expect(response.status).toBe(400)
     expect(data.error).toBe('Invalid lead ID')
+    // Verify the lead check was called
+    expect(mockSupabaseClient.from).toHaveBeenCalledWith('leads')
+    expect(mockSupabaseClient.single).toHaveBeenCalledTimes(1)
   })
 
   it('should create exercise submission successfully', async () => {
+    // First .single() call: verify lead exists
     mockSupabaseClient.single.mockResolvedValueOnce({
       data: { id: 'lead-123' },
       error: null,
     })
+    // Second .single() call: insert submission and return it
     mockSupabaseClient.single.mockResolvedValueOnce({
       data: { id: 'submission-123' },
       error: null,
@@ -206,26 +219,19 @@ describe('POST /api/exercise-submissions', () => {
     expect(response.status).toBe(201)
     expect(data.success).toBe(true)
     expect(data.submission_id).toBe('submission-123')
+    expect(mockSupabaseClient.single).toHaveBeenCalledTimes(2)
   })
 
   it('should handle server errors gracefully', async () => {
-    // First call: verify lead exists
-    let callCount = 0
-    mockSupabaseClient.single.mockImplementation(() => {
-      callCount++
-      if (callCount === 1) {
-        // First call: lead exists
-        return Promise.resolve({
-          data: { id: 'lead-123' },
-          error: null,
-        })
-      } else {
-        // Second call: insert fails
-        return Promise.resolve({
-          data: null,
-          error: { message: 'Database error' },
-        })
-      }
+    // First .single() call: verify lead exists (success)
+    mockSupabaseClient.single.mockResolvedValueOnce({
+      data: { id: 'lead-123' },
+      error: null,
+    })
+    // Second .single() call: insert submission fails (returns error)
+    mockSupabaseClient.single.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Database error' },
     })
 
     const request = new NextRequest('http://localhost:3000/api/exercise-submissions', {
@@ -247,6 +253,7 @@ describe('POST /api/exercise-submissions', () => {
 
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to create exercise submission')
+    expect(mockSupabaseClient.single).toHaveBeenCalledTimes(2)
   })
 })
 

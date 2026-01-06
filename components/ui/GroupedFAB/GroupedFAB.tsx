@@ -99,7 +99,7 @@ export const GroupedFAB: React.FC = () => {
 
       {/* ChatWidget - controlled by GroupedFAB */}
       <ChatWidget
-        key={`chat-${isChatOpen}`}
+        key="chat-widget"
         showButton={false}
         defaultOpen={isChatOpen}
         onClose={handleCloseChat}

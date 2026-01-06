@@ -21,6 +21,15 @@ export interface ChatWidgetProps {
    */
   defaultOpen?: boolean
   /**
+   * Whether to show the floating button
+   * @default true
+   */
+  showButton?: boolean
+  /**
+   * Callback when chat is closed
+   */
+  onClose?: () => void
+  /**
    * Custom className for styling
    */
   className?: string

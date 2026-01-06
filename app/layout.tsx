@@ -5,8 +5,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { BotIdClient } from 'botid/client'
 import './globals.scss'
 import { Navbar } from '@/components/landing/Navbar/Navbar'
-import { ChatWidget } from '@/components/ui/ChatWidget/ChatWidget'
-import { SupportFAB } from '@/components/support/SupportFAB'
+import { GroupedFAB } from '@/components/ui/GroupedFAB/GroupedFAB'
 import { AOSStyles } from '@/components/ui/AOSStyles/AOSStyles'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -240,8 +239,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <Navbar />
         <div id="main-content">{children}</div>
-        <ChatWidget />
-        <SupportFAB />
+        <GroupedFAB />
         <Analytics />
       </body>
     </html>

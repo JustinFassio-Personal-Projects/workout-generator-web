@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExerciseChallengePage from '@/app/exercise-challenge/page'
 
@@ -155,15 +155,20 @@ describe('ExerciseChallengePage', () => {
   })
 
   it('should display vision lab iframe after lead capture', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     render(<ExerciseChallengePage />)
 
-    const submitButton = screen.getByText('Submit Lead')
-    await user.click(submitButton)
-
-    await waitFor(() => {
-      expect(screen.getByTestId('vision-lab-iframe')).toBeInTheDocument()
+    await act(async () => {
+      const submitButton = screen.getByText('Submit Lead')
+      await user.click(submitButton)
     })
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('vision-lab-iframe')).toBeInTheDocument()
+      },
+      { timeout: 2000 }
+    )
 
     expect(screen.queryByTestId('lead-gate')).not.toBeInTheDocument()
   })

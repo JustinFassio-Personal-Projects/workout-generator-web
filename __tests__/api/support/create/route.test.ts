@@ -300,6 +300,7 @@ describe('POST /api/support/create', () => {
         blob: async () => new Blob(),
         formData: async () => new FormData(),
         text: async () => '',
+        bytes: async () => new Uint8Array(0),
       } as Response)
 
       const response = await POST(request)

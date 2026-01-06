@@ -121,7 +121,7 @@ describe('useSupabaseUser', () => {
 
     // Simulate auth state change
     if (authStateCallback) {
-      authStateCallback('SIGNED_IN', { user: mockUser })
+      ;(authStateCallback as (event: string, session: any) => void)('SIGNED_IN', { user: mockUser })
     }
 
     await waitFor(() => {
@@ -150,7 +150,7 @@ describe('useSupabaseUser', () => {
 
     // Simulate sign out
     if (authStateCallback) {
-      authStateCallback('SIGNED_OUT', null)
+      ;(authStateCallback as (event: string, session: any) => void)('SIGNED_OUT', null)
     }
 
     await waitFor(() => {

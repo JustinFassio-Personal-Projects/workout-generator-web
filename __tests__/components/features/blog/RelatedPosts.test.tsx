@@ -12,7 +12,10 @@ vi.mock('next/link', () => ({
 
 // Mock next/image
 vi.mock('next/image', () => ({
-  default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
+  default: ({ src, alt }: { src: string; alt: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} />
+  ),
 }))
 
 const mockPosts: BlogPost[] = [

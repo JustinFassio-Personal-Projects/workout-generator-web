@@ -5,7 +5,10 @@ import * as chaptersModule from '@/data/story/chapters'
 
 // Mock Next.js Image
 vi.mock('next/image', () => ({
-  default: (props: any) => <img {...props} />,
+  default: (props: any) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img alt="" {...props} />
+  ),
 }))
 
 // Mock StoryHero

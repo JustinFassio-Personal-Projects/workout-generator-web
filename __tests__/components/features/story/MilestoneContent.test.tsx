@@ -167,7 +167,8 @@ describe('MilestoneContent', () => {
     // So we need to click the link, not the button
     const primaryLink = screen.getByText('Test Primary CTA').closest('a')
     if (primaryLink) {
-      fireEvent.click(primaryLink)
+      const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true })
+      fireEvent.click(primaryLink, clickEvent)
     } else {
       // If it's a button (for anchor links), click the button
       const primaryButton = screen.getByText('Test Primary CTA')
@@ -184,7 +185,8 @@ describe('MilestoneContent', () => {
     render(<MilestoneContent milestone={mockMilestone} relatedChapters={mockRelatedChapters} />)
 
     const relatedLink = screen.getByText('Related Chapter 1').closest('a')
-    fireEvent.click(relatedLink!)
+    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true })
+    fireEvent.click(relatedLink!, clickEvent)
 
     expect(trackNavigationClick).toHaveBeenCalledWith(
       '/story/related-chapter-1',

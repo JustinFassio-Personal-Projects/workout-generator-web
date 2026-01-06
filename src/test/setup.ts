@@ -85,6 +85,37 @@ global.fetch = vi.fn().mockResolvedValue({
   text: async () => '',
 } as Response)
 
+// Mock window.location to prevent jsdom navigation errors
+// This prevents "Not implemented: navigation (except hash changes)" errors
+const mockLocation = {
+  href: 'http://localhost:3000',
+  origin: 'http://localhost:3000',
+  protocol: 'http:',
+  host: 'localhost:3000',
+  hostname: 'localhost',
+  port: '3000',
+  pathname: '/',
+  search: '',
+  hash: '',
+  assign: vi.fn(),
+  replace: vi.fn(),
+  reload: vi.fn(),
+}
+
+Object.defineProperty(window, 'location', {
+  writable: true,
+  value: mockLocation,
+})
+
+// Prevent default navigation behavior on anchor clicks in tests
+document.addEventListener('click', event => {
+  const target = event.target as HTMLElement
+  const anchor = target.closest('a')
+  if (anchor && anchor.href && !anchor.href.startsWith('#')) {
+    event.preventDefault()
+  }
+})
+
 // Set default test environment variables to prevent API key errors
 if (!process.env.OPENAI_API_KEY) {
   process.env.OPENAI_API_KEY = 'test-api-key-for-testing-only'

@@ -85,8 +85,8 @@ vi.mock('@/components/ui/Button/Button', () => ({
 describe('ExerciseChallengePage', () => {
   let timers: ReturnType<typeof setTimeout>[]
   let mockGetElementById: any
-  let setTimeoutSpy: ReturnType<typeof vi.spyOn>
-  let clearTimeoutSpy: ReturnType<typeof vi.spyOn>
+  let setTimeoutSpy: any
+  let clearTimeoutSpy: any
   let originalSetTimeout: typeof global.setTimeout
   let originalClearTimeout: typeof global.clearTimeout
 

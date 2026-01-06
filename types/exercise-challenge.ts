@@ -94,6 +94,7 @@ export interface VisionLeadIntel {
   id: string
   lead_id: string
   vision_prompt?: string | null
+  image_url?: string | null
   goal_primary: string
   frustration_primary: string
   ai_expectation_primary: string
@@ -111,6 +112,7 @@ export interface MicroInterviewFormData {
   expectation_free_text?: string
   exercise_suggestion?: string
   vision_prompt?: string
+  image_url?: string
 }
 
 export interface CreateVisionLeadIntelResponse {

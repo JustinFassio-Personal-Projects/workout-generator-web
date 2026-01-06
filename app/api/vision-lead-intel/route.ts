@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
       expectation_free_text,
       exercise_suggestion,
       vision_prompt,
+      image_url,
     } = body
 
     // Validate required fields
@@ -127,12 +128,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid lead ID' }, { status: 400 })
     }
 
+    // Validate image_url if provided (should be a valid URL or data URL)
+    if (image_url && typeof image_url === 'string' && image_url.trim().length > 0) {
+      const trimmedUrl = image_url.trim()
+      // Accept data URLs (base64 encoded images)
+      if (trimmedUrl.startsWith('data:')) {
+        // Validate data URL format: data:image/[type];base64,[data]
+        if (trimmedUrl.startsWith('data:image/')) {
+          const dataUrlPattern = /^data:image\/[a-zA-Z]+;base64,/
+          if (!dataUrlPattern.test(trimmedUrl)) {
+            return NextResponse.json({ error: 'Invalid data URL format' }, { status: 400 })
+          }
+        } else {
+          // data: but not data:image/ - invalid
+          return NextResponse.json({ error: 'Invalid data URL format' }, { status: 400 })
+        }
+      } else {
+        // Validate regular URLs
+        try {
+          new URL(trimmedUrl)
+        } catch {
+          return NextResponse.json({ error: 'Invalid image URL format' }, { status: 400 })
+        }
+      }
+    }
+
     // Insert vision lead intel
     const { data: intel, error: insertError } = await supabase
       .from('vision_lead_intel')
       .insert({
         lead_id: lead_id.trim(),
         vision_prompt: vision_prompt ? vision_prompt.trim() : null,
+        image_url: image_url ? image_url.trim() : null,
         goal_primary: goal_primary.trim(),
         frustration_primary: frustration_primary.trim(),
         ai_expectation_primary: ai_expectation_primary.trim(),

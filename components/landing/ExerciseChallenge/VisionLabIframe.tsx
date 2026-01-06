@@ -7,7 +7,7 @@ import styles from './VisionLabIframe.module.scss'
 interface VisionLabIframeProps {
   leadId: string
   onGenerationStarted?: (prompt?: string) => void
-  onGenerationCompleted?: () => void
+  onGenerationCompleted?: (imageUrl?: string) => void
 }
 
 export const VisionLabIframe: React.FC<VisionLabIframeProps> = ({
@@ -43,12 +43,13 @@ export const VisionLabIframe: React.FC<VisionLabIframeProps> = ({
         const prompt = event.data.prompt || ''
         const framework = event.data.framework
         const level = event.data.level
+        const imageUrl = event.data.image_url || event.data.imageUrl || undefined
 
         analytics.trackVisionGenerationCompleted(leadId)
 
-        // Notify parent of completion
+        // Notify parent of completion with image URL
         if (onGenerationCompleted) {
-          onGenerationCompleted()
+          onGenerationCompleted(imageUrl)
         }
       }
     }

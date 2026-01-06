@@ -48,6 +48,15 @@ export const Navbar: React.FC = () => {
           Blog
         </Button>
       </Link>
+      <Link
+        href="/exercise-challenge"
+        className={styles.navLink}
+        onClick={() => handleNavClick('/exercise-challenge', 'Submit an Exercise')}
+      >
+        <Button variant="secondary" size="md" className={styles.button} type="button">
+          Submit an Exercise
+        </Button>
+      </Link>
     </>
   )
 

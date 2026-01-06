@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useRef } from 'react'
 import classNames from 'classnames'
 import styles from './Drawer.module.scss'
 
@@ -15,14 +15,18 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title
   const drawerRef = useRef<HTMLDivElement>(null)
   const previousFocusRef = useRef<HTMLElement | null>(null)
 
-  useEffect(() => {
-    if (isOpen) {
+  // Use useLayoutEffect for synchronous focus (runs after DOM updates, before paint)
+  useLayoutEffect(() => {
+    if (isOpen && drawerRef.current) {
       // Store the currently focused element
       previousFocusRef.current = document.activeElement as HTMLElement
+      // Focus the drawer immediately when it opens
+      drawerRef.current.focus()
+    }
+  }, [isOpen])
 
-      // Focus the drawer when it opens
-      drawerRef.current?.focus()
-
+  useEffect(() => {
+    if (isOpen) {
       // Prevent body scroll when drawer is open
       const originalOverflow = document.body.style.overflow
       document.body.style.overflow = 'hidden'
@@ -42,18 +46,21 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title
         // Restore focus when drawer closes
         previousFocusRef.current?.focus()
       }
+    } else {
+      // Restore body scroll when drawer closes
+      document.body.style.overflow = ''
     }
   }, [isOpen, onClose])
-
-  if (!isOpen) return null
 
   return (
     <>
       {/* Overlay backdrop */}
       <div
-        className={styles.overlay}
+        className={classNames(styles.overlay, {
+          [styles['overlay--visible']]: isOpen,
+        })}
         onClick={onClose}
-        aria-hidden="true"
+        aria-hidden={!isOpen}
         data-testid="drawer-overlay"
       />
 
@@ -66,6 +73,7 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'drawer-title' : undefined}
+        aria-hidden={!isOpen}
         tabIndex={-1}
       >
         {title && (

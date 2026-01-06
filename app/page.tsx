@@ -12,6 +12,7 @@ import { Blog } from '@/components/landing/Blog/Blog'
 import { Bio } from '@/components/landing/Bio/Bio'
 import { Pricing } from '@/components/landing/Pricing/Pricing'
 import { Footer } from '@/components/landing/Footer/Footer'
+import { ExerciseChallengeSection } from '@/components/landing/ExerciseChallenge/ExerciseChallengeSection'
 import { useScrollTracking } from '@/features/analytics/hooks/useScrollTracking'
 import { faqItems } from '@/data/faq'
 
@@ -157,6 +158,7 @@ export default function Home() {
         <FAQ />
         <WorkoutPlanBuilder />
         <Features />
+        <ExerciseChallengeSection />
         <Journey />
         <Testimonials />
         <Videos />

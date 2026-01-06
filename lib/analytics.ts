@@ -467,4 +467,242 @@ export const analytics = {
   ) => {
     trackVideoResume(videoId, videoTitle, videoCategory, resumeTime, progressPercentage)
   },
+
+  // Exercise Challenge interactions
+  trackExerciseChallengeView: () => {
+    trackVercelEvent('Exercise Challenge View', {
+      location: 'exercise_challenge_page',
+    })
+    trackEvent('exercise_challenge_view', {
+      location: 'exercise_challenge_page',
+    })
+  },
+
+  trackLeadGateOpen: () => {
+    trackVercelEvent('Lead Gate Open', {
+      location: 'exercise_challenge',
+    })
+    trackEvent('lead_gate_open', {
+      location: 'exercise_challenge',
+    })
+  },
+
+  trackLeadSubmitted: (leadId: string) => {
+    trackVercelEvent('Lead Submitted', {
+      location: 'exercise_challenge',
+      lead_id: leadId,
+    })
+    trackEvent('lead_submitted', {
+      location: 'exercise_challenge',
+      lead_id: leadId,
+    })
+  },
+
+  trackVisionIframeShown: () => {
+    trackVercelEvent('Vision Iframe Shown', {
+      location: 'exercise_challenge',
+    })
+    trackEvent('vision_iframe_shown', {
+      location: 'exercise_challenge',
+    })
+  },
+
+  trackExerciseSubmissionStarted: () => {
+    trackVercelEvent('Exercise Submission Started', {
+      location: 'exercise_challenge',
+    })
+    trackEvent('exercise_submission_started', {
+      location: 'exercise_challenge',
+    })
+  },
+
+  trackExerciseSubmissionSubmitted: (submissionId: string) => {
+    trackVercelEvent('Exercise Submission Submitted', {
+      location: 'exercise_challenge',
+      submission_id: submissionId,
+    })
+    trackEvent('exercise_submission_submitted', {
+      location: 'exercise_challenge',
+      submission_id: submissionId,
+    })
+  },
+
+  // Vision Lab interactions
+  trackVisionLabViewed: (metadata?: {
+    path?: string
+    referrer?: string
+    utm_source?: string
+    utm_campaign?: string
+    utm_medium?: string
+  }) => {
+    trackVercelEvent('Vision Lab Viewed', {
+      location: 'vision_lab',
+      ...metadata,
+    })
+    trackEvent('vision_lab_viewed', {
+      location: 'vision_lab',
+      ...metadata,
+    })
+  },
+
+  trackVisionLeadGateOpened: (path?: string) => {
+    trackVercelEvent('Vision Lead Gate Opened', {
+      location: 'vision_lab',
+      path: path || (typeof window !== 'undefined' ? window.location.pathname : ''),
+    })
+    trackEvent('vision_lead_gate_opened', {
+      location: 'vision_lab',
+      path: path || (typeof window !== 'undefined' ? window.location.pathname : ''),
+    })
+  },
+
+  trackVisionLeadSubmitted: (leadId: string, emailDomain: string, consentEmailPlan: boolean) => {
+    trackVercelEvent('Vision Lead Submitted', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      email_domain: emailDomain,
+      consent_email_plan: consentEmailPlan,
+    })
+    trackEvent('vision_lead_submitted', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      email_domain: emailDomain,
+      consent_email_plan: consentEmailPlan,
+    })
+  },
+
+  trackVisionIframeLoaded: (leadId: string) => {
+    trackVercelEvent('Vision Iframe Loaded', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+    trackEvent('vision_iframe_loaded', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+  },
+
+  trackVisionGenerationStarted: (leadId: string, promptLength?: number) => {
+    const metadata: Record<string, string | number | boolean | null> = {
+      location: 'vision_lab',
+      lead_id: leadId,
+    }
+    if (promptLength !== undefined) {
+      metadata.prompt_length = promptLength
+    }
+    trackVercelEvent('Vision Generation Started', metadata)
+    trackEvent('vision_generation_started', metadata)
+  },
+
+  trackVisionGenerationCompleted: (leadId: string) => {
+    trackVercelEvent('Vision Generation Completed', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+    trackEvent('vision_generation_completed', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+  },
+
+  trackVisionMicroqStarted: (leadId: string) => {
+    trackVercelEvent('Vision Micro Interview Started', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+    trackEvent('vision_microq_started', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+  },
+
+  trackVisionMicroqAnswered: (leadId: string, questionKey: string, answerValue: string) => {
+    trackVercelEvent('Vision Micro Interview Answered', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      question_key: questionKey,
+      answer_value: answerValue,
+    })
+    trackEvent('vision_microq_answered', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      question_key: questionKey,
+      answer_value: answerValue,
+    })
+  },
+
+  trackVisionMicroqCompleted: (
+    leadId: string,
+    requiredCompleted: boolean,
+    optionalCompleted: boolean
+  ) => {
+    trackVercelEvent('Vision Micro Interview Completed', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      required_completed: requiredCompleted,
+      optional_completed: optionalCompleted,
+    })
+    trackEvent('vision_microq_completed', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      required_completed: requiredCompleted,
+      optional_completed: optionalCompleted,
+    })
+  },
+
+  trackVisionMicroqFreeTextSaved: (leadId: string, hasText: boolean, textLength: number) => {
+    trackVercelEvent('Vision Micro Interview Free Text Saved', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      has_text: hasText,
+      text_length: textLength,
+    })
+    trackEvent('vision_microq_free_text_saved', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      has_text: hasText,
+      text_length: textLength,
+    })
+  },
+
+  trackVisionExerciseSuggested: (
+    leadId: string,
+    hasSuggestion: boolean,
+    suggestionLength: number
+  ) => {
+    trackVercelEvent('Vision Exercise Suggested', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      has_suggestion: hasSuggestion,
+      suggestion_length: suggestionLength,
+    })
+    trackEvent('vision_exercise_suggested', {
+      location: 'vision_lab',
+      lead_id: leadId,
+      has_suggestion: hasSuggestion,
+      suggestion_length: suggestionLength,
+    })
+  },
+
+  trackVisionCtaGenerateWorkoutClicked: (leadId: string) => {
+    trackVercelEvent('Vision CTA Generate Workout Clicked', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+    trackEvent('vision_cta_generate_workout_clicked', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+  },
+
+  trackVisionCtaViewPricingClicked: (leadId: string) => {
+    trackVercelEvent('Vision CTA View Pricing Clicked', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+    trackEvent('vision_cta_view_pricing_clicked', {
+      location: 'vision_lab',
+      lead_id: leadId,
+    })
+  },
 }

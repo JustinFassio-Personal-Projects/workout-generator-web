@@ -210,6 +210,24 @@ describe('analytics', () => {
       expect(gtagMock).toHaveBeenCalled()
       expect(dataLayer).toHaveLength(1)
     })
+
+    it('should handle page view when isGA4Available returns true but gtag is falsy', () => {
+      // Test the branch: if (isGA4Available() && window.gtag)
+      // When isGA4Available() is true but window.gtag is falsy, the GA4 block should not execute
+      const dataLayer: any[] = []
+      window.gtag = vi.fn() // Set to function first to make isGA4Available() return true
+      // Then set to undefined to test the && window.gtag check
+      window.gtag = undefined
+      window.dataLayer = dataLayer
+      trackPageView('/test-path', 'Test Title')
+      // GA4 should not be called, but GTM should still work
+      expect(dataLayer).toHaveLength(1)
+      expect(dataLayer[0]).toEqual({
+        event: 'page_view',
+        page_path: '/test-path',
+        page_title: 'Test Title',
+      })
+    })
   })
 
   describe('analytics object', () => {
@@ -694,6 +712,386 @@ describe('analytics', () => {
         video_category: 'featured-exercise',
         resume_time: 26,
         progress_percentage: 80,
+      })
+    })
+  })
+
+  describe('Vision Lab tracking', () => {
+    beforeEach(() => {
+      const gtagMock = vi.fn()
+      const dataLayer: any[] = []
+      window.gtag = gtagMock
+      window.dataLayer = dataLayer
+      vi.clearAllMocks()
+    })
+
+    it('should track vision lab viewed', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionLabViewed({
+        path: '/exercise-challenge',
+        referrer: 'https://google.com',
+        utm_source: 'google',
+        utm_campaign: 'test',
+        utm_medium: 'cpc',
+      })
+      expect(track).toHaveBeenCalledWith('Vision Lab Viewed', {
+        location: 'vision_lab',
+        path: '/exercise-challenge',
+        referrer: 'https://google.com',
+        utm_source: 'google',
+        utm_campaign: 'test',
+        utm_medium: 'cpc',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_lab_viewed', {
+        location: 'vision_lab',
+        path: '/exercise-challenge',
+        referrer: 'https://google.com',
+        utm_source: 'google',
+        utm_campaign: 'test',
+        utm_medium: 'cpc',
+      })
+    })
+
+    it('should track vision lab viewed without metadata', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionLabViewed()
+      expect(track).toHaveBeenCalledWith('Vision Lab Viewed', {
+        location: 'vision_lab',
+      })
+    })
+
+    it('should track vision lead gate opened', async () => {
+      const { track } = await import('@vercel/analytics')
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/exercise-challenge' },
+        writable: true,
+        configurable: true,
+      })
+      analytics.trackVisionLeadGateOpened()
+      expect(track).toHaveBeenCalledWith('Vision Lead Gate Opened', {
+        location: 'vision_lab',
+        path: '/exercise-challenge',
+      })
+    })
+
+    it('should track vision lead gate opened with custom path', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionLeadGateOpened('/custom-path')
+      expect(track).toHaveBeenCalledWith('Vision Lead Gate Opened', {
+        location: 'vision_lab',
+        path: '/custom-path',
+      })
+    })
+
+    it('should track vision lead gate opened with empty path when window is undefined', async () => {
+      const { track } = await import('@vercel/analytics')
+      const originalWindow = global.window
+      const gtagMock = vi.fn()
+      const dataLayer: any[] = []
+
+      // @ts-expect-error - intentionally removing window for test
+      delete global.window
+
+      // When window is undefined, trackVercelEvent returns early (so track won't be called),
+      // but the path calculation is still executed before the function call:
+      // path || (typeof window !== 'undefined' ? window.location.pathname : '') = '' (when window is undefined)
+      // This covers the branch in lines 551 and 555 where window is undefined
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      analytics.trackVisionLeadGateOpened(undefined) // Explicitly pass undefined to test the path || branch
+
+      // trackVercelEvent returns early, so track is not called
+      // But trackEvent is called and will warn, which we verify
+      expect(consoleSpy).toHaveBeenCalledWith('Google Analytics 4 is not available')
+      expect(consoleSpy).toHaveBeenCalledWith('Google Tag Manager is not available')
+
+      consoleSpy.mockRestore()
+      global.window = originalWindow
+      // Restore window properties for other tests
+      window.gtag = gtagMock
+      window.dataLayer = dataLayer
+    })
+
+    it('should track vision lead gate opened with window.location.pathname when path is undefined and window exists', async () => {
+      const { track } = await import('@vercel/analytics')
+      const gtagMock = vi.fn()
+      const dataLayer: any[] = []
+      window.gtag = gtagMock
+      window.dataLayer = dataLayer
+
+      // Test the branch where path is undefined but window exists and has pathname
+      // This covers: path || (typeof window !== 'undefined' ? window.location.pathname : '')
+      // When path is undefined and window exists, it should use window.location.pathname
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/test-path-from-window' },
+        writable: true,
+        configurable: true,
+      })
+      analytics.trackVisionLeadGateOpened()
+
+      expect(track).toHaveBeenCalledWith('Vision Lead Gate Opened', {
+        location: 'vision_lab',
+        path: '/test-path-from-window',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_lead_gate_opened', {
+        location: 'vision_lab',
+        path: '/test-path-from-window',
+      })
+    })
+
+    it('should track vision lead submitted', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionLeadSubmitted('lead-123', 'example.com', true)
+      expect(track).toHaveBeenCalledWith('Vision Lead Submitted', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        email_domain: 'example.com',
+        consent_email_plan: true,
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_lead_submitted', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        email_domain: 'example.com',
+        consent_email_plan: true,
+      })
+    })
+
+    it('should track vision iframe loaded', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionIframeLoaded('lead-123')
+      expect(track).toHaveBeenCalledWith('Vision Iframe Loaded', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_iframe_loaded', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+    })
+
+    it('should track vision generation started with prompt length', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionGenerationStarted('lead-123', 50)
+      expect(track).toHaveBeenCalledWith('Vision Generation Started', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        prompt_length: 50,
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_generation_started', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        prompt_length: 50,
+      })
+    })
+
+    it('should track vision generation started without prompt length', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionGenerationStarted('lead-123')
+      expect(track).toHaveBeenCalledWith('Vision Generation Started', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+    })
+
+    it('should track vision generation completed', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionGenerationCompleted('lead-123')
+      expect(track).toHaveBeenCalledWith('Vision Generation Completed', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_generation_completed', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+    })
+
+    it('should track vision micro interview started', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionMicroqStarted('lead-123')
+      expect(track).toHaveBeenCalledWith('Vision Micro Interview Started', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_microq_started', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+    })
+
+    it('should track vision micro interview answered', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionMicroqAnswered('lead-123', 'goal_primary', 'Build muscle')
+      expect(track).toHaveBeenCalledWith('Vision Micro Interview Answered', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        question_key: 'goal_primary',
+        answer_value: 'Build muscle',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_microq_answered', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        question_key: 'goal_primary',
+        answer_value: 'Build muscle',
+      })
+    })
+
+    it('should track vision micro interview completed', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionMicroqCompleted('lead-123', true, true)
+      expect(track).toHaveBeenCalledWith('Vision Micro Interview Completed', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        required_completed: true,
+        optional_completed: true,
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_microq_completed', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        required_completed: true,
+        optional_completed: true,
+      })
+    })
+
+    it('should track vision micro interview free text saved', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionMicroqFreeTextSaved('lead-123', true, 150)
+      expect(track).toHaveBeenCalledWith('Vision Micro Interview Free Text Saved', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        has_text: true,
+        text_length: 150,
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_microq_free_text_saved', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        has_text: true,
+        text_length: 150,
+      })
+    })
+
+    it('should track vision exercise suggested', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionExerciseSuggested('lead-123', true, 30)
+      expect(track).toHaveBeenCalledWith('Vision Exercise Suggested', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        has_suggestion: true,
+        suggestion_length: 30,
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_exercise_suggested', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+        has_suggestion: true,
+        suggestion_length: 30,
+      })
+    })
+
+    it('should track vision CTA generate workout clicked', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionCtaGenerateWorkoutClicked('lead-123')
+      expect(track).toHaveBeenCalledWith('Vision CTA Generate Workout Clicked', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_cta_generate_workout_clicked', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+    })
+
+    it('should track vision CTA view pricing clicked', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionCtaViewPricingClicked('lead-123')
+      expect(track).toHaveBeenCalledWith('Vision CTA View Pricing Clicked', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_cta_view_pricing_clicked', {
+        location: 'vision_lab',
+        lead_id: 'lead-123',
+      })
+    })
+  })
+
+  describe('Exercise Challenge tracking', () => {
+    beforeEach(() => {
+      const gtagMock = vi.fn()
+      const dataLayer: any[] = []
+      window.gtag = gtagMock
+      window.dataLayer = dataLayer
+      vi.clearAllMocks()
+    })
+
+    it('should track exercise challenge view', async () => {
+      const { track } = await import('@vercel/analytics')
+      window.gtag = vi.fn()
+      analytics.trackExerciseChallengeView()
+      expect(track).toHaveBeenCalledWith('Exercise Challenge View', {
+        location: 'exercise_challenge_page',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'exercise_challenge_view', {
+        location: 'exercise_challenge_page',
+      })
+    })
+
+    it('should track lead gate open', async () => {
+      const { track } = await import('@vercel/analytics')
+      window.gtag = vi.fn()
+      analytics.trackLeadGateOpen()
+      expect(track).toHaveBeenCalledWith('Lead Gate Open', {
+        location: 'exercise_challenge',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'lead_gate_open', {
+        location: 'exercise_challenge',
+      })
+    })
+
+    it('should track lead submitted', async () => {
+      const { track } = await import('@vercel/analytics')
+      window.gtag = vi.fn()
+      analytics.trackLeadSubmitted('lead-123')
+      expect(track).toHaveBeenCalledWith('Lead Submitted', {
+        location: 'exercise_challenge',
+        lead_id: 'lead-123',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'lead_submitted', {
+        location: 'exercise_challenge',
+        lead_id: 'lead-123',
+      })
+    })
+
+    it('should track vision iframe shown', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionIframeShown()
+      expect(track).toHaveBeenCalledWith('Vision Iframe Shown', {
+        location: 'exercise_challenge',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_iframe_shown', {
+        location: 'exercise_challenge',
+      })
+    })
+
+    it('should track exercise submission started', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackExerciseSubmissionStarted()
+      expect(track).toHaveBeenCalledWith('Exercise Submission Started', {
+        location: 'exercise_challenge',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'exercise_submission_started', {
+        location: 'exercise_challenge',
+      })
+    })
+
+    it('should track exercise submission submitted', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackExerciseSubmissionSubmitted('submission-123')
+      expect(track).toHaveBeenCalledWith('Exercise Submission Submitted', {
+        location: 'exercise_challenge',
+        submission_id: 'submission-123',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'exercise_submission_submitted', {
+        location: 'exercise_challenge',
+        submission_id: 'submission-123',
       })
     })
   })

@@ -939,4 +939,49 @@ describe('analytics', () => {
       })
     })
   })
+
+  describe('Exercise Challenge tracking', () => {
+    beforeEach(() => {
+      const gtagMock = vi.fn()
+      const dataLayer: any[] = []
+      window.gtag = gtagMock
+      window.dataLayer = dataLayer
+      vi.clearAllMocks()
+    })
+
+    it('should track vision iframe shown', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackVisionIframeShown()
+      expect(track).toHaveBeenCalledWith('Vision Iframe Shown', {
+        location: 'exercise_challenge',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'vision_iframe_shown', {
+        location: 'exercise_challenge',
+      })
+    })
+
+    it('should track exercise submission started', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackExerciseSubmissionStarted()
+      expect(track).toHaveBeenCalledWith('Exercise Submission Started', {
+        location: 'exercise_challenge',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'exercise_submission_started', {
+        location: 'exercise_challenge',
+      })
+    })
+
+    it('should track exercise submission submitted', async () => {
+      const { track } = await import('@vercel/analytics')
+      analytics.trackExerciseSubmissionSubmitted('submission-123')
+      expect(track).toHaveBeenCalledWith('Exercise Submission Submitted', {
+        location: 'exercise_challenge',
+        submission_id: 'submission-123',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'exercise_submission_submitted', {
+        location: 'exercise_challenge',
+        submission_id: 'submission-123',
+      })
+    })
+  })
 })

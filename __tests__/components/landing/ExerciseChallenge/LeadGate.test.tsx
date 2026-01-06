@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { fireEvent } from '@testing-library/react'
 import { LeadGate } from '@/components/landing/ExerciseChallenge/LeadGate'
 import * as analytics from '@/lib/analytics'
 
@@ -74,12 +75,29 @@ describe('LeadGate', () => {
   it('should validate required fields', async () => {
     const user = userEvent.setup()
     const onLeadCaptured = vi.fn()
-    render(<LeadGate onLeadCaptured={onLeadCaptured} />)
+    const { container } = render(<LeadGate onLeadCaptured={onLeadCaptured} />)
 
-    const submitButton = screen.getByRole('button', { name: /Submit Lead/i })
-    await user.click(submitButton)
+    // Complete captcha first (button is disabled without it)
+    const captchaButton = screen.getByText('Complete Captcha')
+    await user.click(captchaButton)
 
-    expect(screen.getByText(/First name is required/i)).toBeInTheDocument()
+    // Wait for button to be enabled
+    await waitFor(
+      () => {
+        const submitButton = screen.getByRole('button', { name: /Continue/i })
+        expect(submitButton).not.toBeDisabled()
+      },
+      { timeout: 1000 }
+    )
+
+    // Submit the form directly
+    const form = container.querySelector('form')
+    expect(form).toBeInTheDocument()
+    fireEvent.submit(form!)
+
+    await waitFor(() => {
+      expect(screen.getByText(/First name is required/i)).toBeInTheDocument()
+    })
   })
 
   it('should validate email format', async () => {
@@ -113,7 +131,7 @@ describe('LeadGate', () => {
 
     const firstNameInput = screen.getByLabelText(/First Name/i)
     const emailInput = screen.getByRole('textbox', { name: /email/i })
-    const submitButton = screen.getByRole('button', { name: /Submit Lead/i })
+    const submitButton = screen.getByRole('button', { name: /Continue/i })
 
     await user.type(firstNameInput, 'Test')
     await user.type(emailInput, 'test@example.com')

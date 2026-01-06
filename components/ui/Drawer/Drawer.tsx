@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useRef } from 'react'
 import classNames from 'classnames'
 import styles from './Drawer.module.scss'
 
@@ -15,16 +15,18 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title
   const drawerRef = useRef<HTMLDivElement>(null)
   const previousFocusRef = useRef<HTMLElement | null>(null)
 
-  useEffect(() => {
-    if (isOpen) {
+  // Use useLayoutEffect for synchronous focus (runs after DOM updates, before paint)
+  useLayoutEffect(() => {
+    if (isOpen && drawerRef.current) {
       // Store the currently focused element
       previousFocusRef.current = document.activeElement as HTMLElement
+      // Focus the drawer immediately when it opens
+      drawerRef.current.focus()
+    }
+  }, [isOpen])
 
-      // Focus the drawer when it opens
-      setTimeout(() => {
-        drawerRef.current?.focus()
-      }, 100)
-
+  useEffect(() => {
+    if (isOpen) {
       // Prevent body scroll when drawer is open
       const originalOverflow = document.body.style.overflow
       document.body.style.overflow = 'hidden'

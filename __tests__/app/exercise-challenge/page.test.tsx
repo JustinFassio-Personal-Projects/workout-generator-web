@@ -83,10 +83,10 @@ vi.mock('@/components/ui/Button/Button', () => ({
 }))
 
 describe('ExerciseChallengePage', () => {
-  let timers: NodeJS.Timeout[]
+  let timers: ReturnType<typeof setTimeout>[]
   let mockGetElementById: any
-  let setTimeoutSpy: ReturnType<typeof vi.spyOn>
-  let clearTimeoutSpy: ReturnType<typeof vi.spyOn>
+  let setTimeoutSpy: ReturnType<typeof vi.spyOn<typeof global, 'setTimeout'>>
+  let clearTimeoutSpy: ReturnType<typeof vi.spyOn<typeof global, 'clearTimeout'>>
   let originalSetTimeout: typeof global.setTimeout
   let originalClearTimeout: typeof global.clearTimeout
 
@@ -100,7 +100,7 @@ describe('ExerciseChallengePage', () => {
 
     // Use vi.spyOn to safely mock setTimeout and clearTimeout
     setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation((fn, delay) => {
-      const timer = originalSetTimeout(fn, delay || 0) as unknown as NodeJS.Timeout
+      const timer = originalSetTimeout(fn, delay || 0)
       timers.push(timer)
       return timer
     })

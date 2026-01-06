@@ -35,6 +35,7 @@ describe('POST /api/support/create', () => {
       blob: async () => new Blob(),
       formData: async () => new FormData(),
       text: async () => '',
+      bytes: async () => new Uint8Array(0),
     } as Response)
   })
 
@@ -241,6 +242,7 @@ describe('POST /api/support/create', () => {
       blob: async () => new Blob(),
       formData: async () => new FormData(),
       text: async () => '',
+      bytes: async () => new Uint8Array(0),
     } as Response)
 
     const request = new NextRequest('http://localhost:3000/api/support/create', {
@@ -349,6 +351,7 @@ describe('POST /api/support/create', () => {
       blob: async () => new Blob(),
       formData: async () => new FormData(),
       text: async () => '',
+      bytes: async () => new Uint8Array(0),
     } as Response)
 
     const request = new NextRequest('http://localhost:3000/api/support/create', {

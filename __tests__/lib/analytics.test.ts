@@ -949,6 +949,18 @@ describe('analytics', () => {
       vi.clearAllMocks()
     })
 
+    it('should track exercise challenge view', async () => {
+      const { track } = await import('@vercel/analytics')
+      window.gtag = vi.fn()
+      analytics.trackExerciseChallengeView()
+      expect(track).toHaveBeenCalledWith('Exercise Challenge View', {
+        location: 'exercise_challenge_page',
+      })
+      expect(window.gtag).toHaveBeenCalledWith('event', 'exercise_challenge_view', {
+        location: 'exercise_challenge_page',
+      })
+    })
+
     it('should track lead gate open', async () => {
       const { track } = await import('@vercel/analytics')
       window.gtag = vi.fn()

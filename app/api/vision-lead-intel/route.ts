@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
+/**
+ * Logging Strategy:
+ * - All console.log statements are gated behind isDev for production cleanliness
+ * - All console.error and console.warn statements are also gated behind isDev for consistency
+ *   with the PR goal of reducing production console output
+ * - Note: This deviates from other API routes (e.g., app/api/admin/leads/) which keep
+ *   console.error in production for monitoring. This route gates all logging for consistency
+ *   with the privacy protection and console output reduction goals.
+ */
+
 // Simple in-memory rate limiting store
 interface RateLimitEntry {
   count: number
@@ -78,10 +88,14 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json()
     } catch (parseError) {
-      console.error('Error parsing request body:', {
-        ...requestMetadata,
-        error: parseError instanceof Error ? parseError.message : 'Unknown parse error',
-      })
+      // Gate error logging behind isDev for consistency with PR goal
+      // Note: In production, parse errors are still returned to client but not logged
+      if (isDev) {
+        console.error('Error parsing request body:', {
+          ...requestMetadata,
+          error: parseError instanceof Error ? parseError.message : 'Unknown parse error',
+        })
+      }
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
 
@@ -102,12 +116,16 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!lead_id || typeof lead_id !== 'string' || lead_id.trim().length === 0) {
-      console.warn('Validation failed: Missing lead_id', metadata)
+      if (isDev) {
+        console.warn('Validation failed: Missing lead_id', metadata)
+      }
       return NextResponse.json({ error: 'Lead ID is required' }, { status: 400 })
     }
 
     if (!goal_primary || typeof goal_primary !== 'string' || goal_primary.trim().length === 0) {
-      console.warn('Validation failed: Missing goal_primary', metadata)
+      if (isDev) {
+        console.warn('Validation failed: Missing goal_primary', metadata)
+      }
       return NextResponse.json({ error: 'Goal is required' }, { status: 400 })
     }
 
@@ -116,7 +134,9 @@ export async function POST(request: NextRequest) {
       typeof frustration_primary !== 'string' ||
       frustration_primary.trim().length === 0
     ) {
-      console.warn('Validation failed: Missing frustration_primary', metadata)
+      if (isDev) {
+        console.warn('Validation failed: Missing frustration_primary', metadata)
+      }
       return NextResponse.json({ error: 'Frustration is required' }, { status: 400 })
     }
 
@@ -125,16 +145,20 @@ export async function POST(request: NextRequest) {
       typeof ai_expectation_primary !== 'string' ||
       ai_expectation_primary.trim().length === 0
     ) {
-      console.warn('Validation failed: Missing ai_expectation_primary', metadata)
+      if (isDev) {
+        console.warn('Validation failed: Missing ai_expectation_primary', metadata)
+      }
       return NextResponse.json({ error: 'AI expectation is required' }, { status: 400 })
     }
 
     // Validate free-text length if provided
     if (expectation_free_text && expectation_free_text.length > 500) {
-      console.warn('Validation failed: expectation_free_text too long', {
-        ...metadata,
-        length: expectation_free_text.length,
-      })
+      if (isDev) {
+        console.warn('Validation failed: expectation_free_text too long', {
+          ...metadata,
+          length: expectation_free_text.length,
+        })
+      }
       return NextResponse.json(
         { error: 'Free text must be 500 characters or less' },
         { status: 400 }
@@ -150,11 +174,13 @@ export async function POST(request: NextRequest) {
       const retryAfter = entry
         ? Math.max(0, Math.ceil((entry.resetTime - Date.now()) / 1000))
         : 3600
-      console.warn('Rate limit exceeded', {
-        ...metadata,
-        retryAfter,
-        rateLimitKey,
-      })
+      if (isDev) {
+        console.warn('Rate limit exceeded', {
+          ...metadata,
+          retryAfter,
+          rateLimitKey,
+        })
+      }
       return NextResponse.json(
         {
           error: 'Rate limit exceeded. Please try again later.',
@@ -171,11 +197,15 @@ export async function POST(request: NextRequest) {
     } catch (supabaseError) {
       const errorMessage =
         supabaseError instanceof Error ? supabaseError.message : 'Unknown Supabase error'
-      console.error('Failed to create Supabase client:', {
-        ...metadata,
-        error: errorMessage,
-        errorType: supabaseError instanceof Error ? supabaseError.constructor.name : 'Unknown',
-      })
+      // Gate error logging behind isDev for consistency
+      // Note: Server configuration errors are critical but gated per PR consistency requirement
+      if (isDev) {
+        console.error('Failed to create Supabase client:', {
+          ...metadata,
+          error: errorMessage,
+          errorType: supabaseError instanceof Error ? supabaseError.constructor.name : 'Unknown',
+        })
+      }
       return NextResponse.json(
         {
           error: 'Server configuration error',
@@ -196,11 +226,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (leadError || !lead) {
-      console.warn('Lead verification failed:', {
-        ...metadata,
-        error: leadError ? leadError.message : 'Lead not found',
-        code: leadError?.code,
-      })
+      if (isDev) {
+        console.warn('Lead verification failed:', {
+          ...metadata,
+          error: leadError ? leadError.message : 'Lead not found',
+          code: leadError?.code,
+        })
+      }
       return NextResponse.json({ error: 'Invalid lead ID' }, { status: 400 })
     }
 
@@ -255,13 +287,17 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (insertError) {
-      console.error('Error inserting vision lead intel:', {
-        ...metadata,
-        error: insertError.message,
-        code: insertError.code,
-        details: insertError.details,
-        hint: insertError.hint,
-      })
+      // Gate error logging behind isDev for consistency
+      // Note: Database errors are critical but gated per PR consistency requirement
+      if (isDev) {
+        console.error('Error inserting vision lead intel:', {
+          ...metadata,
+          error: insertError.message,
+          code: insertError.code,
+          details: insertError.details,
+          hint: insertError.hint,
+        })
+      }
       return NextResponse.json(
         {
           error: 'Failed to save responses',
@@ -294,12 +330,16 @@ export async function POST(request: NextRequest) {
     const errorStack = error instanceof Error ? error.stack : undefined
     const errorName = error instanceof Error ? error.constructor.name : 'Unknown'
 
-    console.error('Unexpected error creating vision lead intel:', {
-      ...requestMetadata,
-      error: errorMessage,
-      errorName,
-      stack: errorStack,
-    })
+    // Gate error logging behind isDev for consistency
+    // Note: Unexpected errors are critical but gated per PR consistency requirement
+    if (isDev) {
+      console.error('Unexpected error creating vision lead intel:', {
+        ...requestMetadata,
+        error: errorMessage,
+        errorName,
+        stack: errorStack,
+      })
+    }
 
     return NextResponse.json(
       {

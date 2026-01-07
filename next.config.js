@@ -3,7 +3,7 @@ const { withBotId } = require('botid/next/config')
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['api.dicebear.com'],
+    domains: ['api.dicebear.com', 'qbklyimfazrkutwqictw.supabase.co'],
     formats: ['image/avif', 'image/webp'],
   },
   sassOptions: {

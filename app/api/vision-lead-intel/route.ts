@@ -267,33 +267,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid lead ID' }, { status: 400 })
     }
 
-    // Validate image_url if provided (should be a valid URL or data URL)
+    // Validate image_url if provided (should be a storage URL or data URL for backward compat)
     if (image_url && typeof image_url === 'string' && image_url.trim().length > 0) {
       const trimmedUrl = image_url.trim()
 
-      // Check length - PostgREST has request body size limits (~1MB typically)
-      // We limit data URLs to 500KB to leave room for other fields and avoid hitting PostgREST limits
-      // Note: This is a conservative limit to prevent PostgREST error 54000 (program_limit_exceeded)
-      const MAX_IMAGE_URL_LENGTH = 500 * 1024 // 500KB
-      if (trimmedUrl.length > MAX_IMAGE_URL_LENGTH) {
-        logProductionError('Image URL too long', new Error('Image URL exceeds size limit'), {
-          timestamp: metadata.timestamp,
-          length: trimmedUrl.length,
-          maxLength: MAX_IMAGE_URL_LENGTH,
-        })
-        return NextResponse.json(
-          {
-            error: 'Image is too large. Please use a smaller image (under 500KB).',
-            ...(isDev && {
-              details: `Image size: ${Math.round(trimmedUrl.length / 1024)}KB, max: 500KB`,
-            }),
-          },
-          { status: 400 }
-        )
-      }
-
-      // Accept data URLs (base64 encoded images)
+      // Check if it's a base64 data URL (backward compatibility)
       if (trimmedUrl.startsWith('data:')) {
+        // Log deprecation warning
+        if (isDev) {
+          console.warn('Base64 image URL detected (deprecated). Consider using storage upload.', {
+            ...metadata,
+            imageUrlLength: trimmedUrl.length,
+          })
+        }
+
         // Validate data URL format: data:image/[type];base64,[data]
         if (trimmedUrl.startsWith('data:image/')) {
           const dataUrlPattern = /^data:image\/[a-zA-Z0-9+.-]+;base64,/i
@@ -304,12 +291,63 @@ export async function POST(request: NextRequest) {
           // data: but not data:image/ - invalid
           return NextResponse.json({ error: 'Invalid data URL format' }, { status: 400 })
         }
+
+        // Note: No size limit for base64 anymore - storage handles large files
+        // But we still validate format for security
       } else {
-        // Validate regular URLs
+        // Validate storage URL format
+        // Pattern: https://{project-ref}.supabase.co/storage/v1/object/(public|sign)/lead-images/{leadId}/...
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+        let supabaseDomain = ''
         try {
-          new URL(trimmedUrl)
+          const url = new URL(supabaseUrl)
+          supabaseDomain = url.hostname
         } catch {
-          return NextResponse.json({ error: 'Invalid image URL format' }, { status: 400 })
+          // Fallback parsing if URL is malformed
+          supabaseDomain = supabaseUrl.replace('https://', '').replace('http://', '').split('/')[0]
+        }
+
+        // Escape special regex characters in domain
+        const escapedDomain = supabaseDomain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const storageUrlPattern = new RegExp(
+          `^https://${escapedDomain}/storage/v1/object/(public|sign)/lead-images/.+`
+        )
+
+        if (!storageUrlPattern.test(trimmedUrl)) {
+          return NextResponse.json(
+            {
+              error: 'Invalid image URL. Must be a Supabase Storage URL.',
+              ...(isDev && {
+                details: `Expected format: https://${supabaseDomain}/storage/v1/object/public/lead-images/{leadId}/...`,
+              }),
+            },
+            { status: 400 }
+          )
+        }
+
+        // Verify URL path starts with the provided lead_id for security
+        try {
+          const urlPath = new URL(trimmedUrl).pathname
+          if (!urlPath.includes(`/lead-images/${lead_id}/`)) {
+            logProductionError(
+              'Storage URL path mismatch:',
+              new Error('URL path does not match lead_id'),
+              {
+                timestamp: metadata.timestamp,
+                leadId: lead_id,
+                urlPath,
+              }
+            )
+            return NextResponse.json(
+              {
+                error: 'Image URL path does not match lead ID',
+                ...(isDev && { details: 'URL must be for the same lead_id being submitted' }),
+              },
+              { status: 400 }
+            )
+          }
+        } catch (urlError) {
+          return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 })
         }
       }
     }

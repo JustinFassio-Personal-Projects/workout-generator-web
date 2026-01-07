@@ -750,6 +750,67 @@ The admin dashboard includes a complete leads management system accessible at `/
 
 All admin routes verify authentication via `getServerUser()` and check `admin_users` table for authorization.
 
+## Storage Buckets
+
+The application uses Supabase Storage for image management. Two buckets are configured for different use cases.
+
+### `lead-images` Bucket
+
+Stores images uploaded by leads during the exercise challenge workflow.
+
+**Configuration:**
+
+- **Type**: Public (images need to be displayed in admin dashboard)
+- **Max File Size**: 5MB
+- **Allowed MIME Types**: `image/jpeg`, `image/png`, `image/webp`, `image/gif`
+- **Path Pattern**: `{leadId}/{timestamp}-{randomId}.{ext}`
+- **Public URL Format**: `https://{project-ref}.supabase.co/storage/v1/object/public/lead-images/{leadId}/{filename}`
+
+**RLS Policies:**
+
+- **Public Read**: Anyone can read images from this bucket
+- **Authenticated Write**: Authenticated users can write (defense-in-depth, actual writes use service role)
+
+**Upload Endpoint:**
+
+- `POST /api/leads/images?lead_id={leadId}` - Uploads image for a specific lead
+- Validates lead_id exists, enforces rate limiting (5 uploads/hour per lead_id)
+- Validates file type via Content-Type and magic bytes
+- Returns public URL for use in vision-lead-intel submission
+
+### `blog-images` Bucket
+
+Stores images uploaded by admins for blog posts.
+
+**Configuration:**
+
+- **Type**: Public
+- **Max File Size**: 5MB
+- **Allowed MIME Types**: `image/jpeg`, `image/png`, `image/webp`, `image/gif`
+- **Path Pattern**: `blog/{timestamp}-{randomId}.{ext}`
+- **Public URL Format**: `https://{project-ref}.supabase.co/storage/v1/object/public/blog-images/blog/{filename}`
+
+**RLS Policies:**
+
+- **Public Read**: Anyone can read images from this bucket
+- **Admin Write**: Only users in `admin_users` table can write
+
+**Upload Endpoint:**
+
+- `POST /api/admin/upload` - Admin-only image upload endpoint
+- Requires admin authentication
+- Returns public URL for use in blog posts
+
+### Storage URL Validation
+
+The `vision_lead_intel.image_url` column has a check constraint that validates:
+
+- `NULL` values (no image)
+- Base64 data URLs (temporary, for backward compatibility): `data:image/{type};base64,{data}`
+- Supabase Storage URLs: `https://{project-ref}.supabase.co/storage/v1/object/(public|sign)/lead-images/{path}`
+
+**Migration**: `supabase/migrations/20260107085000_add_storage_url_validation.sql`
+
 ## Related Files
 
 **Blog System:**
@@ -767,6 +828,8 @@ All admin routes verify authentication via `getServerUser()` and check `admin_us
   - `supabase/migrations/20260105204537_create_exercise_challenge_schema.sql`
   - `supabase/migrations/20260106060432_create_vision_lead_intel_schema.sql`
   - `supabase/migrations/20260106140228_add_image_url_to_vision_lead_intel.sql`
+  - `supabase/migrations/20260107084907_create_storage_buckets.sql`
+  - `supabase/migrations/20260107085000_add_storage_url_validation.sql`
 - TypeScript Types: `types/exercise-challenge.ts`, `types/admin.ts`
 - Admin API Routes:
   - `app/api/admin/leads/route.ts`
@@ -777,3 +840,5 @@ All admin routes verify authentication via `getServerUser()` and check `admin_us
 - Admin Pages:
   - `app/admin/leads/page.tsx`
   - `app/admin/leads/[id]/page.tsx`
+- Image Upload API:
+  - `app/api/leads/images/route.ts` - Lead image upload endpoint

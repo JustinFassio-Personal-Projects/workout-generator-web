@@ -226,6 +226,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate unique filename
+    // Note: Using timestamp + UUID makes duplicate filenames virtually impossible
+    // (probability < 10^-38). However, we still handle the edge case explicitly.
     const ext = file.name.split('.').pop() || 'jpg'
     const timestamp = Date.now()
     const randomId = crypto.randomUUID()
@@ -239,7 +241,7 @@ export async function POST(request: NextRequest) {
       .upload(path, buffer, {
         contentType: file.type,
         cacheControl: '31536000', // 1 year cache
-        upsert: false, // Don't overwrite existing files
+        upsert: false, // Don't overwrite existing files - handle conflicts explicitly
       })
 
     if (uploadError) {
@@ -251,7 +253,23 @@ export async function POST(request: NextRequest) {
         contentType: file.type,
       })
 
-      // Handle specific error codes
+      // Handle specific error cases
+      // Duplicate file error (extremely unlikely due to timestamp + UUID)
+      if (
+        uploadError.message?.includes('duplicate') ||
+        uploadError.message?.includes('already exists') ||
+        uploadError.message?.includes('conflict')
+      ) {
+        return NextResponse.json(
+          {
+            error: 'File with this name already exists. Please try again.',
+            ...(isDev && { details: 'This is an extremely rare edge case' }),
+          },
+          { status: 409 }
+        )
+      }
+
+      // Storage quota errors
       if (uploadError.message?.includes('quota') || uploadError.message?.includes('limit')) {
         return NextResponse.json(
           { error: 'Storage quota exceeded. Please contact support.' },
@@ -259,6 +277,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      // Generic upload failure
       return NextResponse.json(
         {
           error: 'Upload failed',

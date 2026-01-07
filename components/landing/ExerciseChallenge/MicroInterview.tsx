@@ -180,9 +180,20 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
       const response = await fetch(base64Url)
       const blob = await response.blob()
 
+      // Determine file extension from MIME type
+      const mimeType = blob.type || 'image/jpeg'
+      const extensionMap: Record<string, string> = {
+        'image/png': 'png',
+        'image/webp': 'webp',
+        'image/gif': 'gif',
+        'image/jpeg': 'jpg',
+        'image/jpg': 'jpg',
+      }
+      const extension = extensionMap[mimeType] || 'jpg'
+
       // Create FormData
       const formData = new FormData()
-      formData.append('file', blob, 'image.jpg')
+      formData.append('file', blob, `image.${extension}`)
 
       // Upload to storage
       const uploadResponse = await fetch(`/api/leads/images?lead_id=${leadId}`, {

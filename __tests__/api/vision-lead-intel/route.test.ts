@@ -237,6 +237,43 @@ describe('POST /api/vision-lead-intel', () => {
     expect(data.success).toBe(true)
   })
 
+  it('should accept base64 data URL with case-insensitive encoding type', async () => {
+    const uniqueLeadId = `lead-base64-case-${Date.now()}`
+    const uniqueIP = `192.168.1.${Math.floor(Math.random() * 255)}`
+
+    // First call: verify lead exists
+    mockSupabaseClient.single.mockResolvedValueOnce({
+      data: { id: uniqueLeadId },
+      error: null,
+    })
+    // Second call: insert intel
+    mockSupabaseClient.single.mockResolvedValueOnce({
+      data: { id: 'intel-123' },
+      error: null,
+    })
+
+    const request = new NextRequest('http://localhost:3000/api/vision-lead-intel', {
+      method: 'POST',
+      headers: {
+        'x-forwarded-for': uniqueIP,
+      },
+      body: JSON.stringify({
+        lead_id: uniqueLeadId,
+        goal_primary: 'Build muscle',
+        frustration_primary: "I don't know what to do",
+        ai_expectation_primary: 'Build a plan with week-to-week progression',
+        image_url:
+          'data:image/png;Base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      }),
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(data.success).toBe(true)
+  })
+
   it('should accept regular URL for image_url', async () => {
     const uniqueLeadId = `lead-url-${Date.now()}`
     const uniqueIP = `192.168.1.${Math.floor(Math.random() * 255)}`

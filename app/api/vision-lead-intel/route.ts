@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       if (trimmedUrl.startsWith('data:')) {
         // Validate data URL format: data:image/[type];base64,[data]
         if (trimmedUrl.startsWith('data:image/')) {
-          const dataUrlPattern = /^data:image\/[a-zA-Z]+;base64,/i
+          const dataUrlPattern = /^data:image\/[a-zA-Z0-9+.-]+;base64,/i
           if (!dataUrlPattern.test(trimmedUrl)) {
             return NextResponse.json({ error: 'Invalid data URL format' }, { status: 400 })
           }

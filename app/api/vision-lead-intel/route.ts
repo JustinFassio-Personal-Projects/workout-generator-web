@@ -328,7 +328,11 @@ export async function POST(request: NextRequest) {
         // Verify URL path starts with the provided lead_id for security
         try {
           const urlPath = new URL(trimmedUrl).pathname
-          if (!urlPath.includes(`/lead-images/${lead_id}/`)) {
+          const leadImagesPrefix = '/lead-images/'
+          const leadImagesIndex = urlPath.indexOf(leadImagesPrefix)
+          const pathAfterLeadImages =
+            leadImagesIndex === -1 ? '' : urlPath.slice(leadImagesIndex + leadImagesPrefix.length)
+          if (!pathAfterLeadImages.startsWith(`${lead_id}/`)) {
             logProductionError(
               'Storage URL path mismatch:',
               new Error('URL path does not match lead_id'),

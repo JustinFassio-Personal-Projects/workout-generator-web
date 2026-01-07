@@ -4,11 +4,9 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 /**
  * Logging Strategy:
  * - All console.log statements are gated behind isDev for production cleanliness
- * - All console.error and console.warn statements are also gated behind isDev for consistency
- *   with the PR goal of reducing production console output
- * - Note: This deviates from other API routes (e.g., app/api/admin/leads/) which keep
- *   console.error in production for monitoring. This route gates all logging for consistency
- *   with the privacy protection and console output reduction goals.
+ * - console.error statements log in production but sanitized (no IP addresses, no stack traces)
+ * - console.warn statements are gated behind isDev (validation/rate limit warnings)
+ * - Production error logging includes error type, code, and message but excludes PII and stack traces
  */
 
 // Simple in-memory rate limiting store
@@ -78,6 +76,20 @@ function getRequestMetadata(request: NextRequest, leadId?: string, isDev: boolea
   return baseMetadata
 }
 
+// Production-safe error logging - logs errors without PII or stack traces
+function logProductionError(message: string, error: unknown, metadata?: Record<string, unknown>) {
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+  const errorName = error instanceof Error ? error.constructor.name : 'Unknown'
+
+  // Log sanitized error information (no IP, no stack traces, no PII)
+  console.error(message, {
+    ...(metadata || {}),
+    error: errorMessage,
+    errorType: errorName,
+    // Explicitly exclude: ip, stack, leadId (can be sensitive)
+  })
+}
+
 export async function POST(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== 'production'
   const requestMetadata = getRequestMetadata(request, undefined, isDev)
@@ -88,14 +100,10 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json()
     } catch (parseError) {
-      // Gate error logging behind isDev for consistency with PR goal
-      // Note: In production, parse errors are still returned to client but not logged
-      if (isDev) {
-        console.error('Error parsing request body:', {
-          ...requestMetadata,
-          error: parseError instanceof Error ? parseError.message : 'Unknown parse error',
-        })
-      }
+      // Log parse errors in production (sanitized) for debugging
+      logProductionError('Error parsing request body:', parseError, {
+        timestamp: requestMetadata.timestamp,
+      })
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
 
@@ -197,15 +205,11 @@ export async function POST(request: NextRequest) {
     } catch (supabaseError) {
       const errorMessage =
         supabaseError instanceof Error ? supabaseError.message : 'Unknown Supabase error'
-      // Gate error logging behind isDev for consistency
-      // Note: Server configuration errors are critical but gated per PR consistency requirement
-      if (isDev) {
-        console.error('Failed to create Supabase client:', {
-          ...metadata,
-          error: errorMessage,
-          errorType: supabaseError instanceof Error ? supabaseError.constructor.name : 'Unknown',
-        })
-      }
+      // Log Supabase client errors in production (sanitized) - critical for debugging
+      logProductionError('Failed to create Supabase client:', supabaseError, {
+        timestamp: metadata.timestamp,
+        errorType: supabaseError instanceof Error ? supabaseError.constructor.name : 'Unknown',
+      })
       return NextResponse.json(
         {
           error: 'Server configuration error',
@@ -287,17 +291,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (insertError) {
-      // Gate error logging behind isDev for consistency
-      // Note: Database errors are critical but gated per PR consistency requirement
-      if (isDev) {
-        console.error('Error inserting vision lead intel:', {
-          ...metadata,
-          error: insertError.message,
-          code: insertError.code,
-          details: insertError.details,
-          hint: insertError.hint,
-        })
-      }
+      // Log database errors in production (sanitized) - critical for debugging
+      logProductionError('Error inserting vision lead intel:', insertError, {
+        timestamp: metadata.timestamp,
+        code: insertError.code,
+        hint: insertError.hint,
+        // Include hint for debugging but exclude leadId (PII) and full error details
+      })
       return NextResponse.json(
         {
           error: 'Failed to save responses',
@@ -327,17 +327,22 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    const errorStack = error instanceof Error ? error.stack : undefined
     const errorName = error instanceof Error ? error.constructor.name : 'Unknown'
 
-    // Gate error logging behind isDev for consistency
-    // Note: Unexpected errors are critical but gated per PR consistency requirement
+    // Log unexpected errors in production (sanitized) - critical for debugging
+    // Note: Stack traces only logged in dev, production logs error type and message only
     if (isDev) {
+      const errorStack = error instanceof Error ? error.stack : undefined
       console.error('Unexpected error creating vision lead intel:', {
         ...requestMetadata,
         error: errorMessage,
         errorName,
         stack: errorStack,
+      })
+    } else {
+      logProductionError('Unexpected error creating vision lead intel:', error, {
+        timestamp: requestMetadata.timestamp,
+        errorName,
       })
     }
 

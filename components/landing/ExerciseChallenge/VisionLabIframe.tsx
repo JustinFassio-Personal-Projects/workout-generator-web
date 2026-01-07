@@ -100,7 +100,7 @@ export const VisionLabIframe: React.FC<VisionLabIframeProps> = ({
           className={styles.iframe}
           title="Fitcopilot Vision Lab"
           allow="camera; microphone"
-          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
         />
       </div>
     </div>

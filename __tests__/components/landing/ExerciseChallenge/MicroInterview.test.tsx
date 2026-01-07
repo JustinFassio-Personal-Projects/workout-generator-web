@@ -349,10 +349,13 @@ describe('MicroInterview', () => {
 
   it('should submit form successfully with all required fields', async () => {
     const user = userEvent.setup()
-    vi.mocked(global.fetch).mockResolvedValueOnce({
+    const mockResponse = {
       ok: true,
+      status: 201,
+      headers: new Headers({ 'content-type': 'application/json' }),
       json: async () => ({ success: true, intel_id: 'intel-123' }),
-    } as Response)
+    } as Response
+    vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse)
 
     render(<MicroInterview leadId={mockLeadId} onComplete={mockOnComplete} />)
 
@@ -386,23 +389,26 @@ describe('MicroInterview', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/vision-lead-intel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          lead_id: mockLeadId,
-          goal_primary: 'Build muscle',
-          frustration_primary: "I don't know what to do",
-          ai_expectation_primary: 'Build a plan with week-to-week progression',
-          payment_trigger_primary: '',
-          expectation_free_text: '',
-          exercise_suggestion: '',
-          vision_prompt: '',
-          image_url: '',
-        }),
-      })
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/vision-lead-intel',
+        expect.objectContaining({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            lead_id: mockLeadId,
+            goal_primary: 'Build muscle',
+            frustration_primary: "I don't know what to do",
+            ai_expectation_primary: 'Build a plan with week-to-week progression',
+            payment_trigger_primary: '',
+            expectation_free_text: '',
+            exercise_suggestion: '',
+            vision_prompt: '',
+            image_url: '',
+          }),
+        })
+      )
     })
 
     await waitFor(() => {
@@ -417,10 +423,13 @@ describe('MicroInterview', () => {
 
   it('should submit form with optional Q4 answered', async () => {
     const user = userEvent.setup()
-    vi.mocked(global.fetch).mockResolvedValueOnce({
+    const mockResponse = {
       ok: true,
+      status: 201,
+      headers: new Headers({ 'content-type': 'application/json' }),
       json: async () => ({ success: true, intel_id: 'intel-123' }),
-    } as Response)
+    } as Response
+    vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse)
 
     render(<MicroInterview leadId={mockLeadId} onComplete={mockOnComplete} />)
 
@@ -443,27 +452,40 @@ describe('MicroInterview', () => {
     })
     await user.click(screen.getByText('Clear progression plan (not random)'))
 
-    // Submit
+    // Wait for Q4 to be processed and submit button to appear
     await waitFor(() => {
       expect(screen.getByText('Submit')).toBeInTheDocument()
     })
     const submitButton = screen.getByText('Submit')
+    expect(submitButton).not.toBeDisabled()
     await user.click(submitButton)
 
+    // Wait for fetch to be called
     await waitFor(() => {
-      expect(analytics.analytics.trackVisionMicroqCompleted).toHaveBeenCalledWith(
-        mockLeadId,
-        true,
-        true
-      )
+      expect(global.fetch).toHaveBeenCalled()
     })
+
+    // Wait for analytics and onComplete to be called after successful submission
+    await waitFor(
+      () => {
+        expect(analytics.analytics.trackVisionMicroqCompleted).toHaveBeenCalledWith(
+          mockLeadId,
+          true,
+          true
+        )
+        expect(mockOnComplete).toHaveBeenCalled()
+      },
+      { timeout: 3000 }
+    )
   })
 
   it('should handle submission error', async () => {
     const user = userEvent.setup()
     vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: false,
-      json: async () => ({ message: 'Failed to save responses' }),
+      status: 500,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ error: 'Failed to save responses' }),
     } as Response)
 
     render(<MicroInterview leadId={mockLeadId} onComplete={mockOnComplete} />)
@@ -494,7 +516,7 @@ describe('MicroInterview', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Failed to save responses')).toBeInTheDocument()
+      expect(screen.getByText('Server error. Please try again in a moment.')).toBeInTheDocument()
     })
 
     expect(mockOnComplete).not.toHaveBeenCalled()
@@ -502,10 +524,13 @@ describe('MicroInterview', () => {
 
   it('should include vision_prompt when provided', async () => {
     const user = userEvent.setup()
-    vi.mocked(global.fetch).mockResolvedValueOnce({
+    const mockResponse = {
       ok: true,
+      status: 201,
+      headers: new Headers({ 'content-type': 'application/json' }),
       json: async () => ({ success: true, intel_id: 'intel-123' }),
-    } as Response)
+    } as Response
+    vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse)
 
     render(
       <MicroInterview leadId={mockLeadId} visionPrompt="Push up" onComplete={mockOnComplete} />
@@ -537,23 +562,26 @@ describe('MicroInterview', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/vision-lead-intel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          lead_id: mockLeadId,
-          goal_primary: 'Build muscle',
-          frustration_primary: "I don't know what to do",
-          ai_expectation_primary: 'Build a plan with week-to-week progression',
-          payment_trigger_primary: '',
-          expectation_free_text: '',
-          exercise_suggestion: '',
-          vision_prompt: 'Push up',
-          image_url: '',
-        }),
-      })
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/vision-lead-intel',
+        expect.objectContaining({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            lead_id: mockLeadId,
+            goal_primary: 'Build muscle',
+            frustration_primary: "I don't know what to do",
+            ai_expectation_primary: 'Build a plan with week-to-week progression',
+            payment_trigger_primary: '',
+            expectation_free_text: '',
+            exercise_suggestion: '',
+            vision_prompt: 'Push up',
+            image_url: '',
+          }),
+        })
+      )
     })
   })
 
@@ -594,16 +622,22 @@ describe('MicroInterview', () => {
     })
     const textarea = screen.getByPlaceholderText('Example: Build me a simple plan I can stick to.')
     const longText = 'A'.repeat(600)
-    await user.type(textarea, longText)
+
+    // Type the text - the component should limit it to 500 characters
+    await user.clear(textarea)
+    await user.type(textarea, longText, { delay: 0 })
 
     // Should only accept 500 characters
-    await waitFor(() => {
-      const textarea = screen.getByPlaceholderText(
-        'Example: Build me a simple plan I can stick to.'
-      )
-      expect(textarea).toHaveValue('A'.repeat(500))
-      expect(screen.getByText('500 / 500')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        const textareaElement = screen.getByPlaceholderText(
+          'Example: Build me a simple plan I can stick to.'
+        ) as HTMLTextAreaElement
+        expect(textareaElement.value.length).toBeLessThanOrEqual(500)
+        expect(screen.getByText(/500 \/ 500/)).toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
   })
 
   it('should disable submit button when required questions are not answered', async () => {

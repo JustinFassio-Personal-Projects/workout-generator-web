@@ -187,21 +187,57 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
     setError(null)
 
     try {
-      const response = await fetch('/api/vision-lead-intel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          lead_id: leadId,
-          ...formData,
-        }),
-      })
+      // Add timeout for fetch request (30 seconds)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000)
 
-      const data: CreateVisionLeadIntelResponse = await response.json()
+      let response: Response
+      try {
+        response = await fetch('/api/vision-lead-intel', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            lead_id: leadId,
+            ...formData,
+          }),
+          signal: controller.signal,
+        })
+        clearTimeout(timeoutId)
+      } catch (fetchError) {
+        clearTimeout(timeoutId)
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          throw new Error('Request timed out. Please check your connection and try again.')
+        }
+        throw new Error('Network error. Please check your internet connection and try again.')
+      }
+
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text()
+        throw new Error(
+          response.status === 500
+            ? 'Server error. Please try again in a moment.'
+            : `Unexpected response: ${text.substring(0, 100)}`
+        )
+      }
+
+      const data: CreateVisionLeadIntelResponse & { error?: string } = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to save responses')
+        // Provide more specific error messages
+        if (response.status === 400) {
+          throw new Error(data.error || data.message || 'Invalid data. Please check your answers.')
+        }
+        if (response.status === 429) {
+          throw new Error('Too many requests. Please wait a moment and try again.')
+        }
+        if (response.status === 500) {
+          throw new Error('Server error. Please try again in a moment.')
+        }
+        throw new Error(data.error || data.message || 'Failed to save responses')
       }
 
       // Track completion

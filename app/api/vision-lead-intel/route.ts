@@ -172,7 +172,14 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Error inserting vision lead intel:', insertError)
-      return NextResponse.json({ error: 'Failed to save responses' }, { status: 500 })
+      const isDev = process.env.NODE_ENV !== 'production'
+      return NextResponse.json(
+        {
+          error: 'Failed to save responses',
+          ...(isDev && { details: insertError.message, code: insertError.code }),
+        },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json(

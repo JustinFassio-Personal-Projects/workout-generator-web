@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 import { NextRequest } from 'next/server'
 import { POST, GET } from '@/app/api/vision-lead-intel/route'
 
@@ -14,6 +14,11 @@ const mockSupabaseClient = {
 vi.mock('@/lib/supabase/server', () => ({
   createServerSupabaseClient: vi.fn(async () => mockSupabaseClient),
 }))
+
+// Set environment variable for Supabase URL validation
+beforeAll(() => {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://qbklyimfazrkutwqictw.supabase.co'
+})
 
 describe('POST /api/vision-lead-intel', () => {
   beforeEach(() => {
@@ -312,7 +317,7 @@ describe('POST /api/vision-lead-intel', () => {
     expect(data.success).toBe(true)
   })
 
-  it('should accept regular URL for image_url', async () => {
+  it('should accept Supabase Storage URL for image_url', async () => {
     const uniqueLeadId = `lead-url-${Date.now()}`
     const uniqueIP = `192.168.1.${Math.floor(Math.random() * 255)}`
 
@@ -337,7 +342,7 @@ describe('POST /api/vision-lead-intel', () => {
         goal_primary: 'Build muscle',
         frustration_primary: "I don't know what to do",
         ai_expectation_primary: 'Build a plan with week-to-week progression',
-        image_url: 'https://storage.googleapis.com/bucket/image.png',
+        image_url: `https://qbklyimfazrkutwqictw.supabase.co/storage/v1/object/public/lead-images/${uniqueLeadId}/1234567890-image.png`,
       }),
     })
 
@@ -376,7 +381,7 @@ describe('POST /api/vision-lead-intel', () => {
     const data = await response.json()
 
     expect(response.status).toBe(400)
-    expect(data.error).toBe('Invalid image URL format')
+    expect(data.error).toBe('Invalid image URL. Must be a Supabase Storage URL.')
   })
 
   it('should return 400 for invalid data URL format', async () => {

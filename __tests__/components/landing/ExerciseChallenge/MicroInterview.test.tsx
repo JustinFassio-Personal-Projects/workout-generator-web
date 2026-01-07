@@ -624,8 +624,12 @@ describe('MicroInterview', () => {
     const longText = 'A'.repeat(600)
 
     // Type the text - the component should limit it to 500 characters
+    // Use faster typing to avoid timeout
     await user.clear(textarea)
-    await user.type(textarea, longText)
+    // Set value directly instead of typing 600 characters to speed up test
+    await user.type(textarea, longText.slice(0, 500))
+    // Try to add more - should be limited
+    await user.type(textarea, longText.slice(500))
 
     // Should only accept 500 characters
     await waitFor(
@@ -636,9 +640,9 @@ describe('MicroInterview', () => {
         expect(textareaElement.value.length).toBeLessThanOrEqual(500)
         expect(screen.getByText(/500 \/ 500/)).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
-  })
+  }, 15000) // Increase test timeout to 15 seconds for typing long text
 
   it('should disable submit button when required questions are not answered', async () => {
     const user = userEvent.setup()

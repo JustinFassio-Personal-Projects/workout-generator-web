@@ -91,6 +91,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
     image_url: imageUrl || '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Update vision_prompt when prop changes
@@ -172,6 +173,47 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
     analytics.trackVisionExerciseSuggested(leadId, hasSuggestion, suggestionLength)
   }
 
+  // Upload base64 image to storage and return storage URL
+  const uploadImageToStorage = async (base64Url: string): Promise<string> => {
+    try {
+      // Convert base64 data URL to Blob
+      const response = await fetch(base64Url)
+      const blob = await response.blob()
+
+      // Determine file extension from MIME type
+      const mimeType = blob.type || 'image/jpeg'
+      const extensionMap: Record<string, string> = {
+        'image/png': 'png',
+        'image/webp': 'webp',
+        'image/gif': 'gif',
+        'image/jpeg': 'jpg',
+        'image/jpg': 'jpg',
+      }
+      const extension = extensionMap[mimeType] || 'jpg'
+
+      // Create FormData
+      const formData = new FormData()
+      formData.append('file', blob, `image.${extension}`)
+
+      // Upload to storage
+      const uploadResponse = await fetch(`/api/leads/images?lead_id=${leadId}`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to upload image. Please try again.')
+      }
+
+      const { url } = await uploadResponse.json()
+      return url
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload image'
+      throw new Error(errorMessage)
+    }
+  }
+
   const handleSubmit = async () => {
     // Validate required fields
     if (
@@ -187,6 +229,26 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
     setError(null)
 
     try {
+      // Upload image to storage if it's a base64 data URL
+      let finalImageUrl = formData.image_url
+      if (formData.image_url && formData.image_url.startsWith('data:')) {
+        setIsUploadingImage(true)
+        try {
+          finalImageUrl = await uploadImageToStorage(formData.image_url)
+          // Update formData with storage URL
+          setFormData(prev => ({ ...prev, image_url: finalImageUrl }))
+        } catch (uploadError) {
+          const errorMessage =
+            uploadError instanceof Error ? uploadError.message : 'Failed to upload image'
+          setError(errorMessage)
+          setIsUploadingImage(false)
+          setIsSubmitting(false)
+          return
+        } finally {
+          setIsUploadingImage(false)
+        }
+      }
+
       // Add timeout for fetch request (30 seconds)
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 30000)
@@ -201,6 +263,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
           body: JSON.stringify({
             lead_id: leadId,
             ...formData,
+            image_url: finalImageUrl, // Use storage URL
           }),
           signal: controller.signal,
         })
@@ -401,10 +464,10 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
               size="lg"
               className={styles.submitButton}
               onClick={handleSubmit}
-              disabled={isSubmitting || !canSubmit}
-              loading={isSubmitting}
+              disabled={isSubmitting || isUploadingImage || !canSubmit}
+              loading={isSubmitting || isUploadingImage}
             >
-              Submit
+              {isUploadingImage ? 'Uploading image...' : isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>
           </div>
         )}

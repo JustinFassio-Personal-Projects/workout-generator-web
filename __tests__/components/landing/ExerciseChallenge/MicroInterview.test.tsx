@@ -400,6 +400,7 @@ describe('MicroInterview', () => {
           expectation_free_text: '',
           exercise_suggestion: '',
           vision_prompt: '',
+          image_url: '',
         }),
       })
     })
@@ -550,6 +551,7 @@ describe('MicroInterview', () => {
           expectation_free_text: '',
           exercise_suggestion: '',
           vision_prompt: 'Push up',
+          image_url: '',
         }),
       })
     })

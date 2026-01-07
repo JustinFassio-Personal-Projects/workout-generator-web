@@ -93,6 +93,13 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Update vision_prompt when prop changes
+  useEffect(() => {
+    if (visionPrompt) {
+      setFormData(prev => ({ ...prev, vision_prompt: visionPrompt }))
+    }
+  }, [visionPrompt])
+
   // Update image_url when prop changes (e.g., when generation completes)
   useEffect(() => {
     if (imageUrl) {

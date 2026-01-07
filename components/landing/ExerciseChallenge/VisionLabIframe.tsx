@@ -43,7 +43,7 @@ export const VisionLabIframe: React.FC<VisionLabIframeProps> = ({
         const prompt = event.data.prompt || ''
         const framework = event.data.framework
         const level = event.data.level
-        const imageUrl = event.data.image_url || event.data.imageUrl || undefined
+        const imageUrl = event.data.image_url || undefined
 
         analytics.trackVisionGenerationCompleted(leadId)
 

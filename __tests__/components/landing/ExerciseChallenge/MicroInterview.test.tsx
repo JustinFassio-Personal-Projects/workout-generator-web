@@ -625,7 +625,7 @@ describe('MicroInterview', () => {
 
     // Type the text - the component should limit it to 500 characters
     await user.clear(textarea)
-    await user.type(textarea, longText, { delay: 0 })
+    await user.type(textarea, longText)
 
     // Should only accept 500 characters
     await waitFor(

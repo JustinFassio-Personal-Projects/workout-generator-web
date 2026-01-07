@@ -627,9 +627,9 @@ describe('MicroInterview', () => {
     // Use faster typing to avoid timeout
     await user.clear(textarea)
     // Set value directly instead of typing 600 characters to speed up test
-    await user.type(textarea, longText.slice(0, 500), { delay: 0 })
+    await user.type(textarea, longText.slice(0, 500))
     // Try to add more - should be limited
-    await user.type(textarea, longText.slice(500), { delay: 0 })
+    await user.type(textarea, longText.slice(500))
 
     // Should only accept 500 characters
     await waitFor(

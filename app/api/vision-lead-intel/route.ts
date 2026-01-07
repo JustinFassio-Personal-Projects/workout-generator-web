@@ -90,6 +90,22 @@ function logProductionError(message: string, error: unknown, metadata?: Record<s
   })
 }
 
+// Enhanced error logging for Supabase errors with more context
+function logSupabaseError(
+  message: string,
+  error: { message: string; code?: string; details?: string; hint?: string },
+  metadata?: Record<string, unknown>
+) {
+  console.error(message, {
+    ...(metadata || {}),
+    error: error.message,
+    code: error.code,
+    hint: error.hint,
+    // Include details if it's not too long (might contain useful debugging info)
+    details: error.details && error.details.length < 200 ? error.details : undefined,
+  })
+}
+
 export async function POST(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== 'production'
   const requestMetadata = getRequestMetadata(request, undefined, isDev)
@@ -230,19 +246,48 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (leadError || !lead) {
-      if (isDev) {
-        console.warn('Lead verification failed:', {
-          ...metadata,
-          error: leadError ? leadError.message : 'Lead not found',
+      // Log lead verification failures in production for debugging
+      logSupabaseError(
+        'Lead verification failed:',
+        {
+          message: leadError ? leadError.message : 'Lead not found',
           code: leadError?.code,
-        })
-      }
+          hint: leadError?.hint,
+        },
+        {
+          timestamp: metadata.timestamp,
+          leadIdLength: lead_id ? lead_id.length : 0,
+          leadIdFormat: lead_id
+            ? lead_id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+              ? 'valid-uuid'
+              : 'invalid-uuid'
+            : 'missing',
+        }
+      )
       return NextResponse.json({ error: 'Invalid lead ID' }, { status: 400 })
     }
 
     // Validate image_url if provided (should be a valid URL or data URL)
     if (image_url && typeof image_url === 'string' && image_url.trim().length > 0) {
       const trimmedUrl = image_url.trim()
+
+      // Check length - data URLs can be very long, but we should have a reasonable limit
+      // PostgreSQL TEXT can handle up to ~1GB, but we'll limit to 10MB for practical purposes
+      const MAX_IMAGE_URL_LENGTH = 10 * 1024 * 1024 // 10MB
+      if (trimmedUrl.length > MAX_IMAGE_URL_LENGTH) {
+        if (isDev) {
+          console.warn('Image URL too long', {
+            ...metadata,
+            length: trimmedUrl.length,
+            maxLength: MAX_IMAGE_URL_LENGTH,
+          })
+        }
+        return NextResponse.json(
+          { error: 'Image URL is too long. Please use a smaller image.' },
+          { status: 400 }
+        )
+      }
+
       // Accept data URLs (base64 encoded images)
       if (trimmedUrl.startsWith('data:')) {
         // Validate data URL format: data:image/[type];base64,[data]
@@ -292,11 +337,18 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       // Log database errors in production (sanitized) - critical for debugging
-      logProductionError('Error inserting vision lead intel:', insertError, {
+      logSupabaseError('Error inserting vision lead intel:', insertError, {
         timestamp: metadata.timestamp,
-        code: insertError.code,
-        hint: insertError.hint,
-        // Include hint for debugging but exclude leadId (PII) and full error details
+        // Log field presence to help debug data issues
+        hasGoal: Boolean(goal_primary),
+        hasFrustration: Boolean(frustration_primary),
+        hasAiExpectation: Boolean(ai_expectation_primary),
+        hasImageUrl: Boolean(image_url),
+        hasVisionPrompt: Boolean(vision_prompt),
+        imageUrlLength: image_url ? image_url.length : 0,
+        goalLength: goal_primary ? goal_primary.length : 0,
+        frustrationLength: frustration_primary ? frustration_primary.length : 0,
+        aiExpectationLength: ai_expectation_primary ? ai_expectation_primary.length : 0,
       })
       return NextResponse.json(
         {
@@ -306,6 +358,24 @@ export async function POST(request: NextRequest) {
             code: insertError.code,
             hint: insertError.hint,
           }),
+        },
+        { status: 500 }
+      )
+    }
+
+    // Safety check: ensure intel was created
+    if (!intel || !intel.id) {
+      logProductionError(
+        'Insert succeeded but no data returned:',
+        new Error('No intel data returned'),
+        {
+          timestamp: metadata.timestamp,
+        }
+      )
+      return NextResponse.json(
+        {
+          error: 'Failed to save responses',
+          ...(isDev && { details: 'Insert succeeded but no data returned' }),
         },
         { status: 500 }
       )

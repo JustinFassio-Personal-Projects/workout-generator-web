@@ -1,11 +1,24 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, getServerUser } from '@/lib/supabase/server'
 import { AdminLayout } from '@/components/admin/AdminLayout'
-import { BlogStats } from '@/types/blog'
 import styles from './admin.module.scss'
 import Link from 'next/link'
 
-async function getStats(): Promise<BlogStats> {
+interface Stats {
+  totalPosts: number
+  publishedPosts: number
+  draftPosts: number
+  postsThisWeek: number
+  totalCategories: number
+  totalAuthors: number
+  totalLeads: number
+  leadsThisWeek: number
+  visionLabLeads: number
+  exerciseChallengeLeads: number
+  verifiedLeads: number
+}
+
+async function getStats(): Promise<Stats> {
   const supabase = await createServerSupabaseClient()
 
   // Get post counts
@@ -42,6 +55,31 @@ async function getStats(): Promise<BlogStats> {
     .from('authors')
     .select('*', { count: 'exact', head: true })
 
+  // Get lead counts
+  const { count: totalLeads } = await supabase
+    .from('leads')
+    .select('*', { count: 'exact', head: true })
+
+  const { count: leadsThisWeek } = await supabase
+    .from('leads')
+    .select('*', { count: 'exact', head: true })
+    .gte('created_at', weekAgo.toISOString())
+
+  const { count: visionLabLeads } = await supabase
+    .from('leads')
+    .select('*', { count: 'exact', head: true })
+    .eq('source', 'vision_lab')
+
+  const { count: exerciseChallengeLeads } = await supabase
+    .from('leads')
+    .select('*', { count: 'exact', head: true })
+    .eq('source', 'exercise_challenge')
+
+  const { count: verifiedLeads } = await supabase
+    .from('leads')
+    .select('*', { count: 'exact', head: true })
+    .eq('verified', true)
+
   return {
     totalPosts: totalPosts || 0,
     publishedPosts: publishedPosts || 0,
@@ -49,6 +87,11 @@ async function getStats(): Promise<BlogStats> {
     postsThisWeek: postsThisWeek || 0,
     totalCategories: totalCategories || 0,
     totalAuthors: totalAuthors || 0,
+    totalLeads: totalLeads || 0,
+    leadsThisWeek: leadsThisWeek || 0,
+    visionLabLeads: visionLabLeads || 0,
+    exerciseChallengeLeads: exerciseChallengeLeads || 0,
+    verifiedLeads: verifiedLeads || 0,
   }
 }
 
@@ -94,6 +137,27 @@ async function getRecentPosts(): Promise<RecentPost[]> {
   })
 }
 
+interface RecentLead {
+  id: string
+  first_name: string
+  email: string
+  source: string
+  verified: boolean
+  created_at: string
+}
+
+async function getRecentLeads(): Promise<RecentLead[]> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data: leads } = await supabase
+    .from('leads')
+    .select('id, first_name, email, source, verified, created_at')
+    .order('created_at', { ascending: false })
+    .limit(5)
+
+  return (leads || []) as RecentLead[]
+}
+
 export default async function AdminDashboardPage() {
   // Auth check
   const user = await getServerUser()
@@ -114,6 +178,7 @@ export default async function AdminDashboardPage() {
 
   const stats = await getStats()
   const recentPosts = await getRecentPosts()
+  const recentLeads = await getRecentLeads()
 
   return (
     <AdminLayout user={user} role={adminUser.role}>
@@ -140,7 +205,27 @@ export default async function AdminDashboardPage() {
           </div>
           <div className={styles.statCard}>
             <div className={styles.statValue}>{stats.postsThisWeek}</div>
-            <div className={styles.statLabel}>This Week</div>
+            <div className={styles.statLabel}>Posts This Week</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.totalLeads}</div>
+            <div className={styles.statLabel}>Total Leads</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.leadsThisWeek}</div>
+            <div className={styles.statLabel}>Leads This Week</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.visionLabLeads}</div>
+            <div className={styles.statLabel}>Vision Lab Leads</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.exerciseChallengeLeads}</div>
+            <div className={styles.statLabel}>Exercise Challenge Leads</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.verifiedLeads}</div>
+            <div className={styles.statLabel}>Verified Leads</div>
           </div>
         </div>
 
@@ -177,6 +262,40 @@ export default async function AdminDashboardPage() {
                     className={`${styles.statusBadge} ${post.status === 'published' ? styles.published : styles.draft}`}
                   >
                     {post.status}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Recent Leads</h2>
+            <Link href="/admin/leads" className={styles.viewAllLink}>
+              View All Leads →
+            </Link>
+          </div>
+
+          {recentLeads.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>No leads yet.</p>
+            </div>
+          ) : (
+            <div className={styles.recentList}>
+              {recentLeads.map(lead => (
+                <Link key={lead.id} href={`/admin/leads/${lead.id}`} className={styles.recentItem}>
+                  <div className={styles.recentInfo}>
+                    <span className={styles.recentTitle}>{lead.first_name}</span>
+                    <span className={styles.recentMeta}>{lead.email}</span>
+                    <span className={styles.recentMeta}>
+                      {lead.source === 'vision_lab' ? 'Vision Lab' : 'Exercise Challenge'}
+                    </span>
+                  </div>
+                  <span
+                    className={`${styles.statusBadge} ${lead.verified ? styles.published : styles.draft}`}
+                  >
+                    {lead.verified ? 'Verified' : 'Unverified'}
                   </span>
                 </Link>
               ))}

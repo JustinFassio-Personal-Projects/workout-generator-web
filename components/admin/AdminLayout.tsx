@@ -4,7 +4,15 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
-import { Zap, LayoutDashboard, FileText, ChevronLeft, ChevronRight, LogOut } from 'lucide-react'
+import {
+  Zap,
+  LayoutDashboard,
+  FileText,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+} from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import styles from './AdminLayout.module.scss'
 
@@ -38,6 +46,7 @@ export function AdminLayout({ children, user, role }: AdminLayoutProps) {
   }> = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/blog', label: 'Blog Posts', icon: FileText },
+    { href: '/admin/leads', label: 'Leads', icon: Users },
   ]
 
   return (

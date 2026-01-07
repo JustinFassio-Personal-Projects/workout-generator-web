@@ -271,19 +271,23 @@ export async function POST(request: NextRequest) {
     if (image_url && typeof image_url === 'string' && image_url.trim().length > 0) {
       const trimmedUrl = image_url.trim()
 
-      // Check length - data URLs can be very long, but we should have a reasonable limit
-      // PostgreSQL TEXT can handle up to ~1GB, but we'll limit to 10MB for practical purposes
-      const MAX_IMAGE_URL_LENGTH = 10 * 1024 * 1024 // 10MB
+      // Check length - PostgREST has request body size limits (~1MB typically)
+      // We limit data URLs to 500KB to leave room for other fields and avoid hitting PostgREST limits
+      // Note: This is a conservative limit to prevent PostgREST error 54000 (program_limit_exceeded)
+      const MAX_IMAGE_URL_LENGTH = 500 * 1024 // 500KB
       if (trimmedUrl.length > MAX_IMAGE_URL_LENGTH) {
-        if (isDev) {
-          console.warn('Image URL too long', {
-            ...metadata,
-            length: trimmedUrl.length,
-            maxLength: MAX_IMAGE_URL_LENGTH,
-          })
-        }
+        logProductionError('Image URL too long', new Error('Image URL exceeds size limit'), {
+          timestamp: metadata.timestamp,
+          length: trimmedUrl.length,
+          maxLength: MAX_IMAGE_URL_LENGTH,
+        })
         return NextResponse.json(
-          { error: 'Image URL is too long. Please use a smaller image.' },
+          {
+            error: 'Image is too large. Please use a smaller image (under 500KB).',
+            ...(isDev && {
+              details: `Image size: ${Math.round(trimmedUrl.length / 1024)}KB, max: 500KB`,
+            }),
+          },
           { status: 400 }
         )
       }
@@ -339,6 +343,8 @@ export async function POST(request: NextRequest) {
       // Log database errors in production (sanitized) - critical for debugging
       logSupabaseError('Error inserting vision lead intel:', insertError, {
         timestamp: metadata.timestamp,
+        code: insertError.code,
+        hint: insertError.hint,
         // Log field presence to help debug data issues
         hasGoal: Boolean(goal_primary),
         hasFrustration: Boolean(frustration_primary),
@@ -350,6 +356,22 @@ export async function POST(request: NextRequest) {
         frustrationLength: frustration_primary ? frustration_primary.length : 0,
         aiExpectationLength: ai_expectation_primary ? ai_expectation_primary.length : 0,
       })
+
+      // Handle specific PostgREST error 54000 (program_limit_exceeded) - usually means request too large
+      if (insertError.code === '54000' || insertError.message?.includes('54000')) {
+        return NextResponse.json(
+          {
+            error: 'Request too large. Please reduce the image size or remove the image.',
+            ...(isDev && {
+              details: 'PostgREST request body size limit exceeded',
+              code: insertError.code,
+              hint: 'Try using a smaller image or upload to storage instead',
+            }),
+          },
+          { status: 413 } // 413 Payload Too Large
+        )
+      }
+
       return NextResponse.json(
         {
           error: 'Failed to save responses',

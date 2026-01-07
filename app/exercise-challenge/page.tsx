@@ -16,6 +16,7 @@ export default function ExerciseChallengePage() {
   const [microInterviewComplete, setMicroInterviewComplete] = useState(false)
   const [showMicroInterview, setShowMicroInterview] = useState(false)
   const [visionPrompt, setVisionPrompt] = useState<string | undefined>(undefined)
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     // Track page view with metadata
@@ -50,8 +51,11 @@ export default function ExerciseChallengePage() {
     }
   }, [leadId, showMicroInterview])
 
-  const handleGenerationCompleted = () => {
-    // Could trigger completion logic if needed
+  const handleGenerationCompleted = (imageUrl?: string) => {
+    // Store the image URL when generation completes
+    if (imageUrl) {
+      setImageUrl(imageUrl)
+    }
   }
 
   const handleMicroInterviewComplete = () => {
@@ -123,6 +127,7 @@ export default function ExerciseChallengePage() {
                 <MicroInterview
                   leadId={leadId}
                   visionPrompt={visionPrompt}
+                  imageUrl={imageUrl}
                   onComplete={handleMicroInterviewComplete}
                 />
               </section>

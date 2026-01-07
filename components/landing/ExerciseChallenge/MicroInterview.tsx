@@ -14,6 +14,7 @@ import styles from './MicroInterview.module.scss'
 interface MicroInterviewProps {
   leadId: string
   visionPrompt?: string
+  imageUrl?: string
   onComplete: () => void
 }
 
@@ -72,6 +73,7 @@ type QuestionKey = keyof typeof QUESTIONS
 export const MicroInterview: React.FC<MicroInterviewProps> = ({
   leadId,
   visionPrompt,
+  imageUrl,
   onComplete,
 }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -86,9 +88,24 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
     expectation_free_text: '',
     exercise_suggestion: '',
     vision_prompt: visionPrompt || '',
+    image_url: imageUrl || '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Update vision_prompt when prop changes
+  useEffect(() => {
+    if (visionPrompt) {
+      setFormData(prev => ({ ...prev, vision_prompt: visionPrompt }))
+    }
+  }, [visionPrompt])
+
+  // Update image_url when prop changes (e.g., when generation completes)
+  useEffect(() => {
+    if (imageUrl) {
+      setFormData(prev => ({ ...prev, image_url: imageUrl }))
+    }
+  }, [imageUrl])
 
   const requiredQuestions: QuestionKey[] = [
     'goal_primary',

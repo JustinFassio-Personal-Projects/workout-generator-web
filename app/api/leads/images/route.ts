@@ -288,9 +288,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    logProductionError('Unexpected error in image upload:', error, {
-      ip: isDev ? ip : undefined,
-    })
+    logProductionError('Unexpected error in image upload:', error, {})
 
     return NextResponse.json(
       {

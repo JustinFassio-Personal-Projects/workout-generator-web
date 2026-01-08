@@ -14,6 +14,8 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  // Externalize Supabase packages to prevent vendor chunk issues
+  serverComponentsExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
   // Fix webpack chunk resolution issues in development
   webpack: (config, { dev }) => {
     if (dev) {

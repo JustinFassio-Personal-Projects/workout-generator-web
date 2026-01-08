@@ -63,19 +63,29 @@ export default async function BlogPage() {
   const posts = await getAllPublishedPosts()
 
   // Transform posts to match the expected format for BlogPageClient
-  const transformedPosts = posts.map(post => ({
-    id: post.id,
-    slug: post.slug,
-    title: post.title,
-    excerpt: post.excerpt,
-    content: post.content,
-    date: post.published_at || post.created_at,
-    dateModified: post.updated_at,
-    author: post.author?.name || 'Unknown',
-    category: post.category?.name || 'Uncategorized',
-    tags: post.tags || [],
-    image: post.featured_image || undefined,
-  }))
+  const transformedPosts = posts.map(post => {
+    // Normalize date to ISO string format for consistent parsing
+    const publishedDate = post.published_at || post.created_at
+    const normalizedDate = publishedDate
+      ? new Date(publishedDate).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0]
+
+    return {
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      date: normalizedDate,
+      dateModified: post.updated_at
+        ? new Date(post.updated_at).toISOString().split('T')[0]
+        : normalizedDate,
+      author: post.author?.name || 'Unknown',
+      category: post.category?.name || 'Uncategorized',
+      tags: post.tags || [],
+      image: post.featured_image || undefined,
+    }
+  })
 
   // Blog/CollectionPage structured data (JSON-LD)
   const blogSchema = {

@@ -13,7 +13,27 @@ interface BlogPostHeroProps {
 const DEFAULT_IMAGE = '/og-image.jpg'
 
 export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post }) => {
-  const publishedDate = new Date(post.date)
+  // Parse date safely, handling both date strings and timestamps
+  let publishedDate: Date
+  try {
+    // If it's a simple date string (YYYY-MM-DD), parse it explicitly
+    if (post.date && /^\d{4}-\d{2}-\d{2}$/.test(post.date)) {
+      const [year, month, day] = post.date.split('-').map(Number)
+      publishedDate = new Date(year, month - 1, day)
+    } else {
+      publishedDate = new Date(post.date)
+    }
+  } catch (error) {
+    console.error('Error parsing date:', post.date, error)
+    publishedDate = new Date()
+  }
+
+  // Validate date before using
+  if (isNaN(publishedDate.getTime())) {
+    console.error('Invalid date:', post.date)
+    publishedDate = new Date()
+  }
+
   const isoDate = publishedDate.toISOString()
   const heroImage = post.image || DEFAULT_IMAGE
   const authorSlug = authorToSlug(post.author)

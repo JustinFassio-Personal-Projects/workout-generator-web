@@ -25,9 +25,10 @@ function logError(context: string, error: unknown): void {
 
 const rateLimitStore = new Map<string, RateLimitEntry>()
 
-// Rate limit: 5 submissions per hour per IP/user
-const RATE_LIMIT_MAX = 5
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000 // 1 hour in milliseconds
+// Rate limit: 5 submissions per hour per IP/user (production)
+// In development, use a much higher limit and shorter window to allow for testing
+const RATE_LIMIT_MAX = process.env.NODE_ENV === 'production' ? 5 : 50
+const RATE_LIMIT_WINDOW = process.env.NODE_ENV === 'production' ? 60 * 60 * 1000 : 5 * 60 * 1000 // 1 hour (prod) or 5 minutes (dev)
 const RATE_LIMIT_STORE_MAX_SIZE = 1000 // Maximum entries before cleanup
 
 // Maximum length for error text in logs (truncate longer errors to prevent log bloat)
@@ -38,13 +39,26 @@ function getRateLimitKey(request: NextRequest, userId: string | null): string {
   if (userId) {
     return `user:${userId}`
   }
-  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+  const xForwardedFor = request.headers.get('x-forwarded-for')
+  const xRealIp = request.headers.get('x-real-ip')
+  const ip = xForwardedFor || xRealIp || 'unknown'
+  // In development, all requests from localhost share the same IP, which can cause rate limit issues
+  // Consider using a more unique identifier in development (e.g., session-based)
   return `ip:${ip}`
 }
 
 function checkRateLimit(key: string): { allowed: boolean; remaining: number } {
   const now = Date.now()
   const entry = rateLimitStore.get(key)
+
+  // In development, clean up expired entries more aggressively
+  if (process.env.NODE_ENV !== 'production' && rateLimitStore.size > 0) {
+    for (const [k, v] of rateLimitStore.entries()) {
+      if (now > v.resetTime) {
+        rateLimitStore.delete(k)
+      }
+    }
+  }
 
   if (!entry || now > entry.resetTime) {
     // Create new entry or reset expired entry
@@ -85,11 +99,34 @@ export async function POST(request: NextRequest) {
     // Parse request body
     const body = await request.json()
 
+    // Log request for debugging (in development only)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Support API] Request body:', {
+        hasSubject: !!body.subject,
+        hasDescription: !!body.description,
+        category: body.category,
+        priority: body.priority,
+        hasEmail: !!body.email,
+        emailValue: body.email ? `${body.email.substring(0, 3)}...` : 'missing',
+        isAuthenticated: !!user,
+        userId: user?.id || 'anonymous',
+      })
+    }
+
     // Validate required fields
     const { subject, description, category, priority, email } = body
 
     if (!subject || typeof subject !== 'string' || subject.trim().length === 0) {
       return NextResponse.json({ error: 'Subject is required' }, { status: 400 })
+    }
+
+    // Validate subject minimum length (Firebase requires at least 5 characters)
+    const trimmedSubject = subject.trim()
+    if (trimmedSubject.length < 5) {
+      return NextResponse.json(
+        { error: 'Subject must be at least 5 characters long' },
+        { status: 400 }
+      )
     }
 
     if (!description || typeof description !== 'string' || description.trim().length === 0) {
@@ -129,6 +166,7 @@ export async function POST(request: NextRequest) {
       const retryAfter = entry
         ? Math.max(0, Math.ceil((entry.resetTime - Date.now()) / 1000))
         : 3600
+
       return NextResponse.json(
         {
           error: 'Rate limit exceeded. Please try again later.',
@@ -148,11 +186,15 @@ export async function POST(request: NextRequest) {
 
     // Prepare payload - pass through body with honeypot field ensured
     // Ensure email and user_id are set correctly
+    // NOTE: Only include user_id if Firebase knows about this user.
+    // Since Firebase is a separate system, we don't send user_id to avoid
+    // "User not found" errors. Firebase can identify users by email if needed.
     const payload = {
       ...body,
       email: userEmail, // Use validated email
       website: '', // Honeypot field - must be empty
-      ...(user?.id && { user_id: user.id }), // Add user_id if authenticated
+      // Removed user_id - Firebase doesn't have Supabase users, causing "User not found" errors
+      // Firebase can use email to identify users if needed
     }
 
     // Prepare headers

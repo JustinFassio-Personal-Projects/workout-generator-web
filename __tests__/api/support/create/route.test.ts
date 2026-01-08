@@ -268,15 +268,20 @@ describe('POST /api/support/create', () => {
     const uniqueIP = `192.168.1.${Math.floor(Math.random() * 255)}`
     const uniqueEmail = `ratelimit-${Date.now()}@example.com`
 
-    // Make 5 successful requests (rate limit is 5)
-    for (let i = 0; i < 5; i++) {
+    // Rate limit is 50 in development, 5 in production
+    // Test with production limit by making 5 requests, then 6th should be limited
+    // But since module is already loaded with dev settings, we'll test with dev limit (50)
+    const rateLimitMax = process.env.NODE_ENV === 'production' ? 5 : 50
+
+    // Make requests up to the rate limit
+    for (let i = 0; i < rateLimitMax; i++) {
       const request = new NextRequest('http://localhost:3000/api/support/create', {
         method: 'POST',
         headers: {
           'x-forwarded-for': uniqueIP,
         },
         body: JSON.stringify({
-          subject: `Test subject ${i}`,
+          subject: `Test subject ${i + 1}`.padEnd(5, 'x'), // Ensure subject is at least 5 chars
           description: 'Test description',
           category: 'technical',
           priority: 'medium',
@@ -307,20 +312,39 @@ describe('POST /api/support/create', () => {
       expect(response.status).toBe(200)
     }
 
-    // 6th request should be rate limited
+    // Next request should be rate limited
     const rateLimitedRequest = new NextRequest('http://localhost:3000/api/support/create', {
       method: 'POST',
       headers: {
         'x-forwarded-for': uniqueIP,
       },
       body: JSON.stringify({
-        subject: 'Test subject 6',
+        subject: 'Test subject rate limited'.padEnd(5, 'x'),
         description: 'Test description',
         category: 'technical',
         priority: 'medium',
         email: uniqueEmail,
       }),
     })
+
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ success: true, ticketId: 'ticket-rate-limited' }),
+      headers: new Headers(),
+      redirected: false,
+      statusText: '',
+      type: 'default',
+      url: '',
+      body: null,
+      bodyUsed: false,
+      clone: () => ({}) as Response,
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob: async () => new Blob(),
+      formData: async () => new FormData(),
+      text: async () => '',
+      bytes: async () => new Uint8Array(0),
+    } as Response)
 
     const response = await POST(rateLimitedRequest)
     const data = await response.json()

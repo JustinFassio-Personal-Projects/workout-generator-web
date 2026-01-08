@@ -39,7 +39,9 @@ describe('Hero', () => {
   it('should render hero H2', () => {
     render(<Hero />)
     expect(
-      screen.getByText(/Smart, safe workout plans powered by adaptive AI and human expertise/i)
+      screen.getByText(
+        /Smart, safe workout plans powered by adaptive AI — grounded in real coaching experience/i
+      )
     ).toBeInTheDocument()
   })
 
@@ -49,7 +51,7 @@ describe('Hero', () => {
       screen.getByText(/Create adaptive workout plans that evolve with your progress/i)
     ).toBeInTheDocument()
     expect(
-      screen.getByText(/using real training principles, not random AI guesses/i)
+      screen.getByText(/based on real training principles, not random AI guesses/i)
     ).toBeInTheDocument()
   })
 
@@ -61,8 +63,8 @@ describe('Hero', () => {
 
   it('should render stats', () => {
     render(<Hero />)
-    expect(screen.getByText(/8,000\+ athletes/i)).toBeInTheDocument()
-    expect(screen.getByText(/50,000\+ workouts generated/i)).toBeInTheDocument()
+    expect(screen.getByText(/Trained 8,000\+ athletes/i)).toBeInTheDocument()
+    expect(screen.getByText(/15,000\+ workouts generated/i)).toBeInTheDocument()
     expect(screen.getByText(/4\.9★ average rating/i)).toBeInTheDocument()
   })
 

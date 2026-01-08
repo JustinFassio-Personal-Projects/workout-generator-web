@@ -6,6 +6,7 @@ import { ArrowRight, Play } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { FloatingIcons } from './FloatingIcons'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
+import { CredibilityCard } from './CredibilityCard'
 import { trackButtonClick } from '@/lib/analytics'
 import styles from './Hero.module.scss'
 
@@ -45,16 +46,6 @@ export const Hero: React.FC = () => {
             AI Workout Generator for Personalized Strength & Conditioning —{' '}
             <span className={styles.gradientText}>Built by Certified Trainers</span>
           </h1>
-          <h2 className={styles.heroH2}>
-            Smart, safe workout plans powered by adaptive AI and human expertise
-          </h2>
-          <p className={styles.heroSubtitle}>
-            Create adaptive workout plans that evolve with your progress, goals, and equipment —
-            using real training principles, not random AI guesses.
-          </p>
-          <div className={styles.heroStats}>
-            Used by 8,000+ athletes • 50,000+ workouts generated • 4.9★ average rating
-          </div>
           <div className={styles.heroActions}>
             <div className={styles.ctaLink} data-aos="fade-up" data-aos-delay="100">
               <Button
@@ -90,6 +81,17 @@ export const Hero: React.FC = () => {
                 Watch How It Works
               </Button>
             </div>
+          </div>
+          <h2 className={styles.heroH2}>
+            Smart, safe workout plans powered by adaptive AI — grounded in real coaching experience
+          </h2>
+          <p className={styles.heroSubtitle}>
+            Create adaptive workout plans that evolve with your progress, goals, and equipment —
+            based on real training principles, not random AI guesses.
+          </p>
+          <CredibilityCard />
+          <div className={styles.heroStats}>
+            Trained 8,000+ athletes • 15,000+ workouts generated • 4.9★ average rating
           </div>
         </div>
       </div>

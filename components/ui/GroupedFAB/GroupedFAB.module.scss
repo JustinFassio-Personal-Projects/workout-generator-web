@@ -2,7 +2,7 @@
   position: fixed;
   bottom: var(--spacing-lg); // 24px from bottom
   right: var(--spacing-lg); // 24px from right
-  z-index: 9999; // Above everything except modals (increased from 9998)
+  z-index: 9999; // Above most content, but below modals (--z-modal: 1050)
   font-family: var(--font-sans);
   // Ensure container doesn't extend beyond viewport
   max-height: 100vh;
@@ -40,7 +40,7 @@
   transition: all var(--transition-base);
   position: relative; // Keep position relative to container
   color: white;
-  z-index: 10000; // Well above expansion menu and all other content
+  z-index: 100; // Above expansion menu (z-index: 1) within container's stacking context
   // Ensure FAB is always visible and clickable - override AOS animations
   opacity: 1 !important;
   visibility: visible !important;
@@ -120,7 +120,7 @@
   flex-direction: column-reverse; // Reverse order so Ask is on top, Feedback below
   gap: var(--spacing-sm);
   pointer-events: auto;
-  z-index: 1; // Below main FAB button (z-index: 10)
+  z-index: 1; // Below main FAB button (z-index: 100)
   // Ensure menu doesn't push FAB down - it's absolutely positioned
   // Constrain menu to viewport - prevent it from extending beyond top
   max-height: calc(

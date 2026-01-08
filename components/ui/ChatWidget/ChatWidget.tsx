@@ -153,7 +153,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       console.error('ChatKit error:', event.error)
 
       // Check for domain verification errors specifically
-      if (errorMessage.includes('DomainVerificationRequestError') || errorMessage.includes('401')) {
+      if (errorMessage.includes('DomainVerificationRequestError') || /\b401\b/.test(errorMessage)) {
         setError(
           'Domain verification required. Please verify your production domain in OpenAI ChatKit dashboard.'
         )

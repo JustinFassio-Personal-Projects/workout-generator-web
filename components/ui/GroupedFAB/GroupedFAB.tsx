@@ -41,15 +41,6 @@ export const GroupedFAB: React.FC = () => {
 
   const handleCloseForm = () => {
     setIsFormOpen(false)
-    // Force repaint by toggling a CSS property to ensure FAB is visible after modal closes
-    if (containerRef.current) {
-      containerRef.current.style.transform = 'translateZ(0.1px)'
-      requestAnimationFrame(() => {
-        if (containerRef.current) {
-          containerRef.current.style.transform = ''
-        }
-      })
-    }
   }
 
   // Close expansion on Escape key only (removed click-outside handler per user request)

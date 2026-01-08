@@ -45,11 +45,11 @@ describe('GroupedFAB', () => {
     await user.click(mainButton)
 
     expect(screen.getByLabelText('Close menu')).toBeInTheDocument()
-    expect(screen.getByLabelText('Ask AI assistant')).toBeInTheDocument()
-    expect(screen.getByLabelText('Submit feedback')).toBeInTheDocument()
+    expect(screen.getByLabelText('Get support')).toBeInTheDocument()
   })
 
-  it('should open chat when Ask is clicked', async () => {
+  // ChatKit is disabled, so this test is skipped
+  it.skip('should open chat when Ask is clicked', async () => {
     const user = userEvent.setup()
     render(<GroupedFAB />)
 
@@ -62,15 +62,15 @@ describe('GroupedFAB', () => {
     expect(screen.getByTestId('chat-widget')).toBeInTheDocument()
   })
 
-  it('should open form when Feedback is clicked', async () => {
+  it('should open form when Support is clicked', async () => {
     const user = userEvent.setup()
     render(<GroupedFAB />)
 
     const mainButton = screen.getByLabelText('Open support menu')
     await user.click(mainButton)
 
-    const feedbackButton = screen.getByLabelText('Submit feedback')
-    await user.click(feedbackButton)
+    const supportButton = screen.getByLabelText('Get support')
+    await user.click(supportButton)
 
     expect(screen.getByTestId('ticket-form')).toBeInTheDocument()
   })

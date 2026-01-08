@@ -215,6 +215,55 @@
   font-size: var(--font-size-sm);
 }
 
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+  gap: var(--spacing-md);
+}
+
+.errorTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.errorMessage {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.retryButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-primary-500);
+  border: 1px solid var(--glass-border-hover);
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: var(--spacing-sm);
+
+  &:hover {
+    background: var(--color-primary-600);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
 .chatKit {
   flex: 1;
   width: 100%;

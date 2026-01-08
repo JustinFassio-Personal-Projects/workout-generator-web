@@ -232,11 +232,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </noscript>
         )}
-        {/* ChatKit web component script - required for ChatKit to work */}
-        <Script
+        {/* ChatKit web component script - Disabled: ChatKit not configured */}
+        {/* <Script
           src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
           strategy="afterInteractive"
-        />
+        /> */}
         <Navbar />
         <div id="main-content">{children}</div>
         <GroupedFAB />

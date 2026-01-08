@@ -72,7 +72,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       }, 100)
 
       // Prevent body scroll when modal is open
-      const originalOverflow = document.body.style.overflow
+      const originalOverflow = document.body.style.overflow || ''
       document.body.style.overflow = 'hidden'
 
       // Handle escape key
@@ -86,10 +86,15 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
 
       return () => {
         document.removeEventListener('keydown', handleEscape)
-        document.body.style.overflow = originalOverflow
+        // Always restore body overflow, defaulting to empty string if it was empty
+        document.body.style.overflow = originalOverflow || ''
         // Restore focus when modal closes
         previousFocus?.focus()
       }
+    } else {
+      // Ensure body overflow is restored when modal is closed
+      // This handles the case where the component unmounts while isOpen is false
+      document.body.style.overflow = ''
     }
   }, [isOpen, onClose, isSubmitting])
 

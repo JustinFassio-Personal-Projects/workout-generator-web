@@ -25,6 +25,7 @@ interface FormData {
   category: TicketCategory
   priority: TicketPriority
   email: string
+  name: string
 }
 
 interface Metadata {
@@ -43,6 +44,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
     category: 'technical',
     priority: 'medium',
     email: '',
+    name: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,15 +52,16 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
   const formRef = useRef<HTMLFormElement>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
 
-  // Auto-fill email if user is authenticated
+  // Auto-fill email and name if user is authenticated
   useEffect(() => {
-    if (user && !userLoading && !formData.email) {
+    if (user && !userLoading) {
       setFormData(prev => ({
         ...prev,
         email: user.email || '',
+        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
       }))
     }
-  }, [user, userLoading, formData.email])
+  }, [user, userLoading])
 
   // Focus management when modal opens
   useEffect(() => {
@@ -155,8 +158,14 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
     setSuccess(false)
 
     // Validation
-    if (!formData.subject.trim()) {
+    const trimmedSubject = formData.subject.trim()
+    if (!trimmedSubject) {
       setError('Subject is required')
+      return
+    }
+
+    if (trimmedSubject.length < 5) {
+      setError('Subject must be at least 5 characters long')
       return
     }
 
@@ -165,13 +174,13 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       return
     }
 
-    // Email validation (required if not authenticated)
-    if (!user && !formData.email.trim()) {
+    // Email validation (always required)
+    if (!formData.email.trim()) {
       setError('Email is required')
       return
     }
 
-    if (formData.email && !validateEmail(formData.email)) {
+    if (!validateEmail(formData.email)) {
       setError('Please enter a valid email address')
       return
     }
@@ -181,26 +190,64 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
     try {
       const metadata = collectMetadata()
 
+      // Ensure email is provided (should be validated already, but double-check)
+      const emailToSend = formData.email.trim() || user?.email
+      if (!emailToSend) {
+        setError('Email is required')
+        setIsSubmitting(false)
+        return
+      }
+
+      const requestPayload = {
+        subject: formData.subject.trim(),
+        description: formData.description.trim(),
+        category: formData.category,
+        priority: formData.priority,
+        email: emailToSend, // Use validated email (never empty string)
+        name: formData.name.trim(),
+        metadata,
+        website: '', // Honeypot field (must be empty for spam protection)
+      }
+
       const response = await fetch('/api/support/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          subject: formData.subject.trim(),
-          description: formData.description.trim(),
-          category: formData.category,
-          priority: formData.priority,
-          email: formData.email.trim() || user?.email || '',
-          metadata,
-          website: '', // Honeypot field (must be empty for spam protection)
-        }),
+        body: JSON.stringify(requestPayload),
       })
 
-      const data = await response.json()
+      // Parse response - use response.json() directly with error handling
+      let data: any = {}
+      try {
+        data = await response.json()
+      } catch (parseError) {
+        // If JSON parsing fails, try reading as text for error cases
+        try {
+          const responseText = await response.text()
+          data = { error: responseText || 'Failed to parse response' }
+        } catch (textError) {
+          data = { error: 'Failed to parse response' }
+        }
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit ticket')
+        // Log detailed error for debugging (sanitized to avoid exposing sensitive data)
+        console.error('[Support Form] API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: data.error,
+          message: data.message,
+          // Only log details in development, and sanitize if present
+          ...(process.env.NODE_ENV === 'development' && data.details
+            ? {
+                details:
+                  typeof data.details === 'string' ? data.details.substring(0, 200) : 'Object',
+              }
+            : {}),
+        })
+
+        throw new Error(data.error || data.message || 'Failed to submit ticket')
       }
 
       setSuccess(true)
@@ -211,6 +258,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
         category: 'technical',
         priority: 'medium',
         email: user?.email || '',
+        name: user?.user_metadata?.full_name || user?.user_metadata?.name || '',
       })
 
       // Close modal after 2 seconds
@@ -354,24 +402,38 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
             />
           </div>
 
-          {!user && (
-            <div className={styles.formGroup}>
-              <label htmlFor="email" className={styles.label}>
-                Email <span className={styles.required}>*</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className={styles.input}
-                placeholder="your.email@example.com"
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-          )}
+          <div className={styles.formGroup}>
+            <label htmlFor="email" className={styles.label}>
+              Email <span className={styles.required}>*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className={styles.input}
+              placeholder="your.email@example.com"
+              required
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="name" className={styles.label}>
+              Name (optional)
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className={styles.input}
+              placeholder="Your name"
+              disabled={isSubmitting}
+            />
+          </div>
 
           <div className={styles.actions}>
             <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>

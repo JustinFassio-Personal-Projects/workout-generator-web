@@ -63,7 +63,7 @@ describe('Hero', () => {
 
   it('should render stats', () => {
     render(<Hero />)
-    expect(screen.getByText(/Trained over 8,000\+ athletes/i)).toBeInTheDocument()
+    expect(screen.getByText(/Trained 8,000\+ athletes/i)).toBeInTheDocument()
     expect(screen.getByText(/15,000\+ workouts generated/i)).toBeInTheDocument()
     expect(screen.getByText(/4\.9★ average rating/i)).toBeInTheDocument()
   })

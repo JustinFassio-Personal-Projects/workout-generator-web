@@ -91,7 +91,7 @@ export const Hero: React.FC = () => {
           </p>
           <CredibilityCard />
           <div className={styles.heroStats}>
-            Trained over 8,000+ athletes • 15,000+ workouts generated • 4.9★ average rating
+            Trained 8,000+ athletes • 15,000+ workouts generated • 4.9★ average rating
           </div>
         </div>
       </div>

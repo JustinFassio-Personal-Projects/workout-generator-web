@@ -19,7 +19,7 @@ export const CredibilityCard: React.FC = () => {
     <div className={styles.credibilityCard}>
       <div className={styles.credibilityImageHolder}>
         <Image
-          src="/Justin Profile Section 1.png"
+          src="/justin-profile-section-1.png"
           alt="Justin Fassio"
           fill
           className={styles.thumbnailImageSquare}

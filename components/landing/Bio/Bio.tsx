@@ -38,7 +38,7 @@ export const Bio: React.FC = () => {
           <div className={styles.imageSection} data-aos="fade-right">
             <div className={styles.imageWrapper}>
               <Image
-                src="/Justin Profile Section 1.png"
+                src="/justin-profile-section-1.png"
                 alt="Justin Fassio - Founder of AIWorkoutGenerator"
                 width={600}
                 height={800}

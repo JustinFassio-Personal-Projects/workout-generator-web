@@ -156,8 +156,8 @@ describe('POST /api/chatkit-session', () => {
     const data = await response.json()
 
     expect(response.status).toBe(401)
-    expect(data.error).toBe('Failed to create ChatKit session')
-    expect(data.details).toBe('Unauthorized')
+    expect(data.error).toBe('ChatKit authentication failed')
+    expect(data.message).toContain('Domain verification may be required')
     expect(data.status).toBe(401)
   })
 
@@ -184,7 +184,8 @@ describe('POST /api/chatkit-session', () => {
 
     expect(response.status).toBe(429)
     expect(data.error).toBe('Failed to create ChatKit session')
-    expect(data.details).toBe('Rate limit exceeded')
+    expect(data.message).toContain('ChatKit service unavailable')
+    expect(data.status).toBe(429)
   })
 
   it('should use anonymous user if userId is not provided', async () => {

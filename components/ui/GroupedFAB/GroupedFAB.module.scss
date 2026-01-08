@@ -2,7 +2,7 @@
   position: fixed;
   bottom: var(--spacing-lg); // 24px from bottom
   right: var(--spacing-lg); // 24px from right
-  z-index: 9998; // Below modals (z-[9999])
+  z-index: 9999; // Above most content, but below modals (--z-modal: 1050)
   font-family: var(--font-sans);
   // Ensure container doesn't extend beyond viewport
   max-height: 100vh;
@@ -13,6 +13,11 @@
   // Ensure container stays in viewport
   max-width: 100vw;
   pointer-events: none; // Allow clicks to pass through container, but buttons have pointer-events: auto
+  // Ensure FAB is always visible and creates its own stacking context
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+  isolation: isolate; // Create new stacking context to ensure z-index works correctly
 
   @media (max-width: 768px) {
     bottom: var(--spacing-md); // 16px from bottom on mobile
@@ -28,18 +33,19 @@
   background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-accent) 100%);
   border: 2px solid var(--glass-border-accent);
   box-shadow: var(--shadow-glow), var(--shadow-xl);
-  display: flex;
+  display: flex !important; // Override any AOS hiding
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-base);
   position: relative; // Keep position relative to container
   color: white;
-  z-index: 10; // Well above expansion menu (z-index: 1), below modals (z-9999)
-  // Ensure FAB is always visible and clickable
+  z-index: 100; // Above expansion menu (z-index: 1) within container's stacking context
+  // Ensure FAB is always visible and clickable - override AOS animations
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important; // Ensure clicks work even if container has pointer-events: none
+  transform: none !important; // Override any AOS transform that might hide it
   transform-origin: center center; // Scale from center
   // Ensure FAB position doesn't change when expanded
   flex-shrink: 0; // Don't shrink
@@ -114,7 +120,7 @@
   flex-direction: column-reverse; // Reverse order so Ask is on top, Feedback below
   gap: var(--spacing-sm);
   pointer-events: auto;
-  z-index: 1; // Below main FAB button (z-index: 10)
+  z-index: 1; // Below main FAB button (z-index: 100)
   // Ensure menu doesn't push FAB down - it's absolutely positioned
   // Constrain menu to viewport - prevent it from extending beyond top
   max-height: calc(

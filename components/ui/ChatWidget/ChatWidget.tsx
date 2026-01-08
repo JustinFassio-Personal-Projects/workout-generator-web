@@ -25,6 +25,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   const [isMinimized, setIsMinimized] = useState(false)
   const [isChatKitReady, setIsChatKitReady] = useState(false)
   const [isWebComponentLoaded, setIsWebComponentLoaded] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Get configuration from props or environment variables
   // Note: NEXT_PUBLIC_ vars are embedded at BUILD TIME, not runtime
@@ -92,13 +93,35 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({}))
-            throw new Error(errorData.error || `Failed to create ChatKit session: ${res.status}`)
+            const errorMessage =
+              errorData.message ||
+              errorData.error ||
+              `Failed to create ChatKit session: ${res.status}`
+
+            // Set error state for display
+            setError(errorMessage)
+            setIsChatKitReady(false)
+
+            // Log detailed error for debugging
+            console.error('ChatKit session creation failed:', {
+              status: res.status,
+              error: errorData,
+              workflowId: chatkitWorkflowId,
+            })
+
+            throw new Error(errorMessage)
           }
 
           const data = await res.json()
           if (!data.client_secret) {
-            throw new Error('No client_secret in response')
+            const errorMsg = 'No client_secret in response'
+            setError(errorMsg)
+            setIsChatKitReady(false)
+            throw new Error(errorMsg)
           }
+
+          // Clear any previous errors on success
+          setError(null)
           return data.client_secret
         } catch (error) {
           setIsChatKitReady(false)
@@ -123,8 +146,18 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       },
     },
     onError: (event: { error: Error }) => {
-      // Handle errors silently - ChatKit will display error UI
+      // Handle errors and show them to the user
+      const errorMessage = event.error.message || 'ChatKit initialization failed'
+      setError(errorMessage)
+      setIsChatKitReady(false)
       console.error('ChatKit error:', event.error)
+
+      // Check for domain verification errors specifically
+      if (errorMessage.includes('DomainVerificationRequestError') || /\b401\b/.test(errorMessage)) {
+        setError(
+          'Domain verification required. Please verify your production domain in OpenAI ChatKit dashboard.'
+        )
+      }
     },
     onReady: () => {
       // ChatKit is ready
@@ -246,7 +279,28 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
           {/* Chat Content */}
           {!isMinimized && (
             <div className={styles.chatContent}>
-              {chatKit.control ? (
+              {error ? (
+                <div className={styles.errorState}>
+                  <p className={styles.errorTitle}>Unable to load chat</p>
+                  <p className={styles.errorMessage}>{error}</p>
+                  <button
+                    className={styles.retryButton}
+                    onClick={() => {
+                      setError(null)
+                      setIsChatKitReady(false)
+                      // Force re-initialization by closing and reopening the chat
+                      // This will trigger a new getClientSecret call
+                      setIsOpen(false)
+                      setTimeout(() => {
+                        setIsOpen(true)
+                      }, 100)
+                    }}
+                    type="button"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : chatKit.control ? (
                 <ChatKit
                   key={`chatkit-${isOpen}-${chatkitWorkflowId}`}
                   control={chatKit.control}

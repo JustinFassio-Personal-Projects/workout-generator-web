@@ -72,7 +72,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       }, 100)
 
       // Prevent body scroll when modal is open
-      const originalOverflow = document.body.style.overflow
+      const originalOverflow = document.body.style.overflow || ''
       document.body.style.overflow = 'hidden'
 
       // Handle escape key
@@ -86,11 +86,13 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
 
       return () => {
         document.removeEventListener('keydown', handleEscape)
-        document.body.style.overflow = originalOverflow
+        // Always restore body overflow, defaulting to empty string if it was empty
+        document.body.style.overflow = originalOverflow || ''
         // Restore focus when modal closes
         previousFocus?.focus()
       }
     }
+    // No else block needed - cleanup function handles restoration when isOpen changes to false
   }, [isOpen, onClose, isSubmitting])
 
   // Parse UTM parameters from URL

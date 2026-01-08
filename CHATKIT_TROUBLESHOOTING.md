@@ -2,6 +2,8 @@
 
 ## Issue: ChatKit FAB displays locally but not in production
 
+## Issue: ChatKit works locally but fails in production with 401 Domain Verification Error
+
 ### Root Causes (Most Likely)
 
 1. **Environment Variable Missing**: `NEXT_PUBLIC_CHATKIT_WORKFLOW_ID` not set in production
@@ -140,3 +142,65 @@ vercel --prod
 - Ensure the variable is set in your production environment
 - The variable must be present **during the build process**
 - Redeploy after adding the variable
+
+## Issue: Domain Verification Error (401) in Production
+
+### Symptoms
+
+- ChatKit works perfectly in local development
+- In production, you see: `DomainVerificationRequestError: Domain verification request failed with 401`
+- The chat window disappears or shows an error
+- Console shows: `/api/chatkit-session:1 Failed to load resource: the server responded with a status of 500`
+
+### Root Cause
+
+OpenAI ChatKit requires that your production domain be registered and verified in the OpenAI ChatKit dashboard. This is a security measure to prevent unauthorized use of your ChatKit workflow.
+
+### Solution
+
+1. **Verify Your Production Domain in OpenAI ChatKit Dashboard:**
+   - Go to [OpenAI ChatKit Dashboard](https://platform.openai.com/chatkit)
+   - Navigate to your workflow settings
+   - Add your production domain (e.g., `aiworkoutgenerator.com`) to the allowed domains list
+   - Save the changes
+
+2. **Ensure OPENAI_API_KEY is Set in Production:**
+   - Verify that `OPENAI_API_KEY` is set in your production environment variables
+   - The API key must have ChatKit permissions
+   - Check your deployment platform (Vercel, Netlify, etc.) environment variables
+
+3. **Verify Environment Variables:**
+   - `OPENAI_API_KEY` - Server-side API key (must be set in production)
+   - `NEXT_PUBLIC_CHATKIT_WORKFLOW_ID` - Client-side workflow ID (must be set at build time)
+
+### Error Handling Improvements
+
+The ChatWidget now includes better error handling:
+
+- Errors are displayed to users instead of silently failing
+- Specific error messages for domain verification issues
+- Retry button to attempt re-initialization
+- Detailed error logging for debugging
+
+### Testing
+
+After verifying your domain:
+
+1. Clear browser cache and hard refresh
+2. Check browser console for any remaining errors
+3. Verify the chat widget loads and displays properly
+4. Test sending a message to ensure full functionality
+
+### Common Issues
+
+**Issue**: Domain verification still fails after adding domain
+
+- **Solution**: Wait a few minutes for changes to propagate, then try again
+
+**Issue**: API key doesn't have ChatKit permissions
+
+- **Solution**: Ensure your OpenAI API key has ChatKit access enabled in your OpenAI account settings
+
+**Issue**: Different subdomains (www vs non-www)
+
+- **Solution**: Add both `aiworkoutgenerator.com` and `www.aiworkoutgenerator.com` to allowed domains if you use both

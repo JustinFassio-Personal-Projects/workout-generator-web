@@ -39,13 +39,36 @@ export async function POST(request: NextRequest) {
     })
 
     if (!response.ok) {
-      const errorData = await response.text()
+      let errorData: string
+      try {
+        errorData = await response.text()
+      } catch {
+        errorData = 'Unknown error'
+      }
+
+      // Log full error details server-side for debugging (not exposed to client)
       console.error('OpenAI ChatKit API error:', response.status, errorData)
-      // Return detailed error for debugging
+
+      // Handle specific error cases
+      if (response.status === 401) {
+        // Domain verification or authentication error
+        // Don't expose raw errorData to client - may contain sensitive info
+        return NextResponse.json(
+          {
+            error: 'ChatKit authentication failed',
+            message:
+              'Domain verification may be required. Please verify your production domain in OpenAI ChatKit dashboard.',
+            status: response.status,
+          },
+          { status: 401 }
+        )
+      }
+
+      // Return sanitized error message (don't expose raw OpenAI error details)
       return NextResponse.json(
         {
           error: 'Failed to create ChatKit session',
-          details: errorData,
+          message: `ChatKit service unavailable (${response.status})`,
           status: response.status,
         },
         { status: response.status }
@@ -55,7 +78,15 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
     return NextResponse.json({ client_secret: data.client_secret })
   } catch (error) {
+    // Log full error details server-side for debugging (not exposed to client)
     console.error('Error creating ChatKit session:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    // Don't expose raw error message to client - may contain sensitive info
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        message: 'Unable to initialize chat session. Please try again later.',
+      },
+      { status: 500 }
+    )
   }
 }

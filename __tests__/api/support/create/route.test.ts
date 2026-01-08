@@ -281,7 +281,7 @@ describe('POST /api/support/create', () => {
           'x-forwarded-for': uniqueIP,
         },
         body: JSON.stringify({
-          subject: `Test subject ${i + 1}`.padEnd(5, 'x'), // Ensure subject is at least 5 chars
+          subject: `Test subject ${i + 1}`, // Always >= 13 characters, meets 5-char minimum
           description: 'Test description',
           category: 'technical',
           priority: 'medium',
@@ -319,7 +319,7 @@ describe('POST /api/support/create', () => {
         'x-forwarded-for': uniqueIP,
       },
       body: JSON.stringify({
-        subject: 'Test subject rate limited'.padEnd(5, 'x'),
+        subject: 'Test subject rate limited', // Always >= 13 characters, meets 5-char minimum
         description: 'Test description',
         category: 'technical',
         priority: 'medium',

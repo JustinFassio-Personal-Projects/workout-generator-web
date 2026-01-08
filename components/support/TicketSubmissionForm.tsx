@@ -57,8 +57,8 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
     if (user && !userLoading) {
       setFormData(prev => ({
         ...prev,
-        email: user.email || prev.email || '',
-        name: user.user_metadata?.full_name || user.user_metadata?.name || prev.name || '',
+        email: user.email || '',
+        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
       }))
     }
   }, [user, userLoading])
@@ -217,30 +217,37 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
         body: JSON.stringify(requestPayload),
       })
 
-      // Parse response - handle both JSON and text responses
+      // Parse response - use response.json() directly with error handling
       let data: any = {}
-      const responseText = await response.text()
-
       try {
-        data = responseText ? JSON.parse(responseText) : {}
+        data = await response.json()
       } catch (parseError) {
-        // If JSON parsing fails, use the raw text as error message
-        data = { error: responseText || 'Failed to parse response' }
+        // If JSON parsing fails, try reading as text for error cases
+        try {
+          const responseText = await response.text()
+          data = { error: responseText || 'Failed to parse response' }
+        } catch (textError) {
+          data = { error: 'Failed to parse response' }
+        }
       }
 
       if (!response.ok) {
-        // Log detailed error for debugging
+        // Log detailed error for debugging (sanitized to avoid exposing sensitive data)
         console.error('[Support Form] API Error:', {
           status: response.status,
           statusText: response.statusText,
           error: data.error,
           message: data.message,
-          details: data.details,
-          body: data,
-          rawResponse: responseText.substring(0, 500), // First 500 chars
+          // Only log details in development, and sanitize if present
+          ...(process.env.NODE_ENV === 'development' && data.details
+            ? {
+                details:
+                  typeof data.details === 'string' ? data.details.substring(0, 200) : 'Object',
+              }
+            : {}),
         })
 
-        throw new Error(data.error || data.message || responseText || 'Failed to submit ticket')
+        throw new Error(data.error || data.message || 'Failed to submit ticket')
       }
 
       setSuccess(true)

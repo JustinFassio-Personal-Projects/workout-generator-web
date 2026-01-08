@@ -25,10 +25,19 @@ function logError(context: string, error: unknown): void {
 
 const rateLimitStore = new Map<string, RateLimitEntry>()
 
-// Rate limit: 5 submissions per hour per IP/user (production)
-// In development, use a much higher limit and shorter window to allow for testing
-const RATE_LIMIT_MAX = process.env.NODE_ENV === 'production' ? 5 : 50
-const RATE_LIMIT_WINDOW = process.env.NODE_ENV === 'production' ? 60 * 60 * 1000 : 5 * 60 * 1000 // 1 hour (prod) or 5 minutes (dev)
+// Rate limit configuration - can be overridden via environment variables for flexible testing
+// Defaults: 5 requests per hour in production, 50 requests per 5 minutes in development
+const RATE_LIMIT_MAX = process.env.SUPPORT_RATE_LIMIT_MAX
+  ? parseInt(process.env.SUPPORT_RATE_LIMIT_MAX, 10)
+  : process.env.NODE_ENV === 'production'
+    ? 5
+    : 50
+
+const RATE_LIMIT_WINDOW = process.env.SUPPORT_RATE_LIMIT_WINDOW_MS
+  ? parseInt(process.env.SUPPORT_RATE_LIMIT_WINDOW_MS, 10)
+  : process.env.NODE_ENV === 'production'
+    ? 60 * 60 * 1000 // 1 hour in production
+    : 5 * 60 * 1000 // 5 minutes in development
 const RATE_LIMIT_STORE_MAX_SIZE = 1000 // Maximum entries before cleanup
 
 // Maximum length for error text in logs (truncate longer errors to prevent log bloat)

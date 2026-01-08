@@ -58,7 +58,7 @@ describe('Hero', () => {
   it('should render CTA buttons', () => {
     render(<Hero />)
     expect(screen.getByRole('button', { name: /Generate My AI Workout/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Watch How It Works/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /See How It Works/i })).toBeInTheDocument()
   })
 
   it('should render stats', () => {
@@ -78,7 +78,7 @@ describe('Hero', () => {
     expect(trackButtonClick).toHaveBeenCalledWith('Generate My AI Workout', 'hero')
   })
 
-  it('should call trackButtonClick and scroll to videos section when Watch How It Works button is clicked', () => {
+  it('should call trackButtonClick and scroll to journey section when See How It Works button is clicked', () => {
     const { trackButtonClick } = analyticsModule
 
     // Mock getElementById and scrollIntoView
@@ -89,11 +89,11 @@ describe('Hero', () => {
 
     render(<Hero />)
 
-    const watchButton = screen.getByRole('button', { name: /Watch How It Works/i })
-    fireEvent.click(watchButton)
+    const seeButton = screen.getByRole('button', { name: /See How It Works/i })
+    fireEvent.click(seeButton)
 
-    expect(trackButtonClick).toHaveBeenCalledWith('Watch How It Works', 'hero')
-    expect(document.getElementById).toHaveBeenCalledWith('videos')
+    expect(trackButtonClick).toHaveBeenCalledWith('See How It Works', 'hero')
+    expect(document.getElementById).toHaveBeenCalledWith('journey')
     expect(mockScrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
   })
 })

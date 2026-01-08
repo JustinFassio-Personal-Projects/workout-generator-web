@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { ArrowRight, Play } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { FloatingIcons } from './FloatingIcons'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
@@ -41,7 +41,16 @@ export const Hero: React.FC = () => {
       </div>
       <div className={styles.heroContent}>
         <div className={styles.heroText} data-aos="fade-up">
-          <div className={styles.heroBrandMark}>AIWorkoutGenerator™</div>
+          <div className={styles.heroBrandMark}>
+            <Image
+              src="/favicon-48.png"
+              alt=""
+              width={16}
+              height={16}
+              className={styles.brandMarkIcon}
+            />
+            AIWorkoutGenerator™
+          </div>
           <h1 className={styles.heroTitle}>
             AI Workout Generator for Personalized Strength & Conditioning —{' '}
             <span className={styles.gradientText}>Built by Certified Trainers</span>
@@ -68,17 +77,23 @@ export const Hero: React.FC = () => {
               <Button
                 variant="secondary"
                 size="lg"
-                icon={Play}
-                iconPosition="left"
                 onClick={() => {
-                  trackButtonClick('Watch How It Works', 'hero')
-                  const videosSection = document.getElementById('videos')
-                  if (videosSection) {
-                    videosSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  trackButtonClick('See How It Works', 'hero')
+                  const journeySection = document.getElementById('journey')
+                  if (journeySection) {
+                    journeySection.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }
                 }}
+                className={styles.seeHowItWorksButton}
               >
-                Watch How It Works
+                <Image
+                  src="/favicon-48.png"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className={styles.buttonIcon}
+                />
+                See How It Works
               </Button>
             </div>
           </div>

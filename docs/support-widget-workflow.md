@@ -106,7 +106,7 @@ The following fields are **no longer shown to users** but are automatically gene
   - Example: "Generate my first workout: I want to lose weight and have dumbbells at..."
 - **Category**: Auto-mapped from selected intent
   - `something_broken` → `bug`
-  - `plan_help` → `billing`
+  - `plan_help` → `other` (ambiguous - could be subscription or workout plan)
   - `fix_workout` → `feature_request`
   - `generate_first_workout` → `other`
 - **Priority**: Always set to `medium` (no user selection)
@@ -202,7 +202,7 @@ Validation occurs in this order:
 **Category Mapping**:
 
 - `something_broken` → `bug`
-- `plan_help` → `billing`
+- `plan_help` → `other` (ambiguous - could be subscription or workout plan)
 - `fix_workout` → `feature_request`
 - `generate_first_workout` → `other`
 
@@ -424,12 +424,12 @@ Validation occurs in this order:
 
 ## 12. Intent-to-Category Mapping
 
-| User Intent (Button)          | Internal Category | Use Case                                   |
-| ----------------------------- | ----------------- | ------------------------------------------ |
-| "Generate my first workout"   | `other`           | New users needing workout generation help  |
-| "Fix my workout"              | `feature_request` | Users wanting to improve existing workouts |
-| "Which plan should I choose?" | `billing`         | Subscription/pricing questions             |
-| "Something isn't working"     | `bug`             | Technical issues or broken functionality   |
+| User Intent (Button)          | Internal Category | Use Case                                                |
+| ----------------------------- | ----------------- | ------------------------------------------------------- |
+| "Generate my first workout"   | `other`           | New users needing workout generation help               |
+| "Fix my workout"              | `feature_request` | Users wanting to improve existing workouts              |
+| "Which plan should I choose?" | `other`           | Plan selection questions (subscription or workout plan) |
+| "Something isn't working"     | `bug`             | Technical issues or broken functionality                |
 
 ---
 

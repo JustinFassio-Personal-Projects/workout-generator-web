@@ -217,7 +217,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       // Map intent to category
       const intentToCategory: Record<string, TicketCategory> = {
         something_broken: 'bug',
-        plan_help: 'billing',
+        plan_help: 'other', // 'plan' is ambiguous (could be subscription or workout plan)
         fix_workout: 'feature_request',
         generate_first_workout: 'other',
       }

@@ -400,7 +400,7 @@
 
   @media (max-width: 968px) {
     min-height: 0;
-    aspect-ratio: 2 / 3; // Matches image dimensions (512x768)
+    aspect-ratio: 2 / 3; // 2:3 aspect ratio for 512x768 image
     order: -1;
     background-position: top center;
     max-width: 240px;
@@ -408,7 +408,7 @@
   }
 
   @media (max-width: 640px) {
-    aspect-ratio: 2 / 3; // Matches image dimensions (512x768)
+    aspect-ratio: 2 / 3; // 2:3 aspect ratio for 512x768 image
     background-position: top center;
     max-width: 180px;
     margin: 0 auto;

@@ -25,34 +25,81 @@ describe('WorkoutPlanBuilder', () => {
     mockLocation.href = ''
   })
 
+  // Helper function to dismiss intro screen
+  const dismissIntro = async (user?: ReturnType<typeof userEvent.setup>) => {
+    const userInstance = user || userEvent.setup()
+    // Check if intro screen is shown by looking for skip button or START BUILDING button
+    try {
+      const skipButton = await waitFor(() => screen.getByText(/Skip Intro/i), { timeout: 1000 })
+      if (skipButton) {
+        await act(async () => {
+          await userInstance.click(skipButton)
+        })
+        await waitFor(
+          () => {
+            expect(screen.queryByText(/Skip Intro/i)).not.toBeInTheDocument()
+          },
+          { timeout: 2000 }
+        )
+      }
+    } catch {
+      // Intro screen might not be showing, or already dismissed - continue
+    }
+  }
+
   it('should render workout builder section', () => {
     render(<WorkoutPlanBuilder />)
     const section = document.querySelector('section#workout-builder')
     expect(section).toBeInTheDocument()
   })
 
-  it('should render section header with title and subtitle', () => {
-    render(<WorkoutPlanBuilder />)
-    expect(screen.getByText('Workout Plan Builder')).toBeInTheDocument()
-    expect(screen.getByText(/Build your AI workout plan/i)).toBeInTheDocument()
-    expect(screen.getByText(/Choose your goal/i)).toBeInTheDocument()
+  it('should render section header with title and subtitle', async () => {
+    const user = userEvent.setup()
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+    await waitFor(() => {
+      expect(screen.getByText('Workout Plan Builder')).toBeInTheDocument()
+      expect(screen.getByText(/Build your AI workout plan/i)).toBeInTheDocument()
+      expect(screen.getByText(/Choose your goal/i)).toBeInTheDocument()
+    })
   })
 
-  it('should render step one initially', () => {
-    render(<WorkoutPlanBuilder />)
-    expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
-    expect(screen.getByText(/What's your current fitness level/i)).toBeInTheDocument()
-    expect(screen.getByText(/What equipment do you have access to/i)).toBeInTheDocument()
+  it('should render step one initially', async () => {
+    const user = userEvent.setup()
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+      expect(screen.getByText(/What's your current fitness level/i)).toBeInTheDocument()
+      expect(screen.getByText(/What equipment do you have access to/i)).toBeInTheDocument()
+    })
   })
 
-  it('should show progress indicator for step 1', () => {
-    render(<WorkoutPlanBuilder />)
-    expect(screen.getByText('Step 1 of 2')).toBeInTheDocument()
+  it('should show progress indicator for step 1', async () => {
+    const user = userEvent.setup()
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+    await waitFor(() => {
+      expect(screen.getByText('Step 1 of 2')).toBeInTheDocument()
+    })
   })
 
   it('should navigate to step 2 when continue is clicked with valid data', async () => {
     const user = userEvent.setup()
-    render(<WorkoutPlanBuilder />)
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+    })
 
     // Select a fitness goal
     const buildMuscleChip = screen.getByText('Build muscle')
@@ -73,6 +120,11 @@ describe('WorkoutPlanBuilder', () => {
     await act(async () => {
       render(<WorkoutPlanBuilder />)
     })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+    })
 
     await act(async () => {
       const continueButton = screen.getByRole('button', { name: /continue/i })
@@ -88,6 +140,11 @@ describe('WorkoutPlanBuilder', () => {
     const user = userEvent.setup()
     await act(async () => {
       render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
     })
 
     // Go to step 2
@@ -121,6 +178,11 @@ describe('WorkoutPlanBuilder', () => {
     await act(async () => {
       render(<WorkoutPlanBuilder />)
     })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+    })
 
     // Complete step 1
     await act(async () => {
@@ -152,6 +214,11 @@ describe('WorkoutPlanBuilder', () => {
     const user = userEvent.setup()
     await act(async () => {
       render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
     })
 
     // Go to step 2
@@ -189,6 +256,11 @@ describe('WorkoutPlanBuilder', () => {
     const user = userEvent.setup()
     await act(async () => {
       render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
     })
 
     // Complete the form
@@ -235,6 +307,11 @@ describe('WorkoutPlanBuilder', () => {
     await act(async () => {
       render(<WorkoutPlanBuilder />)
     })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+    })
 
     // Complete form to get to preview
     await act(async () => {
@@ -276,6 +353,11 @@ describe('WorkoutPlanBuilder', () => {
     await act(async () => {
       render(<WorkoutPlanBuilder />)
     })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+    })
 
     // Complete step 1
     await act(async () => {
@@ -287,9 +369,12 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(continueButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
 
     // Add optional fields
     await act(async () => {
@@ -308,9 +393,12 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(seeMyPlanButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
 
     // Click create account
     await act(async () => {
@@ -320,25 +408,39 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(createAccountButton)
     })
 
-    await waitFor(() => {
-      expect(mockLocation.href).toContain('gender=male')
-      expect(mockLocation.href).toContain('age=28')
-    })
+    await waitFor(
+      () => {
+        expect(mockLocation.href).toContain('gender=male')
+        expect(mockLocation.href).toContain('age=28')
+      },
+      { timeout: 3000 }
+    )
   })
 
-  it('should render trust badges', () => {
-    render(<WorkoutPlanBuilder />)
-    expect(screen.getByText('No credit card required')).toBeInTheDocument()
-    expect(
-      screen.getByText(/We don't store answers until you create an account/i)
-    ).toBeInTheDocument()
-    expect(screen.getByText('Edit anytime')).toBeInTheDocument()
+  it('should render trust badges', async () => {
+    const user = userEvent.setup()
+    await act(async () => {
+      render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+    await waitFor(() => {
+      expect(screen.getByText('No credit card required')).toBeInTheDocument()
+      expect(
+        screen.getByText(/We don't store answers until you create an account/i)
+      ).toBeInTheDocument()
+      expect(screen.getByText('Edit anytime')).toBeInTheDocument()
+    })
   })
 
   it('should update progress bar when moving to step 2', async () => {
     const user = userEvent.setup()
     await act(async () => {
       render(<WorkoutPlanBuilder />)
+    })
+    await dismissIntro(user)
+
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
     })
 
     await act(async () => {
@@ -364,6 +466,7 @@ describe('WorkoutPlanBuilder', () => {
     await act(async () => {
       render(<WorkoutPlanBuilder />)
     })
+    await dismissIntro(user)
 
     // Wait for component to render
     await waitFor(() => {

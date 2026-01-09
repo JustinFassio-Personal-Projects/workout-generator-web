@@ -18,11 +18,15 @@ import { Card } from '@/components/ui/Card/Card'
 import { StepOne } from './StepOne'
 import { StepTwo } from './StepTwo'
 import { PlanPreview } from './PlanPreview'
+import { IntroScreen } from './IntroScreen'
 import styles from './WorkoutPlanBuilder.module.scss'
 
 type FormErrors = Record<string, string>
 
 export const WorkoutPlanBuilder: React.FC = () => {
+  // Intro screen state
+  const [showIntro, setShowIntro] = useState(true)
+
   // Form state
   const [formData, setFormData] = useState<WebsiteOnboardingData>(DEFAULT_ONBOARDING_DATA)
   const [currentStep, setCurrentStep] = useState<1 | 2>(1)
@@ -119,89 +123,95 @@ export const WorkoutPlanBuilder: React.FC = () => {
 
   return (
     <section id="workout-builder" className={styles.section}>
-      <LogoWatermark position="bottom-left" opacity={0.04} size={350} rotation={15} />
-      <div className={styles.container}>
-        {/* Section Header */}
-        <div className={styles.header} data-aos="fade-up">
-          <span className={styles.eyebrow}>Workout Plan Builder</span>
-          <h2 className={styles.title}>
-            Build your AI workout plan
-            <span className={styles.gradientText}> in 2 minutes</span>
-          </h2>
-          <p className={styles.subtitle}>
-            Choose your goal, fitness level, activity, and equipment. Then create your account to
-            generate and save your personalized workout.
-          </p>
-        </div>
+      {showIntro ? (
+        <IntroScreen onComplete={() => setShowIntro(false)} />
+      ) : (
+        <>
+          <LogoWatermark position="bottom-left" opacity={0.04} size={350} rotation={15} />
+          <div className={styles.container}>
+            {/* Section Header */}
+            <div className={styles.header} data-aos="fade-up">
+              <span className={styles.eyebrow}>Workout Plan Builder</span>
+              <h2 className={styles.title}>
+                Build your AI workout plan
+                <span className={styles.gradientText}> in 2 minutes</span>
+              </h2>
+              <p className={styles.subtitle}>
+                Choose your goal, fitness level, activity, and equipment. Then create your account
+                to generate and save your personalized workout.
+              </p>
+            </div>
 
-        {/* Form Card */}
-        <div className={styles.formWrapper} data-aos="fade-up" data-aos-delay="100">
-          <Card variant="strong" hover={false} className={styles.formCard}>
-            {/* Progress Indicator */}
-            {!showPreview && (
-              <div className={styles.progressBar}>
-                <span className={styles.progressText}>Step {currentStep} of 2</span>
-                <div className={styles.progressTrack}>
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: currentStep === 1 ? '50%' : '100%' }}
+            {/* Form Card */}
+            <div className={styles.formWrapper} data-aos="fade-up" data-aos-delay="100">
+              <Card variant="strong" hover={false} className={styles.formCard}>
+                {/* Progress Indicator */}
+                {!showPreview && (
+                  <div className={styles.progressBar}>
+                    <span className={styles.progressText}>Step {currentStep} of 2</span>
+                    <div className={styles.progressTrack}>
+                      <div
+                        className={styles.progressFill}
+                        style={{ width: currentStep === 1 ? '50%' : '100%' }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Form Steps / Preview */}
+                {showPreview ? (
+                  <PlanPreview
+                    data={formData}
+                    onEdit={handleEdit}
+                    onCreateAccount={handleCreateAccount}
                   />
-                </div>
+                ) : currentStep === 1 ? (
+                  <StepOne
+                    fitnessGoals={formData.fitness_goals}
+                    fitnessLevel={formData.fitness_level}
+                    equipmentAccess={formData.equipment_access}
+                    errors={errors}
+                    onGoalsChange={handleGoalsChange}
+                    onLevelChange={handleLevelChange}
+                    onEquipmentChange={handleEquipmentChange}
+                    onContinue={handleContinue}
+                  />
+                ) : (
+                  <StepTwo
+                    activityLevel={formData.current_activity_level}
+                    gender={formData.gender}
+                    age={formData.age}
+                    preferredUnits={formData.preferred_units}
+                    errors={errors}
+                    onActivityChange={handleActivityChange}
+                    onGenderChange={handleGenderChange}
+                    onAgeChange={handleAgeChange}
+                    onUnitsChange={handleUnitsChange}
+                    onBack={handleBack}
+                    onSubmit={handleSubmit}
+                  />
+                )}
+              </Card>
+            </div>
+
+            {/* Trust Microcopy */}
+            <div className={styles.trustBadges} data-aos="fade-up" data-aos-delay="200">
+              <div className={styles.trustItem}>
+                <CreditCard size={18} className={styles.trustIcon} />
+                <span>No credit card required</span>
               </div>
-            )}
-
-            {/* Form Steps / Preview */}
-            {showPreview ? (
-              <PlanPreview
-                data={formData}
-                onEdit={handleEdit}
-                onCreateAccount={handleCreateAccount}
-              />
-            ) : currentStep === 1 ? (
-              <StepOne
-                fitnessGoals={formData.fitness_goals}
-                fitnessLevel={formData.fitness_level}
-                equipmentAccess={formData.equipment_access}
-                errors={errors}
-                onGoalsChange={handleGoalsChange}
-                onLevelChange={handleLevelChange}
-                onEquipmentChange={handleEquipmentChange}
-                onContinue={handleContinue}
-              />
-            ) : (
-              <StepTwo
-                activityLevel={formData.current_activity_level}
-                gender={formData.gender}
-                age={formData.age}
-                preferredUnits={formData.preferred_units}
-                errors={errors}
-                onActivityChange={handleActivityChange}
-                onGenderChange={handleGenderChange}
-                onAgeChange={handleAgeChange}
-                onUnitsChange={handleUnitsChange}
-                onBack={handleBack}
-                onSubmit={handleSubmit}
-              />
-            )}
-          </Card>
-        </div>
-
-        {/* Trust Microcopy */}
-        <div className={styles.trustBadges} data-aos="fade-up" data-aos-delay="200">
-          <div className={styles.trustItem}>
-            <CreditCard size={18} className={styles.trustIcon} />
-            <span>No credit card required</span>
+              <div className={styles.trustItem}>
+                <Lock size={18} className={styles.trustIcon} />
+                <span>We don&apos;t store answers until you create an account</span>
+              </div>
+              <div className={styles.trustItem}>
+                <RefreshCw size={18} className={styles.trustIcon} />
+                <span>Edit anytime</span>
+              </div>
+            </div>
           </div>
-          <div className={styles.trustItem}>
-            <Lock size={18} className={styles.trustIcon} />
-            <span>We don&apos;t store answers until you create an account</span>
-          </div>
-          <div className={styles.trustItem}>
-            <RefreshCw size={18} className={styles.trustIcon} />
-            <span>Edit anytime</span>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </section>
   )
 }

@@ -36,13 +36,51 @@ export const Navbar: React.FC = () => {
     })
   }
 
+  const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    closeDrawer()
+    trackNavigationClick('#hero', 'nav_link', 'navbar', {
+      link_label: 'Home',
+    })
+    // Check if we're on the home page
+    if (typeof window !== 'undefined' && window.location.pathname === '/') {
+      // Scroll to hero section
+      const heroSection = document.getElementById('hero')
+      if (heroSection) {
+        heroSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    } else if (typeof window !== 'undefined') {
+      // Navigate to home page, then scroll to hero
+      window.location.href = '/#hero'
+    }
+  }
+
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    closeDrawer()
+    trackNavigationClick('#workout-builder', 'nav_link', 'navbar', {
+      link_label: 'Logo',
+    })
+    // Check if we're on the home page
+    if (typeof window !== 'undefined' && window.location.pathname === '/') {
+      // Scroll to workout-builder section (intro screen)
+      const workoutBuilderSection = document.getElementById('workout-builder')
+      if (workoutBuilderSection) {
+        workoutBuilderSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    } else if (typeof window !== 'undefined') {
+      // Navigate to home page, then scroll to workout-builder
+      window.location.href = '/#workout-builder'
+    }
+  }
+
   const navLinks = (
     <>
-      <Link href="/" className={styles.navLink} onClick={() => handleNavClick('/', 'Home')}>
+      <a href="#hero" className={styles.navLink} onClick={handleHomeClick}>
         <Button variant="secondary" size="md" className={styles.button} type="button">
           Home
         </Button>
-      </Link>
+      </a>
       <Link href="/blog" className={styles.navLink} onClick={() => handleNavClick('/blog', 'Blog')}>
         <Button variant="secondary" size="md" className={styles.button} type="button">
           Blog
@@ -81,7 +119,7 @@ export const Navbar: React.FC = () => {
       <nav className={styles.navbar} role="navigation" aria-label="Main navigation">
         <div className={styles.container}>
           {/* Logo */}
-          <Link href="/" className={styles.logoLink}>
+          <a href="#workout-builder" className={styles.logoLink} onClick={handleLogoClick}>
             <div className={styles.logo}>
               {!logoError ? (
                 <Image
@@ -104,7 +142,7 @@ export const Navbar: React.FC = () => {
                 <span className={styles.logoText}>AI Workout Generator</span>
               )}
             </div>
-          </Link>
+          </a>
 
           {/* Desktop Navigation */}
           <div className={styles.desktopNav}>

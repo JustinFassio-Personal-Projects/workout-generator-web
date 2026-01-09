@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 
 vi.mock('next/image', () => ({
@@ -57,15 +57,19 @@ describe('LogoWatermark', () => {
     expect(watermark?.style.transform).toContain('translate(-50%, -50%)')
   })
 
-  it('should hide on image error', () => {
+  it('should hide on image error', async () => {
     const { container, rerender } = render(<LogoWatermark />)
     const image = screen.getByTestId('logo-image')
 
     // Simulate image error
-    const errorEvent = new Event('error')
-    image.dispatchEvent(errorEvent)
+    await act(async () => {
+      const errorEvent = new Event('error')
+      image.dispatchEvent(errorEvent)
+    })
 
-    rerender(<LogoWatermark />)
+    await act(async () => {
+      rerender(<LogoWatermark />)
+    })
     expect(container.querySelector('[aria-hidden="true"]')).not.toBeInTheDocument()
   })
 

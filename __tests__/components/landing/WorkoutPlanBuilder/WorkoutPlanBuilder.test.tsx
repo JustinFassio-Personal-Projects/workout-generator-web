@@ -365,6 +365,11 @@ describe('WorkoutPlanBuilder', () => {
       render(<WorkoutPlanBuilder />)
     })
 
+    // Wait for component to render
+    await waitFor(() => {
+      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+    })
+
     // Go to step 2
     await act(async () => {
       const buildMuscleChip = screen.getByText('Build muscle')

@@ -31,5 +31,11 @@
     "__tests__/**/*.tsx",
     "vitest-setup.d.ts"
   ],
-  "exclude": ["node_modules", "vitest.config.ts", "vitest.config.critical.ts", "src/test"]
+  "exclude": [
+    "node_modules",
+    "vitest.config.ts",
+    "vitest.config.critical.ts",
+    "src/test",
+    "_reference-architecture"
+  ]
 }

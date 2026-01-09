@@ -87,7 +87,7 @@ describe('Bio', () => {
   it('should render bio section with image and content', () => {
     render(<Bio />)
 
-    expect(screen.getByTestId('profile-image')).toBeInTheDocument()
+    // Image section is now a background-image div, check for content instead
     expect(screen.getByText(/Built by a coach, not a prompt/)).toBeInTheDocument()
     expect(screen.getByText(/Justin Fassio/)).toBeInTheDocument()
   })
@@ -174,11 +174,7 @@ describe('Bio', () => {
     expect(screen.getByTestId('arrow-icon')).toBeInTheDocument()
   })
 
-  it('should render micro trust text', () => {
-    render(<Bio />)
-
-    expect(screen.getByText(/AI-generated doesn't mean reckless/)).toBeInTheDocument()
-  })
+  // Micro trust text was removed as part of redesign
 
   it('should render logo watermark', () => {
     render(<Bio />)

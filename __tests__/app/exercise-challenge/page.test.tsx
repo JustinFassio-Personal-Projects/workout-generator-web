@@ -136,10 +136,15 @@ describe('ExerciseChallengePage', () => {
     clearTimeoutSpy.mockRestore()
   })
 
-  it('should render hero section on initial load', () => {
-    render(<ExerciseChallengePage />)
+  it('should render hero section on initial load', async () => {
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
-    expect(screen.getByText('Fitcopilot Vision Lab')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Fitcopilot Vision Lab')).toBeInTheDocument()
+    })
+
     expect(
       screen.getByText(
         /Visualize technique — then tell us what you'd expect from an AI workout generator/
@@ -147,16 +152,23 @@ describe('ExerciseChallengePage', () => {
     ).toBeInTheDocument()
   })
 
-  it('should display lead gate when no leadId', () => {
-    render(<ExerciseChallengePage />)
+  it('should display lead gate when no leadId', async () => {
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
-    expect(screen.getByTestId('lead-gate')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByTestId('lead-gate')).toBeInTheDocument()
+    })
+
     expect(screen.queryByTestId('vision-lab-iframe')).not.toBeInTheDocument()
   })
 
   it('should display vision lab iframe after lead capture', async () => {
     const user = userEvent.setup({ delay: null })
-    render(<ExerciseChallengePage />)
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
     await act(async () => {
       const submitButton = screen.getByText('Submit Lead')
@@ -177,7 +189,9 @@ describe('ExerciseChallengePage', () => {
     vi.useFakeTimers()
     const user = userEvent.setup({ delay: null })
 
-    render(<ExerciseChallengePage />)
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
     // Capture lead
     const submitButton = screen.getByText('Submit Lead')
@@ -197,7 +211,9 @@ describe('ExerciseChallengePage', () => {
 
   it('should show micro-interview immediately when generation starts (Phase 2)', async () => {
     const user = userEvent.setup({ delay: null })
-    render(<ExerciseChallengePage />)
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
     // Capture lead
     const submitButton = screen.getByText('Submit Lead')
@@ -226,7 +242,9 @@ describe('ExerciseChallengePage', () => {
 
   it('should show success state after micro-interview completion', async () => {
     const user = userEvent.setup({ delay: null })
-    render(<ExerciseChallengePage />)
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
     // Capture lead
     const submitButton = screen.getByText('Submit Lead')
@@ -277,7 +295,9 @@ describe('ExerciseChallengePage', () => {
     ;(window as any).location.href =
       'http://localhost:3000/exercise-challenge?utm_source=test-source&utm_campaign=test-campaign&utm_medium=test-medium'
 
-    render(<ExerciseChallengePage />)
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
     // Wait a bit for useEffect to run
     await new Promise(resolve => setTimeout(resolve, 100))
@@ -294,7 +314,9 @@ describe('ExerciseChallengePage', () => {
     // Clear UTM parameters
     ;(window as any).location.searchParams = new URLSearchParams()
 
-    render(<ExerciseChallengePage />)
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
     expect(analytics.trackVisionLabViewed).toHaveBeenCalledWith({
       path: '/exercise-challenge',
@@ -315,7 +337,9 @@ describe('ExerciseChallengePage', () => {
     }
     mockGetElementById.mockReturnValue(mockElement)
 
-    render(<ExerciseChallengePage />)
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
     // Complete the flow to get to success state
     const submitButton = screen.getByText('Submit Lead')
@@ -375,7 +399,9 @@ describe('ExerciseChallengePage', () => {
     }
     mockGetElementById.mockReturnValue(mockElement)
 
-    render(<ExerciseChallengePage />)
+    await act(async () => {
+      render(<ExerciseChallengePage />)
+    })
 
     // Complete the flow to get to success state
     const submitButton = screen.getByText('Submit Lead')
@@ -484,7 +510,11 @@ describe('ExerciseChallengePage', () => {
   it('should cleanup setTimeout on unmount', async () => {
     const user = userEvent.setup({ delay: null })
 
-    const { unmount } = render(<ExerciseChallengePage />)
+    let unmount: (() => void) | undefined
+    await act(async () => {
+      const result = render(<ExerciseChallengePage />)
+      unmount = result.unmount
+    })
 
     // Capture lead to trigger setTimeout
     const submitButton = screen.getByText('Submit Lead')
@@ -494,7 +524,9 @@ describe('ExerciseChallengePage', () => {
     expect(global.setTimeout).toHaveBeenCalled()
 
     // Unmount - cleanup should be called
-    unmount()
+    if (unmount) {
+      unmount()
+    }
 
     // Verify that the component unmounted without errors
     expect(screen.queryByTestId('lead-gate')).not.toBeInTheDocument()

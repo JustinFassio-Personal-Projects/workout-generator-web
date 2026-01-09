@@ -366,78 +366,73 @@
 }
 
 .credibilityCard {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: 0;
+  align-items: stretch;
   align-self: center;
-  max-width: 600px;
-  background: rgba(15, 23, 42, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  opacity: 0.85;
-  margin-bottom: 0;
-  overflow: visible;
-  position: relative;
+  max-width: 700px;
+  min-height: 300px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg-dark);
+  box-shadow: var(--shadow-2xl);
 
   @media (max-width: 968px) {
+    max-width: 500px;
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  @media (max-width: 640px) {
     max-width: 100%;
   }
 }
 
-.credibilityImageHolder {
-  flex-shrink: 0;
+.credibilityImageSection {
   position: relative;
-  width: 120px;
-  height: 120px;
-  overflow: hidden;
-  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  width: 100%;
+  background-image: url('/justin-profile-hero-three-quarter.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 300px;
 
   @media (max-width: 968px) {
-    width: 100px;
-    height: 100px;
+    min-height: 0;
+    aspect-ratio: 2 / 3; // 2:3 aspect ratio for 512x768 image
+    order: -1;
+    background-position: top center;
+    max-width: 240px;
+    margin: 0 auto;
   }
 
-  @media (max-width: 480px) {
-    width: 80px;
-    height: 80px;
+  @media (max-width: 640px) {
+    aspect-ratio: 2 / 3; // 2:3 aspect ratio for 512x768 image
+    background-position: top center;
+    max-width: 180px;
+    margin: 0 auto;
   }
 }
 
 .credibilityContent {
-  flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-md);
-  padding-bottom: var(--spacing-sm);
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+  padding-bottom: calc(var(--spacing-xl) + 50px); // Extra padding for CTA
 
   @media (max-width: 968px) {
+    padding: var(--spacing-md);
+    padding-bottom: calc(var(--spacing-md) + 50px);
+  }
+
+  @media (max-width: 640px) {
     padding: var(--spacing-sm);
-    padding-bottom: var(--spacing-xs);
+    padding-bottom: calc(var(--spacing-sm) + 50px);
+    gap: var(--spacing-sm);
   }
-
-  @media (max-width: 480px) {
-    padding: var(--spacing-xs);
-    padding-bottom: var(--spacing-xs);
-  }
-}
-
-.thumbnailImage {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.thumbnailImageSquare {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .credibilityText {
@@ -445,11 +440,11 @@
   color: var(--text-secondary);
   line-height: var(--line-height-relaxed);
   margin: 0;
-  opacity: 0.9;
   text-align: left;
 
   @media (max-width: 768px) {
     font-size: var(--font-size-xs);
+    text-align: center;
   }
 }
 
@@ -458,39 +453,24 @@
   color: var(--text-tertiary);
   line-height: var(--line-height-normal);
   margin: 0;
-  opacity: 0.75;
 
   @media (max-width: 768px) {
     font-size: 0.7rem;
+    text-align: center;
   }
 }
 
 .credibilityCta {
   position: absolute;
-  bottom: var(--spacing-sm);
-  left: calc(120px + var(--spacing-md));
+  bottom: var(--spacing-md);
+  right: var(--spacing-md);
   z-index: 1;
 
-  button {
-    font-size: var(--font-size-xs);
-    padding: calc(var(--spacing-xs) * 0.75) var(--spacing-sm);
-    height: auto;
-    min-height: auto;
-    line-height: 1.2;
-  }
-
   @media (max-width: 968px) {
-    left: calc(100px + var(--spacing-sm));
-    bottom: var(--spacing-xs);
-  }
-
-  @media (max-width: 480px) {
-    left: calc(80px + var(--spacing-xs));
-    bottom: var(--spacing-xs);
-
-    button {
-      font-size: 0.65rem;
-      padding: calc(var(--spacing-xs) * 0.5) var(--spacing-xs);
-    }
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin-top: var(--spacing-md);
+    align-self: center;
   }
 }

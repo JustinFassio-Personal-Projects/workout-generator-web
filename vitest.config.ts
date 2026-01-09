@@ -36,6 +36,8 @@ export default defineConfig({
         'lib/blog/**',
         'middleware.ts',
         'scripts/**',
+        // Exclude reference architecture directory (not part of main codebase)
+        '_reference-architecture/**',
         // Exclude re-export and type-only files (no logic to test)
         'features/blog/index.ts',
         'features/blog/types.ts',

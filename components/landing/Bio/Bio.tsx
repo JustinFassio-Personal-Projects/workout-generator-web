@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Check } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
@@ -34,21 +33,8 @@ export const Bio: React.FC = () => {
       <LogoWatermark position="center" opacity={0.03} size={400} rotation={0} />
       <div className={styles.container}>
         <div className={styles.layout}>
-          {/* Image Section */}
-          <div className={styles.imageSection} data-aos="fade-right">
-            <div className={styles.imageWrapper}>
-              <Image
-                src="/justin-profile-section-1.png"
-                alt="Justin Fassio - Founder of AIWorkoutGenerator"
-                width={600}
-                height={800}
-                className={styles.profileImage}
-                priority
-                quality={90}
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-              />
-            </div>
-          </div>
+          {/* Image Section - Full-bleed background */}
+          <div className={styles.imageSection} data-aos="fade-right" />
 
           {/* Content Section */}
           <div className={styles.content} data-aos="fade-left">
@@ -89,23 +75,18 @@ export const Bio: React.FC = () => {
           </div>
         </div>
 
-        {/* CTAs Section - Below image and credentials */}
-        <div className={styles.ctaSection}>
-          <div className={styles.actions} data-aos="fade-up" data-aos-delay="200">
+        {/* CTAs - Outside card, bottom right of section */}
+        <div className={styles.ctaSection} data-aos="fade-up" data-aos-delay="200">
+          <div className={styles.actions}>
             <Link href="/founder-story" onClick={handleFounderStoryClick}>
-              <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
+              <Button variant="primary" size="md" icon={ArrowRight} iconPosition="right">
                 Read the Founder Story
               </Button>
             </Link>
-            <Button variant="secondary" size="lg" onClick={handleGenerateWorkoutClick}>
+            <Button variant="secondary" size="md" onClick={handleGenerateWorkoutClick}>
               Generate My First Workout
             </Button>
           </div>
-
-          <p className={styles.microTrust} data-aos="fade-up" data-aos-delay="300">
-            AI-generated doesn&apos;t mean reckless. Programming logic is built around progression,
-            constraints, and real coaching fundamentals.
-          </p>
         </div>
       </div>
     </section>

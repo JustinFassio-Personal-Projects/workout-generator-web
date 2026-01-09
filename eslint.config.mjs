@@ -24,6 +24,7 @@ const eslintConfig = [
       '.vitest/**',
       '*.tsbuildinfo',
       'next-env.d.ts',
+      '_reference-architecture/**',
     ],
   },
 ];

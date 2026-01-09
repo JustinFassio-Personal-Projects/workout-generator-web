@@ -510,7 +510,7 @@ describe('ExerciseChallengePage', () => {
   it('should cleanup setTimeout on unmount', async () => {
     const user = userEvent.setup({ delay: null })
 
-    let unmount: () => void
+    let unmount: (() => void) | undefined
     await act(async () => {
       const result = render(<ExerciseChallengePage />)
       unmount = result.unmount
@@ -524,7 +524,9 @@ describe('ExerciseChallengePage', () => {
     expect(global.setTimeout).toHaveBeenCalled()
 
     // Unmount - cleanup should be called
-    unmount()
+    if (unmount) {
+      unmount()
+    }
 
     // Verify that the component unmounted without errors
     expect(screen.queryByTestId('lead-gate')).not.toBeInTheDocument()

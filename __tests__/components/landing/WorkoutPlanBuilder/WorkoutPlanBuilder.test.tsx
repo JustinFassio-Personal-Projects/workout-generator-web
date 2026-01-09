@@ -415,7 +415,7 @@ describe('WorkoutPlanBuilder', () => {
       },
       { timeout: 3000 }
     )
-  }, 10000)
+  })
 
   it('should render trust badges', async () => {
     const user = userEvent.setup()

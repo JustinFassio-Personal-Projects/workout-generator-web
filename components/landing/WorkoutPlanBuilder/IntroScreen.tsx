@@ -32,26 +32,25 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
     }
   }, [])
 
+  const scrollToSection = (sectionId: string) => {
+    setTimeout(() => {
+      const sectionElement = document.getElementById(sectionId)
+      if (sectionElement) {
+        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+  }
+
   const handleEnter = () => {
     onComplete()
     // Scroll to workout-builder section after intro hides
-    setTimeout(() => {
-      const workoutBuilderSection = document.getElementById('workout-builder')
-      if (workoutBuilderSection) {
-        workoutBuilderSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-    }, 100)
+    scrollToSection('workout-builder')
   }
 
   const handleLearnMore = () => {
     onComplete()
     // Scroll to hero section after intro hides
-    setTimeout(() => {
-      const heroSection = document.getElementById('hero')
-      if (heroSection) {
-        heroSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-    }, 100)
+    scrollToSection('hero')
   }
 
   const strands = Array.from({ length: 12 })

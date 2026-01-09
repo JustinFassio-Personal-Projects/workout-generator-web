@@ -43,11 +43,17 @@ jobs:
       - name: Run critical path tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key-for-ci' }}
+          FIREBASE_FUNCTION_URL: ${{ secrets.FIREBASE_FUNCTION_URL || 'https://test-function-url.firebaseapp.com' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://test.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'test-anon-key' }}
         run: npm run test:critical
 
       - name: Generate test coverage
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key-for-ci' }}
+          FIREBASE_FUNCTION_URL: ${{ secrets.FIREBASE_FUNCTION_URL || 'https://test-function-url.firebaseapp.com' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://test.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'test-anon-key' }}
         run: npm run test:coverage
         # Runs all tests with coverage (includes critical tests)
         # Coverage thresholds are enforced by vitest config
@@ -85,4 +91,5 @@ jobs:
           files: ./coverage/lcov.info
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
         continue-on-error: true

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The support/feedback widget is a modal form accessible via a Floating Action Button (FAB) that allows users (both authenticated and anonymous) to submit support tickets, bug reports, and feature requests.
+The support/feedback widget is a conversational modal form accessible via a Floating Action Button (FAB) that allows users (both authenticated and anonymous) to submit questions and get help. The interface uses an intent-based workflow to make it feel more like talking to a human rather than filing a formal ticket.
 
 ---
 
@@ -12,6 +12,7 @@ The support/feedback widget is a modal form accessible via a Floating Action But
 
 1. **FAB Button** (Floating Action Button) appears on all pages (bottom-right corner)
    - Icon: `HelpCircle` (question mark in circle)
+   - Label: "Questions?" (aria-label)
    - Always visible, rendered via React Portal to `document.body`
 
 2. **User clicks FAB button** → Menu expands with options:
@@ -24,60 +25,57 @@ The support/feedback widget is a modal form accessible via a Floating Action But
 
 ## 2. Form Fields & Questions
 
-### Field 1: **Subject** (Required)
+### Header Section
 
-- **Type**: Free text input
-- **Label**: "Subject \*"
-- **Placeholder**: "Brief description of your feedback"
-- **Validation Rules**:
-  - Cannot be empty
-  - Must be at least 5 characters long (trimmed)
-  - Client-side validation before submission
-  - Server-side validation enforces same rules
-- **Default Value**: Empty string
-- **Auto-filled**: No
+The modal header includes:
 
-### Field 2: **Category** (Required)
+- **Title**: "Need help with your workout?"
+- **Subtitle**: "Ask anything — workouts, goals, equipment, or pricing. We'll reply by email."
+- **Trust Lines**:
+  - "Real human replies"
+  - "Usually within 1 business day"
+  - "No spam"
+- **Profile Thumbnail**: Round image of Justin on the right side of the header
 
-- **Type**: Dropdown select (NOT free text)
-- **Label**: "Category \*"
-- **Options** (fixed list):
-  1. `"technical"` → Display: "Technical Support"
-  2. `"bug"` → Display: "Bug Report"
-  3. `"feature_request"` → Display: "Feature Request"
-  4. `"billing"` → Display: "Billing"
-  5. `"other"` → Display: "Other"
-- **Default Value**: `"technical"` (Technical Support)
-- **Validation**: Must be one of the 5 valid options (server validates)
+### Field 1: **Intent Selection** (Required)
 
-### Field 3: **Priority** (Required)
+- **Type**: Button selector (4 large buttons in a 2x2 grid)
+- **Label**: "What do you need help with? \*"
+- **Options** (user-friendly buttons):
+  1. `"generate_first_workout"` → Display: "Generate my first workout"
+  2. `"fix_workout"` → Display: "Fix my workout"
+  3. `"plan_help"` → Display: "Which plan should I choose?"
+  4. `"something_broken"` → Display: "Something isn't working"
+- **Default Value**: `null` (no selection)
+- **Validation**: Must select one intent before submission
+- **Behavior**:
+  - Selected button is highlighted with accent color
+  - Clicking a button clears any previous error messages
+  - Selection affects the placeholder text for the question field
 
-- **Type**: Dropdown select (NOT free text)
-- **Label**: "Priority \*"
-- **Options** (fixed list):
-  1. `"low"` → Display: "Low"
-  2. `"medium"` → Display: "Medium"
-  3. `"high"` → Display: "High"
-  4. `"urgent"` → Display: "Urgent"
-- **Default Value**: `"medium"` (Medium)
-- **Validation**: Must be one of the 4 valid options (server validates)
-
-### Field 4: **Description** (Required)
+### Field 2: **Your Question / Message** (Required)
 
 - **Type**: Free text textarea
-- **Label**: "Description \*"
-- **Placeholder**: "Please provide as much detail as possible..."
+- **Label**: "Your question \*"
+- **Placeholder**: Dynamic, changes based on selected intent:
+  - `generate_first_workout`: "Tell us your goal + what equipment you have (or 'none'). Example: 'Lose fat, dumbbells at home, 30 min, 3 days/week.'"
+  - `fix_workout`: "What felt off — too hard/easy, too long, wrong equipment, pain? If you can, paste the workout link or describe the exercises."
+  - `plan_help`: "What's your goal and how often do you train? We'll recommend the best plan."
+  - `something_broken`: "What were you trying to do when it failed? Any error message? What device/browser?"
+  - No intent selected: "Ask your question here..."
 - **Rows**: 6
 - **Validation Rules**:
   - Cannot be empty (trimmed)
+  - Must be at least 10 characters long (trimmed)
   - No maximum length specified
 - **Default Value**: Empty string
 - **Auto-filled**: No
+- **Auto-focus**: Yes (first field focused when modal opens)
 
-### Field 5: **Email** (Required)
+### Field 3: **Email** (Required)
 
-- **Type**: Email input (free text, but validated as email format)
-- **Label**: "Email \*"
+- **Type**: Email input (validated as email format)
+- **Label**: "Email (so we can reply) \*"
 - **Placeholder**: "your.email@example.com"
 - **Validation Rules**:
   - Cannot be empty
@@ -88,7 +86,7 @@ The support/feedback widget is a modal form accessible via a Floating Action But
   - Uses: `user.email` from Supabase authentication
   - If user email is missing, field is cleared (not preserved from previous value)
 
-### Field 6: **Name** (Optional)
+### Field 4: **Name** (Optional)
 
 - **Type**: Free text input
 - **Label**: "Name (optional)"
@@ -98,6 +96,20 @@ The support/feedback widget is a modal form accessible via a Floating Action But
 - **Auto-filled**: Yes (if user is authenticated)
   - Uses: `user.user_metadata?.full_name` or `user.user_metadata?.name`
   - If user name is missing, field is cleared (not preserved from previous value)
+
+### Removed Fields (Auto-Generated)
+
+The following fields are **no longer shown to users** but are automatically generated:
+
+- **Subject**: Auto-generated from intent label + message preview (first 60 chars)
+  - Format: `"{Intent Label}: {Message Preview}..."`
+  - Example: "Generate my first workout: I want to lose weight and have dumbbells at..."
+- **Category**: Auto-mapped from selected intent
+  - `something_broken` → `bug`
+  - `plan_help` → `billing`
+  - `fix_workout` → `feature_request`
+  - `generate_first_workout` → `other`
+- **Priority**: Always set to `medium` (no user selection)
 
 ---
 
@@ -109,16 +121,27 @@ The support/feedback widget is a modal form accessible via a Floating Action But
 - **Keyboard**: ESC key closes modal (when not submitting)
 - **Body Scroll**: Prevented when modal is open
 - **Focus Management**:
-  - First input (Subject) auto-focuses when modal opens
+  - First input (Your question textarea) auto-focuses when modal opens
   - Previous focus restored when modal closes
 
 ### Form States:
 
-- **Initial**: All fields empty (except defaults for category/priority)
+- **Initial**: All fields empty (except auto-filled email/name if authenticated)
 - **Loading**: If user is authenticated, email/name auto-fill after user data loads
 - **Submitting**: Form disabled, submit button shows loading spinner
-- **Success**: Green success message, form auto-closes after 2 seconds
+- **Success**: Success screen displayed with email confirmation and action buttons
 - **Error**: Red error message displayed above form
+
+### Success Screen:
+
+After successful submission, the form shows:
+
+- **Title**: "Sent."
+- **Message**: "We'll reply to {email}. Usually within 1 business day."
+- **Actions**:
+  - "Close" button (secondary) - Closes the modal
+  - "Ask another question" button (primary) - Resets form and allows another submission
+- **No auto-close**: Modal stays open until user clicks an action button
 
 ---
 
@@ -126,20 +149,18 @@ The support/feedback widget is a modal form accessible via a Floating Action But
 
 Validation occurs in this order:
 
-1. **Subject**:
-   - ❌ Empty → Error: "Subject is required"
-   - ❌ Less than 5 characters → Error: "Subject must be at least 5 characters long"
+1. **Intent Selection**:
+   - ❌ Not selected → Error: "Please select what you need help with"
 
-2. **Description**:
-   - ❌ Empty → Error: "Description is required"
+2. **Your Question / Message**:
+   - ❌ Empty → Error: "Your question is required"
+   - ❌ Less than 10 characters → Error: "Please provide more details (at least 10 characters)"
 
 3. **Email**:
    - ❌ Empty → Error: "Email is required"
    - ❌ Invalid format → Error: "Please enter a valid email address"
 
-4. **Category & Priority**:
-   - Validated by HTML5 `required` attribute (browser validation)
-   - Server also validates against allowed values
+4. **Name**: No validation (optional field)
 
 ---
 
@@ -147,7 +168,7 @@ Validation occurs in this order:
 
 ### Step 1: Form Submission
 
-- User clicks "Submit Feedback" button
+- User clicks "Send question" button
 - Client-side validation runs
 - If validation passes, form data is prepared
 
@@ -155,10 +176,10 @@ Validation occurs in this order:
 
 ```typescript
 {
-  subject: string (trimmed, min 5 chars),
-  description: string (trimmed),
-  category: 'billing' | 'technical' | 'feature_request' | 'bug' | 'other',
-  priority: 'low' | 'medium' | 'high' | 'urgent',
+  subject: string (auto-generated from intent + message preview),
+  description: string (trimmed, min 10 chars),
+  category: 'billing' | 'technical' | 'feature_request' | 'bug' | 'other' (mapped from intent),
+  priority: 'medium' (always),
   email: string (validated email),
   name: string (trimmed, optional),
   metadata: {
@@ -171,6 +192,19 @@ Validation occurs in this order:
   website: '' (honeypot field - must be empty)
 }
 ```
+
+**Subject Generation Logic**:
+
+- Intent label is retrieved from mapping
+- First 60 characters of message are used as preview
+- Format: `"{Intent Label}: {Preview}..."` (if preview is 60 chars, "..." is appended)
+
+**Category Mapping**:
+
+- `something_broken` → `bug`
+- `plan_help` → `billing`
+- `fix_workout` → `feature_request`
+- `generate_first_workout` → `other`
 
 ### Step 3: API Request
 
@@ -195,7 +229,7 @@ Validation occurs in this order:
 
 1. **Subject**:
    - Must exist, be string, non-empty
-   - Must be at least 5 characters (trimmed)
+   - No minimum length validation (auto-generated, so assumed valid)
 
 2. **Description**:
    - Must exist, be string, non-empty
@@ -243,24 +277,29 @@ Validation occurs in this order:
 
 ### Success Response:
 
-1. Success message displayed: "Thank you! Your feedback has been submitted successfully."
-2. Form fields reset to defaults
-3. Modal auto-closes after 2 seconds
-4. Form state cleared
+1. Success screen displayed with:
+   - "Sent." title
+   - "We'll reply to {email}. Usually within 1 business day." message
+   - "Close" and "Ask another question" buttons
+2. Form fields remain visible but disabled
+3. Modal stays open (no auto-close)
+4. User can click "Ask another question" to reset form and submit again
+5. User can click "Close" to close the modal
 
 ### Error Response:
 
 1. Error message displayed in red above form
-2. Form remains open
+2. Form remains open and enabled
 3. User can correct and resubmit
 4. Error details logged to console (sanitized in production)
 
 ### Common Error Messages:
 
-- `"Subject is required"`
-- `"Subject must be at least 5 characters long"`
-- `"Description is required"`
-- `"Valid email is required"`
+- `"Please select what you need help with"`
+- `"Your question is required"`
+- `"Please provide more details (at least 10 characters)"`
+- `"Email is required"`
+- `"Please enter a valid email address"`
 - `"Category must be one of: billing, technical, feature_request, bug, other"`
 - `"Priority must be one of: low, medium, high, urgent"`
 - `"Rate limit exceeded. Please try again later."`
@@ -271,17 +310,18 @@ Validation occurs in this order:
 
 ## 7. Summary: Field Types
 
-### Free Text Fields (User types freely):
+### User-Visible Fields:
 
-1. ✅ **Subject** - Text input (min 5 chars)
-2. ✅ **Description** - Textarea (unlimited length)
-3. ✅ **Email** - Email input (validated format)
+1. ✅ **Intent Selection** - Button selector (4 options, required)
+2. ✅ **Your Question** - Textarea (min 10 chars, required)
+3. ✅ **Email** - Email input (validated format, required)
 4. ✅ **Name** - Text input (optional, unlimited length)
 
-### Dropdown/Select Fields (Fixed options):
+### Auto-Generated Fields (Hidden from User):
 
-1. 📋 **Category** - Select dropdown (5 options)
-2. 📋 **Priority** - Select dropdown (4 options)
+1. 🔒 **Subject** - Auto-generated from intent + message preview
+2. 🔒 **Category** - Auto-mapped from intent selection
+3. 🔒 **Priority** - Always set to `medium`
 
 ### Auto-Collected Fields (Not user input):
 
@@ -298,8 +338,8 @@ Validation occurs in this order:
 
 ### Components:
 
-- **GroupedFAB** (`components/ui/GroupedFAB/GroupedFAB.tsx`): FAB button and menu
-- **TicketSubmissionForm** (`components/support/TicketSubmissionForm.tsx`): Form modal
+- **GroupedFAB** (`components/ui/GroupedFAB/GroupedFAB.tsx`): FAB button and menu (label: "Questions?")
+- **TicketSubmissionForm** (`components/support/TicketSubmissionForm.tsx`): Form modal with intent-based workflow
 - **API Route** (`app/api/support/create/route.ts`): Server-side handler
 
 ### Dependencies:
@@ -307,6 +347,7 @@ Validation occurs in this order:
 - Supabase authentication (optional - for auto-filling user data)
 - Firebase Cloud Functions (for ticket creation)
 - Next.js API routes (for request handling)
+- Next.js Image component (for profile thumbnail)
 
 ### Security Features:
 
@@ -321,31 +362,34 @@ Validation occurs in this order:
 ## 9. User Experience Flow
 
 ```
-1. User sees FAB button (bottom-right)
+1. User sees FAB button (bottom-right) with "Questions?" label
    ↓
 2. User clicks FAB → Menu expands
    ↓
 3. User clicks "Support" → Modal opens
    ↓
 4. Form appears with:
-   - Subject field (focused)
-   - Category dropdown (default: Technical Support)
-   - Priority dropdown (default: Medium)
-   - Description textarea
+   - Header: "Need help with your workout?" + profile thumbnail
+   - Intent selector: 4 large buttons (2x2 grid)
+   - Your question textarea (focused, dynamic placeholder)
    - Email field (auto-filled if logged in)
    - Name field (auto-filled if logged in, optional)
    ↓
-5. User fills out form
+5. User selects intent button → Placeholder updates
    ↓
-6. User clicks "Submit Feedback"
+6. User fills out question, email, and optionally name
    ↓
-7a. If validation fails → Error message shown, form stays open
-7b. If validation passes → Loading spinner, form disabled
+7. User clicks "Send question"
    ↓
-8. API processes request
+8a. If validation fails → Error message shown, form stays open
+8b. If validation passes → Loading spinner, form disabled
    ↓
-9a. If error → Error message shown, form re-enabled
-9b. If success → Success message, form closes after 2 seconds
+9. API processes request
+   ↓
+10a. If error → Error message shown, form re-enabled
+10b. If success → Success screen shown with email confirmation
+   ↓
+11. User clicks "Close" or "Ask another question"
 ```
 
 ---
@@ -366,16 +410,29 @@ Validation occurs in this order:
 
 ## 11. Validation Summary Table
 
-| Field       | Type              | Required | Min Length | Max Length | Format/Options                                  |
-| ----------- | ----------------- | -------- | ---------- | ---------- | ----------------------------------------------- |
-| Subject     | Free text         | ✅ Yes   | 5 chars    | None       | Any text                                        |
-| Category    | Dropdown          | ✅ Yes   | N/A        | N/A        | technical, bug, feature_request, billing, other |
-| Priority    | Dropdown          | ✅ Yes   | N/A        | N/A        | low, medium, high, urgent                       |
-| Description | Free text         | ✅ Yes   | 1 char     | None       | Any text                                        |
-| Email       | Free text (email) | ✅ Yes   | N/A        | N/A        | Valid email format                              |
-| Name        | Free text         | ❌ No    | N/A        | None       | Any text                                        |
+| Field            | Type              | Required | Min Length | Max Length | Format/Options                                                   |
+| ---------------- | ----------------- | -------- | ---------- | ---------- | ---------------------------------------------------------------- |
+| Intent Selection | Button selector   | ✅ Yes   | N/A        | N/A        | generate_first_workout, fix_workout, plan_help, something_broken |
+| Your Question    | Free text         | ✅ Yes   | 10 chars   | None       | Any text                                                         |
+| Email            | Free text (email) | ✅ Yes   | N/A        | N/A        | Valid email format                                               |
+| Name             | Free text         | ❌ No    | N/A        | None       | Any text                                                         |
+| Subject (auto)   | Auto-generated    | ✅ Yes   | N/A        | N/A        | "{Intent Label}: {Message Preview}..."                           |
+| Category (auto)  | Auto-mapped       | ✅ Yes   | N/A        | N/A        | bug, billing, feature_request, other (from intent)               |
+| Priority (auto)  | Auto-set          | ✅ Yes   | N/A        | N/A        | Always "medium"                                                  |
+
+---
+
+## 12. Intent-to-Category Mapping
+
+| User Intent (Button)          | Internal Category | Use Case                                   |
+| ----------------------------- | ----------------- | ------------------------------------------ |
+| "Generate my first workout"   | `other`           | New users needing workout generation help  |
+| "Fix my workout"              | `feature_request` | Users wanting to improve existing workouts |
+| "Which plan should I choose?" | `billing`         | Subscription/pricing questions             |
+| "Something isn't working"     | `bug`             | Technical issues or broken functionality   |
 
 ---
 
 **Last Updated**: January 2025  
-**Version**: 1.0
+**Version**: 2.0  
+**Status**: ✅ Updated to reflect intent-based conversational interface

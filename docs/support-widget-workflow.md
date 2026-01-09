@@ -107,7 +107,7 @@ The following fields are **no longer shown to users** but are automatically gene
 - **Category**: Auto-mapped from selected intent
   - `something_broken` → `bug`
   - `plan_help` → `other` (ambiguous - could be subscription or workout plan)
-  - `fix_workout` → `feature_request`
+  - `fix_workout` → `bug` (workout fixes are typically bugs in generation logic)
   - `generate_first_workout` → `other`
 - **Priority**: Always set to `medium` (no user selection)
 
@@ -203,7 +203,7 @@ Validation occurs in this order:
 
 - `something_broken` → `bug`
 - `plan_help` → `other` (ambiguous - could be subscription or workout plan)
-- `fix_workout` → `feature_request`
+- `fix_workout` → `bug` (workout fixes are typically bugs in generation logic)
 - `generate_first_workout` → `other`
 
 ### Step 3: API Request
@@ -410,26 +410,26 @@ Validation occurs in this order:
 
 ## 11. Validation Summary Table
 
-| Field            | Type              | Required | Min Length | Max Length | Format/Options                                                   |
-| ---------------- | ----------------- | -------- | ---------- | ---------- | ---------------------------------------------------------------- |
-| Intent Selection | Button selector   | ✅ Yes   | N/A        | N/A        | generate_first_workout, fix_workout, plan_help, something_broken |
-| Your Question    | Free text         | ✅ Yes   | 10 chars   | None       | Any text                                                         |
-| Email            | Free text (email) | ✅ Yes   | N/A        | N/A        | Valid email format                                               |
-| Name             | Free text         | ❌ No    | N/A        | None       | Any text                                                         |
-| Subject (auto)   | Auto-generated    | ✅ Yes   | N/A        | N/A        | "{Intent Label}: {Message Preview}..."                           |
-| Category (auto)  | Auto-mapped       | ✅ Yes   | N/A        | N/A        | bug, billing, feature_request, other (from intent)               |
-| Priority (auto)  | Auto-set          | ✅ Yes   | N/A        | N/A        | Always "medium"                                                  |
+| Field            | Type              | Required | Min Length | Max Length | Format/Options                                                               |
+| ---------------- | ----------------- | -------- | ---------- | ---------- | ---------------------------------------------------------------------------- |
+| Intent Selection | Button selector   | ✅ Yes   | N/A        | N/A        | generate_first_workout, fix_workout, plan_help, something_broken             |
+| Your Question    | Free text         | ✅ Yes   | 10 chars   | None       | Any text                                                                     |
+| Email            | Free text (email) | ✅ Yes   | N/A        | N/A        | Valid email format                                                           |
+| Name             | Free text         | ❌ No    | N/A        | None       | Any text                                                                     |
+| Subject (auto)   | Auto-generated    | ✅ Yes   | N/A        | N/A        | "{Intent Label}: {Message Preview}..."                                       |
+| Category (auto)  | Auto-mapped       | ✅ Yes   | N/A        | N/A        | bug, other (from intent - plan_help and generate_first_workout map to other) |
+| Priority (auto)  | Auto-set          | ✅ Yes   | N/A        | N/A        | Always "medium"                                                              |
 
 ---
 
 ## 12. Intent-to-Category Mapping
 
-| User Intent (Button)          | Internal Category | Use Case                                                |
-| ----------------------------- | ----------------- | ------------------------------------------------------- |
-| "Generate my first workout"   | `other`           | New users needing workout generation help               |
-| "Fix my workout"              | `feature_request` | Users wanting to improve existing workouts              |
-| "Which plan should I choose?" | `other`           | Plan selection questions (subscription or workout plan) |
-| "Something isn't working"     | `bug`             | Technical issues or broken functionality                |
+| User Intent (Button)          | Internal Category | Use Case                                                             |
+| ----------------------------- | ----------------- | -------------------------------------------------------------------- |
+| "Generate my first workout"   | `other`           | New users needing workout generation help                            |
+| "Fix my workout"              | `bug`             | Workout generation issues (incorrect results, wrong equipment, etc.) |
+| "Which plan should I choose?" | `other`           | Plan selection questions (subscription or workout plan)              |
+| "Something isn't working"     | `bug`             | Technical issues or broken functionality                             |
 
 ---
 

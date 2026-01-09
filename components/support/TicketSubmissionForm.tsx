@@ -36,6 +36,7 @@ interface Metadata {
   device_type?: 'mobile' | 'desktop' | 'tablet'
   subscription_tier?: string // If user is authenticated
   utm_params?: Record<string, string> // From URL query params
+  intent?: IntentType // User's selected intent (for admin visibility)
 }
 
 export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOpen, onClose }) => {
@@ -135,7 +136,10 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       source: 'website',
       source_url: typeof window !== 'undefined' ? window.location.href : undefined,
       device_type: detectDeviceType(),
-      subscription_tier: undefined, // TODO: Get from user profile if available
+      subscription_tier:
+        user?.user_metadata?.subscription_tier ||
+        user?.app_metadata?.subscription_tier ||
+        undefined,
       utm_params: Object.keys(parseUTMParams()).length > 0 ? parseUTMParams() : undefined,
     }
   }
@@ -148,7 +152,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       case 'fix_workout':
         return 'What felt off — too hard/easy, too long, wrong equipment, pain? If you can, paste the workout link or describe the exercises.'
       case 'plan_help':
-        return "What's your goal and how often do you train? We&apos;ll recommend the best plan."
+        return 'How many workouts per month do you need? What features matter most? We will recommend the best subscription plan for you.'
       case 'something_broken':
         return 'What were you trying to do when it failed? Any error message? What device/browser?'
       default:
@@ -244,7 +248,10 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
         priority, // Always 'medium'
         email: emailToSend, // Use validated email (never empty string)
         name: formData.name.trim(),
-        metadata,
+        metadata: {
+          ...metadata, // Existing metadata (source, source_url, device_type, utm_params)
+          intent: formData.intent, // Add intent to metadata for admin visibility
+        },
         website: '', // Honeypot field (must be empty for spam protection)
       }
 

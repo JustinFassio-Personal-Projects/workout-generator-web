@@ -68,7 +68,7 @@ export const GroupedFAB: React.FC = () => {
             [styles.mainFabExpanded]: isExpanded,
           })}
           onClick={toggleExpansion}
-          aria-label={isExpanded ? 'Close menu' : 'Open support menu'}
+          aria-label={isExpanded ? 'Close menu' : 'Questions?'}
           aria-expanded={isExpanded}
           type="button"
           // Removed data-aos attributes - AOS was causing the FAB to disappear after modal closes

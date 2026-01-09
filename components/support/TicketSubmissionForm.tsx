@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { X } from 'lucide-react'
 import classNames from 'classnames'
 import { useSupabaseUser } from '@/hooks/useSupabaseUser'
@@ -19,11 +20,12 @@ type TicketCategory = 'billing' | 'technical' | 'feature_request' | 'bug' | 'oth
 // Admin-expected priority values
 type TicketPriority = 'low' | 'medium' | 'high' | 'urgent'
 
+// User-friendly intent types
+type IntentType = 'generate_first_workout' | 'fix_workout' | 'plan_help' | 'something_broken' | null
+
 interface FormData {
-  subject: string
+  intent: IntentType
   description: string
-  category: TicketCategory
-  priority: TicketPriority
   email: string
   name: string
 }
@@ -39,10 +41,8 @@ interface Metadata {
 export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOpen, onClose }) => {
   const { user, loading: userLoading } = useSupabaseUser()
   const [formData, setFormData] = useState<FormData>({
-    subject: '',
+    intent: null,
     description: '',
-    category: 'technical',
-    priority: 'medium',
     email: '',
     name: '',
   })
@@ -50,7 +50,7 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
-  const firstInputRef = useRef<HTMLInputElement>(null)
+  const firstInputRef = useRef<HTMLTextAreaElement>(null)
 
   // Auto-fill email and name if user is authenticated
   useEffect(() => {
@@ -140,6 +140,22 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
     }
   }
 
+  // Get dynamic placeholder based on selected intent
+  const getPlaceholder = (intent: IntentType): string => {
+    switch (intent) {
+      case 'generate_first_workout':
+        return "Tell us your goal + what equipment you have (or 'none'). Example: 'Lose fat, dumbbells at home, 30 min, 3 days/week.'"
+      case 'fix_workout':
+        return 'What felt off — too hard/easy, too long, wrong equipment, pain? If you can, paste the workout link or describe the exercises.'
+      case 'plan_help':
+        return "What's your goal and how often do you train? We&apos;ll recommend the best plan."
+      case 'something_broken':
+        return 'What were you trying to do when it failed? Any error message? What device/browser?'
+      default:
+        return 'Ask your question here...'
+    }
+  }
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -158,19 +174,19 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
     setSuccess(false)
 
     // Validation
-    const trimmedSubject = formData.subject.trim()
-    if (!trimmedSubject) {
-      setError('Subject is required')
+    if (!formData.intent) {
+      setError('Please select what you need help with')
       return
     }
 
-    if (trimmedSubject.length < 5) {
-      setError('Subject must be at least 5 characters long')
+    const trimmedMessage = formData.description.trim()
+    if (!trimmedMessage) {
+      setError('Your question is required')
       return
     }
 
-    if (!formData.description.trim()) {
-      setError('Description is required')
+    if (trimmedMessage.length < 10) {
+      setError('Please provide more details (at least 10 characters)')
       return
     }
 
@@ -198,11 +214,34 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
         return
       }
 
+      // Map intent to category
+      const intentToCategory: Record<string, TicketCategory> = {
+        something_broken: 'bug',
+        plan_help: 'billing',
+        fix_workout: 'feature_request',
+        generate_first_workout: 'other',
+      }
+      const category = intentToCategory[formData.intent] || 'other'
+
+      // Auto-generate subject
+      const intentLabels: Record<string, string> = {
+        generate_first_workout: 'Generate my first workout',
+        fix_workout: 'Fix my workout',
+        plan_help: 'Which plan should I choose?',
+        something_broken: "Something isn't working",
+      }
+      const intentLabel = intentLabels[formData.intent] || 'Question'
+      const messagePreview = trimmedMessage.substring(0, 60)
+      const subject = `${intentLabel}: ${messagePreview}${messagePreview.length === 60 ? '...' : ''}`
+
+      // Set default priority
+      const priority: TicketPriority = 'medium'
+
       const requestPayload = {
-        subject: formData.subject.trim(),
-        description: formData.description.trim(),
-        category: formData.category,
-        priority: formData.priority,
+        subject, // Auto-generated
+        description: trimmedMessage,
+        category, // Mapped from intent
+        priority, // Always 'medium'
         email: emailToSend, // Use validated email (never empty string)
         name: formData.name.trim(),
         metadata,
@@ -251,21 +290,8 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
       }
 
       setSuccess(true)
-      // Reset form
-      setFormData({
-        subject: '',
-        description: '',
-        category: 'technical',
-        priority: 'medium',
-        email: user?.email || '',
-        name: user?.user_metadata?.full_name || user?.user_metadata?.name || '',
-      })
-
-      // Close modal after 2 seconds
-      setTimeout(() => {
-        onClose()
-        setSuccess(false)
-      }, 2000)
+      // Don't reset form yet - let user see success message
+      // Form will be reset when they click "Ask another question" or close
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred. Please try again.')
     } finally {
@@ -298,19 +324,37 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
         <div className={styles.header}>
           <div className={styles.headerContent}>
             <h2 id="ticket-form-title" className={styles.title}>
-              Send Feedback
+              Need help with your workout?
             </h2>
-            <p className={styles.subtitle}>Support, bug reports, and feature requests</p>
+            <p className={styles.subtitle}>
+              Ask anything — workouts, goals, equipment, or pricing. We&apos;ll reply by email.
+            </p>
+            <div className={styles.trustLines}>
+              <span className={styles.trustLine}>Real human replies</span>
+              <span className={styles.trustLine}>Usually within 1 business day</span>
+              <span className={styles.trustLine}>No spam</span>
+            </div>
           </div>
-          <button
-            className={styles.closeButton}
-            onClick={onClose}
-            aria-label="Close feedback form"
-            type="button"
-            disabled={isSubmitting}
-          >
-            <X size={20} />
-          </button>
+          <div className={styles.headerRight}>
+            <div className={styles.profileThumbnail}>
+              <Image
+                src="/Justin Profile Square.png"
+                alt="Justin"
+                width={48}
+                height={48}
+                className={styles.profileImage}
+              />
+            </div>
+            <button
+              className={styles.closeButton}
+              onClick={onClose}
+              aria-label="Close feedback form"
+              type="button"
+              disabled={isSubmitting}
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
@@ -322,127 +366,166 @@ export const TicketSubmissionForm: React.FC<TicketSubmissionFormProps> = ({ isOp
 
           {success && (
             <div className={styles.successMessage} role="alert">
-              Thank you! Your feedback has been submitted successfully.
+              <h3 className={styles.successTitle}>Sent.</h3>
+              <p className={styles.successBody}>
+                We&apos;ll reply to <strong>{formData.email}</strong>. Usually within 1 business
+                day.
+              </p>
+              <div className={styles.successActions}>
+                <Button type="button" variant="secondary" onClick={onClose}>
+                  Close
+                </Button>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={() => {
+                    setSuccess(false)
+                    setFormData({
+                      intent: null,
+                      description: '',
+                      email: user?.email || '',
+                      name: user?.user_metadata?.full_name || user?.user_metadata?.name || '',
+                    })
+                  }}
+                >
+                  Ask another question
+                </Button>
+              </div>
             </div>
           )}
 
-          <div className={styles.formGroup}>
-            <label htmlFor="subject" className={styles.label}>
-              Subject <span className={styles.required}>*</span>
-            </label>
-            <input
-              ref={firstInputRef}
-              type="text"
-              id="subject"
-              name="subject"
-              value={formData.subject}
-              onChange={handleInputChange}
-              className={styles.input}
-              placeholder="Brief description of your feedback"
-              required
-              disabled={isSubmitting}
-            />
-          </div>
+          {!success && (
+            <>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  What do you need help with? <span className={styles.required}>*</span>
+                </label>
+                <div className={styles.intentSelector}>
+                  <button
+                    type="button"
+                    className={classNames(styles.intentButton, {
+                      [styles['intentButton--selected']]:
+                        formData.intent === 'generate_first_workout',
+                    })}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, intent: 'generate_first_workout' }))
+                      setError(null)
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    Generate my first workout
+                  </button>
+                  <button
+                    type="button"
+                    className={classNames(styles.intentButton, {
+                      [styles['intentButton--selected']]: formData.intent === 'fix_workout',
+                    })}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, intent: 'fix_workout' }))
+                      setError(null)
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    Fix my workout
+                  </button>
+                  <button
+                    type="button"
+                    className={classNames(styles.intentButton, {
+                      [styles['intentButton--selected']]: formData.intent === 'plan_help',
+                    })}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, intent: 'plan_help' }))
+                      setError(null)
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    Which plan should I choose?
+                  </button>
+                  <button
+                    type="button"
+                    className={classNames(styles.intentButton, {
+                      [styles['intentButton--selected']]: formData.intent === 'something_broken',
+                    })}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, intent: 'something_broken' }))
+                      setError(null)
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    Something isn&apos;t working
+                  </button>
+                </div>
+              </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="category" className={styles.label}>
-              Category <span className={styles.required}>*</span>
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}
-              className={styles.select}
-              required
-              disabled={isSubmitting}
-            >
-              <option value="technical">Technical Support</option>
-              <option value="bug">Bug Report</option>
-              <option value="feature_request">Feature Request</option>
-              <option value="billing">Billing</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="description" className={styles.label}>
+                  Your question <span className={styles.required}>*</span>
+                </label>
+                <textarea
+                  ref={firstInputRef}
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className={styles.textarea}
+                  placeholder={getPlaceholder(formData.intent)}
+                  rows={6}
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+            </>
+          )}
 
-          <div className={styles.formGroup}>
-            <label htmlFor="priority" className={styles.label}>
-              Priority <span className={styles.required}>*</span>
-            </label>
-            <select
-              id="priority"
-              name="priority"
-              value={formData.priority}
-              onChange={handleInputChange}
-              className={styles.select}
-              required
-              disabled={isSubmitting}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-          </div>
+          {!success && (
+            <>
+              <div className={styles.formGroup}>
+                <label htmlFor="email" className={styles.label}>
+                  Email (so we can reply) <span className={styles.required}>*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className={styles.input}
+                  placeholder="your.email@example.com"
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+            </>
+          )}
 
-          <div className={styles.formGroup}>
-            <label htmlFor="description" className={styles.label}>
-              Description <span className={styles.required}>*</span>
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              className={styles.textarea}
-              placeholder="Please provide as much detail as possible..."
-              rows={6}
-              required
-              disabled={isSubmitting}
-            />
-          </div>
+          {!success && (
+            <>
+              <div className={styles.formGroup}>
+                <label htmlFor="name" className={styles.label}>
+                  Name (optional)
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className={styles.input}
+                  placeholder="Your name"
+                  disabled={isSubmitting}
+                />
+              </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="email" className={styles.label}>
-              Email <span className={styles.required}>*</span>
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className={styles.input}
-              placeholder="your.email@example.com"
-              required
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="name" className={styles.label}>
-              Name (optional)
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className={styles.input}
-              placeholder="Your name"
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className={styles.actions}>
-            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" loading={isSubmitting}>
-              Submit Feedback
-            </Button>
-          </div>
+              <div className={styles.actions}>
+                <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+                  Cancel
+                </Button>
+                <Button type="submit" variant="primary" loading={isSubmitting}>
+                  Send question
+                </Button>
+              </div>
+            </>
+          )}
         </form>
       </div>
     </>

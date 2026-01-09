@@ -34,14 +34,14 @@ describe('GroupedFAB', () => {
 
   it('should render main FAB button', () => {
     render(<GroupedFAB />)
-    expect(screen.getByLabelText('Open support menu')).toBeInTheDocument()
+    expect(screen.getByLabelText('Questions?')).toBeInTheDocument()
   })
 
   it('should expand menu when clicked', async () => {
     const user = userEvent.setup()
     render(<GroupedFAB />)
 
-    const mainButton = screen.getByLabelText('Open support menu')
+    const mainButton = screen.getByLabelText('Questions?')
     await user.click(mainButton)
 
     expect(screen.getByLabelText('Close menu')).toBeInTheDocument()
@@ -53,7 +53,7 @@ describe('GroupedFAB', () => {
     const user = userEvent.setup()
     render(<GroupedFAB />)
 
-    const mainButton = screen.getByLabelText('Open support menu')
+    const mainButton = screen.getByLabelText('Questions?')
     await user.click(mainButton)
 
     const askButton = screen.getByLabelText('Ask AI assistant')
@@ -66,7 +66,7 @@ describe('GroupedFAB', () => {
     const user = userEvent.setup()
     render(<GroupedFAB />)
 
-    const mainButton = screen.getByLabelText('Open support menu')
+    const mainButton = screen.getByLabelText('Questions?')
     await user.click(mainButton)
 
     const supportButton = screen.getByLabelText('Get support')
@@ -79,7 +79,7 @@ describe('GroupedFAB', () => {
     const user = userEvent.setup()
     render(<GroupedFAB />)
 
-    const mainButton = screen.getByLabelText('Open support menu')
+    const mainButton = screen.getByLabelText('Questions?')
     await user.click(mainButton)
 
     expect(screen.getByLabelText('Close menu')).toBeInTheDocument()

@@ -33,9 +33,11 @@ describe('Navbar', () => {
 
   it('should render navbar with logo', () => {
     render(<Navbar />)
-    // Logo image should be visible when logo loads successfully
-    const logoImage = screen.getByAltText('AI Workout Generator')
-    expect(logoImage).toBeInTheDocument()
+    // Brand name should be visible
+    expect(screen.getByText(/AI Workout/i)).toBeInTheDocument()
+    expect(screen.getByText(/Generator/i)).toBeInTheDocument()
+    // Tagline should be visible
+    expect(screen.getByText(/AI-Powered Fitness Plans/i)).toBeInTheDocument()
   })
 
   it('should render navigation links', () => {
@@ -182,77 +184,45 @@ describe('Navbar', () => {
     expect(nav).toBeInTheDocument()
   })
 
-  it('should handle logo error and show fallback text', async () => {
+  it('should render theme toggle button', () => {
     render(<Navbar />)
-    // Initially logo image should be visible
-    const logoImage = screen.getByAltText('AI Workout Generator')
-    expect(logoImage).toBeInTheDocument()
-
-    // Simulate error event
-    await act(async () => {
-      const errorEvent = new Event('error')
-      logoImage.dispatchEvent(errorEvent)
-    })
-
-    // After error, text should be visible instead
-    await waitFor(
-      () => {
-        expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
-      },
-      { timeout: 3000 }
-    )
-    // Logo image should no longer be in document
-    await waitFor(
-      () => {
-        expect(screen.queryByAltText('AI Workout Generator')).not.toBeInTheDocument()
-      },
-      { timeout: 3000 }
-    )
-  }, 10000)
-
-  it('should handle logo image error event', async () => {
-    render(<Navbar />)
-    const logoImage = screen.getByAltText('AI Workout Generator')
-    expect(logoImage).toBeInTheDocument()
-
-    // Simulate error event
-    await act(async () => {
-      const errorEvent = new Event('error')
-      logoImage.dispatchEvent(errorEvent)
-    })
-
-    // After error, text should be visible instead
-    await waitFor(() => {
-      expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
-    })
-    // Logo image should no longer be in document
-    await waitFor(() => {
-      expect(screen.queryByAltText('AI Workout Generator')).not.toBeInTheDocument()
-    })
+    const themeToggle = screen.getAllByRole('button', { name: /toggle theme/i })
+    expect(themeToggle.length).toBeGreaterThan(0)
   })
 
-  it('should handle logo image load event with zero width', async () => {
+  it('should toggle theme when theme button is clicked', async () => {
+    const user = userEvent.setup()
+
+    // Set known initial state in localStorage before rendering
+    localStorage.setItem('theme', 'dark')
+    document.documentElement.classList.add('dark')
+
     render(<Navbar />)
-    const logoImage = screen.getByAltText('AI Workout Generator') as HTMLImageElement
-    expect(logoImage).toBeInTheDocument()
 
-    // Simulate load event with zero width
+    // Verify initial state (should be dark)
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
+
+    const themeToggle = screen.getAllByRole('button', { name: /toggle theme/i })[0]
     await act(async () => {
-      Object.defineProperty(logoImage, 'naturalWidth', {
-        value: 0,
-        writable: true,
-      })
-      const loadEvent = new Event('load')
-      logoImage.dispatchEvent(loadEvent)
+      await user.click(themeToggle)
     })
 
-    // After zero width detected, text should be visible instead
+    // Verify theme was toggled (should be light now)
     await waitFor(() => {
-      expect(screen.getByText('AI Workout Generator')).toBeInTheDocument()
+      const htmlElement = document.documentElement
+      expect(htmlElement.classList.contains('dark')).toBe(false)
+      expect(localStorage.getItem('theme')).toBe('light')
     })
-    // Logo image should no longer be in document
+
+    // Toggle again to verify it goes back
+    await act(async () => {
+      await user.click(themeToggle)
+    })
+
     await waitFor(() => {
-      expect(screen.queryByAltText('AI Workout Generator')).not.toBeInTheDocument()
+      const htmlElement = document.documentElement
+      expect(htmlElement.classList.contains('dark')).toBe(true)
+      expect(localStorage.getItem('theme')).toBe('dark')
     })
   })
 })

@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
-import Image from 'next/image'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Activity, Sun, Moon } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { Drawer } from '@/components/ui/Drawer/Drawer'
 import { trackButtonClick, trackNavigationClick, trackVercelEvent } from '@/lib/analytics'
@@ -10,7 +10,52 @@ import styles from './Navbar.module.scss'
 
 export const Navbar: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [logoError, setLogoError] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Initialize from localStorage or system preference (client-side only)
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('theme')
+        if (stored === 'dark' || stored === 'light') {
+          // Apply immediately to prevent flash
+          if (stored === 'dark') {
+            document.documentElement.classList.add('dark')
+          } else {
+            document.documentElement.classList.remove('dark')
+          }
+          return stored === 'dark'
+        }
+        // Check system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        // Apply immediately to prevent flash
+        if (prefersDark) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+        return prefersDark
+      } catch {
+        // Fallback if localStorage is not available
+        return true
+      }
+    }
+    return true // Default for SSR
+  })
+
+  useEffect(() => {
+    // Apply theme class and persist preference when state changes
+    if (typeof window === 'undefined') return
+
+    try {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
+    } catch {
+      // Silently fail if localStorage or DOM manipulation fails
+    }
+  }, [isDarkMode])
 
   const toggleDrawer = () => {
     const newState = !isDrawerOpen
@@ -74,26 +119,53 @@ export const Navbar: React.FC = () => {
     }
   }
 
+  const navLinkBaseClasses =
+    'inline-flex items-center justify-center p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-green transition-colors border border-slate-200 dark:border-white/10 shadow-sm text-sm font-medium px-4 whitespace-nowrap'
+
   const navLinks = (
     <>
-      <a href="#hero" className={styles.navLink} onClick={handleHomeClick}>
-        <Button variant="secondary" size="md" className={styles.button} type="button">
-          Home
-        </Button>
+      <a href="#hero" onClick={handleHomeClick} className={navLinkBaseClasses}>
+        Home
       </a>
-      <Link href="/blog" className={styles.navLink} onClick={() => handleNavClick('/blog', 'Blog')}>
-        <Button variant="secondary" size="md" className={styles.button} type="button">
-          Blog
-        </Button>
+      <Link
+        href="/blog"
+        onClick={() => handleNavClick('/blog', 'Blog')}
+        className={navLinkBaseClasses}
+      >
+        Blog
       </Link>
       <Link
         href="/exercise-challenge"
-        className={styles.navLink}
         onClick={() => handleNavClick('/exercise-challenge', 'Submit an Exercise')}
+        className={navLinkBaseClasses}
       >
-        <Button variant="secondary" size="md" className={styles.button} type="button">
-          Submit an Exercise
-        </Button>
+        Submit an Exercise
+      </Link>
+    </>
+  )
+
+  const drawerNavLinks = (
+    <>
+      <a
+        href="#hero"
+        onClick={handleHomeClick}
+        className={`${navLinkBaseClasses} w-full justify-center`}
+      >
+        Home
+      </a>
+      <Link
+        href="/blog"
+        onClick={() => handleNavClick('/blog', 'Blog')}
+        className={`${navLinkBaseClasses} w-full justify-center`}
+      >
+        Blog
+      </Link>
+      <Link
+        href="/exercise-challenge"
+        onClick={() => handleNavClick('/exercise-challenge', 'Submit an Exercise')}
+        className={`${navLinkBaseClasses} w-full justify-center`}
+      >
+        Submit an Exercise
       </Link>
     </>
   )
@@ -116,60 +188,77 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className={styles.navbar} role="navigation" aria-label="Main navigation">
-        <div className={styles.container}>
+      <header
+        className="border-b border-slate-200 dark:border-white/10 sticky top-0 z-50 backdrop-blur-md bg-white/70 dark:bg-brand-dark/60 transition-colors"
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 md:h-20 flex items-center justify-between">
           {/* Logo */}
-          <a href="#workout-builder" className={styles.logoLink} onClick={handleLogoClick}>
-            <div className={styles.logo}>
-              {!logoError ? (
-                <Image
-                  src="/logo.png"
-                  alt="AI Workout Generator"
-                  width={80}
-                  height={80}
-                  className={styles.logoImage}
-                  unoptimized
-                  style={{ backgroundColor: 'transparent' }}
-                  onError={() => setLogoError(true)}
-                  onLoad={e => {
-                    const img = e.currentTarget
-                    if (img.naturalWidth === 0) {
-                      setLogoError(true)
-                    }
-                  }}
-                />
-              ) : (
-                <span className={styles.logoText}>AI Workout Generator</span>
-              )}
+          <a
+            href="#workout-builder"
+            onClick={handleLogoClick}
+            className="flex items-center gap-3 md:gap-4 group"
+          >
+            <div className="relative scale-90 md:scale-100">
+              <div className="absolute inset-0 bg-brand-green blur-lg opacity-20 dark:opacity-40 group-hover:opacity-60 transition-opacity"></div>
+              <div className="bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-white/10 relative z-10 shadow-sm dark:shadow-none">
+                <Activity className="w-6 h-6 text-brand-green dark:text-brand-lime" />
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-display font-bold text-lg md:text-2xl tracking-tight text-slate-900 dark:text-white leading-none">
+                AI Workout{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-lime">
+                  Generator
+                </span>
+              </span>
+              <span className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 font-medium">
+                AI-Powered Fitness Plans
+              </span>
             </div>
           </a>
 
           {/* Desktop Navigation */}
-          <div className={styles.desktopNav}>
-            <div className={styles.navLinks}>{navLinks}</div>
+          <div className="hidden lg:flex items-center gap-2">
+            <div className="flex items-center gap-2">{navLinks}</div>
             {signInButton}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-green transition-colors border border-slate-200 dark:border-white/10 shadow-sm"
+              aria-label="Toggle theme"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <Button
-            variant="secondary"
-            size="md"
-            className={`${styles.button} ${styles.menuButton}`}
-            onClick={toggleDrawer}
-            aria-label="Open menu"
-            aria-expanded={isDrawerOpen}
-          >
-            Menu
-          </Button>
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-green transition-colors border border-slate-200 dark:border-white/10 shadow-sm"
+              aria-label="Toggle theme"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={toggleDrawer}
+              className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-brand-green transition-colors border border-slate-200 dark:border-white/10 shadow-sm text-sm font-medium px-4"
+              aria-label="Open menu"
+              aria-expanded={isDrawerOpen}
+            >
+              Menu
+            </button>
+          </div>
         </div>
-      </nav>
+      </header>
 
       {/* Mobile Drawer */}
       <Drawer isOpen={isDrawerOpen} onClose={closeDrawer}>
-        <div className={styles.drawerContent}>
-          <div className={styles.drawerSignIn}>{signInButton}</div>
-          <div className={styles.drawerDivider} />
-          <div className={styles.drawerNavLinks}>{navLinks}</div>
+        <div className="flex flex-col w-full">
+          <div className="w-full mb-4">{signInButton}</div>
+          <div className="h-px bg-slate-200 dark:bg-white/10 my-4"></div>
+          <div className="flex flex-col gap-2 w-full">{drawerNavLinks}</div>
         </div>
       </Drawer>
     </>

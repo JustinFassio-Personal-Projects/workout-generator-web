@@ -40,13 +40,13 @@ export const StepOne: React.FC<StepOneProps> = ({
 
   return (
     <div className="relative flex flex-col">
-      {/* Fitness Goals - EXACT match to Analysis Presets (lines 331-356) */}
-      <div className="flex flex-col md:flex-row md:items-center gap-2 px-12 md:px-16 pb-2 -mt-1 md:-mt-2">
+      {/* Fitness Goals - Horizontal scrolling */}
+      <div className="flex flex-col gap-2 px-4 md:px-12 pb-4 -mt-1 md:-mt-2 mb-4">
         <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest shrink-0">
           Fitness Goals:
         </span>
-        {/* Wrap horizontally to create 2-3 rows on all screen sizes - never stack vertically */}
-        <div className="flex flex-wrap items-start gap-2 min-h-[72px] max-h-[120px] w-full">
+        {/* Horizontal scrolling container */}
+        <div className="flex items-center gap-2 overflow-x-auto w-full pb-2 -mx-4 md:-mx-12 px-4 md:px-12 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {fitnessGoalOptions.map(option => {
             const isSelected = fitnessGoals.includes(option.value)
             return (
@@ -55,7 +55,7 @@ export const StepOne: React.FC<StepOneProps> = ({
                 type="button"
                 onClick={() => toggleGoal(option.value)}
                 aria-pressed={isSelected}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 flex-[1_1_auto] min-w-[120px] max-w-[200px] ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 whitespace-nowrap ${
                   isSelected
                     ? 'bg-brand-green/10 dark:bg-brand-green/20 border-brand-green/50 text-brand-green dark:text-brand-lime'
                     : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-300 hover:border-brand-green/50'
@@ -69,7 +69,7 @@ export const StepOne: React.FC<StepOneProps> = ({
         </div>
       </div>
       {errors.fitness_goals && (
-        <p className="text-xs text-red-500 dark:text-red-400 mt-1 px-12 md:px-16">
+        <p className="text-xs text-red-500 dark:text-red-400 mt-1 px-4 md:px-12 mb-2">
           {errors.fitness_goals}
         </p>
       )}

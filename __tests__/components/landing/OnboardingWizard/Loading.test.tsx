@@ -58,13 +58,14 @@ describe('OnboardingWizard Loading', () => {
     })
 
     // Wait for fact rotation - the component updates after the interval
+    // The interval callback should update currentFactIndex after 5 seconds
     await waitFor(
       () => {
         expect(screen.getByText('Exercise increases neuroplasticity')).toBeInTheDocument()
       },
-      { timeout: 2000 }
+      { timeout: 5000 }
     )
-  }, 10000) // Increase timeout for this specific test
+  }, 30000) // 30 seconds timeout for this test
 
   it('should handle empty facts array', () => {
     render(<Loading {...defaultProps} facts={[]} />)

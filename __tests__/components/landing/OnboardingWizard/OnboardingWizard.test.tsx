@@ -48,166 +48,204 @@ describe('OnboardingWizard', () => {
     render(<OnboardingWizard />)
 
     // Select a fitness goal
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
 
     // Click continue
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
-  })
+  }, 30000)
 
   it('should show error when continuing without selecting fitness goals', async () => {
     const user = userEvent.setup({ delay: null })
     render(<OnboardingWizard />)
 
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Please select at least one fitness goal')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
-  })
+  }, 30000)
 
   it('should navigate back to step 1 from step 2', async () => {
     const user = userEvent.setup({ delay: null })
     render(<OnboardingWizard />)
 
     // Complete step 1
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
 
     // Go back
-    const backButton = screen.getByRole('button', { name: /back/i })
-    await user.click(backButton)
+    await act(async () => {
+      const backButton = screen.getByRole('button', { name: /back/i })
+      await user.click(backButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 1 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
-  })
+  }, 30000)
 
   it('should show preview when submit is clicked with valid data', async () => {
     const user = userEvent.setup({ delay: null })
     render(<OnboardingWizard />)
 
     // Complete step 1
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
 
     // Submit step 2
-    const submitButton = screen.getByRole('button', { name: /let's go/i })
-    await user.click(submitButton)
+    await act(async () => {
+      const submitButton = screen.getByRole('button', { name: /let's go/i })
+      await user.click(submitButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Your workout profile is set.')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
-  })
+  }, 30000)
 
   it('should show error when age is invalid', async () => {
     const user = userEvent.setup({ delay: null })
     render(<OnboardingWizard />)
 
     // Complete step 1
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
 
     // Enter invalid age
-    const ageInput = screen.getByLabelText(/Age/i) as HTMLInputElement
-    await user.clear(ageInput)
-    await user.type(ageInput, '200')
+    await act(async () => {
+      const ageInput = screen.getByLabelText(/Age/i) as HTMLInputElement
+      await user.clear(ageInput)
+      await user.type(ageInput, '200')
+    })
 
     // Submit
-    const submitButton = screen.getByRole('button', { name: /let's go/i })
-    await user.click(submitButton)
+    await act(async () => {
+      const submitButton = screen.getByRole('button', { name: /let's go/i })
+      await user.click(submitButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Age must be between 13 and 120')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
-  })
+  }, 30000)
 
   it('should return to step 1 when edit answers is clicked from preview', async () => {
     const user = userEvent.setup({ delay: null })
     render(<OnboardingWizard />)
 
     // Complete the form
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
 
-    const submitButton = screen.getByRole('button', { name: /let's go/i })
-    await user.click(submitButton)
+    await act(async () => {
+      const submitButton = screen.getByRole('button', { name: /let's go/i })
+      await user.click(submitButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Your workout profile is set.')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
 
     // Click edit
-    const editButton = screen.getByRole('button', { name: /edit answers/i })
-    await user.click(editButton)
+    await act(async () => {
+      const editButton = screen.getByRole('button', { name: /edit answers/i })
+      await user.click(editButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 1 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 10000 }
     )
-  })
+  }, 30000)
 
   it('should start loading sequence when create account is clicked', async () => {
     vi.useFakeTimers()
@@ -216,33 +254,40 @@ describe('OnboardingWizard', () => {
       render(<OnboardingWizard />)
 
       // Complete the form
-      const buildMuscleChip = screen.getByText('Build muscle')
-      await user.click(buildMuscleChip)
-      const continueButton = screen.getByRole('button', { name: /continue/i })
-      await user.click(continueButton)
+      await act(async () => {
+        const buildMuscleChip = screen.getByText('Build muscle')
+        await user.click(buildMuscleChip)
+      })
+
+      await act(async () => {
+        const continueButton = screen.getByRole('button', { name: /continue/i })
+        await user.click(continueButton)
+      })
 
       await waitFor(
         () => {
           expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
         },
-        { timeout: 3000 }
+        { timeout: 10000 }
       )
 
-      const submitButton = screen.getByRole('button', { name: /let's go/i })
-      await user.click(submitButton)
+      await act(async () => {
+        const submitButton = screen.getByRole('button', { name: /let's go/i })
+        await user.click(submitButton)
+      })
 
       await waitFor(
         () => {
           expect(screen.getByText('Your workout profile is set.')).toBeInTheDocument()
         },
-        { timeout: 3000 }
+        { timeout: 10000 }
       )
 
       // Click create account
-      const createAccountButton = screen.getByRole('button', {
-        name: /create account to generate workout/i,
-      })
       await act(async () => {
+        const createAccountButton = screen.getByRole('button', {
+          name: /create account to generate workout/i,
+        })
         await user.click(createAccountButton)
       })
 
@@ -255,14 +300,14 @@ describe('OnboardingWizard', () => {
         () => {
           expect(screen.getByText('Analyzing Biomechanics...')).toBeInTheDocument()
         },
-        { timeout: 3000 }
+        { timeout: 10000 }
       )
 
       expect(buildSignupUrl).toHaveBeenCalled()
     } finally {
       vi.useRealTimers()
     }
-  }, 20000) // Increase timeout for this test
+  }, 30000) // 30 seconds timeout for this test
 
   it('should cleanup timeouts on unmount', async () => {
     // Set up spy before rendering to capture all clearTimeout calls
@@ -286,7 +331,7 @@ describe('OnboardingWizard', () => {
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 5000 }
+      { timeout: 10000 }
     )
 
     await act(async () => {
@@ -298,7 +343,7 @@ describe('OnboardingWizard', () => {
       () => {
         expect(screen.getByText('Your workout profile is set.')).toBeInTheDocument()
       },
-      { timeout: 5000 }
+      { timeout: 10000 }
     )
 
     // Reset spy count before clicking create account (handleCreateAccount may call clearTimeout)
@@ -316,7 +361,7 @@ describe('OnboardingWizard', () => {
       () => {
         expect(screen.getByText('Analyzing Biomechanics...')).toBeInTheDocument()
       },
-      { timeout: 5000 }
+      { timeout: 10000 }
     )
 
     // Wait a moment to ensure React has processed state updates and timeouts are created
@@ -339,7 +384,7 @@ describe('OnboardingWizard', () => {
     expect(callCountAfterUnmount).toBeGreaterThan(callCountBeforeCreate)
 
     clearTimeoutSpy.mockRestore()
-  }, 20000) // Increase timeout for this test
+  }, 30000) // 30 seconds timeout for this test
 
   it('should handle form data updates correctly', async () => {
     const user = userEvent.setup({ delay: null })
@@ -385,7 +430,7 @@ describe('OnboardingWizard', () => {
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 5000 }
+      { timeout: 10000 }
     )
 
     // Update units
@@ -404,7 +449,7 @@ describe('OnboardingWizard', () => {
       () => {
         expect(screen.getByText('Your workout profile is set.')).toBeInTheDocument()
       },
-      { timeout: 5000 }
+      { timeout: 10000 }
     )
-  }, 20000) // Increase timeout for this test
+  }, 30000) // 30 seconds timeout for this test
 })

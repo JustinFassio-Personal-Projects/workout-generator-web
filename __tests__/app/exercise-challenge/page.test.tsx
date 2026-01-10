@@ -186,27 +186,28 @@ describe('ExerciseChallengePage', () => {
   })
 
   it('should show micro-interview after 2 second delay (Phase 1 fallback)', async () => {
-    vi.useFakeTimers()
-    const user = userEvent.setup({ delay: null })
+    // Use real timers for this test - React 19 async updates work better with real timers
+    vi.useRealTimers()
+    const user = userEvent.setup()
 
-    await act(async () => {
-      render(<ExerciseChallengePage />)
-    })
+    render(<ExerciseChallengePage />)
 
     // Capture lead
     const submitButton = screen.getByText('Submit Lead')
-    await user.click(submitButton)
+    await act(async () => {
+      await user.click(submitButton)
+    })
 
     // Micro-interview should not be visible yet
     expect(screen.queryByTestId('micro-interview')).not.toBeInTheDocument()
 
-    // Fast-forward 2 seconds
-    await vi.advanceTimersByTimeAsync(2000)
-
-    // Micro-interview should now be visible
-    expect(screen.getByTestId('micro-interview')).toBeInTheDocument()
-
-    vi.useRealTimers()
+    // Wait for 2 second delay with real timers
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('micro-interview')).toBeInTheDocument()
+      },
+      { timeout: 3000 } // 2 seconds + buffer
+    )
   })
 
   it('should show micro-interview immediately when generation starts (Phase 2)', async () => {

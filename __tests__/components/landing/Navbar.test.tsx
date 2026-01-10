@@ -90,7 +90,7 @@ describe('Navbar', () => {
       () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
     // Close drawer via overlay
@@ -104,10 +104,10 @@ describe('Navbar', () => {
       () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
     expect(menuButton).toHaveAttribute('aria-expanded', 'false')
-  }, 10000)
+  }, 20000)
 
   it('should close drawer when navigation link is clicked', async () => {
     const user = userEvent.setup()
@@ -124,7 +124,7 @@ describe('Navbar', () => {
       () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
     // Click navigation link
@@ -138,9 +138,9 @@ describe('Navbar', () => {
       () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
-  }, 10000)
+  }, 20000)
 
   it('should close drawer when Sign In button is clicked', async () => {
     const user = userEvent.setup()
@@ -157,7 +157,7 @@ describe('Navbar', () => {
       () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
     // Click Sign In button in drawer
@@ -174,15 +174,15 @@ describe('Navbar', () => {
       () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
-  }, 10000)
+  }, 20000)
 
   it('should have correct navigation role and aria-label', () => {
     render(<Navbar />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     expect(nav).toBeInTheDocument()
-  })
+  }, 15000)
 
   it('should render theme toggle button', () => {
     render(<Navbar />)

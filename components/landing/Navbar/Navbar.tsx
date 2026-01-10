@@ -16,10 +16,23 @@ export const Navbar: React.FC = () => {
       try {
         const stored = localStorage.getItem('theme')
         if (stored === 'dark' || stored === 'light') {
+          // Apply immediately to prevent flash
+          if (stored === 'dark') {
+            document.documentElement.classList.add('dark')
+          } else {
+            document.documentElement.classList.remove('dark')
+          }
           return stored === 'dark'
         }
         // Check system preference
-        return window.matchMedia('(prefers-color-scheme: dark)').matches
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        // Apply immediately to prevent flash
+        if (prefersDark) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+        return prefersDark
       } catch {
         // Fallback if localStorage is not available
         return true
@@ -43,38 +56,6 @@ export const Navbar: React.FC = () => {
       // Silently fail if localStorage or DOM manipulation fails
     }
   }, [isDarkMode])
-
-  useEffect(() => {
-    // Initialize theme synchronously on mount to prevent flash
-    if (typeof window === 'undefined') return
-
-    try {
-      const stored = localStorage.getItem('theme')
-      if (stored === 'dark' || stored === 'light') {
-        const shouldBeDark = stored === 'dark'
-        if (shouldBeDark) {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
-        // Sync state if it differs from initial state
-        setIsDarkMode(prev => (prev !== shouldBeDark ? shouldBeDark : prev))
-      } else {
-        // No stored preference, check system preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        if (prefersDark) {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
-        // Sync state if it differs from initial state
-        setIsDarkMode(prev => (prev !== prefersDark ? prefersDark : prev))
-      }
-    } catch {
-      // Silently fail if localStorage or DOM manipulation fails
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const toggleDrawer = () => {
     const newState = !isDrawerOpen

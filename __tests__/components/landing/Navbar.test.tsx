@@ -192,20 +192,37 @@ describe('Navbar', () => {
 
   it('should toggle theme when theme button is clicked', async () => {
     const user = userEvent.setup()
+
+    // Set known initial state in localStorage before rendering
+    localStorage.setItem('theme', 'dark')
+    document.documentElement.classList.add('dark')
+
     render(<Navbar />)
+
+    // Verify initial state (should be dark)
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
 
     const themeToggle = screen.getAllByRole('button', { name: /toggle theme/i })[0]
     await act(async () => {
       await user.click(themeToggle)
     })
 
-    // Theme class should be toggled on document element
+    // Verify theme was toggled (should be light now)
     await waitFor(() => {
-      // Check that dark mode class is toggled (initial state is dark mode, so clicking should remove it)
       const htmlElement = document.documentElement
-      expect(
-        htmlElement.classList.contains('dark') || !htmlElement.classList.contains('dark')
-      ).toBe(true)
+      expect(htmlElement.classList.contains('dark')).toBe(false)
+      expect(localStorage.getItem('theme')).toBe('light')
+    })
+
+    // Toggle again to verify it goes back
+    await act(async () => {
+      await user.click(themeToggle)
+    })
+
+    await waitFor(() => {
+      const htmlElement = document.documentElement
+      expect(htmlElement.classList.contains('dark')).toBe(true)
+      expect(localStorage.getItem('theme')).toBe('dark')
     })
   })
 })

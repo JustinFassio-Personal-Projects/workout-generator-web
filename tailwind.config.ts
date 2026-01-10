@@ -76,7 +76,6 @@ const config: Config = {
       fontFamily: {
         display: [
           'var(--font-display)',
-          'Space Grotesk',
           'system-ui',
           '-apple-system',
           'BlinkMacSystemFont',

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { StepOne } from '@/components/landing/WorkoutPlanBuilder/StepOne'
+import { StepOne } from '@/components/landing/OnboardingWizard/StepOne'
 import type { FitnessGoal, FitnessLevel, EquipmentAccess } from '@/types/onboarding'
 
 // Mock AOS
@@ -11,7 +11,7 @@ vi.mock('aos', () => ({
   },
 }))
 
-describe('StepOne', () => {
+describe('OnboardingWizard StepOne', () => {
   const defaultProps = {
     fitnessGoals: [] as FitnessGoal[],
     fitnessLevel: 'beginner' as FitnessLevel,
@@ -29,9 +29,9 @@ describe('StepOne', () => {
 
   it('should render step one form', () => {
     render(<StepOne {...defaultProps} />)
-    expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
-    expect(screen.getByText(/What's your current fitness level/i)).toBeInTheDocument()
-    expect(screen.getByText(/What equipment do you have access to/i)).toBeInTheDocument()
+    expect(screen.getByText('Fitness Goals:')).toBeInTheDocument()
+    expect(screen.getByText('Fitness Level')).toBeInTheDocument()
+    expect(screen.getByText('Equipment Access')).toBeInTheDocument()
   })
 
   it('should render all fitness goal chips', () => {
@@ -84,8 +84,10 @@ describe('StepOne', () => {
 
   it('should render fitness level select with correct value', () => {
     render(<StepOne {...defaultProps} fitnessLevel="intermediate" />)
-    const select = screen.getByLabelText(/What's your current fitness level/i) as HTMLSelectElement
-    expect(select.value).toBe('intermediate')
+    const fitnessLevelText = screen.getByText('Fitness Level')
+    const select = fitnessLevelText.closest('div')?.querySelector('select') as HTMLSelectElement
+    expect(select).toBeInTheDocument()
+    expect(select?.value).toBe('intermediate')
   })
 
   it('should call onLevelChange when fitness level changes', async () => {
@@ -93,8 +95,11 @@ describe('StepOne', () => {
     const onLevelChange = vi.fn()
     render(<StepOne {...defaultProps} onLevelChange={onLevelChange} />)
 
-    const select = screen.getByLabelText(/What's your current fitness level/i)
-    await user.selectOptions(select, 'advanced')
+    const fitnessLevelText = screen.getByText('Fitness Level')
+    const select = fitnessLevelText.closest('div')?.querySelector('select') as HTMLSelectElement
+    if (select) {
+      await user.selectOptions(select, 'advanced')
+    }
 
     await waitFor(() => {
       expect(onLevelChange).toHaveBeenCalledWith('advanced')
@@ -103,10 +108,10 @@ describe('StepOne', () => {
 
   it('should render equipment access select with correct value', () => {
     render(<StepOne {...defaultProps} equipmentAccess="full_gym" />)
-    const select = screen.getByLabelText(
-      /What equipment do you have access to/i
-    ) as HTMLSelectElement
-    expect(select.value).toBe('full_gym')
+    const equipmentText = screen.getByText('Equipment Access')
+    const select = equipmentText.closest('div')?.querySelector('select') as HTMLSelectElement
+    expect(select).toBeInTheDocument()
+    expect(select?.value).toBe('full_gym')
   })
 
   it('should call onEquipmentChange when equipment access changes', async () => {
@@ -114,8 +119,11 @@ describe('StepOne', () => {
     const onEquipmentChange = vi.fn()
     render(<StepOne {...defaultProps} onEquipmentChange={onEquipmentChange} />)
 
-    const select = screen.getByLabelText(/What equipment do you have access to/i)
-    await user.selectOptions(select, 'minimal')
+    const equipmentText = screen.getByText('Equipment Access')
+    const select = equipmentText.closest('div')?.querySelector('select') as HTMLSelectElement
+    if (select) {
+      await user.selectOptions(select, 'minimal')
+    }
 
     await waitFor(() => {
       expect(onEquipmentChange).toHaveBeenCalledWith('minimal')
@@ -159,14 +167,19 @@ describe('StepOne', () => {
     })
   })
 
-  it('should show required field indicators', () => {
-    render(<StepOne {...defaultProps} />)
-    const requiredIndicators = screen.getAllByText('*')
-    expect(requiredIndicators.length).toBeGreaterThan(0)
-  })
+  it('should handle multiple fitness goals selection', async () => {
+    const user = userEvent.setup()
+    const onGoalsChange = vi.fn()
+    render(<StepOne {...defaultProps} onGoalsChange={onGoalsChange} />)
 
-  it('should show field hint for goals', () => {
-    render(<StepOne {...defaultProps} />)
-    expect(screen.getByText('Select all that apply')).toBeInTheDocument()
+    const buildMuscleChip = screen.getByText('Build muscle')
+    const loseFatChip = screen.getByText('Lose fat')
+
+    await user.click(buildMuscleChip)
+    await user.click(loseFatChip)
+
+    await waitFor(() => {
+      expect(onGoalsChange).toHaveBeenCalledTimes(2)
+    })
   })
 })

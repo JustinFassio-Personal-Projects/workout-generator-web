@@ -6,6 +6,11 @@ import RootLayout from '@/app/layout'
 vi.mock('next/font/google', () => ({
   Inter: vi.fn(() => ({
     className: 'inter-font',
+    variable: '--font-inter',
+  })),
+  Space_Grotesk: vi.fn(() => ({
+    className: 'space-grotesk-font',
+    variable: '--font-space-grotesk',
   })),
 }))
 

@@ -11,14 +11,15 @@ export interface LabeledOption<T> {
   label: string
 }
 
-// Fitness goals for multi-select chips
+// Fitness goals for multi-select chips (public-optimized)
 export const fitnessGoalOptions: LabeledOption<FitnessGoal>[] = [
   { value: 'Build muscle', label: 'Build muscle' },
   { value: 'Lose fat', label: 'Lose fat' },
-  { value: 'Improve endurance', label: 'Improve endurance' },
   { value: 'Increase strength', label: 'Increase strength' },
-  { value: 'Mobility & flexibility', label: 'Mobility & flexibility' },
-  { value: 'General health', label: 'General health' },
+  { value: 'Improve endurance', label: 'Improve endurance' },
+  { value: 'Get back in shape', label: 'Get back in shape' },
+  { value: 'Move better / reduce pain', label: 'Move better / reduce pain' },
+  { value: 'Improve overall fitness', label: 'Improve overall fitness' },
 ]
 
 // Fitness level options

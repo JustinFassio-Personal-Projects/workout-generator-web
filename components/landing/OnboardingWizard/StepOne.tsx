@@ -45,8 +45,8 @@ export const StepOne: React.FC<StepOneProps> = ({
         <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest shrink-0">
           Fitness Goals:
         </span>
-        {/* Small screens: horizontal scroll with flex-wrap for two rows, large screens: vertical stack */}
-        <div className="flex flex-wrap md:flex-col md:flex-nowrap items-start md:items-stretch gap-2 overflow-x-auto md:overflow-x-visible no-scrollbar min-h-[36px] md:min-h-0">
+        {/* Wrap horizontally to create 2-3 rows on all screen sizes - never stack vertically */}
+        <div className="flex flex-wrap items-start gap-2 min-h-[72px] max-h-[120px] w-full">
           {fitnessGoalOptions.map(option => {
             const isSelected = fitnessGoals.includes(option.value)
             return (
@@ -55,7 +55,7 @@ export const StepOne: React.FC<StepOneProps> = ({
                 type="button"
                 onClick={() => toggleGoal(option.value)}
                 aria-pressed={isSelected}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 flex-[1_1_auto] min-w-[120px] max-w-[200px] ${
                   isSelected
                     ? 'bg-brand-green/10 dark:bg-brand-green/20 border-brand-green/50 text-brand-green dark:text-brand-lime'
                     : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-300 hover:border-brand-green/50'

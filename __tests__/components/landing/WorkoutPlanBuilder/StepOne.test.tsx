@@ -38,10 +38,11 @@ describe('StepOne', () => {
     render(<StepOne {...defaultProps} />)
     expect(screen.getByText('Build muscle')).toBeInTheDocument()
     expect(screen.getByText('Lose fat')).toBeInTheDocument()
-    expect(screen.getByText('Improve endurance')).toBeInTheDocument()
     expect(screen.getByText('Increase strength')).toBeInTheDocument()
-    expect(screen.getByText('Mobility & flexibility')).toBeInTheDocument()
-    expect(screen.getByText('General health')).toBeInTheDocument()
+    expect(screen.getByText('Improve endurance')).toBeInTheDocument()
+    expect(screen.getByText('Get back in shape')).toBeInTheDocument()
+    expect(screen.getByText('Move better / reduce pain')).toBeInTheDocument()
+    expect(screen.getByText('Improve overall fitness')).toBeInTheDocument()
   })
 
   it('should toggle fitness goal when chip is clicked', async () => {

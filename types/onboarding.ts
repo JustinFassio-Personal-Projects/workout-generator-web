@@ -2,10 +2,11 @@
 export type FitnessGoal =
   | 'Build muscle'
   | 'Lose fat'
-  | 'Improve endurance'
   | 'Increase strength'
-  | 'Mobility & flexibility'
-  | 'General health'
+  | 'Improve endurance'
+  | 'Get back in shape'
+  | 'Move better / reduce pain'
+  | 'Improve overall fitness'
 
 // Fitness level options
 export type FitnessLevel = 'beginner' | 'intermediate' | 'advanced' | 'athlete'

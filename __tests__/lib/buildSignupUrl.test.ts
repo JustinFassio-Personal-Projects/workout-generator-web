@@ -72,7 +72,7 @@ describe('buildSignupUrl', () => {
     const data: WebsiteOnboardingData = {
       fitness_level: 'athlete',
       current_activity_level: 'sedentary',
-      fitness_goals: ['General health'],
+      fitness_goals: ['Improve overall fitness'],
       equipment_access: 'none',
       gender: 'female',
       age: 35,
@@ -93,7 +93,7 @@ describe('buildSignupUrl', () => {
     const data: WebsiteOnboardingData = {
       fitness_level: 'beginner',
       current_activity_level: 'lightly_active',
-      fitness_goals: ['Mobility & flexibility'],
+      fitness_goals: ['Move better / reduce pain'],
       equipment_access: 'home',
       preferred_units: {
         weight: 'lb',
@@ -133,7 +133,7 @@ describe('buildSignupUrl', () => {
     const data: WebsiteOnboardingData = {
       fitness_level: 'beginner',
       current_activity_level: 'sedentary',
-      fitness_goals: ['General health'],
+      fitness_goals: ['Get back in shape'],
       equipment_access: 'none',
       preferred_units: {
         weight: 'kg',
@@ -192,7 +192,7 @@ describe('buildSignupUrl', () => {
     const data: WebsiteOnboardingData = {
       fitness_level: 'beginner',
       current_activity_level: 'lightly_active',
-      fitness_goals: ['General health'],
+      fitness_goals: ['Improve overall fitness'],
       equipment_access: 'none',
       age: 13,
       preferred_units: {
@@ -211,7 +211,7 @@ describe('buildSignupUrl', () => {
     const data: WebsiteOnboardingData = {
       fitness_level: 'beginner',
       current_activity_level: 'sedentary',
-      fitness_goals: ['Mobility & flexibility'],
+      fitness_goals: ['Move better / reduce pain'],
       equipment_access: 'home',
       age: 120,
       preferred_units: {

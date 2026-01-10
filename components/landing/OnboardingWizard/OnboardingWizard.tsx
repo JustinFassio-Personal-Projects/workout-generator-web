@@ -224,7 +224,7 @@ export const OnboardingWizard: React.FC = () => {
                 handleSubmit()
               }
             }}
-            className={`relative z-20 transition-all duration-300 ${false ? 'opacity-50 pointer-events-none scale-95 blur-sm' : 'scale-100'}`}
+            className="relative z-20 transition-all duration-300 scale-100"
           >
             <div className="relative group">
               {/* Glow Effect - EXACT match (line 318) */}

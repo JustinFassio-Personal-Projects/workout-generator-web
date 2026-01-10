@@ -44,8 +44,12 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
   }
 
   const handleEnter = () => {
-    onComplete()
-    // Navigate to onboarding wizard route
+    // Navigate directly to onboarding wizard route
+    // Note: We intentionally skip onComplete() here because:
+    // 1. We're navigating to a different route (/onboard), so this component will unmount immediately
+    // 2. The state change from setShowIntro(false) would not be visible since we're navigating away
+    // 3. This prevents any potential flash of the form content before navigation completes
+    // 4. No analytics tracking is lost - navigation itself is tracked via Next.js router events
     router.push('/onboard')
   }
 

@@ -52,7 +52,7 @@ const Loading: React.FC<LoadingProps> = ({ status, step, facts = [] }) => {
 
     return (
       <div
-        className={`absolute flex items-center justify-center font-bold opacity-0 select-none ${type === 'text' ? 'text-brand-green text-[10px] md:text-xs tracking-[0.2em] bg-white/80 dark:bg-brand-dark/80 border border-brand-green/30 px-2 py-0.5 md:px-3 md:py-1 rounded shadow-[0_0_10px_rgba(34,197,94,0.3)] backdrop-blur-sm' : 'text-brand-lime'}`}
+        className={`absolute flex items-center justify-center font-bold opacity-0 select-none ${type === 'text' ? 'text-brand-green text-[10px] md:text-xs tracking-[0.2em] bg-brand-dark/80 border border-brand-green/30 px-2 py-0.5 md:px-3 md:py-1 rounded shadow-[0_0_10px_rgba(34,197,94,0.3)] backdrop-blur-sm' : 'text-brand-lime'}`}
         style={{
           animation: `implode 2.5s infinite ease-in ${delay}s`,
           top: startTop,
@@ -70,7 +70,7 @@ const Loading: React.FC<LoadingProps> = ({ status, step, facts = [] }) => {
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full max-w-4xl mx-auto min-h-[350px] md:min-h-[500px] overflow-hidden rounded-3xl bg-white/40 dark:bg-brand-dark/40 border border-slate-200 dark:border-white/10 shadow-2xl backdrop-blur-md transition-colors">
+    <div className="relative flex flex-col items-center justify-center w-full max-w-4xl mx-auto min-h-[350px] md:min-h-[500px] overflow-hidden rounded-3xl bg-brand-dark/40 border border-white/10 shadow-2xl backdrop-blur-md">
       <style>{`
         @keyframes implode {
           0% { transform: scale(1) rotate(0deg); opacity: 0; }
@@ -103,9 +103,9 @@ const Loading: React.FC<LoadingProps> = ({ status, step, facts = [] }) => {
         <div className="absolute inset-0 w-48 h-48 -translate-x-12 -translate-y-12 border-2 border-dashed border-brand-lime/20 rounded-full animate-[spin-slow_10s_linear_infinite]"></div>
         <div className="absolute inset-0 w-40 h-40 -translate-x-8 -translate-y-8 border border-emerald-500/30 rounded-full animate-[spin-reverse_8s_linear_infinite]"></div>
 
-        <div className="relative bg-white/50 dark:bg-white/10 p-1 rounded-full shadow-[0_0_60px_rgba(34,197,94,0.4)] animate-[pulse-core_2s_infinite]">
-          <div className="bg-white dark:bg-brand-dark p-4 rounded-full flex items-center justify-center w-24 h-24 relative overflow-hidden border border-brand-green/50">
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-green to-brand-lime opacity-10 dark:opacity-30"></div>
+        <div className="relative bg-white/10 p-1 rounded-full shadow-[0_0_60px_rgba(34,197,94,0.4)] animate-[pulse-core_2s_infinite]">
+          <div className="bg-brand-dark p-4 rounded-full flex items-center justify-center w-24 h-24 relative overflow-hidden border border-brand-green/50">
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-green to-brand-lime opacity-30"></div>
             <Dumbbell className="w-12 h-12 text-brand-green animate-pulse relative z-10" />
             <div className="absolute top-0 left-1/2 w-[1px] h-full bg-brand-green/50 animate-[spin-slow_2s_linear_infinite]"></div>
             <div className="absolute top-1/2 left-0 h-[1px] w-full bg-brand-green/50 animate-[spin-slow_2s_linear_infinite]"></div>
@@ -126,7 +126,7 @@ const Loading: React.FC<LoadingProps> = ({ status, step, facts = [] }) => {
         </div>
       </div>
 
-      <div className="relative z-30 w-full max-w-lg bg-white/80 dark:bg-brand-dark/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-2xl border border-slate-200 dark:border-white/10 text-center flex flex-col items-center transition-all duration-500 min-h-[140px] md:min-h-[160px]">
+      <div className="relative z-30 w-full max-w-lg bg-brand-dark/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-2xl border border-white/10 text-center flex flex-col items-center transition-all duration-500 min-h-[140px] md:min-h-[160px]">
         <div className="flex items-center gap-3 mb-4">
           {step === 1 && <Globe className="w-4 h-4 text-brand-lime animate-spin" />}
           {step === 2 && <Activity className="w-4 h-4 text-brand-green animate-spin" />}
@@ -142,7 +142,7 @@ const Loading: React.FC<LoadingProps> = ({ status, step, facts = [] }) => {
               key={currentFactIndex}
               className="w-full animate-in slide-in-from-bottom-2 fade-in duration-700"
             >
-              <div className="relative p-4 rounded-xl bg-black/60 dark:bg-black/60 border border-white/5 font-mono text-xs leading-relaxed text-slate-300 overflow-x-auto">
+              <div className="relative p-4 rounded-xl bg-black/60 border border-white/5 font-mono text-xs leading-relaxed text-slate-300 overflow-x-auto">
                 <div className="absolute top-2 right-2 opacity-20">
                   <Terminal className="w-4 h-4" />
                 </div>
@@ -156,14 +156,14 @@ const Loading: React.FC<LoadingProps> = ({ status, step, facts = [] }) => {
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-500 italic font-light text-sm md:text-base">
+            <div className="flex items-center gap-2 text-slate-500 italic font-light text-sm md:text-base">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span>Establishing connection...</span>
             </div>
           )}
         </div>
 
-        <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 mt-6 rounded-full overflow-hidden">
+        <div className="w-full h-1 bg-slate-800 mt-6 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-brand-green via-brand-lime to-emerald-500 transition-all duration-1000 ease-out relative overflow-hidden shadow-[0_0_10px_rgba(34,197,94,0.8)]"
             style={{ width: `${step * 20 + 10}%` }}

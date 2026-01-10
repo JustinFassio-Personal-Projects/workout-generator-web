@@ -191,24 +191,25 @@ export const OnboardingWizard: React.FC = () => {
     timeoutRefs.current.push(timeout5)
   }, [formData])
 
+  // Dark mode is always on - no light mode support
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-brand-dark text-slate-900 dark:text-slate-200 font-sans selection:bg-brand-green selection:text-white pb-20 relative overflow-x-hidden animate-in fade-in duration-1000 transition-colors">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-green/10 via-slate-50 to-white dark:from-brand-green/5 dark:via-brand-dark dark:to-black z-0 transition-colors"></div>
+    <div className="min-h-screen bg-brand-dark text-slate-200 font-sans selection:bg-brand-green selection:text-white pb-20 relative overflow-x-hidden animate-in fade-in duration-1000">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-green/5 via-brand-dark to-black z-0"></div>
 
       <main className="px-3 sm:px-6 py-4 md:py-8 relative z-10">
         <div className="max-w-6xl mx-auto transition-all duration-500 min-h-[50vh] md:min-h-[70vh] flex flex-col justify-center">
           {/* Header Section - EXACT match to fitcopilot-vision App.tsx (lines 295-310) */}
           <div className="text-center mb-6 md:mb-16 space-y-3 md:space-y-8 animate-in slide-in-from-bottom-8 duration-700 fade-in">
-            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-brand-green dark:text-brand-lime text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
+            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-brand-lime text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
               <Dumbbell className="w-3 h-3 md:w-4 md:h-4" /> Professional Kinetic Analysis Engine
             </div>
-            <h1 className="text-3xl sm:text-5xl md:text-8xl font-display font-bold text-slate-900 dark:text-white tracking-tight leading-[0.95] md:leading-[0.9]">
+            <h1 className="text-3xl sm:text-5xl md:text-8xl font-display font-bold text-white tracking-tight leading-[0.95] md:leading-[0.9]">
               Master the Science of <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green via-brand-lime to-emerald-400">
                 Human Motion.
               </span>
             </h1>
-            <p className="text-sm md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto font-light leading-relaxed px-4">
+            <p className="text-sm md:text-2xl text-slate-400 max-w-3xl mx-auto font-light leading-relaxed px-4">
               Built to understand complex kinetic movements, biomechanics, and technical cues. From
               foundational lifts to elite-level performance.
             </p>
@@ -227,10 +228,10 @@ export const OnboardingWizard: React.FC = () => {
             className="relative z-20 transition-all duration-300 scale-100"
           >
             <div className="relative group">
-              {/* Glow Effect - EXACT match (line 318) */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-brand-green via-brand-lime to-emerald-500 rounded-3xl opacity-10 dark:opacity-20 group-hover:opacity-30 dark:group-hover:opacity-40 transition duration-500 blur-xl"></div>
-              {/* Main Container - EXACT match (line 319) */}
-              <div className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 p-2 rounded-3xl shadow-2xl">
+              {/* Glow Effect - Dark mode only */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-brand-green via-brand-lime to-emerald-500 rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur-xl"></div>
+              {/* Main Container - Dark mode only */}
+              <div className="relative bg-slate-900/80 backdrop-blur-xl border border-white/10 p-2 rounded-3xl shadow-2xl">
                 <div className="relative flex flex-col min-h-[400px] md:min-h-[500px]">
                   {/* Progress Indicator */}
                   {!showPreview && (
@@ -238,7 +239,7 @@ export const OnboardingWizard: React.FC = () => {
                       <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
                         Step {currentStep} of 2
                       </span>
-                      <div className="h-1 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
+                      <div className="h-1 bg-slate-800 rounded-full overflow-hidden mt-2">
                         <div
                           className="h-full bg-gradient-to-r from-brand-green via-brand-lime to-emerald-400 rounded-full transition-all duration-300"
                           style={{ width: currentStep === 1 ? '50%' : '100%' }}
@@ -251,7 +252,7 @@ export const OnboardingWizard: React.FC = () => {
                   {isLoading && (
                     <>
                       {/* Background overlay - fully opaque */}
-                      <div className="absolute inset-0 bg-white dark:bg-slate-900 rounded-3xl z-40 animate-in fade-in duration-300" />
+                      <div className="absolute inset-0 bg-slate-900 rounded-3xl z-40 animate-in fade-in duration-300" />
                       {/* Loading component */}
                       <div className="absolute inset-0 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
                         <Loading status={loadingMessage} step={loadingStep} facts={loadingFacts} />

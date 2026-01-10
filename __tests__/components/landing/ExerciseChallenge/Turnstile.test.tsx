@@ -39,11 +39,12 @@ describe('Turnstile', () => {
     // Widget rendering happens in useEffect, which is tested via integration
   })
 
-  it('should accept theme and size props', () => {
+  it('should accept size prop and use dark theme by default', () => {
     const { container } = render(
-      <Turnstile siteKey="test-key" onSuccess={vi.fn()} theme="dark" size="compact" />
+      <Turnstile siteKey="test-key" onSuccess={vi.fn()} size="compact" />
     )
     expect(container.querySelector('div')).toBeInTheDocument()
+    // Theme is hardcoded to 'dark' internally and cannot be changed
   })
 
   it('should handle onError prop', () => {

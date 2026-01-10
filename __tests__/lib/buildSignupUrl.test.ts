@@ -243,4 +243,25 @@ describe('buildSignupUrl', () => {
     const url = buildSignupUrl(data)
     expect(url).toContain('source=website_builder')
   })
+
+  it('should include theme and tab parameters for UI preferences', () => {
+    const data: WebsiteOnboardingData = {
+      fitness_level: 'beginner',
+      current_activity_level: 'moderately_active',
+      fitness_goals: ['Build muscle'],
+      equipment_access: 'home',
+      preferred_units: {
+        weight: 'lb',
+        height: 'in',
+        distance: 'mi',
+        temperature: 'f',
+      },
+    }
+
+    const url = buildSignupUrl(data)
+    // Theme should be dark to match this website's theme
+    expect(url).toContain('theme=dark')
+    // Tab should be signup to open the Sign Up tab by default
+    expect(url).toContain('tab=signup')
+  })
 })

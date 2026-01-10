@@ -17,7 +17,7 @@ interface TurnstileOptions {
   callback?: (token: string) => void
   'error-callback'?: () => void
   'expired-callback'?: () => void
-  theme?: 'light' | 'dark' | 'auto'
+  theme: 'dark' // Hardcoded to dark to match site theme
   size?: 'normal' | 'compact'
 }
 
@@ -26,7 +26,6 @@ interface TurnstileProps {
   onSuccess: (token: string) => void
   onError?: () => void
   onExpire?: () => void
-  theme?: 'light' | 'dark' | 'auto'
   size?: 'normal' | 'compact'
 }
 
@@ -34,12 +33,12 @@ interface TurnstileProps {
 let scriptLoaded = false
 let scriptLoading = false
 
+// Turnstile component - theme is hardcoded to 'dark' for consistency with site theme
 export const Turnstile: React.FC<TurnstileProps> = ({
   siteKey,
   onSuccess,
   onError,
   onExpire,
-  theme = 'auto',
   size = 'normal',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -162,7 +161,7 @@ export const Turnstile: React.FC<TurnstileProps> = ({
         callback: handleSuccess,
         'error-callback': handleError,
         'expired-callback': handleExpire,
-        theme,
+        theme: 'dark', // Hardcoded to dark to match site theme
         size,
       })
 
@@ -182,7 +181,7 @@ export const Turnstile: React.FC<TurnstileProps> = ({
         }
       }
     }
-  }, [isLoaded, siteKey, theme, size]) // Removed callbacks from dependencies
+  }, [isLoaded, siteKey, size]) // Removed callbacks and theme from dependencies (theme is hardcoded)
 
   // Cleanup on unmount
   useEffect(() => {

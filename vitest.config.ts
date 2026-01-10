@@ -13,7 +13,7 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['**/__tests__/**/*.{test,spec}.{ts,tsx}', '**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules', '.next', 'out', 'dist'],
-    testTimeout: 30000, // 30 seconds for long-running async tests
+    testTimeout: 10000, // 10 seconds default - tests should be fast
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],

@@ -22,12 +22,7 @@ describe('OnboardingWizard Loading', () => {
   }
 
   beforeEach(() => {
-    vi.useFakeTimers()
     vi.clearAllMocks()
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
   })
 
   it('should render loading component', () => {
@@ -47,25 +42,25 @@ describe('OnboardingWizard Loading', () => {
   })
 
   it('should rotate through facts', async () => {
-    render(<Loading {...defaultProps} />)
+    vi.useFakeTimers()
+    try {
+      render(<Loading {...defaultProps} />)
 
-    // Initial fact should be displayed
-    expect(screen.getByText('The human body has over 600 muscles')).toBeInTheDocument()
+      // Initial fact should be displayed
+      expect(screen.getByText('The human body has over 600 muscles')).toBeInTheDocument()
 
-    // Advance time by 5 seconds to trigger interval
-    await act(async () => {
-      vi.advanceTimersByTime(5000)
-    })
+      // Advance time by 5 seconds to trigger interval
+      act(() => {
+        vi.advanceTimersByTime(5000)
+      })
 
-    // Wait for fact rotation - the component updates after the interval
-    // The interval callback should update currentFactIndex after 5 seconds
-    await waitFor(
-      () => {
-        expect(screen.getByText('Exercise increases neuroplasticity')).toBeInTheDocument()
-      },
-      { timeout: 5000 }
-    )
-  }, 30000) // 30 seconds timeout for this test
+      // With fake timers, the state update should happen immediately after advancing
+      // Check synchronously - no waitFor needed with fake timers
+      expect(screen.getByText('Exercise increases neuroplasticity')).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 10000)
 
   it('should handle empty facts array', () => {
     render(<Loading {...defaultProps} facts={[]} />)

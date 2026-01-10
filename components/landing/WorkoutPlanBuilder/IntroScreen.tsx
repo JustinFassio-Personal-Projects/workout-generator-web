@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Play, Globe, PersonStanding, Info } from 'lucide-react'
 import styles from './IntroScreen.module.scss'
 
@@ -9,6 +10,7 @@ interface IntroScreenProps {
 }
 
 export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
+  const router = useRouter()
   const [phase, setPhase] = useState(0)
   const [isSmallScreen, setIsSmallScreen] = useState(false)
 
@@ -43,8 +45,8 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
   const handleEnter = () => {
     onComplete()
-    // Scroll to workout-builder section after intro hides
-    scrollToSection('workout-builder')
+    // Navigate to onboarding wizard route
+    router.push('/onboard')
   }
 
   const handleLearnMore = () => {

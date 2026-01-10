@@ -138,6 +138,8 @@ export const StepTwo: React.FC<StepTwoProps> = ({
             className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 p-0 w-full hover:text-brand-green transition-colors placeholder:text-slate-500"
           />
         </div>
+        {/* Note: Prettier formats this as single-line (78 chars) while activity_level stays multi-line (89 chars, closer to printWidth: 100).
+            Both formats are valid. PR review suggested multi-line for consistency, but deferring to Prettier's heuristic for maintainability. */}
         {errors.age && (
           <p className="absolute -bottom-5 left-4 text-xs text-red-400">{errors.age}</p>
         )}

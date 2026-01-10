@@ -68,6 +68,8 @@ export const StepOne: React.FC<StepOneProps> = ({
           })}
         </div>
       </div>
+      {/* Note: Prettier formats this as single-line (86 chars) while equipment_access stays multi-line (91 chars, closer to printWidth: 100).
+          PR review suggested multi-line for consistency and readability. Both formats are valid, deferring to Prettier's heuristic for maintainability. */}
       {errors.fitness_goals && (
         <p className="text-xs text-red-400 mt-1 px-4 md:px-12 mb-2">{errors.fitness_goals}</p>
       )}

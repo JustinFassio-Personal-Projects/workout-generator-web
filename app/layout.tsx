@@ -107,10 +107,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
-  ],
+  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#000000' }],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -169,7 +166,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   ]
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} ${spaceGrotesk.variable}`}>
         {/* Skip to Content Link - Accessibility */}
         <a href="#main-content" className="skip-to-content">

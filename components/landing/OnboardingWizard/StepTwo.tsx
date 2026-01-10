@@ -53,9 +53,9 @@ export const StepTwo: React.FC<StepTwoProps> = ({
     <div className="relative flex flex-col">
       {/* Activity Level & Gender - Dropdown Row Container - EXACT match (line 359) */}
       <div className="flex flex-col md:flex-row gap-2 p-2">
-        {/* Activity Level - EXACT match to Dropdown Structure (lines 360-379) */}
-        <div className="flex-1 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-white/5 px-4 py-3 flex items-center gap-3 hover:border-brand-green/30 transition-colors relative overflow-hidden group/item">
-          <div className="p-2 bg-white dark:bg-slate-800 rounded-lg text-brand-green shrink-0 shadow-sm">
+        {/* Activity Level - Dark mode only */}
+        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-brand-green/30 transition-colors relative overflow-hidden group/item">
+          <div className="p-2 bg-slate-800 rounded-lg text-brand-green shrink-0 shadow-sm">
             <Activity className="w-4 h-4" />
           </div>
           <div className="flex flex-col z-10 w-full overflow-hidden relative">
@@ -66,7 +66,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
               <select
                 value={activityLevel}
                 onChange={e => onActivityChange(e.target.value as ActivityLevel)}
-                className="bg-transparent border-none text-base font-bold text-slate-900 dark:text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-green transition-colors truncate pr-8 appearance-none"
+                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-green transition-colors truncate pr-8 appearance-none"
               >
                 {activityLevelOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -74,21 +74,21 @@ export const StepTwo: React.FC<StepTwoProps> = ({
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 flex items-center pr-2 text-slate-400 dark:text-slate-500">
+              <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 flex items-center pr-2 text-slate-500">
                 <ChevronDown className="w-4 h-4" />
               </div>
             </div>
           </div>
           {errors.activity_level && (
-            <p className="absolute -bottom-5 left-4 text-xs text-red-500 dark:text-red-400">
+            <p className="absolute -bottom-5 left-4 text-xs text-red-400">
               {errors.activity_level}
             </p>
           )}
         </div>
 
-        {/* Gender - EXACT Same Structure with brand-lime icon */}
-        <div className="flex-1 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-white/5 px-4 py-3 flex items-center gap-3 hover:border-brand-lime/30 transition-colors relative overflow-hidden group/item">
-          <div className="p-2 bg-white dark:bg-slate-800 rounded-lg text-brand-lime shrink-0 shadow-sm">
+        {/* Gender - Dark mode only */}
+        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-brand-lime/30 transition-colors relative overflow-hidden group/item">
+          <div className="p-2 bg-slate-800 rounded-lg text-brand-lime shrink-0 shadow-sm">
             <Users className="w-4 h-4" />
           </div>
           <div className="flex flex-col z-10 w-full overflow-hidden relative">
@@ -99,7 +99,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
               <select
                 value={gender || 'prefer_not_to_say'}
                 onChange={e => onGenderChange(e.target.value as Gender)}
-                className="bg-transparent border-none text-base font-bold text-slate-900 dark:text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-lime transition-colors truncate pr-8 appearance-none"
+                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-lime transition-colors truncate pr-8 appearance-none"
               >
                 {genderOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -107,7 +107,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 flex items-center pr-2 text-slate-400 dark:text-slate-500">
+              <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 flex items-center pr-2 text-slate-500">
                 <ChevronDown className="w-4 h-4" />
               </div>
             </div>
@@ -115,9 +115,9 @@ export const StepTwo: React.FC<StepTwoProps> = ({
         </div>
       </div>
 
-      {/* Age - Optional Number Input - Same container structure */}
-      <div className="flex-1 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-white/5 px-4 py-3 flex items-center gap-3 hover:border-brand-green/30 transition-colors relative overflow-hidden group/item mt-2 mx-2">
-        <div className="p-2 bg-white dark:bg-slate-800 rounded-lg text-brand-green shrink-0 shadow-sm">
+      {/* Age - Optional Number Input - Dark mode only */}
+      <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-brand-green/30 transition-colors relative overflow-hidden group/item mt-2 mx-2">
+        <div className="p-2 bg-slate-800 rounded-lg text-brand-green shrink-0 shadow-sm">
           <Calendar className="w-4 h-4" />
         </div>
         <div className="flex flex-col z-10 w-full overflow-hidden">
@@ -135,13 +135,13 @@ export const StepTwo: React.FC<StepTwoProps> = ({
             min={13}
             max={120}
             placeholder="Enter your age"
-            className="bg-transparent border-none text-base font-bold text-slate-900 dark:text-slate-100 focus:ring-0 p-0 w-full hover:text-brand-green transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 p-0 w-full hover:text-brand-green transition-colors placeholder:text-slate-500"
           />
         </div>
+        {/* Note: Prettier formats this as single-line (78 chars) while activity_level stays multi-line (89 chars, closer to printWidth: 100).
+            Both formats are valid. PR review suggested multi-line for consistency, but deferring to Prettier's heuristic for maintainability. */}
         {errors.age && (
-          <p className="absolute -bottom-5 left-4 text-xs text-red-500 dark:text-red-400">
-            {errors.age}
-          </p>
+          <p className="absolute -bottom-5 left-4 text-xs text-red-400">{errors.age}</p>
         )}
       </div>
 
@@ -160,8 +160,8 @@ export const StepTwo: React.FC<StepTwoProps> = ({
               onClick={() => onUnitsChange({ weight: option.value })}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 ${
                 isActive
-                  ? 'bg-brand-green/10 dark:bg-brand-green/20 border-brand-green/50 text-brand-green dark:text-brand-lime'
-                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-300 hover:border-brand-green/50'
+                  ? 'bg-brand-green/20 border-brand-green/50 text-brand-lime'
+                  : 'bg-slate-800 border-white/5 text-slate-300 hover:border-brand-green/50'
               }`}
             >
               <Activity className="w-3 h-3 text-brand-green" />
@@ -170,7 +170,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
           )
         })}
         {/* Vertical Divider */}
-        <div className="h-6 w-px bg-slate-400 dark:bg-slate-400 shrink-0"></div>
+        <div className="h-6 w-px bg-slate-400 shrink-0"></div>
         {/* Height Units */}
         {heightUnitOptions.map(option => {
           const isActive = preferredUnits.height === option.value
@@ -181,8 +181,8 @@ export const StepTwo: React.FC<StepTwoProps> = ({
               onClick={() => onUnitsChange({ height: option.value })}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 ${
                 isActive
-                  ? 'bg-brand-green/10 dark:bg-brand-green/20 border-brand-green/50 text-brand-green dark:text-brand-lime'
-                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-300 hover:border-brand-green/50'
+                  ? 'bg-brand-green/20 border-brand-green/50 text-brand-lime'
+                  : 'bg-slate-800 border-white/5 text-slate-300 hover:border-brand-green/50'
               }`}
             >
               <Activity className="w-3 h-3 text-brand-green" />
@@ -197,7 +197,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
         <button
           type="button"
           onClick={onBack}
-          className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-2xl font-bold px-6 py-4 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+          className="bg-slate-800 border border-white/10 text-white rounded-2xl font-bold px-6 py-4 hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>BACK</span>

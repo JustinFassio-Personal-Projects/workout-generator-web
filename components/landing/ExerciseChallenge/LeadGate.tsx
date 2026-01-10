@@ -195,7 +195,6 @@ export const LeadGate: React.FC<LeadGateProps> = ({ onLeadCaptured }) => {
               onSuccess={handleTurnstileSuccess}
               onError={handleTurnstileError}
               onExpire={handleTurnstileExpire}
-              theme="auto"
               size="normal"
             />
           </div>

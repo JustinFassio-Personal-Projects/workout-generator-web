@@ -33,5 +33,12 @@ export function buildSignupUrl(data: WebsiteOnboardingData): string {
   // Analytics tracking
   params.set('source', 'website_builder')
 
+  // Theme and UI preferences
+  // Note: These parameters are read by the aiworkoutgen.app repo to control:
+  // - theme: Forces dark mode to match this website's theme
+  // - tab: Sets the initial active tab (signup vs signin)
+  params.set('theme', 'dark')
+  params.set('tab', 'signup')
+
   return `${SIGNUP_BASE_URL}?${params.toString()}`
 }

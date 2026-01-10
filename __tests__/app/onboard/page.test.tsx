@@ -37,30 +37,7 @@ describe('OnboardPage', () => {
     expect(screen.getByText('OnboardingWizard')).toBeInTheDocument()
   })
 
-  it('should force dark mode on mount', () => {
-    render(<OnboardPage />)
-    expect(document.documentElement.classList.contains('dark')).toBe(true)
-  })
-
-  it('should restore original dark mode state on unmount when it was not dark', () => {
-    document.documentElement.classList.remove('dark')
-    const { unmount } = render(<OnboardPage />)
-
-    expect(document.documentElement.classList.contains('dark')).toBe(true)
-
-    unmount()
-
-    expect(document.documentElement.classList.contains('dark')).toBe(false)
-  })
-
-  it('should keep dark mode on unmount if it was already dark', () => {
-    document.documentElement.classList.add('dark')
-    const { unmount } = render(<OnboardPage />)
-
-    expect(document.documentElement.classList.contains('dark')).toBe(true)
-
-    unmount()
-
-    expect(document.documentElement.classList.contains('dark')).toBe(true)
-  })
+  // Note: Dark mode is now applied by app/onboard/layout.tsx via inline script
+  // The page component no longer manages dark mode - it's handled at the layout level
+  // to prevent flash of light mode before React hydrates
 })

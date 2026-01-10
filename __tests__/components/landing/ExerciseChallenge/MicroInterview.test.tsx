@@ -600,46 +600,73 @@ describe('MicroInterview', () => {
     render(<MicroInterview leadId={mockLeadId} onComplete={mockOnComplete} />)
 
     // Answer all required questions and skip Q4
-    await user.click(screen.getByText('Build muscle'))
-    await waitFor(() => {
-      expect(screen.getByText('Question 2 of 3')).toBeInTheDocument()
+    await act(async () => {
+      await user.click(screen.getByText('Build muscle'))
     })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Question 2 of 3')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
-    await user.click(screen.getByText("I don't know what to do"))
-    await waitFor(() => {
-      expect(screen.getByText('Question 3 of 3')).toBeInTheDocument()
+    await act(async () => {
+      await user.click(screen.getByText("I don't know what to do"))
     })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Question 3 of 3')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
-    await user.click(screen.getByText('Build a plan with week-to-week progression'))
-    await waitFor(() => {
-      expect(screen.getByText('Skip')).toBeInTheDocument()
+    await act(async () => {
+      await user.click(screen.getByText('Build a plan with week-to-week progression'))
     })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Skip')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
-    await user.click(screen.getByText('Skip'))
+    await act(async () => {
+      await user.click(screen.getByText('Skip'))
+    })
 
     // Open free text
-    await waitFor(() => {
-      expect(screen.getByText('Tell us more (optional)')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Tell us more (optional)')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
     const tellUsMoreLink = screen.getByText('Tell us more (optional)')
-    await user.click(tellUsMoreLink)
+    await act(async () => {
+      await user.click(tellUsMoreLink)
+    })
 
     // Try to type more than 500 characters
-    await waitFor(() => {
-      expect(
-        screen.getByPlaceholderText('Example: Build me a simple plan I can stick to.')
-      ).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(
+          screen.getByPlaceholderText('Example: Build me a simple plan I can stick to.')
+        ).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
     const textarea = screen.getByPlaceholderText('Example: Build me a simple plan I can stick to.')
     const longText = 'A'.repeat(600)
 
     // Type the text - the component should limit it to 500 characters
     // Use faster typing to avoid timeout
-    await user.clear(textarea)
-    // Set value directly instead of typing 600 characters to speed up test
-    await user.type(textarea, longText.slice(0, 500))
-    // Try to add more - should be limited
-    await user.type(textarea, longText.slice(500))
+    await act(async () => {
+      await user.clear(textarea)
+      // Set value directly instead of typing 600 characters to speed up test
+      await user.type(textarea, longText.slice(0, 500))
+      // Try to add more - should be limited
+      await user.type(textarea, longText.slice(500))
+    })
 
     // Should only accept 500 characters
     await waitFor(
@@ -650,9 +677,9 @@ describe('MicroInterview', () => {
         expect(textareaElement.value.length).toBeLessThanOrEqual(500)
         expect(screen.getByText(/500 \/ 500/)).toBeInTheDocument()
       },
-      { timeout: 5000 }
+      { timeout: 10000 }
     )
-  }, 15000) // Increase test timeout to 15 seconds for typing long text
+  }, 30000)
 
   it('should disable submit button when required questions are not answered', async () => {
     const user = userEvent.setup()

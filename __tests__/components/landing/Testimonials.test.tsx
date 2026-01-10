@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Testimonials } from '@/components/landing/Testimonials/Testimonials'
 import { testimonials } from '@/data/testimonials'
@@ -19,7 +19,8 @@ vi.mock('@/components/ui/LogoWatermark/LogoWatermark', () => ({
 describe('Testimonials', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.useFakeTimers()
+    // Use real timers for userEvent compatibility with React 19
+    vi.useRealTimers()
     // Reset window.innerWidth
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -51,44 +52,50 @@ describe('Testimonials', () => {
   })
 
   it('should handle next button click', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     const nextButton = screen.getByLabelText(/Next testimonials/i)
     expect(nextButton).toBeInTheDocument()
 
-    await user.click(nextButton)
+    await act(async () => {
+      await user.click(nextButton)
+    })
 
     // After clicking next, auto-play should be disabled
     expect(nextButton).toBeInTheDocument()
   })
 
   it('should handle previous button click', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     const prevButton = screen.getByLabelText(/Previous testimonials/i)
     expect(prevButton).toBeInTheDocument()
 
-    await user.click(prevButton)
+    await act(async () => {
+      await user.click(prevButton)
+    })
 
     // After clicking prev, auto-play should be disabled
     expect(prevButton).toBeInTheDocument()
   })
 
   it('should stop auto-play when navigation buttons are clicked', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     const nextButton = screen.getByLabelText(/Next testimonials/i)
-    await user.click(nextButton)
+    await act(async () => {
+      await user.click(nextButton)
+    })
 
     // Auto-play should be stopped
     expect(nextButton).toBeInTheDocument()
   })
 
   it('should handle dot navigation', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     // Find all dot buttons
@@ -97,23 +104,29 @@ describe('Testimonials', () => {
 
     // Click on the second dot
     if (dots.length > 1) {
-      await user.click(dots[1])
+      await act(async () => {
+        await user.click(dots[1])
+      })
       // After clicking dot, auto-play should be disabled
       expect(dots[1]).toBeInTheDocument()
     }
   })
 
   it('should handle dot click and update current index', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     const dots = screen.getAllByLabelText(/Go to page/i)
     if (dots.length > 1) {
       const secondDot = dots[1]
-      await user.click(secondDot)
+      await act(async () => {
+        await user.click(secondDot)
+      })
 
       // Verify the dot is active (SCSS modules add hash)
-      expect(secondDot.className).toContain('dot--active')
+      await waitFor(() => {
+        expect(secondDot.className).toContain('dot--active')
+      })
     }
   })
 
@@ -179,21 +192,25 @@ describe('Testimonials', () => {
     expect(carouselItems.length).toBeGreaterThan(0)
   })
 
-  it('should auto-advance testimonials when auto-play is enabled', () => {
+  it('should auto-advance testimonials when auto-play is enabled', async () => {
+    vi.useFakeTimers()
     render(<Testimonials />)
 
     const initialTestimonial = screen.getByText(testimonials[0].name)
     expect(initialTestimonial).toBeInTheDocument()
 
     // Fast-forward time by 5 seconds to trigger auto-advance
-    vi.advanceTimersByTime(5000)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5000)
+    })
 
     // The testimonial should still be in the document (it's still rendered, just shifted)
     expect(screen.getByText(testimonials[0].name)).toBeInTheDocument()
+    vi.useRealTimers()
   })
 
   it('should wrap around to first page when reaching the end', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     const nextButton = screen.getByLabelText(/Next testimonials/i)
@@ -202,7 +219,9 @@ describe('Testimonials', () => {
 
     // Click next enough times to reach the end
     for (let i = 0; i < totalPages; i++) {
-      await user.click(nextButton)
+      await act(async () => {
+        await user.click(nextButton)
+      })
     }
 
     // Should wrap around to first page
@@ -210,14 +229,16 @@ describe('Testimonials', () => {
   })
 
   it('should wrap around to last page when going back from first page', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     const prevButton = screen.getByLabelText(/Previous testimonials/i)
     const dots = screen.getAllByLabelText(/Go to page/i)
 
     // Click previous from first page
-    await user.click(prevButton)
+    await act(async () => {
+      await user.click(prevButton)
+    })
 
     // Should wrap to last page
     expect(dots[dots.length - 1]).toBeInTheDocument()
@@ -244,17 +265,19 @@ describe('Testimonials', () => {
   })
 
   it('should handle rapid navigation clicks', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     const nextButton = screen.getByLabelText(/Next testimonials/i)
     const prevButton = screen.getByLabelText(/Previous testimonials/i)
 
     // Rapidly click both buttons
-    await user.click(nextButton)
-    await user.click(prevButton)
-    await user.click(nextButton)
-    await user.click(prevButton)
+    await act(async () => {
+      await user.click(nextButton)
+      await user.click(prevButton)
+      await user.click(nextButton)
+      await user.click(prevButton)
+    })
 
     // Should handle all clicks without errors
     expect(nextButton).toBeInTheDocument()
@@ -284,15 +307,19 @@ describe('Testimonials', () => {
   })
 
   it('should update active dot when navigating', async () => {
-    const user = userEvent.setup({ delay: null })
+    const user = userEvent.setup()
     render(<Testimonials />)
 
     const dots = screen.getAllByLabelText(/Go to page/i)
     if (dots.length > 1) {
-      await user.click(dots[1])
+      await act(async () => {
+        await user.click(dots[1])
+      })
       // SCSS modules add hash, so check for class name containing dot--active
-      expect(dots[1].className).toContain('dot--active')
-      expect(dots[0].className).not.toContain('dot--active')
+      await waitFor(() => {
+        expect(dots[1].className).toContain('dot--active')
+        expect(dots[0].className).not.toContain('dot--active')
+      })
     }
   })
 })

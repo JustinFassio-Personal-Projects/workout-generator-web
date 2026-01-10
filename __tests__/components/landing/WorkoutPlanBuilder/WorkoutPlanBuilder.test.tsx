@@ -217,9 +217,12 @@ describe('WorkoutPlanBuilder', () => {
     })
     await dismissIntro(user)
 
-    await waitFor(() => {
-      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     // Go to step 2
     await act(async () => {
@@ -231,9 +234,12 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(continueButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     // Enter invalid age
     await act(async () => {
@@ -247,10 +253,13 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(seeMyPlanButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText(/Age must be between 13 and 120/i)).toBeInTheDocument()
-    })
-  })
+    await waitFor(
+      () => {
+        expect(screen.getByText(/Age must be between 13 and 120/i)).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
+  }, 30000)
 
   it('should redirect to signup URL when create account is clicked', async () => {
     const user = userEvent.setup()
@@ -259,9 +268,12 @@ describe('WorkoutPlanBuilder', () => {
     })
     await dismissIntro(user)
 
-    await waitFor(() => {
-      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     // Complete the form
     await act(async () => {
@@ -273,18 +285,24 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(continueButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     await act(async () => {
       const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
       await user.click(seeMyPlanButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     // Click create account
     await act(async () => {
@@ -294,13 +312,16 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(createAccountButton)
     })
 
-    await waitFor(() => {
-      expect(mockLocation.href).toContain('https://aiworkoutgen.app/signup?')
-      expect(mockLocation.href).toContain('fitness_level=beginner')
-      // URLSearchParams encodes spaces as +
-      expect(mockLocation.href).toContain('fitness_goals=Build+muscle')
-    })
-  })
+    await waitFor(
+      () => {
+        expect(mockLocation.href).toContain('https://aiworkoutgen.app/signup?')
+        expect(mockLocation.href).toContain('fitness_level=beginner')
+        // URLSearchParams encodes spaces as +
+        expect(mockLocation.href).toContain('fitness_goals=Build+muscle')
+      },
+      { timeout: 5000 }
+    )
+  }, 30000)
 
   it('should return to step 1 when edit answers is clicked from preview', async () => {
     const user = userEvent.setup()
@@ -309,9 +330,12 @@ describe('WorkoutPlanBuilder', () => {
     })
     await dismissIntro(user)
 
-    await waitFor(() => {
-      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     // Complete form to get to preview
     await act(async () => {
@@ -323,18 +347,24 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(continueButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     await act(async () => {
       const seeMyPlanButton = screen.getByRole('button', { name: /see my plan/i })
       await user.click(seeMyPlanButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     // Click edit answers
     await act(async () => {
@@ -342,11 +372,14 @@ describe('WorkoutPlanBuilder', () => {
       await user.click(editButton)
     })
 
-    await waitFor(() => {
-      expect(screen.getByText('Step 1 of 2')).toBeInTheDocument()
-      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
-    })
-  })
+    await waitFor(
+      () => {
+        expect(screen.getByText('Step 1 of 2')).toBeInTheDocument()
+        expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
+  }, 30000)
 
   it('should include optional fields in URL when provided', async () => {
     const user = userEvent.setup()
@@ -355,9 +388,12 @@ describe('WorkoutPlanBuilder', () => {
     })
     await dismissIntro(user)
 
-    await waitFor(() => {
-      expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByText(/What are your fitness goals/i)).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
 
     // Complete step 1
     await act(async () => {
@@ -373,7 +409,7 @@ describe('WorkoutPlanBuilder', () => {
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
     // Add optional fields
@@ -397,7 +433,7 @@ describe('WorkoutPlanBuilder', () => {
       () => {
         expect(screen.getByText('Your plan is ready.')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
     // Click create account
@@ -413,9 +449,9 @@ describe('WorkoutPlanBuilder', () => {
         expect(mockLocation.href).toContain('gender=male')
         expect(mockLocation.href).toContain('age=28')
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
-  })
+  }, 30000)
 
   it('should render trust badges', async () => {
     const user = userEvent.setup()

@@ -3,7 +3,16 @@ const { withBotId } = require('botid/next/config')
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['api.dicebear.com', 'qbklyimfazrkutwqictw.supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'qbklyimfazrkutwqictw.supabase.co',
+      },
+    ],
     formats: ['image/avif', 'image/webp'],
   },
   sassOptions: {
@@ -11,10 +20,14 @@ const nextConfig = {
     // Suppress deprecation warnings during development
     silenceDeprecations: ['legacy-js-api'],
   },
+  // optimizePackageImports is still experimental in Next.js 16 (kept for safety during migration)
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  // Fix webpack chunk resolution issues in development
+  // Turbopack config (empty for now - using default behavior)
+  turbopack: {},
+  // Webpack config applies to production builds (Turbopack is default for dev in Next.js 16)
+  // Fix webpack chunk resolution issues in development/production
   webpack: (config, { dev, isServer }) => {
     if (dev) {
       // Use deterministic IDs for both client and server to prevent missing chunk errors

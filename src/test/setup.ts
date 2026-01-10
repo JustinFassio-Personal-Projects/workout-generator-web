@@ -123,6 +123,9 @@ if (!process.env.OPENAI_API_KEY) {
 if (!process.env.FIREBASE_FUNCTION_URL) {
   process.env.FIREBASE_FUNCTION_URL = 'https://test-function-url.firebaseapp.com'
 }
+if (!process.env.FIREBASE_CLOUD_FUNCTION_URL) {
+  process.env.FIREBASE_CLOUD_FUNCTION_URL = 'https://test-function-url.firebaseapp.com'
+}
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
 }

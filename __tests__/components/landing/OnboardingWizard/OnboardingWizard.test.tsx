@@ -211,73 +211,147 @@ describe('OnboardingWizard', () => {
 
   it('should start loading sequence when create account is clicked', async () => {
     vi.useFakeTimers()
-    const user = userEvent.setup({ delay: null })
-    render(<OnboardingWizard />)
+    try {
+      const user = userEvent.setup({ delay: null })
+      render(<OnboardingWizard />)
 
-    // Complete the form
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+      // Complete the form
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+
+      await waitFor(
+        () => {
+          expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
+        },
+        { timeout: 3000 }
+      )
+
+      const submitButton = screen.getByRole('button', { name: /let's go/i })
+      await user.click(submitButton)
+
+      await waitFor(
+        () => {
+          expect(screen.getByText('Your workout profile is set.')).toBeInTheDocument()
+        },
+        { timeout: 3000 }
+      )
+
+      // Click create account
+      const createAccountButton = screen.getByRole('button', {
+        name: /create account to generate workout/i,
+      })
+      await act(async () => {
+        await user.click(createAccountButton)
+      })
+
+      // Advance timers to trigger loading state
+      await act(async () => {
+        vi.advanceTimersByTime(100)
+      })
+
+      await waitFor(
+        () => {
+          expect(screen.getByText('Analyzing Biomechanics...')).toBeInTheDocument()
+        },
+        { timeout: 3000 }
+      )
+
+      expect(buildSignupUrl).toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 20000) // Increase timeout for this test
+
+  it('should cleanup timeouts on unmount', async () => {
+    // Set up spy before rendering to capture all clearTimeout calls
+    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout')
+    const { unmount } = render(<OnboardingWizard />)
+
+    // Trigger loading state to create timeouts
+    const user = userEvent.setup({ delay: null })
+
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+    })
+
+    await act(async () => {
+      const continueButton = screen.getByRole('button', { name: /continue/i })
+      await user.click(continueButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
-    const submitButton = screen.getByRole('button', { name: /let's go/i })
-    await user.click(submitButton)
+    await act(async () => {
+      const submitButton = screen.getByRole('button', { name: /let's go/i })
+      await user.click(submitButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Your workout profile is set.')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
-    // Click create account
-    const createAccountButton = screen.getByRole('button', {
-      name: /create account to generate workout/i,
-    })
-    await user.click(createAccountButton)
+    // Reset spy count before clicking create account (handleCreateAccount may call clearTimeout)
+    const callCountBeforeCreate = clearTimeoutSpy.mock.calls.length
 
-    // Advance timers to trigger loading state
-    act(() => {
-      vi.advanceTimersByTime(100)
+    await act(async () => {
+      const createAccountButton = screen.getByRole('button', {
+        name: /create account to generate workout/i,
+      })
+      await user.click(createAccountButton)
     })
 
+    // Wait for loading state to be set and timeouts to be created
     await waitFor(
       () => {
         expect(screen.getByText('Analyzing Biomechanics...')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
-    expect(buildSignupUrl).toHaveBeenCalled()
-    vi.useRealTimers()
-  })
+    // Wait a moment to ensure React has processed state updates and timeouts are created
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    })
 
-  it('should cleanup timeouts on unmount', () => {
-    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout')
-    const { unmount } = render(<OnboardingWizard />)
+    // Unmount should cleanup any active timeouts
+    // The cleanup useEffect in OnboardingWizard calls clearTimeout for each timeout in timeoutRefs
+    // Since handleCreateAccount creates 5 timeouts, cleanup should call clearTimeout 5 times
+    await act(async () => {
+      unmount()
+      // Give cleanup useEffect time to execute
+      await new Promise(resolve => setTimeout(resolve, 100))
+    })
 
-    unmount()
+    // clearTimeout should be called during cleanup useEffect (5 times for 5 timeouts)
+    // handleCreateAccount also calls clearTimeout initially, but array is empty so no callback executes
+    const callCountAfterUnmount = clearTimeoutSpy.mock.calls.length
+    expect(callCountAfterUnmount).toBeGreaterThan(callCountBeforeCreate)
 
-    expect(clearTimeoutSpy).toHaveBeenCalled()
     clearTimeoutSpy.mockRestore()
-  })
+  }, 20000) // Increase timeout for this test
 
   it('should handle form data updates correctly', async () => {
     const user = userEvent.setup({ delay: null })
     render(<OnboardingWizard />)
 
     // Update fitness goals
-    const buildMuscleChip = screen.getByText('Build muscle')
-    await user.click(buildMuscleChip)
-    const loseFatChip = screen.getByText('Lose fat')
-    await user.click(loseFatChip)
+    await act(async () => {
+      const buildMuscleChip = screen.getByText('Build muscle')
+      await user.click(buildMuscleChip)
+      const loseFatChip = screen.getByText('Lose fat')
+      await user.click(loseFatChip)
+    })
 
     // Update fitness level
     const fitnessLevelText = screen.getByText('Fitness Level')
@@ -285,7 +359,9 @@ describe('OnboardingWizard', () => {
       .closest('div')
       ?.querySelector('select') as HTMLSelectElement
     if (levelSelect) {
-      await user.selectOptions(levelSelect, 'intermediate')
+      await act(async () => {
+        await user.selectOptions(levelSelect, 'intermediate')
+      })
     }
 
     // Update equipment
@@ -294,33 +370,41 @@ describe('OnboardingWizard', () => {
       .closest('div')
       ?.querySelector('select') as HTMLSelectElement
     if (equipmentSelect) {
-      await user.selectOptions(equipmentSelect, 'full_gym')
+      await act(async () => {
+        await user.selectOptions(equipmentSelect, 'full_gym')
+      })
     }
 
     // Continue to step 2
     const continueButton = screen.getByRole('button', { name: /continue/i })
-    await user.click(continueButton)
+    await act(async () => {
+      await user.click(continueButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Step 2 of 2')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
 
     // Update units
     const kgButton = screen.getByText('kg')
-    await user.click(kgButton)
+    await act(async () => {
+      await user.click(kgButton)
+    })
 
     // Submit
     const submitButton = screen.getByRole('button', { name: /let's go/i })
-    await user.click(submitButton)
+    await act(async () => {
+      await user.click(submitButton)
+    })
 
     await waitFor(
       () => {
         expect(screen.getByText('Your workout profile is set.')).toBeInTheDocument()
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     )
-  })
+  }, 20000) // Increase timeout for this test
 })

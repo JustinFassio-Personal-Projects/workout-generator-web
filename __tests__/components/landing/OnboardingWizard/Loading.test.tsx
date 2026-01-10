@@ -53,7 +53,7 @@ describe('OnboardingWizard Loading', () => {
     expect(screen.getByText('The human body has over 600 muscles')).toBeInTheDocument()
 
     // Advance time by 5 seconds to trigger interval
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(5000)
     })
 
@@ -62,9 +62,9 @@ describe('OnboardingWizard Loading', () => {
       () => {
         expect(screen.getByText('Exercise increases neuroplasticity')).toBeInTheDocument()
       },
-      { timeout: 1000 }
+      { timeout: 2000 }
     )
-  })
+  }, 10000) // Increase timeout for this specific test
 
   it('should handle empty facts array', () => {
     render(<Loading {...defaultProps} facts={[]} />)

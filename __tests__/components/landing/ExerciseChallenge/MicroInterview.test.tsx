@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MicroInterview } from '@/components/landing/ExerciseChallenge/MicroInterview'
 import * as analytics from '@/lib/analytics'
@@ -491,29 +491,39 @@ describe('MicroInterview', () => {
     render(<MicroInterview leadId={mockLeadId} onComplete={mockOnComplete} />)
 
     // Answer all required questions
-    await user.click(screen.getByText('Build muscle'))
+    await act(async () => {
+      await user.click(screen.getByText('Build muscle'))
+    })
     await waitFor(() => {
       expect(screen.getByText('Question 2 of 3')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByText("I don't know what to do"))
+    await act(async () => {
+      await user.click(screen.getByText("I don't know what to do"))
+    })
     await waitFor(() => {
       expect(screen.getByText('Question 3 of 3')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByText('Build a plan with week-to-week progression'))
+    await act(async () => {
+      await user.click(screen.getByText('Build a plan with week-to-week progression'))
+    })
     await waitFor(() => {
       expect(screen.getByText('Skip')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByText('Skip'))
+    await act(async () => {
+      await user.click(screen.getByText('Skip'))
+    })
 
     // Submit
     await waitFor(() => {
       expect(screen.getByText('Submit')).toBeInTheDocument()
     })
     const submitButton = screen.getByText('Submit')
-    await user.click(submitButton)
+    await act(async () => {
+      await user.click(submitButton)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Server error. Please try again in a moment.')).toBeInTheDocument()

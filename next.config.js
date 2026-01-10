@@ -15,13 +15,18 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react'],
   },
   // Fix webpack chunk resolution issues in development
-  webpack: (config, { dev }) => {
+  webpack: (config, { dev, isServer }) => {
     if (dev) {
       // Use deterministic IDs for both client and server to prevent missing chunk errors
       config.optimization = {
         ...config.optimization,
         moduleIds: 'deterministic',
         chunkIds: 'deterministic',
+      }
+      // In development, prevent vendor chunk splitting to avoid ENOENT errors
+      // when chunks are referenced but don't exist yet
+      if (isServer) {
+        config.optimization.splitChunks = false
       }
     }
     return config

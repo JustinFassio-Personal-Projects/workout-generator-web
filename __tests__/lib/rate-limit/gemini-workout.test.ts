@@ -1,10 +1,17 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkGeminiRateLimit, setGeminiRateLimit } from '@/lib/rate-limit/gemini-workout'
 
 describe('gemini-workout rate limiting', () => {
+  const ORIGINAL_NODE_ENV = process.env.NODE_ENV
+
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    // Restore original NODE_ENV after each test
+    ;(process.env as any).NODE_ENV = ORIGINAL_NODE_ENV
   })
 
   describe('checkGeminiRateLimit', () => {
@@ -45,10 +52,9 @@ describe('gemini-workout rate limiting', () => {
   describe('setGeminiRateLimit', () => {
     it('should set the rate limit cookie with correct properties', () => {
       const response = NextResponse.json({ workout: 'test workout' })
-      const originalEnv = process.env.NODE_ENV
 
-      // Test in development mode
-      process.env.NODE_ENV = 'development'
+      // Test in development mode - using type assertion to bypass TypeScript read-only restriction
+      ;(process.env as any).NODE_ENV = 'development'
       const result = setGeminiRateLimit(response)
 
       expect(result).toBe(response)
@@ -61,25 +67,19 @@ describe('gemini-workout rate limiting', () => {
       expect(cookie?.secure).toBe(false) // Not secure in development
       expect(cookie?.sameSite).toBe('strict')
       expect(cookie?.path).toBe('/')
-
-      // Restore original env
-      process.env.NODE_ENV = originalEnv
     })
 
     it('should set secure flag to true in production', () => {
       const response = NextResponse.json({ workout: 'test workout' })
-      const originalEnv = process.env.NODE_ENV
 
-      process.env.NODE_ENV = 'production'
+      // Test in production mode - using type assertion to bypass TypeScript read-only restriction
+      ;(process.env as any).NODE_ENV = 'production'
       const result = setGeminiRateLimit(response)
 
       const cookies = result.cookies.getAll()
       const cookie = cookies.find(c => c.name === 'gemini_workout_used')
 
       expect(cookie?.secure).toBe(true) // Secure in production
-
-      // Restore original env
-      process.env.NODE_ENV = originalEnv
     })
 
     it('should set cookie with future expiration date', () => {

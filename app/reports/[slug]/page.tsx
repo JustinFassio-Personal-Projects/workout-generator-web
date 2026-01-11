@@ -3,9 +3,6 @@ import { reports } from '@/types/reports'
 import { notFound } from 'next/navigation'
 import { ReportV2Content } from '@/components/features/reports/ReportV2Content'
 
-// Mark as dynamic for now - can be made static later
-export const dynamic = 'force-dynamic'
-
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 export async function generateStaticParams() {

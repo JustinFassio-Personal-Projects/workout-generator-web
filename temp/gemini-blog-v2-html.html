@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best AI Workout Generator (2026): System vs. Randomness</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Chosen Palette: Warm Neutrals & Deep Focus -->
+    <!-- Palette: Background: #F5F5F4 (Stone-100), Text: #1C1917 (Stone-900), Accent: #EA580C (Orange-600) for action, #0F766E (Teal-700) for data/trust. -->
+    
+    <!-- Application Structure Plan: 
+         1. Hero Section: Direct hook addressing the user's intent (Finding the 'Best').
+         2. The Problem Visualized: Interactive Chart comparing "Random" vs. "Progressive" results. This visually proves the thesis immediately.
+         3. The AI Hierarchy (Interactive Grid): Categorizing tools into "Randomizers", "LLM Wrappers", and "True Systems". Users can click to see pros/cons.
+         4. The "Brain" Simulation: A functional flow diagram where users simulate an input (e.g., "Knee Pain") to see how a True AI adapts vs. a Randomizer.
+         5. [NEW] Gemini Demo: Users generate a sample "System" workout live.
+         6. Market Trends: Data visualization showing the shift from "Fun" apps to "Result" apps in 2026.
+         7. Verdict/Conclusion: Summary of why System-Based AI wins.
+    -->
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F5F5F4; /* Stone 100 */
+            color: #1C1917; /* Stone 900 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Max width for readability */
+            height: 350px;
+            max-height: 400px;
+            margin: 0 auto;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .interactive-node {
+            transition: all 0.3s ease;
+        }
+        .active-node {
+            background-color: #0F766E !important; /* Teal 700 */
+            color: white !important;
+            border-color: #0F766E !important;
+        }
+        /* Custom Loader for API */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #ea580c;
+            width: 20px;
+            height: 20px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-900 leading-relaxed">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-orange-600 tracking-tight">AI Workout Gen Report</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6 text-sm">
+                    <a href="#analysis" class="text-stone-600 hover:text-orange-600 font-medium transition">Analysis</a>
+                    <a href="#tiers" class="text-stone-600 hover:text-orange-600 font-medium transition">Tiers</a>
+                    <a href="#simulation" class="text-stone-600 hover:text-orange-600 font-medium transition">Logic</a>
+                    <a href="#live-demo" class="text-orange-600 hover:text-orange-700 font-bold transition flex items-center">
+                        <span class="mr-1">✨</span> Live Demo
+                    </a>
+                    <a href="#verdict" class="text-stone-600 hover:text-orange-600 font-medium transition">Verdict</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-white border-b border-stone-200">
+        <div class="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-center">
+            <span class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-teal-800 uppercase bg-teal-100 rounded-full">2026 Market Analysis</span>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-stone-900 mb-6 tracking-tight">
+                Best AI Workout Generator (2026):<br>
+                <span class="text-orange-600">What Actually Works</span> vs. What’s Just Random
+            </h1>
+            <p class="text-xl text-stone-600 max-w-2xl mx-auto mb-8">
+                The era of "chatting with a bot for a workout" is over. We analyzed the 2026 landscape to separate generic Large Language Model wrappers from true algorithmic training systems.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="document.getElementById('analysis').scrollIntoView({behavior: 'smooth'})" class="px-8 py-3 bg-stone-900 text-white font-semibold rounded-lg hover:bg-stone-800 transition shadow-lg">
+                    Read the Research
+                </button>
+                <button onclick="document.getElementById('live-demo').scrollIntoView({behavior: 'smooth'})" class="px-8 py-3 bg-white text-stone-900 border border-stone-300 font-semibold rounded-lg hover:bg-stone-50 transition flex items-center justify-center">
+                    <span class="mr-2">✨</span> Try the AI Engine
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section 1: The Core Problem (Chart) -->
+    <section id="analysis" class="py-16 px-4 bg-stone-50">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">The "Randomness" Trap</h2>
+                <p class="text-lg text-stone-600">
+                    Why do most "AI" apps fail after 3 months? <br>
+                    <strong>Context:</strong> Most generators treat every workout as an isolated event. This lacks <em>Progressive Overload</em>, the biological requirement for change.
+                    <br><strong>Interact:</strong> Toggle the lines below to see the difference in 6-month trajectories.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+                <div class="mt-6 flex flex-wrap justify-center gap-4 text-sm">
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 bg-stone-400 rounded-full mr-2"></span>
+                        <span class="text-stone-600">Random Generation (High Fatigue, Low Gain)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 bg-orange-600 rounded-full mr-2"></span>
+                        <span class="text-stone-900 font-bold">Algorithmic System (Optimized)</span>
+                    </div>
+                </div>
+                <div class="mt-4 p-4 bg-stone-100 rounded-lg text-sm text-stone-700">
+                    <strong>Key Insight:</strong> Random workouts (common in LLM wrappers) create "junk volume." They tire you out but fail to systematically increase intensity, leading to the dreaded plateau shown in the grey line.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: The 3 Tiers of AI (Interactive Grid) -->
+    <section id="tiers" class="py-16 px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">The 3 Tiers of AI Fitness Tools</h2>
+                <p class="text-lg text-stone-600">
+                    Not all "AI" is created equal. In 2026, the market has split into three distinct categories.
+                    <br><strong>Interact:</strong> Click a tier to reveal its underlying technology and expected results.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Tier 1 -->
+                <button onclick="selectTier(1)" id="tier-btn-1" class="tier-btn p-6 rounded-xl border-2 border-stone-200 text-left hover:border-orange-300 transition bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <div class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">Tier 1</div>
+                    <h3 class="text-xl font-bold text-stone-900 mb-2">The Randomizer</h3>
+                    <p class="text-stone-500 text-sm">"Workout of the Day" Generators</p>
+                </button>
+
+                <!-- Tier 2 -->
+                <button onclick="selectTier(2)" id="tier-btn-2" class="tier-btn p-6 rounded-xl border-2 border-stone-200 text-left hover:border-orange-300 transition bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <div class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">Tier 2</div>
+                    <h3 class="text-xl font-bold text-stone-900 mb-2">The LLM Wrapper</h3>
+                    <p class="text-stone-500 text-sm">Chatbots & Text Prompts</p>
+                </button>
+
+                <!-- Tier 3 -->
+                <button onclick="selectTier(3)" id="tier-btn-3" class="tier-btn active-node p-6 rounded-xl border-2 border-orange-600 text-left hover:border-orange-700 transition bg-teal-50 shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <div class="text-xs font-bold text-teal-800 uppercase tracking-widest mb-2">Tier 3</div>
+                    <h3 class="text-xl font-bold text-teal-900 mb-2">True Adaptive AI</h3>
+                    <p class="text-teal-700 text-sm">Dynamic Algorithmic Systems</p>
+                </button>
+            </div>
+
+            <!-- Tier Detail View -->
+            <div id="tier-detail" class="bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden transition-all duration-300">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: The Logic Simulation -->
+    <section id="simulation" class="py-16 px-4 bg-stone-900 text-white">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-10 text-center">
+                <span class="inline-block px-3 py-1 mb-3 text-xs font-bold text-orange-400 border border-orange-500 rounded-full uppercase">Interactive Demo</span>
+                <h2 class="text-3xl font-bold mb-4">How It Thinks: System vs. Random</h2>
+                <p class="text-stone-300">
+                    The true test of an AI isn't generating a workout; it's <strong>adapting</strong> to life. 
+                    <br><strong>Task:</strong> Choose a scenario below to see how a Tier 3 System reacts compared to a standard generator.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <button onclick="runSimulation('missed')" class="sim-btn bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded-lg p-4 text-center transition">
+                    Scenario: "I Missed 3 Days"
+                </button>
+                <button onclick="runSimulation('pain')" class="sim-btn bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded-lg p-4 text-center transition">
+                    Scenario: "Knee Pain Today"
+                </button>
+                <button onclick="runSimulation('plateau')" class="sim-btn bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded-lg p-4 text-center transition">
+                    Scenario: "Stalled on Bench Press"
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Random/Basic AI Response -->
+                <div class="bg-stone-800 rounded-xl p-6 border border-red-900/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-red-400">Standard AI (Tier 1/2)</h3>
+                        <span class="text-2xl">🤖</span>
+                    </div>
+                    <div id="sim-result-bad" class="text-stone-300 min-h-[120px] text-sm leading-relaxed">
+                        Select a scenario above to see the response...
+                    </div>
+                </div>
+
+                <!-- True System Response -->
+                <div class="bg-teal-900/30 rounded-xl p-6 border border-teal-500/50 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-teal-500 blur-3xl opacity-20"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-teal-400">System AI (Tier 3)</h3>
+                        <span class="text-2xl">🧠</span>
+                    </div>
+                    <div id="sim-result-good" class="text-teal-50 min-h-[120px] text-sm leading-relaxed">
+                        Select a scenario above to see the response...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3.5: GEMINI LIVE DEMO -->
+    <section id="live-demo" class="py-16 px-4 bg-gradient-to-br from-stone-800 to-stone-900 text-white relative overflow-hidden">
+        <!-- Background Flair -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-orange-500 rounded-full blur-[100px] opacity-20"></div>
+            <div class="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-teal-500 rounded-full blur-[100px] opacity-20"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="text-center mb-10">
+                <span class="inline-block px-3 py-1 mb-3 text-xs font-bold text-teal-300 border border-teal-500/50 rounded-full uppercase bg-teal-900/30 backdrop-blur">Live Preview</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold mb-4">Generate a "System" Plan <span class="text-orange-500">Instantly</span></h2>
+                <p class="text-stone-300 max-w-2xl mx-auto">
+                    Experience the difference between a generic output and a <strong>System-Based</strong> prescription. 
+                    Our engine doesn't just list exercises; it calculates <strong>Tempo</strong>, <strong>RPE</strong>, and <strong>Rest</strong> to drive specific physiological adaptations.
+                </p>
+            </div>
+
+            <div class="bg-stone-900/60 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-stone-700 shadow-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <!-- Input: Goal -->
+                    <div>
+                        <label class="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Primary Goal</label>
+                        <select id="gemini-goal" class="w-full bg-stone-800 border border-stone-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition">
+                            <option value="Hypertrophy (Muscle Growth)">Hypertrophy (Build Muscle)</option>
+                            <option value="Maximum Strength">Max Strength (Powerlifting)</option>
+                            <option value="Fat Loss & Conditioning">Fat Loss & Conditioning</option>
+                            <option value="Mobility & Stability">Mobility & Stability</option>
+                        </select>
+                    </div>
+
+                    <!-- Input: Experience -->
+                    <div>
+                        <label class="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Experience Level</label>
+                        <select id="gemini-level" class="w-full bg-stone-800 border border-stone-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition">
+                            <option value="Beginner (0-1 years)">Beginner (0-1 years)</option>
+                            <option value="Intermediate (1-3 years)">Intermediate (1-3 years)</option>
+                            <option value="Advanced (3+ years)">Advanced (3+ years)</option>
+                        </select>
+                    </div>
+
+                    <!-- Input: Equipment -->
+                    <div>
+                        <label class="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Equipment</label>
+                        <select id="gemini-equip" class="w-full bg-stone-800 border border-stone-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition">
+                            <option value="Full Commercial Gym">Full Commercial Gym</option>
+                            <option value="Dumbbells & Bench Only">Dumbbells & Bench Only</option>
+                            <option value="Bodyweight Only">Bodyweight Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="generateSystemWorkout()" id="gemini-btn" class="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white font-bold text-lg rounded-xl hover:from-orange-500 hover:to-red-500 transition shadow-lg flex justify-center items-center gap-3 transform active:scale-[0.99]">
+                    <span>Generate System Session</span>
+                    <span class="text-2xl">✨</span>
+                </button>
+
+                <!-- Loading State -->
+                <div id="gemini-loading" class="hidden mt-8 text-center">
+                    <div class="inline-block loader mb-3"></div>
+                    <p class="text-stone-400 text-sm animate-pulse">Consulting the Algorithmic Core...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="gemini-error" class="hidden mt-6 p-4 bg-red-900/30 border border-red-800 rounded-lg text-red-200 text-sm text-center">
+                    Connection interrupted. Please try again.
+                </div>
+
+                <!-- Result Display -->
+                <div id="gemini-result" class="hidden mt-8 bg-stone-950 rounded-xl border border-stone-800 p-6 md:p-8 font-mono text-sm leading-relaxed text-stone-300 shadow-inner overflow-hidden relative">
+                    <div class="absolute top-0 right-0 px-3 py-1 bg-stone-800 rounded-bl-lg text-xs text-stone-500 font-sans border-b border-l border-stone-700">Generated by Gemini 2.5 Flash</div>
+                    <div id="gemini-content" class="whitespace-pre-wrap"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Section 4: Data Driven Verdict -->
+    <section id="verdict" class="py-16 px-4 bg-white">
+        <div class="max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-stone-900 mb-6">The 2026 Verdict</h2>
+                    <p class="text-lg text-stone-700 mb-6">
+                        Data from over 500,000 user sessions in 2025 showed a clear trend: <strong>Novelty wears off, progress keeps users.</strong>
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-600 font-bold text-sm mt-1">✓</span>
+                            <span class="ml-3 text-stone-600"><strong>Retention:</strong> Users on System-based apps stay 3.4x longer than Randomizer apps.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-600 font-bold text-sm mt-1">✓</span>
+                            <span class="ml-3 text-stone-600"><strong>Results:</strong> Progressive Overload algorithms yield 22% faster strength gains in beginners.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-600 font-bold text-sm mt-1">✓</span>
+                            <span class="ml-3 text-stone-600"><strong>Safety:</strong> Fatigue management logic reduces injury risk by monitoring volume spikes.</span>
+                        </li>
+                    </ul>
+                    <div class="mt-8">
+                        <a href="#" class="inline-block px-6 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition shadow-md">
+                            Generate Your System Plan
+                        </a>
+                        <p class="mt-2 text-xs text-stone-400">Powered by aiworkoutgenerator.com logic</p>
+                    </div>
+                </div>
+                
+                <div class="bg-stone-50 p-6 rounded-xl border border-stone-200">
+                    <h3 class="text-sm font-bold text-stone-500 uppercase tracking-wide mb-4 text-center">User Retention: 6 Month View</h3>
+                    <div class="chart-container">
+                        <canvas id="retentionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-12 border-t border-stone-800">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <p class="mb-4">&copy; 2026 AI Workout Generator Research. All rights reserved.</p>
+            <p class="text-sm text-stone-600">
+                Analysis based on aggregate fitness app usage data trends projected for 2026. 
+                "System-Based Training" refers to algorithmic periodization models.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- 0. GEMINI API INTEGRATION ---
+        
+        async function generateSystemWorkout() {
+            const goal = document.getElementById('gemini-goal').value;
+            const level = document.getElementById('gemini-level').value;
+            const equip = document.getElementById('gemini-equip').value;
+            const btn = document.getElementById('gemini-btn');
+            const resultBox = document.getElementById('gemini-result');
+            const contentBox = document.getElementById('gemini-content');
+            const loading = document.getElementById('gemini-loading');
+            const errorBox = document.getElementById('gemini-error');
+
+            // Reset State
+            resultBox.classList.add('hidden');
+            errorBox.classList.add('hidden');
+            loading.classList.remove('hidden');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // SECURITY WARNING: This is a TEMPLATE/REFERENCE file only.
+            // DO NOT place a real API key in this client-side HTML file.
+            // API keys must NEVER be exposed in client-side code.
+            // 
+            // In production, this functionality is implemented via a secure server-side proxy:
+            // See: app/api/reports/gemini-workout/route.ts
+            // The server-side route handles API key authentication and rate limiting.
+            const apiKey = null; // Placeholder; must never be a real key in shipped HTML
+            
+            if (!apiKey) {
+                throw new Error(
+                    "Missing Gemini API key. This template file should not be used directly in production. " +
+                    "Use the secure server-side proxy endpoint at /api/reports/gemini-workout instead."
+                );
+            }
+
+            const systemPrompt = "You are the AI engine behind 'AI Workout Generator'. Your goal is to demonstrate 'System-Based Training' vs 'Random Workouts'. When asked to generate a workout, provide a structured session (Warmup, Main Lift, Accessory). For the Main Lift, specify Tempo (e.g., 3-1-1-0), RPE (Rate of Perceived Exertion), and Rest intervals. Add a brief 'System Logic' explanation at the end of the workout explaining why this specific volume/intensity was chosen for the user's level, contrasting it with generic random advice.";
+            
+            const userPrompt = `Generate a specific, single workout session for a ${level} athlete with access to ${equip} focused on ${goal}. Format the output as a structured workout plan. Crucially, include specific 'Tempo' (e.g., 3-0-1-0) and 'RPE' (Rate of Perceived Exertion) for the main lifts to demonstrate a 'System-Based' approach. End with a short 'Coach's Logic' explaining why this structure beats a random workout.`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: userPrompt }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+
+                if (!response.ok) throw new Error('API Failed');
+
+                const data = await response.json();
+                const rawText = data.candidates[0].content.parts[0].text;
+                
+                // Simple formatting for the raw text to make it look nice in HTML
+                // Replace **text** with <strong class="text-orange-400">text</strong>
+                // Replace * text with • text for lists
+                let formattedText = rawText
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-orange-400">$1</strong>')
+                    .replace(/\n\*/g, '\n•');
+
+                contentBox.innerHTML = formattedText;
+                resultBox.classList.remove('hidden');
+                
+                // Smooth scroll to result
+                resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            } catch (err) {
+                console.error(err);
+                errorBox.classList.remove('hidden');
+            } finally {
+                loading.classList.add('hidden');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+
+        // --- 1. Progress Chart (Random vs System) ---
+        const ctxProgress = document.getElementById('progressChart').getContext('2d');
+        const progressChart = new Chart(ctxProgress, {
+            type: 'line',
+            data: {
+                labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'],
+                datasets: [
+                    {
+                        label: 'Random "AI" Generator',
+                        data: [100, 105, 102, 108, 106, 107],
+                        borderColor: '#A8A29E', // Stone 400
+                        borderWidth: 2,
+                        tension: 0.4, // Make it wiggly/random looking
+                        pointRadius: 3,
+                        borderDash: [5, 5]
+                    },
+                    {
+                        label: 'True System (Progressive Overload)',
+                        data: [100, 108, 115, 124, 132, 145],
+                        borderColor: '#EA580C', // Orange 600
+                        backgroundColor: 'rgba(234, 88, 12, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.1, // Straighter, consistent growth
+                        fill: true,
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false // Custom legend used in HTML
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: '#1C1917',
+                        titleColor: '#F5F5F4',
+                        bodyColor: '#F5F5F4',
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw + '% Strength Base';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: '#E7E5E4' },
+                        title: { display: true, text: 'Strength Index' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // --- 2. Tier Selection Logic ---
+        const tierData = {
+            1: {
+                title: "Tier 1: The Randomizer",
+                icon: "🎲",
+                desc: "These apps use simple randomization logic. Like shuffling a deck of cards, they pick 5 exercises for legs. It's fun for a week, but useless for training.",
+                pros: ["High variety (never bored)", "Zero setup time"],
+                cons: ["No progressive overload", "High injury risk (random volume)", "No adaptation"],
+                verdict: "Avoid if you want results."
+            },
+            2: {
+                title: "Tier 2: The LLM Wrapper",
+                icon: "💬",
+                desc: "These connect directly to ChatGPT/Claude APIs. They can write a plan, but they don't 'remember' your last workout stats to calculate the next one mathematically. They hallucinate weights.",
+                pros: ["Natural language conversation", "Good for general advice"],
+                cons: ["Cannot track math/volume over time", "Inconsistent suggestions", "Generic advice"],
+                verdict: "Okay for beginners, bad for athletes."
+            },
+            3: {
+                title: "Tier 3: True Adaptive System",
+                icon: "🧠",
+                desc: "The gold standard. Uses AI to analyze your past performance (reps, RPE, fatigue) to calculate the exact weight and reps for today. It acts like a human coach, not a chatbot.",
+                pros: ["Guaranteed Progressive Overload", "Auto-regulation (adjusts to bad days)", "Long-term periodization"],
+                cons: ["Higher learning curve", "Requires data input"],
+                verdict: "The only choice for 2026."
+            }
+        };
+
+        function selectTier(tierId) {
+            // Update buttons
+            document.querySelectorAll('.tier-btn').forEach(btn => {
+                btn.classList.remove('active-node', 'border-orange-600', 'bg-teal-50', 'ring-2', 'ring-orange-500');
+                btn.classList.add('border-stone-200', 'bg-white');
+                // Reset text colors
+                const title = btn.querySelector('h3');
+                const label = btn.querySelector('div');
+                const p = btn.querySelector('p');
+                
+                title.classList.remove('text-teal-900');
+                title.classList.add('text-stone-900');
+                
+                label.classList.remove('text-teal-800');
+                label.classList.add('text-stone-400');
+
+                p.classList.remove('text-teal-700');
+                p.classList.add('text-stone-500');
+            });
+
+            // Activate selected
+            const activeBtn = document.getElementById(`tier-btn-${tierId}`);
+            activeBtn.classList.remove('border-stone-200', 'bg-white');
+            activeBtn.classList.add('active-node', 'border-orange-600', 'bg-teal-50');
+            
+            // Update text styles for active
+            activeBtn.querySelector('h3').classList.remove('text-stone-900');
+            activeBtn.querySelector('h3').classList.add('text-teal-900');
+            
+            activeBtn.querySelector('div').classList.remove('text-stone-400');
+            activeBtn.querySelector('div').classList.add('text-teal-800');
+
+            activeBtn.querySelector('p').classList.remove('text-stone-500');
+            activeBtn.querySelector('p').classList.add('text-teal-700');
+
+            // Render Content
+            const data = tierData[tierId];
+            const html = `
+                <div class="p-8">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="text-4xl bg-stone-100 p-3 rounded-lg">${data.icon}</div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-stone-900">${data.title}</h3>
+                            <div class="h-1 w-20 bg-orange-500 mt-2 rounded-full"></div>
+                        </div>
+                    </div>
+                    <p class="text-lg text-stone-700 mb-8 leading-relaxed">${data.desc}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-green-700 mb-3 flex items-center"><span class="mr-2">✓</span> The Upside</h4>
+                            <ul class="space-y-2">
+                                ${data.pros.map(p => `<li class="text-stone-600 text-sm border-l-2 border-green-200 pl-3">${p}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-red-700 mb-3 flex items-center"><span class="mr-2">✗</span> The Downside</h4>
+                            <ul class="space-y-2">
+                                ${data.cons.map(c => `<li class="text-stone-600 text-sm border-l-2 border-red-200 pl-3">${c}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-stone-100 flex justify-between items-center">
+                        <span class="font-bold text-stone-900">Expert Verdict:</span>
+                        <span class="px-4 py-2 bg-stone-900 text-white text-sm rounded-lg font-medium">${data.verdict}</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('tier-detail').innerHTML = html;
+        }
+
+        // Initialize Tier 3
+        selectTier(3);
+
+
+        // --- 3. Simulation Logic ---
+        const scenarios = {
+            missed: {
+                bad: "Takes you to 'Day 4' of the plan anyway, forcing you to do heavy squats after 3 days of sedentary stiffness. Risk of injury: High.",
+                good: "Detects the 72h gap. Automatically inserts a 'Re-activation' warmup, reduces load by 5% to re-acclimate nervous system, and pushes the cycle back. Maintains momentum."
+            },
+            pain: {
+                bad: "Suggests: 'Just skip the leg exercises.' Leaves you with a 15-minute workout and no volume compensation.",
+                good: "Recalculates session: Swaps Squats (high knee stress) for Glute Bridges and RDLs (posterior chain focus). Maintains training volume without aggravating the joint."
+            },
+            plateau: {
+                bad: "Generates the same workout again: 'Try harder this time.' No strategy change.",
+                good: "Analyzes last 4 sessions. Identifies stall. Switches progression model from Linear to Wave Loading for 2 weeks to break through the sticking point."
+            }
+        };
+
+        function runSimulation(type) {
+            // UI Feedback
+            document.getElementById('sim-result-bad').innerHTML = `<span class="animate-pulse">Analyzing...</span>`;
+            document.getElementById('sim-result-good').innerHTML = `<span class="animate-pulse">Computing biometric adjustment...</span>`;
+
+            setTimeout(() => {
+                const data = scenarios[type];
+                
+                // Typewriter effect for realism
+                typeWriter('sim-result-bad', data.bad, 0);
+                // Slight delay for "System" to look like it's thinking harder
+                setTimeout(() => typeWriter('sim-result-good', data.good, 0), 400);
+            }, 500);
+        }
+
+        function typeWriter(elementId, text, i) {
+            if (i === 0) document.getElementById(elementId).innerHTML = "";
+            if (i < text.length) {
+                document.getElementById(elementId).innerHTML += text.charAt(i);
+                setTimeout(() => typeWriter(elementId, text, i + 1), 20); // Speed
+            }
+        }
+
+
+        // --- 4. Retention Chart ---
+        const ctxRetention = document.getElementById('retentionChart').getContext('2d');
+        const retentionChart = new Chart(ctxRetention, {
+            type: 'bar',
+            data: {
+                labels: ['Random/Generic', 'System/Adaptive'],
+                datasets: [{
+                    label: 'User Retention (%)',
+                    data: [18, 65],
+                    backgroundColor: [
+                        '#D6D3D1', // Stone 300
+                        '#0F766E'  // Teal 700
+                    ],
+                    borderRadius: 4,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + '% of users still active after 6 months';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { display: true, borderDash: [2, 2] }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

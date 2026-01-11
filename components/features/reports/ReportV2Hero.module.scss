@@ -1,0 +1,102 @@
+.hero {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e7e5e4; // Stone-200
+  padding: var(--spacing-2xl) var(--spacing-md);
+}
+
+.heroContent {
+  max-width: 896px; // max-w-4xl
+  margin: 0 auto;
+  text-align: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #0f766e; // Teal-800
+  background-color: #ccfbf1; // Teal-100
+  border-radius: 9999px;
+}
+
+.title {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  color: #1c1917; // Stone-900
+  margin-bottom: var(--spacing-lg);
+  letter-spacing: -0.025em;
+  line-height: var(--line-height-tight);
+
+  @media (min-width: 768px) {
+    font-size: var(--font-size-5xl);
+  }
+}
+
+.titleAccent {
+  color: #ea580c; // Orange-600
+}
+
+.excerpt {
+  font-size: var(--font-size-xl);
+  color: #57534e; // Stone-600
+  max-width: 672px; // max-w-2xl
+  margin: 0 auto var(--spacing-xl);
+  line-height: var(--line-height-relaxed);
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
+}
+
+.buttonPrimary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: #1c1917; // Stone-900
+  color: #ffffff;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background-color: #292524; // Stone-800
+  }
+}
+
+.buttonSecondary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: #ffffff;
+  color: #1c1917; // Stone-900
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-lg);
+  border: 1px solid #d6d3d1; // Stone-300
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+
+  &:hover {
+    background-color: #fafaf9; // Stone-50
+  }
+}
+
+.sparkle {
+  font-size: var(--font-size-lg);
+}

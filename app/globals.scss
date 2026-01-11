@@ -1,7 +1,10 @@
 // Global Styles
-@import '../styles/design-system/colors.scss';
-@import '../styles/design-system/tokens.scss';
-@import '../styles/design-system/animations.scss';
+// Note: Using @use without 'as *' because these files define CSS custom properties (:root)
+// which are automatically global. CSS custom properties don't require namespacing.
+// If we later add Sass variables/mixins that need namespacing, we'll use explicit namespaces.
+@use '../styles/design-system/colors.scss';
+@use '../styles/design-system/tokens.scss';
+@use '../styles/design-system/animations.scss';
 
 @tailwind base;
 @tailwind components;

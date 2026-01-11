@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import styles from './BlogSearch.module.scss'
@@ -15,24 +15,39 @@ export const BlogSearch: React.FC<BlogSearchProps> = ({ onSearch, initialQuery =
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  // Create stable string representation of searchParams to use as dependency
+  // This prevents stale closures while avoiding infinite loops
+  const searchParamsString = useMemo(() => searchParams.toString(), [searchParams])
+
   // Debounce search
   useEffect(() => {
+    // Capture searchParams values at effect start to avoid stale closures
+    // Read values immediately to capture current state, not from closure
+    const currentPage = searchParams.get('page')
+
     const timer = setTimeout(() => {
       onSearch(query)
 
       // Update URL with search query
-      const params = new URLSearchParams(searchParams.toString())
+      // Build new params from stable searchParamsString to avoid reading from potentially stale closure
+      const params = new URLSearchParams(searchParamsString)
       if (query) {
         params.set('search', query)
       } else {
         params.delete('search')
+      }
+      // Also preserve page param if it exists (unless clearing search)
+      if (!query && currentPage) {
+        params.set('page', currentPage)
       }
       const newUrl = params.toString() ? `/blog?${params.toString()}` : '/blog'
       router.replace(newUrl, { scroll: false })
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [query, onSearch, router, searchParams])
+    // Use searchParamsString (memoized) as dependency - stable string that only changes when URL params change
+    // This prevents stale closures while avoiding infinite loops (debounce + conditional updates prevent circular updates)
+  }, [query, onSearch, router, searchParamsString])
 
   // Initialize from URL on mount
   useEffect(() => {

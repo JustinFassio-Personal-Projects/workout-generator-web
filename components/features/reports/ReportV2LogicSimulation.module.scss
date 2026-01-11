@@ -1,0 +1,123 @@
+.buttonGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.scenarioButton {
+  background-color: #292524; // Stone-800
+  border: 1px solid #44403c; // Stone-700
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #ffffff;
+
+  &:hover {
+    background-color: #44403c; // Stone-700
+  }
+}
+
+.scenarioButtonActive {
+  border-color: #ea580c; // Orange-600
+  background-color: #ea580c; // Orange-600
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--spacing-xl);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.resultCardBad {
+  background-color: #292524; // Stone-800
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  border: 1px solid rgba(220, 38, 38, 0.5); // Red-900/50
+}
+
+.resultCardGood {
+  background-color: rgba(15, 118, 110, 0.3); // Teal-900/30
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  border: 1px solid rgba(20, 184, 166, 0.5); // Teal-500/50
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 64px;
+    height: 64px;
+    background-color: #0f766e; // Teal-700
+    filter: blur(48px);
+    opacity: 0.2;
+  }
+}
+
+.resultHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.resultTitleBad {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: #f87171; // Red-400
+}
+
+.resultTitleGood {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: #2dd4bf; // Teal-400
+  position: relative;
+  z-index: 1;
+}
+
+.resultIcon {
+  font-size: var(--font-size-2xl);
+}
+
+.resultContent {
+  color: #d6d3d1; // Stone-300
+  min-height: 120px;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.resultContentGood {
+  color: #f0fdfa; // Teal-50
+  min-height: 120px;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  position: relative;
+  z-index: 1;
+}
+
+.typing {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

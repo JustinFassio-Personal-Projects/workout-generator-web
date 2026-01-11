@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { BlogPostHero } from '@/components/features/blog/BlogPostHero'
 import { BlogPostContent } from '@/components/features/blog/BlogPostContent'
+import { BlogPostContentInteractive } from '@/components/features/blog/BlogPostContentInteractive'
 import { RelatedPosts } from '@/components/features/blog/RelatedPosts'
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/lib/blog/queries'
 import { notFound } from 'next/navigation'
@@ -209,6 +210,14 @@ export default async function BlogPostPage({ params }: PageProps) {
     image: p.featured_image || undefined,
   }))
 
+  // Determine if post should use interactive style
+  // Check for slug patterns that indicate interactive/research posts
+  const isInteractivePost =
+    post.slug.includes('best-ai-workout-generator') ||
+    post.slug.includes('research') ||
+    post.slug.includes('analysis') ||
+    post.slug.includes('system-vs-random')
+
   return (
     <>
       <script
@@ -219,9 +228,15 @@ export default async function BlogPostPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <BlogPostHero post={transformedPost} />
-      <BlogPostContent post={transformedPost} />
-      <RelatedPosts posts={transformedRelatedPosts} />
+      {isInteractivePost ? (
+        <BlogPostContentInteractive post={transformedPost} />
+      ) : (
+        <>
+          <BlogPostHero post={transformedPost} />
+          <BlogPostContent post={transformedPost} />
+          <RelatedPosts posts={transformedRelatedPosts} />
+        </>
+      )}
     </>
   )
 }

@@ -22,6 +22,13 @@
   --color-error-light: #f87171;
   --color-error-dark: #dc2626;
 
+  // Orange/Chart Colors (for better contrast in data visualizations)
+  --color-orange-light: #ffbf00; // (255,191,0) - Lightest, for highlights/fills
+  --color-orange: #ffa500; // (255,165,0) - Main orange, for primary chart elements
+  --color-orange-medium: #ff8000; // (255,128,0) - Medium orange
+  --color-orange-dark: #ff4000; // (255,64,0) - Darker orange
+  --color-orange-darkest: #ff1500; // (255,21,0) - Darkest, for borders/accents
+
   // Gray Scale
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;

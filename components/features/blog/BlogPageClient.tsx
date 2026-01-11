@@ -57,11 +57,13 @@ function BlogPageClientInner({ posts }: BlogPageClientProps) {
       setCurrentPage(page)
 
       // Update URL with page number
-      const params = new URLSearchParams(searchParams.toString())
+      // Build params from state to avoid dependency on searchParams object
+      const params = new URLSearchParams()
+      if (searchQuery) {
+        params.set('search', searchQuery)
+      }
       if (page > 1) {
         params.set('page', page.toString())
-      } else {
-        params.delete('page')
       }
       const newUrl = params.toString() ? `/blog?${params.toString()}` : '/blog'
       router.replace(newUrl, { scroll: false })
@@ -69,7 +71,7 @@ function BlogPageClientInner({ posts }: BlogPageClientProps) {
       // Scroll to top of blog list
       window.scrollTo({ top: 0, behavior: 'smooth' })
     },
-    [router, searchParams]
+    [router, searchQuery]
   )
 
   return (

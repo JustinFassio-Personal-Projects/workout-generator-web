@@ -126,33 +126,52 @@ export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
 
 /**
  * Get a single published post by slug
+ * Falls back to static data if Supabase is unavailable or returns no results
  */
 export async function getPostBySlug(slug: string): Promise<PostWithRelations | null> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
+        *,
+        category:categories(*),
+        author:authors(*)
       `
-      *,
-      category:categories(*),
-      author:authors(*)
-    `
-    )
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .single()
+      )
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single()
 
-  if (error) {
-    console.error('Error fetching post:', error)
+    if (!error && data) {
+      return transformPost(data)
+    }
+
+    // If Supabase fails or returns no data, fall back to static data
+    if (error) {
+      console.error('Error fetching post from Supabase, checking fallback data:', error)
+    }
+
+    // Check static fallback data
+    const staticPost = blogPosts.find(post => post.slug === slug)
+    if (staticPost) {
+      const converted = convertStaticPostsToSupabaseFormat([staticPost])
+      return converted[0] || null
+    }
+
+    return null
+  } catch (error) {
+    // If Supabase client creation fails, use static data
+    console.error('Failed to connect to Supabase, checking fallback data:', error)
+    const staticPost = blogPosts.find(post => post.slug === slug)
+    if (staticPost) {
+      const converted = convertStaticPostsToSupabaseFormat([staticPost])
+      return converted[0] || null
+    }
     return null
   }
-
-  if (!data) {
-    return null
-  }
-
-  return transformPost(data)
 }
 
 /**

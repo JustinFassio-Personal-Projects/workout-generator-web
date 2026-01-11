@@ -21,18 +21,25 @@ export const BlogSearch: React.FC<BlogSearchProps> = ({ onSearch, initialQuery =
       onSearch(query)
 
       // Update URL with search query
+      // Read current params but don't depend on them to avoid circular updates
       const params = new URLSearchParams(searchParams.toString())
       if (query) {
         params.set('search', query)
       } else {
         params.delete('search')
       }
+      // Also preserve page param if it exists (unless clearing search)
+      if (!query && searchParams.get('page')) {
+        params.set('page', searchParams.get('page')!)
+      }
       const newUrl = params.toString() ? `/blog?${params.toString()}` : '/blog'
       router.replace(newUrl, { scroll: false })
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [query, onSearch, router, searchParams])
+    // Only depend on query and callbacks, not searchParams to avoid circular updates
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, onSearch, router])
 
   // Initialize from URL on mount
   useEffect(() => {

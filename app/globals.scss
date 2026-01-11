@@ -1,7 +1,7 @@
 // Global Styles
-@import '../styles/design-system/colors.scss';
-@import '../styles/design-system/tokens.scss';
-@import '../styles/design-system/animations.scss';
+@use '../styles/design-system/colors.scss';
+@use '../styles/design-system/tokens.scss';
+@use '../styles/design-system/animations.scss';
 
 @tailwind base;
 @tailwind components;

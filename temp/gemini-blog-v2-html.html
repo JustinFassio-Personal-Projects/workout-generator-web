@@ -380,7 +380,21 @@
             btn.disabled = true;
             btn.classList.add('opacity-50', 'cursor-not-allowed');
 
-            const apiKey = ""; // Injected by environment
+            // SECURITY WARNING: This is a TEMPLATE/REFERENCE file only.
+            // DO NOT place a real API key in this client-side HTML file.
+            // API keys must NEVER be exposed in client-side code.
+            // 
+            // In production, this functionality is implemented via a secure server-side proxy:
+            // See: app/api/reports/gemini-workout/route.ts
+            // The server-side route handles API key authentication and rate limiting.
+            const apiKey = null; // Placeholder; must never be a real key in shipped HTML
+            
+            if (!apiKey) {
+                throw new Error(
+                    "Missing Gemini API key. This template file should not be used directly in production. " +
+                    "Use the secure server-side proxy endpoint at /api/reports/gemini-workout instead."
+                );
+            }
 
             const systemPrompt = "You are the AI engine behind 'AI Workout Generator'. Your goal is to demonstrate 'System-Based Training' vs 'Random Workouts'. When asked to generate a workout, provide a structured session (Warmup, Main Lift, Accessory). For the Main Lift, specify Tempo (e.g., 3-1-1-0), RPE (Rate of Perceived Exertion), and Rest intervals. Add a brief 'System Logic' explanation at the end of the workout explaining why this specific volume/intensity was chosen for the user's level, contrasting it with generic random advice.";
             

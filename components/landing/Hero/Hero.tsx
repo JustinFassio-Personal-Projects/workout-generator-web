@@ -74,6 +74,7 @@ export const Hero: React.FC = () => {
                   analytics.trackIntroStartBuilding()
                   trackButtonClick('Generate My AI Workout', 'hero')
 
+                  // Scroll to the workout builder section after tracking
                   const workoutBuilderSection = document.getElementById('workout-builder')
                   if (workoutBuilderSection) {
                     workoutBuilderSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -97,6 +98,7 @@ export const Hero: React.FC = () => {
                   analytics.trackIntroLearnMore()
                   trackButtonClick('See How It Works', 'hero')
 
+                  // Scroll to the journey section after tracking
                   const journeySection = document.getElementById('journey')
                   if (journeySection) {
                     journeySection.scrollIntoView({ behavior: 'smooth', block: 'start' })

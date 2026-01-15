@@ -67,8 +67,8 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
                 plan_price: plan.price,
                 plan_period: plan.period,
                 location: 'pricing',
-                is_login_link: isLoginLink || false,
-                is_signup_link: isSignupLink || false,
+                is_login_link: isLoginLink,
+                is_signup_link: isSignupLink,
               })
             }}
           >

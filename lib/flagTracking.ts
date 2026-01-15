@@ -69,7 +69,9 @@ export const getFlagsFromDOM = (): string[] => {
 
   try {
     const flagElements = document.querySelectorAll('[data-vercel-flag]')
-    return Array.from(flagElements).map(el => el.getAttribute('data-vercel-flag') || '')
+    return Array.from(flagElements)
+      .map(el => el.getAttribute('data-vercel-flag'))
+      .filter((name): name is string => !!name)
   } catch (error) {
     console.warn('Failed to get flags from DOM:', error)
     return []

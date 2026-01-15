@@ -73,7 +73,6 @@ export const Hero: React.FC = () => {
                   // Track the event with flag
                   analytics.trackIntroStartBuilding()
                   trackButtonClick('Generate My AI Workout', 'hero')
-
                   // Scroll to the workout builder section after tracking
                   const workoutBuilderSection = document.getElementById('workout-builder')
                   if (workoutBuilderSection) {
@@ -97,7 +96,6 @@ export const Hero: React.FC = () => {
                   // Track the event with flag
                   analytics.trackIntroLearnMore()
                   trackButtonClick('See How It Works', 'hero')
-
                   // Scroll to the journey section after tracking
                   const journeySection = document.getElementById('journey')
                   if (journeySection) {

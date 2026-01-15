@@ -9,6 +9,9 @@ vi.mock('@/lib/analytics', () => ({
   trackButtonClick: vi.fn(),
   trackNavigationClick: vi.fn(),
   trackVercelEvent: vi.fn(),
+  analytics: {
+    trackLoginIntent: vi.fn(),
+  },
 }))
 
 // Note: next/image is already mocked globally in src/test/setup.ts

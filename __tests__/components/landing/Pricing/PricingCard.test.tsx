@@ -7,6 +7,10 @@ import * as analyticsModule from '@/lib/analytics'
 // Mock analytics
 vi.mock('@/lib/analytics', () => ({
   trackVercelEvent: vi.fn(),
+  analytics: {
+    trackLoginIntent: vi.fn(),
+    trackSignupIntent: vi.fn(),
+  },
 }))
 
 describe('PricingCard', () => {
@@ -65,6 +69,8 @@ describe('PricingCard', () => {
       plan_price: 10,
       plan_period: 'month',
       location: 'pricing',
+      is_login_link: false,
+      is_signup_link: false,
     })
   })
 
@@ -80,6 +86,8 @@ describe('PricingCard', () => {
       plan_price: 10,
       plan_period: 'month',
       location: 'pricing',
+      is_login_link: false,
+      is_signup_link: false,
     })
   })
 })

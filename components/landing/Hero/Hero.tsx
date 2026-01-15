@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/Button/Button'
 import { FloatingIcons } from './FloatingIcons'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import { CredibilityCard } from './CredibilityCard'
-import { trackButtonClick } from '@/lib/analytics'
+import { trackButtonClick, analytics } from '@/lib/analytics'
+import { emitFlagToDOM, storeFlagInLocalStorage } from '@/lib/flagTracking'
+import { FLAG_NAMES } from '@/lib/flags'
 import styles from './Hero.module.scss'
 
 export const Hero: React.FC = () => {
@@ -63,7 +65,15 @@ export const Hero: React.FC = () => {
                 icon={ArrowRight}
                 iconPosition="right"
                 onClick={() => {
+                  // Set feature flag for "Start Building" click (client-side)
+                  // Emit to DOM for Vercel Web Analytics to detect
+                  emitFlagToDOM(FLAG_NAMES.INTRO_START_BUILDING_CLICKED, true)
+                  storeFlagInLocalStorage(FLAG_NAMES.INTRO_START_BUILDING_CLICKED, true)
+
+                  // Track the event with flag
+                  analytics.trackIntroStartBuilding()
                   trackButtonClick('Generate My AI Workout', 'hero')
+
                   const workoutBuilderSection = document.getElementById('workout-builder')
                   if (workoutBuilderSection) {
                     workoutBuilderSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -78,7 +88,15 @@ export const Hero: React.FC = () => {
                 variant="secondary"
                 size="lg"
                 onClick={() => {
+                  // Set feature flag for "Learn more" click (client-side)
+                  // Emit to DOM for Vercel Web Analytics to detect
+                  emitFlagToDOM(FLAG_NAMES.INTRO_LEARN_MORE_CLICKED, true)
+                  storeFlagInLocalStorage(FLAG_NAMES.INTRO_LEARN_MORE_CLICKED, true)
+
+                  // Track the event with flag
+                  analytics.trackIntroLearnMore()
                   trackButtonClick('See How It Works', 'hero')
+
                   const journeySection = document.getElementById('journey')
                   if (journeySection) {
                     journeySection.scrollIntoView({ behavior: 'smooth', block: 'start' })

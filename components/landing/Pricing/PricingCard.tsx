@@ -5,7 +5,7 @@ import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { Card } from '@/components/ui/Card/Card'
 import { PricingPlan } from '@/data/pricing'
-import { trackVercelEvent } from '@/lib/analytics'
+import { trackVercelEvent, analytics } from '@/lib/analytics'
 import styles from './Pricing.module.scss'
 
 export interface PricingCardProps {
@@ -48,11 +48,27 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
             href={plan.ctaLink}
             className={styles.ctaLink}
             onClick={() => {
+              // Check if link is to login/signup page
+              const ctaLink = plan.ctaLink || ''
+              const isLoginLink = ctaLink.includes('/login') || ctaLink.includes('login')
+              const isSignupLink =
+                ctaLink.includes('/signup') ||
+                ctaLink.includes('/register') ||
+                ctaLink.includes('signup')
+
+              if (isLoginLink && ctaLink) {
+                analytics.trackLoginIntent('pricing', ctaLink)
+              } else if (isSignupLink && ctaLink) {
+                analytics.trackSignupIntent('pricing', ctaLink)
+              }
+
               trackVercelEvent('Pricing Plan Click', {
                 plan_name: plan.name,
                 plan_price: plan.price,
                 plan_period: plan.period,
                 location: 'pricing',
+                is_login_link: isLoginLink || false,
+                is_signup_link: isSignupLink || false,
               })
             }}
           >
@@ -71,6 +87,8 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
                 plan_price: plan.price,
                 plan_period: plan.period,
                 location: 'pricing',
+                is_login_link: false,
+                is_signup_link: false,
               })
             }}
           >

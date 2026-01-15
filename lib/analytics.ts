@@ -107,17 +107,24 @@ export const trackPageView = (path: string, title?: string): void => {
  * Track a Vercel Analytics event
  * @param eventName - The name of the event (max 255 characters)
  * @param data - Optional event data (flat object with string, number, boolean, or null values)
+ * @param flags - Optional array of flag names to attach to this event
  */
 export const trackVercelEvent = (
   eventName: string,
-  data?: Record<string, string | number | boolean | null>
+  data?: Record<string, string | number | boolean | null>,
+  flags?: string[]
 ): void => {
   if (typeof window === 'undefined') {
     return
   }
 
   try {
-    track(eventName, data)
+    // Use track with flags option if flags are provided
+    if (flags && flags.length > 0) {
+      track(eventName, data, { flags })
+    } else {
+      track(eventName, data)
+    }
   } catch (error) {
     console.warn('Failed to track Vercel Analytics event:', error)
   }
@@ -703,6 +710,98 @@ export const analytics = {
     trackEvent('vision_cta_view_pricing_clicked', {
       location: 'vision_lab',
       lead_id: leadId,
+    })
+  },
+
+  // Intro page tracking with flags
+  trackIntroStartBuilding: () => {
+    trackVercelEvent(
+      'Intro Start Building Clicked',
+      {
+        location: 'hero',
+        button_name: 'Generate My AI Workout',
+      },
+      ['intro-start-building-clicked']
+    )
+    trackEvent('intro_start_building_clicked', {
+      location: 'hero',
+      button_name: 'Generate My AI Workout',
+    })
+  },
+
+  trackIntroLearnMore: () => {
+    trackVercelEvent(
+      'Intro Learn More Clicked',
+      {
+        location: 'hero',
+        button_name: 'See How It Works',
+      },
+      ['intro-learn-more-clicked']
+    )
+    trackEvent('intro_learn_more_clicked', {
+      location: 'hero',
+      button_name: 'See How It Works',
+    })
+  },
+
+  // Auth event tracking with flags
+  trackUserLogin: (metadata?: { source?: string; method?: string; location?: string }) => {
+    trackVercelEvent(
+      'User Login',
+      {
+        location: metadata?.location || 'unknown',
+        source: metadata?.source || 'unknown',
+        method: metadata?.method || 'unknown',
+      },
+      ['user-logged-in']
+    )
+    trackEvent('user_logged_in', {
+      location: metadata?.location || 'unknown',
+      source: metadata?.source || 'unknown',
+      method: metadata?.method || 'unknown',
+    })
+  },
+
+  trackUserAccountCreated: (metadata?: { source?: string; method?: string; location?: string }) => {
+    trackVercelEvent(
+      'User Account Created',
+      {
+        location: metadata?.location || 'unknown',
+        source: metadata?.source || 'unknown',
+        method: metadata?.method || 'unknown',
+      },
+      ['user-account-created']
+    )
+    trackEvent('user_account_created', {
+      location: metadata?.location || 'unknown',
+      source: metadata?.source || 'unknown',
+      method: metadata?.method || 'unknown',
+    })
+  },
+
+  trackLoginIntent: (location: string, destination: string) => {
+    trackVercelEvent('Login Intent', {
+      location,
+      destination,
+      action: 'navigate_to_login',
+    })
+    trackEvent('login_intent', {
+      location,
+      destination,
+      action: 'navigate_to_login',
+    })
+  },
+
+  trackSignupIntent: (location: string, destination: string) => {
+    trackVercelEvent('Signup Intent', {
+      location,
+      destination,
+      action: 'navigate_to_signup',
+    })
+    trackEvent('signup_intent', {
+      location,
+      destination,
+      action: 'navigate_to_signup',
     })
   },
 }

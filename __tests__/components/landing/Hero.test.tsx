@@ -13,6 +13,10 @@ vi.mock('aos', () => ({
 // Mock analytics
 vi.mock('@/lib/analytics', () => ({
   trackButtonClick: vi.fn(),
+  analytics: {
+    trackIntroStartBuilding: vi.fn(),
+    trackIntroLearnMore: vi.fn(),
+  },
 }))
 
 describe('Hero', () => {

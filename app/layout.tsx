@@ -7,6 +7,7 @@ import './globals.scss'
 import { Navbar } from '@/components/landing/Navbar/Navbar'
 import { GroupedFAB } from '@/components/ui/GroupedFAB/GroupedFAB'
 import { AOSStyles } from '@/components/ui/AOSStyles/AOSStyles'
+import { FlagRestorer } from '@/components/ui/FlagRestorer/FlagRestorer'
 
 const inter = Inter({ subsets: ['latin'] })
 const spaceGrotesk = Space_Grotesk({
@@ -173,6 +174,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
         <AOSStyles />
+        <FlagRestorer />
         <BotIdClient protect={protectedRoutes} />
         {/* Google Tag Manager */}
         {gtmId && (

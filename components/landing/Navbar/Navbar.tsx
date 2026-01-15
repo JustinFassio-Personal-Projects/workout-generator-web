@@ -5,7 +5,12 @@ import Link from 'next/link'
 import { Activity } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { Drawer } from '@/components/ui/Drawer/Drawer'
-import { trackButtonClick, trackNavigationClick, trackVercelEvent } from '@/lib/analytics'
+import {
+  trackButtonClick,
+  trackNavigationClick,
+  trackVercelEvent,
+  analytics,
+} from '@/lib/analytics'
 import styles from './Navbar.module.scss'
 
 export const Navbar: React.FC = () => {
@@ -145,6 +150,8 @@ export const Navbar: React.FC = () => {
         href="https://aiworkoutgen.app/login"
         onClick={() => {
           closeDrawer()
+          // Track login intent with flag
+          analytics.trackLoginIntent('navbar', 'https://aiworkoutgen.app/login')
           trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
         }}
       >

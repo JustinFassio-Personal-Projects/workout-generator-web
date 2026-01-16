@@ -2,9 +2,124 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname, search } = request.nextUrl
+  const normalizedPath = pathname.toLowerCase().replace(/\/$/, '') // Remove trailing slash and normalize case
 
-  // Only protect /admin routes
+  // Helper function to create redirect response
+  const createRedirect = (destination: string, permanent = true) => {
+    // Detect if destination is an external URL (starts with http:// or https://)
+    const isExternal = /^https?:\/\//i.test(destination)
+    // For external URLs, use destination directly; for internal, use request.url as base
+    const url = isExternal ? new URL(destination) : new URL(destination, request.url)
+    // Preserve query parameters only for internal redirects (e.g., ?ref=source, ?utm_source=...)
+    // External redirects (full URLs) should not preserve query params to avoid leaking data
+    if (!isExternal && search) {
+      url.search = search
+    }
+    return NextResponse.redirect(url, { status: permanent ? 301 : 302 })
+  }
+
+  // Handle WordPress URL redirects before admin route checks
+  // WordPress URL patterns - redirect workout-related pages to /generate
+  const workoutPatterns = [
+    '/workout-summary',
+    '/workouts',
+    '/fitness-program',
+    '/project',
+    '/project_tag',
+    '/project_category',
+  ]
+
+  for (const pattern of workoutPatterns) {
+    if (normalizedPath === pattern || normalizedPath.startsWith(pattern + '/')) {
+      return createRedirect('/generate')
+    }
+  }
+
+  // Author pages -> home
+  if (normalizedPath === '/author' || normalizedPath.startsWith('/author/')) {
+    return createRedirect('/')
+  }
+
+  // Category pages -> blog
+  if (normalizedPath === '/category' || normalizedPath.startsWith('/category/')) {
+    return createRedirect('/blog')
+  }
+
+  // Marketing/static page redirects (handle both with and without trailing slashes)
+  const staticRedirects: Record<string, string> = {
+    '/home': '/',
+    '/api-documentation': '/',
+    '/contact': '/',
+    '/faq': '/',
+    '/privacy-policy': '/',
+    '/physical-information': '/',
+    '/prompt': '/',
+    '/pricing': '/#pricing',
+    '/purchase': '/#pricing',
+    '/how-it-works': '/#journey',
+    '/ai-generated-workouts': '/',
+    '/explorer': '/',
+    '/trailblazer': '/',
+    '/workout-generator-app': '/',
+    '/membership-account': '/',
+  }
+
+  if (staticRedirects[normalizedPath] !== undefined) {
+    return createRedirect(staticRedirects[normalizedPath])
+  }
+
+  // Handle membership-account with subpaths
+  if (normalizedPath.startsWith('/membership-account/')) {
+    return createRedirect('/')
+  }
+
+  // External redirects to app domain (https://aiworkoutgen.app)
+  const externalRedirects: Record<string, string> = {
+    '/login': 'https://aiworkoutgen.app/login',
+    '/react-login': 'https://aiworkoutgen.app/login',
+    '/workout-generator-registration': 'https://aiworkoutgen.app/signup',
+    '/build/login': 'https://aiworkoutgen.app/login',
+    '/features/login': 'https://aiworkoutgen.app/login',
+    '/register': 'https://aiworkoutgen.app/signup',
+  }
+
+  if (externalRedirects[normalizedPath] !== undefined) {
+    return createRedirect(externalRedirects[normalizedPath])
+  }
+
+  // Blog post redirects - check if it's a known blog slug that should redirect to /blog/:slug
+  // These are individual blog posts from WordPress that should be under /blog/
+  const blogPostRedirects: Record<string, string> = {
+    '/ai-will-revolutionize-your-approach-to-fitness':
+      '/blog/ai-will-revolutionize-your-approach-to-fitness',
+    '/the-power-of-functional-fitness': '/blog/the-power-of-functional-fitness',
+    '/ai-fitness-trainers': '/blog/ai-fitness-trainers',
+    '/tacp-school-house-workout-1990s': '/blog/tacp-school-house-workout-1990s',
+    // Keep misspelling in both source and destination to match:
+    // 1. Actual WordPress URL from Google Search Console (source)
+    // 2. Actual blog post slug in database (destination - see next.config.js)
+    '/football-accelleration-decelleration-workout':
+      '/blog/football-accelleration-decelleration-workout',
+    // Defensive redirect for correctly spelled version (if someone types it correctly)
+    // Still redirects to misspelled slug since that's what exists in the database
+    '/football-acceleration-deceleration-workout':
+      '/blog/football-accelleration-decelleration-workout',
+    '/can-ai-generated-workouts-boost-gym-revenue':
+      '/blog/can-ai-generated-workouts-boost-gym-revenue',
+    '/mobility-exercises-for-golfers': '/blog/mobility-exercises-for-golfers',
+    '/ai-generated-dumbbell-chest-workout': '/blog/ai-generated-dumbbell-chest-workout',
+    '/ai-generated-high-intensity-workout': '/blog/ai-generated-high-intensity-workout',
+    '/ai-generated-micro-workout': '/blog/ai-generated-micro-workout',
+    '/ai-workout-female-38yrs-active-runner-high-intensity':
+      '/blog/ai-workout-female-38yrs-active-runner-high-intensity',
+  }
+
+  if (blogPostRedirects[normalizedPath] !== undefined) {
+    return createRedirect(blogPostRedirects[normalizedPath])
+  }
+
+  // Only protect /admin routes (after redirect checks)
   if (!pathname.startsWith('/admin')) {
     return NextResponse.next()
   }
@@ -69,5 +184,20 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (images, etc.)
+     *
+     * Performance note: This middleware runs on most requests to handle WordPress redirects.
+     * Redirect checks are O(1) string comparisons and return early for non-matches.
+     * Admin authentication only executes for /admin routes (see early return at line 120).
+     * Static assets are excluded by the matcher pattern above, so they never hit this middleware.
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
+  ],
 }

@@ -27,7 +27,7 @@ export const Card: React.FC<CardProps> = ({
   )
 
   return (
-    <div className={cardClasses} {...props}>
+    <div className={cardClasses} data-variant={variant} {...props}>
       {children}
     </div>
   )

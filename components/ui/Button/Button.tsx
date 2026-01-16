@@ -37,7 +37,14 @@ export const Button: React.FC<ButtonProps> = ({
   )
 
   return (
-    <button className={buttonClasses} disabled={disabled || loading} {...props}>
+    <button
+      className={buttonClasses}
+      disabled={disabled || loading}
+      data-variant={variant}
+      data-size={size}
+      data-icon-position={iconPosition}
+      {...props}
+    >
       {loading ? (
         <span className={styles.spinner} />
       ) : (

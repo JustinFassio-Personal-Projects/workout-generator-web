@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { Turnstile } from '@/components/landing/ExerciseChallenge/Turnstile'
+import posthog from 'posthog-js'
 import styles from './ReportV2LiveDemo.module.scss'
 
 export const ReportV2LiveDemo: React.FC = () => {
@@ -83,6 +84,18 @@ export const ReportV2LiveDemo: React.FC = () => {
         .replace(/\n\*/g, '\n•')
 
       setWorkout(formattedText)
+
+      // PostHog: Track workout_saved when workout is displayed/viewed
+      try {
+        posthog.capture('workout_saved', {
+          goal: goal,
+          level: level,
+          equipment: equipment,
+          location: 'reports_live_demo',
+        })
+      } catch (posthogError) {
+        console.warn('PostHog tracking error:', posthogError)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Connection interrupted. Please try again.')
     } finally {

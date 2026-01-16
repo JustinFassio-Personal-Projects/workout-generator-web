@@ -115,6 +115,31 @@ export async function POST(request: NextRequest) {
 
     const rawText = data.candidates[0].content.parts[0].text
 
+    // Infer workout_type from goal
+    const goalLower = goal.toLowerCase()
+    let workout_type = 'strength' // default
+    if (goalLower.includes('cardio') || goalLower.includes('endurance')) {
+      workout_type = 'cardio'
+    } else if (goalLower.includes('conditioning') || goalLower.includes('circuit')) {
+      workout_type = 'conditioning'
+    } else if (goalLower.includes('strength') || goalLower.includes('power')) {
+      workout_type = 'strength'
+    }
+
+    // Map level to difficulty (standardize values)
+    const difficultyMap: Record<string, string> = {
+      beginner: 'beginner',
+      intermediate: 'intermediate',
+      advanced: 'advanced',
+      novice: 'beginner',
+      expert: 'advanced',
+    }
+    const difficulty = difficultyMap[level.toLowerCase()] || level.toLowerCase()
+
+    // Estimate duration based on workout type (default 30 minutes)
+    const duration_minutes =
+      workout_type === 'cardio' ? 30 : workout_type === 'conditioning' ? 45 : 30
+
     // PostHog: Track successful AI workout generation - key conversion event
     try {
       const posthog = getPostHogClient()
@@ -123,8 +148,11 @@ export async function POST(request: NextRequest) {
         request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'anonymous'
       posthog.capture({
         distinctId: ip,
-        event: 'ai_workout_generated',
+        event: 'workout_generated',
         properties: {
+          workout_type: workout_type,
+          difficulty: difficulty,
+          duration_minutes: duration_minutes,
           goal: goal,
           level: level,
           equipment: equipment,

@@ -95,8 +95,6 @@ export default async function VideoWatchPage({ params }: PageProps) {
       : `${baseUrl}${video.thumbnailUrl}`
     : undefined
 
-  const url = `${baseUrl}/videos/${video.id}`
-
   // Generate VideoObject structured data for SEO
   const videoSchema = {
     '@context': 'https://schema.org',

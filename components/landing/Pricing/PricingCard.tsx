@@ -5,6 +5,7 @@ import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { Card } from '@/components/ui/Card/Card'
 import { PricingPlan } from '@/data/pricing'
+import posthog from 'posthog-js'
 import { trackVercelEvent, analytics } from '@/lib/analytics'
 import styles from './Pricing.module.scss'
 
@@ -70,6 +71,16 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
                 is_login_link: isLoginLink,
                 is_signup_link: isSignupLink,
               })
+
+              // PostHog: Track pricing plan selection
+              posthog.capture('pricing_plan_selected', {
+                plan_name: plan.name,
+                plan_price: plan.price,
+                plan_period: plan.period,
+                is_popular: plan.popular || false,
+                cta_text: plan.ctaText,
+                location: 'pricing',
+              })
             }}
           >
             <Button variant={plan.ctaVariant} size="lg" className={styles.ctaButton}>
@@ -89,6 +100,16 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
                 location: 'pricing',
                 is_login_link: false,
                 is_signup_link: false,
+              })
+
+              // PostHog: Track pricing plan selection
+              posthog.capture('pricing_plan_selected', {
+                plan_name: plan.name,
+                plan_price: plan.price,
+                plan_period: plan.period,
+                is_popular: plan.popular || false,
+                cta_text: plan.ctaText,
+                location: 'pricing',
               })
             }}
           >

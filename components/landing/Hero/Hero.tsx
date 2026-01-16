@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button/Button'
 import { FloatingIcons } from './FloatingIcons'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import { CredibilityCard } from './CredibilityCard'
+import posthog from 'posthog-js'
 import { trackButtonClick, analytics } from '@/lib/analytics'
 import { emitFlagToDOM, storeFlagInLocalStorage } from '@/lib/flagTracking'
 import { FLAG_NAMES } from '@/lib/flags'
@@ -73,6 +74,13 @@ export const Hero: React.FC = () => {
                   // Track the event with flag
                   analytics.trackIntroStartBuilding()
                   trackButtonClick('Generate My AI Workout', 'hero')
+
+                  // PostHog: Track hero CTA click - top of funnel event
+                  posthog.capture('hero_generate_workout_clicked', {
+                    button_text: 'Generate My AI Workout',
+                    location: 'hero',
+                  })
+
                   // Scroll to the workout builder section after tracking
                   const workoutBuilderSection = document.getElementById('workout-builder')
                   if (workoutBuilderSection) {
@@ -96,6 +104,13 @@ export const Hero: React.FC = () => {
                   // Track the event with flag
                   analytics.trackIntroLearnMore()
                   trackButtonClick('See How It Works', 'hero')
+
+                  // PostHog: Track hero secondary CTA click
+                  posthog.capture('hero_see_how_it_works_clicked', {
+                    button_text: 'See How It Works',
+                    location: 'hero',
+                  })
+
                   // Scroll to the journey section after tracking
                   const journeySection = document.getElementById('journey')
                   if (journeySection) {

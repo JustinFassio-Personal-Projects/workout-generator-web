@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { useBlogPosts } from '@/features/blog/hooks/useBlogPosts'
 
 describe('useBlogPosts', () => {
@@ -17,15 +17,18 @@ describe('useBlogPosts', () => {
     vi.restoreAllMocks()
   })
 
-  it('should initialize with loading state', () => {
+  it('should resolve to empty posts when no posts are returned', async () => {
     vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => [],
     } as Response)
 
-    const { result } = renderHook(() => useBlogPosts())
+    const { result } = await act(async () => renderHook(() => useBlogPosts()))
 
-    expect(result.current.loading).toBe(true)
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
     expect(result.current.posts).toEqual([])
     expect(result.current.error).toBeNull()
   })

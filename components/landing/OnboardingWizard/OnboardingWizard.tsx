@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
+import posthog from 'posthog-js'
 import type {
   WebsiteOnboardingData,
   FitnessGoal,
@@ -148,6 +149,15 @@ export const OnboardingWizard: React.FC = () => {
     // Clear any existing timeouts
     timeoutRefs.current.forEach(timeout => clearTimeout(timeout))
     timeoutRefs.current = []
+
+    // PostHog: Track create account click - key conversion event
+    posthog.capture('onboarding_create_account_clicked', {
+      fitness_goals: formData.fitness_goals,
+      fitness_level: formData.fitness_level,
+      equipment_access: formData.equipment_access,
+      activity_level: formData.current_activity_level,
+      location: 'onboarding_wizard',
+    })
 
     const signupUrl = buildSignupUrl(formData)
 

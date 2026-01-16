@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 export async function POST(request: Request) {
   try {
@@ -18,6 +19,22 @@ export async function POST(request: Request) {
     })
 
     if (authError) {
+      // PostHog: Track failed login attempt
+      try {
+        const posthog = getPostHogClient()
+        posthog.capture({
+          distinctId: email,
+          event: 'admin_login_failed',
+          properties: {
+            email_domain: email.split('@')[1] || 'unknown',
+            error_message: authError.message,
+            reason: 'auth_error',
+          },
+        })
+        await posthog.flush()
+      } catch (posthogError) {
+        console.warn('PostHog tracking error:', posthogError)
+      }
       return NextResponse.json({ error: authError.message }, { status: 401 })
     }
 
@@ -33,9 +50,51 @@ export async function POST(request: Request) {
       .single()
 
     if (adminError || !adminUser) {
+      // PostHog: Track unauthorized admin access attempt
+      try {
+        const posthog = getPostHogClient()
+        posthog.capture({
+          distinctId: data.user.id,
+          event: 'admin_login_failed',
+          properties: {
+            user_id: data.user.id,
+            email_domain: (data.user.email || '').split('@')[1] || 'unknown',
+            reason: 'not_admin',
+          },
+        })
+        await posthog.flush()
+      } catch (posthogError) {
+        console.warn('PostHog tracking error:', posthogError)
+      }
       // Sign out since user is not an admin
       await supabase.auth.signOut()
       return NextResponse.json({ error: 'You do not have admin access' }, { status: 403 })
+    }
+
+    // PostHog: Track successful admin login
+    try {
+      const posthog = getPostHogClient()
+      posthog.capture({
+        distinctId: data.user.id,
+        event: 'admin_login_success',
+        properties: {
+          user_id: data.user.id,
+          email_domain: (data.user.email || '').split('@')[1] || 'unknown',
+          role: adminUser.role,
+        },
+      })
+      // Identify the admin user
+      posthog.identify({
+        distinctId: data.user.id,
+        properties: {
+          email: data.user.email,
+          role: adminUser.role,
+          is_admin: true,
+        },
+      })
+      await posthog.flush()
+    } catch (posthogError) {
+      console.warn('PostHog tracking error:', posthogError)
     }
 
     return NextResponse.json({

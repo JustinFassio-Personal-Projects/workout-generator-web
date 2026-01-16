@@ -4,6 +4,7 @@ import React, { FormEvent, useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/Button/Button'
 import { Card } from '@/components/ui/Card/Card'
 import { validateEmail } from '@/lib/validation'
+import posthog from 'posthog-js'
 import { analytics } from '@/lib/analytics'
 import { Turnstile } from './Turnstile'
 import type { CreateLeadResponse } from '@/types/exercise-challenge'
@@ -106,6 +107,16 @@ export const LeadGate: React.FC<LeadGateProps> = ({ onLeadCaptured }) => {
       // Extract email domain for analytics
       const emailDomain = email.trim().toLowerCase().split('@')[1] || 'unknown'
       analytics.trackVisionLeadSubmitted(data.lead_id, emailDomain, consentEmailPlan)
+
+      // PostHog: Track Vision Lab lead captured
+      posthog.capture('vision_lab_lead_captured', {
+        lead_id: data.lead_id,
+        email_domain: emailDomain,
+        consent_email_plan: consentEmailPlan,
+        source: 'vision_lab',
+        location: 'lead_gate',
+      })
+
       onLeadCaptured(data.lead_id)
     } catch (err) {
       const errorMessage =

@@ -1,0 +1,77 @@
+[
+  {
+    "event_name": "workout_builder_started",
+    "description": "User starts the workout builder form by clicking Continue from intro screen",
+    "file_path": "components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder.tsx"
+  },
+  {
+    "event_name": "workout_builder_step_completed",
+    "description": "User completes step 1 or 2 of the workout builder form",
+    "file_path": "components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder.tsx"
+  },
+  {
+    "event_name": "workout_plan_preview_shown",
+    "description": "User reaches the plan preview screen after completing the wizard steps",
+    "file_path": "components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder.tsx"
+  },
+  {
+    "event_name": "workout_create_account_clicked",
+    "description": "User clicks Create Account CTA to finalize their workout plan - key conversion event",
+    "file_path": "components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder.tsx"
+  },
+  {
+    "event_name": "onboarding_create_account_clicked",
+    "description": "User clicks Create Account on the dedicated onboarding wizard page - key conversion event",
+    "file_path": "components/landing/OnboardingWizard/OnboardingWizard.tsx"
+  },
+  {
+    "event_name": "pricing_plan_selected",
+    "description": "User clicks on a pricing plan CTA button",
+    "file_path": "components/landing/Pricing/PricingCard.tsx"
+  },
+  {
+    "event_name": "lead_form_submitted",
+    "description": "User successfully submits the Vision Lab lead capture form - server-side conversion event",
+    "file_path": "app/api/leads/route.ts"
+  },
+  {
+    "event_name": "admin_login_success",
+    "description": "Admin user successfully logs in - server-side security/usage event",
+    "file_path": "app/api/admin/auth/login/route.ts"
+  },
+  {
+    "event_name": "admin_login_failed",
+    "description": "Admin login attempt failed - server-side security event",
+    "file_path": "app/api/admin/auth/login/route.ts"
+  },
+  {
+    "event_name": "ai_workout_generated",
+    "description": "AI successfully generates a workout via Gemini API - server-side key conversion event",
+    "file_path": "app/api/reports/gemini-workout/route.ts"
+  },
+  {
+    "event_name": "faq_cta_clicked",
+    "description": "User clicks a CTA button within an FAQ accordion item",
+    "file_path": "components/landing/FAQ/FAQ.tsx"
+  },
+  {
+    "event_name": "hero_generate_workout_clicked",
+    "description": "User clicks Generate My AI Workout button in hero section - top-of-funnel event",
+    "file_path": "components/landing/Hero/Hero.tsx"
+  },
+  {
+    "event_name": "hero_see_how_it_works_clicked",
+    "description": "User clicks See How It Works button in hero section - engagement event",
+    "file_path": "components/landing/Hero/Hero.tsx"
+  },
+  {
+    "event_name": "vision_lab_lead_captured",
+    "description": "Lead captured via Vision Lab lead gate form",
+    "file_path": "components/landing/ExerciseChallenge/LeadGate.tsx"
+  },
+  {
+    "event_name": "vision_lab_cta_clicked",
+    "description": "User clicks a CTA button on Vision Lab completion screen",
+    "file_path": "app/exercise-challenge/page.tsx"
+  }
+]

@@ -491,39 +491,29 @@ describe('MicroInterview', () => {
     render(<MicroInterview leadId={mockLeadId} onComplete={mockOnComplete} />)
 
     // Answer all required questions
-    await act(async () => {
-      await user.click(screen.getByText('Build muscle'))
-    })
+    await user.click(screen.getByText('Build muscle'))
     await waitFor(() => {
       expect(screen.getByText('Question 2 of 3')).toBeInTheDocument()
     })
 
-    await act(async () => {
-      await user.click(screen.getByText("I don't know what to do"))
-    })
+    await user.click(screen.getByText("I don't know what to do"))
     await waitFor(() => {
       expect(screen.getByText('Question 3 of 3')).toBeInTheDocument()
     })
 
-    await act(async () => {
-      await user.click(screen.getByText('Build a plan with week-to-week progression'))
-    })
+    await user.click(screen.getByText('Build a plan with week-to-week progression'))
     await waitFor(() => {
       expect(screen.getByText('Skip')).toBeInTheDocument()
     })
 
-    await act(async () => {
-      await user.click(screen.getByText('Skip'))
-    })
+    await user.click(screen.getByText('Skip'))
 
     // Submit
     await waitFor(() => {
       expect(screen.getByText('Submit')).toBeInTheDocument()
     })
     const submitButton = screen.getByText('Submit')
-    await act(async () => {
-      await user.click(submitButton)
-    })
+    await user.click(submitButton)
 
     await waitFor(() => {
       expect(screen.getByText('Server error. Please try again in a moment.')).toBeInTheDocument()

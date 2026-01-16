@@ -2,6 +2,9 @@ import '@testing-library/jest-dom/vitest'
 import { vi } from 'vitest'
 import React from 'react'
 
+// Enable React act() environment for React 18/19 warnings
+globalThis.IS_REACT_ACT_ENVIRONMENT = true
+
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -131,4 +134,10 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
 }
 if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
+}
+if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+  process.env.NEXT_PUBLIC_POSTHOG_KEY = 'test-posthog-key'
+}
+if (!process.env.NEXT_PUBLIC_POSTHOG_HOST) {
+  process.env.NEXT_PUBLIC_POSTHOG_HOST = 'https://us.i.posthog.com'
 }

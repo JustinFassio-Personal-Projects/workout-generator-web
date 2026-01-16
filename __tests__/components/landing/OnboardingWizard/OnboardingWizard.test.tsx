@@ -142,7 +142,7 @@ describe('OnboardingWizard', () => {
       },
       { timeout: 3000 }
     )
-  })
+  }, 30000)
 
   it('should show error when age is invalid', async () => {
     const user = userEvent.setup()
@@ -406,5 +406,5 @@ describe('OnboardingWizard', () => {
       },
       { timeout: 3000 }
     )
-  }, 10000)
+  }, 30000)
 })

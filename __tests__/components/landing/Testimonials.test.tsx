@@ -185,7 +185,9 @@ describe('Testimonials', () => {
       value: 500,
     })
 
-    window.dispatchEvent(new Event('resize'))
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
 
     // Verify component still renders after resize
     const carouselItems = document.querySelectorAll('[class*="carouselItem"]')

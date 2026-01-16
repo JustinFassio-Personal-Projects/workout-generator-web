@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import { VideoCard } from '@/components/landing/Videos/VideoCard'
 import { Video } from '@/data/videos'
 import * as analytics from '@/lib/analytics'
@@ -84,8 +84,10 @@ describe('VideoCard', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     render(<VideoCard video={mockVideo} />)
     const videoElement = document.querySelector('video') as HTMLVideoElement
-    const errorEvent = new Event('error')
-    videoElement.dispatchEvent(errorEvent)
+    act(() => {
+      const errorEvent = new Event('error')
+      videoElement.dispatchEvent(errorEvent)
+    })
     expect(consoleErrorSpy).toHaveBeenCalled()
     consoleErrorSpy.mockRestore()
   })
@@ -96,9 +98,11 @@ describe('VideoCard', () => {
     render(<VideoCard video={mockVideo} />)
     const videoElement = document.querySelector('video') as HTMLVideoElement
 
-    // Simulate play event
-    const playEvent = new Event('play')
-    videoElement.dispatchEvent(playEvent)
+    act(() => {
+      // Simulate play event
+      const playEvent = new Event('play')
+      videoElement.dispatchEvent(playEvent)
+    })
 
     // Function should be called (may be async)
     expect(trackVideoStartSpy).toHaveBeenCalled()
@@ -117,9 +121,11 @@ describe('VideoCard', () => {
     // Set up video duration
     Object.defineProperty(videoElement, 'duration', { value: 100, writable: true })
 
-    // Simulate ended event
-    const endedEvent = new Event('ended')
-    videoElement.dispatchEvent(endedEvent)
+    act(() => {
+      // Simulate ended event
+      const endedEvent = new Event('ended')
+      videoElement.dispatchEvent(endedEvent)
+    })
 
     // Function should be called
     expect(trackVideoCompleteSpy).toHaveBeenCalled()

@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { CreditCard, Lock, RefreshCw } from 'lucide-react'
+import posthog from 'posthog-js'
 import type {
   WebsiteOnboardingData,
   FitnessGoal,
@@ -74,9 +75,16 @@ export const WorkoutPlanBuilder: React.FC = () => {
 
   const handleContinue = useCallback(() => {
     if (validateStepOne()) {
+      // PostHog: Track step 1 completion
+      posthog.capture('workout_builder_step_completed', {
+        step: 1,
+        fitness_goals: formData.fitness_goals,
+        fitness_level: formData.fitness_level,
+        equipment_access: formData.equipment_access,
+      })
       setCurrentStep(2)
     }
-  }, [validateStepOne])
+  }, [validateStepOne, formData.fitness_goals, formData.fitness_level, formData.equipment_access])
 
   // Step 2 handlers
   const handleActivityChange = useCallback((level: ActivityLevel) => {
@@ -106,9 +114,22 @@ export const WorkoutPlanBuilder: React.FC = () => {
 
   const handleSubmit = useCallback(() => {
     if (validateStepTwo()) {
+      // PostHog: Track step 2 completion and preview shown
+      posthog.capture('workout_builder_step_completed', {
+        step: 2,
+        activity_level: formData.current_activity_level,
+        gender: formData.gender,
+        age: formData.age,
+      })
+      posthog.capture('workout_plan_preview_shown', {
+        fitness_goals: formData.fitness_goals,
+        fitness_level: formData.fitness_level,
+        equipment_access: formData.equipment_access,
+        activity_level: formData.current_activity_level,
+      })
       setShowPreview(true)
     }
-  }, [validateStepTwo])
+  }, [validateStepTwo, formData])
 
   // Preview handlers
   const handleEdit = useCallback(() => {
@@ -117,6 +138,14 @@ export const WorkoutPlanBuilder: React.FC = () => {
   }, [])
 
   const handleCreateAccount = useCallback(() => {
+    // PostHog: Track create account click - key conversion event
+    posthog.capture('workout_create_account_clicked', {
+      fitness_goals: formData.fitness_goals,
+      fitness_level: formData.fitness_level,
+      equipment_access: formData.equipment_access,
+      activity_level: formData.current_activity_level,
+      location: 'workout_plan_builder',
+    })
     const signupUrl = buildSignupUrl(formData)
     window.location.href = signupUrl
   }, [formData])
@@ -124,7 +153,15 @@ export const WorkoutPlanBuilder: React.FC = () => {
   return (
     <section id="workout-builder" className={styles.section}>
       {showIntro ? (
-        <IntroScreen onComplete={() => setShowIntro(false)} />
+        <IntroScreen
+          onComplete={() => {
+            // PostHog: Track when user starts the workout builder
+            posthog.capture('workout_builder_started', {
+              location: 'workout_plan_builder',
+            })
+            setShowIntro(false)
+          }}
+        />
       ) : (
         <>
           <LogoWatermark position="bottom-left" opacity={0.04} size={350} rotation={15} />

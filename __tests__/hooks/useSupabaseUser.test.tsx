@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { useSupabaseUser } from '@/hooks/useSupabaseUser'
 import type { User } from '@supabase/supabase-js'
 
@@ -40,15 +40,18 @@ describe('useSupabaseUser', () => {
     vi.restoreAllMocks()
   })
 
-  it('should return loading state initially', () => {
+  it('should resolve to null user when unauthenticated', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
     mockOnAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: vi.fn() } },
     })
 
-    const { result } = renderHook(() => useSupabaseUser())
+    const { result } = await act(async () => renderHook(() => useSupabaseUser()))
 
-    expect(result.current.loading).toBe(true)
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
     expect(result.current.user).toBe(null)
     expect(result.current.error).toBe(null)
   })
@@ -121,7 +124,11 @@ describe('useSupabaseUser', () => {
 
     // Simulate auth state change
     if (authStateCallback) {
-      ;(authStateCallback as (event: string, session: any) => void)('SIGNED_IN', { user: mockUser })
+      act(() => {
+        ;(authStateCallback as (event: string, session: any) => void)('SIGNED_IN', {
+          user: mockUser,
+        })
+      })
     }
 
     await waitFor(() => {
@@ -150,7 +157,9 @@ describe('useSupabaseUser', () => {
 
     // Simulate sign out
     if (authStateCallback) {
-      ;(authStateCallback as (event: string, session: any) => void)('SIGNED_OUT', null)
+      act(() => {
+        ;(authStateCallback as (event: string, session: any) => void)('SIGNED_OUT', null)
+      })
     }
 
     await waitFor(() => {

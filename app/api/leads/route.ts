@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { validateEmail } from '@/lib/validation'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 // Simple in-memory rate limiting store
 interface RateLimitEntry {
@@ -185,6 +186,30 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       console.error('Error inserting lead:', insertError)
       return NextResponse.json({ error: 'Failed to create lead' }, { status: 500 })
+    }
+
+    // PostHog: Track lead form submission - server-side conversion event
+    try {
+      const posthog = getPostHogClient()
+      posthog.capture({
+        distinctId: lead.id,
+        event: 'lead_form_submitted',
+        properties: {
+          lead_id: lead.id,
+          source: leadSource,
+          consent_email_plan: Boolean(consent_email_plan),
+          consent_follow_up: Boolean(consent_follow_up),
+          coaching_interest: Boolean(coaching_interest),
+          utm_source: utmSource,
+          utm_campaign: utmCampaign,
+          utm_medium: utmMedium,
+          email_domain: email.toLowerCase().trim().split('@')[1] || 'unknown',
+        },
+      })
+      await posthog.flush()
+    } catch (posthogError) {
+      // Don't fail the request if PostHog tracking fails
+      console.warn('PostHog tracking error:', posthogError)
     }
 
     return NextResponse.json(

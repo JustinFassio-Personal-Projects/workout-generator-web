@@ -5,12 +5,20 @@ import { faqItems } from '@/data/faq'
 import { Accordion } from '@/components/ui/Accordion/Accordion'
 import type { AccordionItem } from '@/components/ui/Accordion/Accordion'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
+import posthog from 'posthog-js'
 import { trackButtonClick } from '@/lib/analytics'
 import styles from './FAQ.module.scss'
 
 export const FAQ: React.FC = () => {
   const handleButtonClick = (buttonText: string) => {
     trackButtonClick(buttonText, 'faq')
+
+    // PostHog: Track FAQ CTA click
+    posthog.capture('faq_cta_clicked', {
+      button_text: buttonText,
+      location: 'faq',
+    })
+
     const workoutBuilderSection = document.getElementById('workout-builder')
     if (workoutBuilderSection) {
       workoutBuilderSection.scrollIntoView({ behavior: 'smooth', block: 'start' })

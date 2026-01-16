@@ -7,6 +7,7 @@ import { VisionLabIframe } from '@/components/landing/ExerciseChallenge/VisionLa
 import { MicroInterview } from '@/components/landing/ExerciseChallenge/MicroInterview'
 import { Card } from '@/components/ui/Card/Card'
 import { Button } from '@/components/ui/Button/Button'
+import posthog from 'posthog-js'
 import { analytics } from '@/lib/analytics'
 import styles from './page.module.scss'
 
@@ -66,6 +67,14 @@ export default function ExerciseChallengePage() {
     if (leadId) {
       analytics.trackVisionCtaGenerateWorkoutClicked(leadId)
     }
+
+    // PostHog: Track Vision Lab CTA click
+    posthog.capture('vision_lab_cta_clicked', {
+      cta_type: 'generate_workout',
+      lead_id: leadId,
+      location: 'vision_lab_success',
+    })
+
     // Navigate to workout plan builder section on landing page
     router.push('/#workout-builder')
     // Scroll to element after navigation completes (Next.js router handles hash but we ensure smooth scroll)
@@ -81,6 +90,14 @@ export default function ExerciseChallengePage() {
     if (leadId) {
       analytics.trackVisionCtaViewPricingClicked(leadId)
     }
+
+    // PostHog: Track Vision Lab CTA click
+    posthog.capture('vision_lab_cta_clicked', {
+      cta_type: 'view_pricing',
+      lead_id: leadId,
+      location: 'vision_lab_success',
+    })
+
     // Navigate to pricing section
     router.push('/#pricing')
     // Scroll to element after navigation completes (Next.js router handles hash but we ensure smooth scroll)

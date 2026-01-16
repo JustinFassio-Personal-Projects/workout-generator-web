@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkGeminiRateLimit, setGeminiRateLimit } from '@/lib/rate-limit/gemini-workout'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 export const dynamic = 'force-dynamic'
 
@@ -113,6 +114,29 @@ export async function POST(request: NextRequest) {
     }
 
     const rawText = data.candidates[0].content.parts[0].text
+
+    // PostHog: Track successful AI workout generation - key conversion event
+    try {
+      const posthog = getPostHogClient()
+      // Use IP as distinct ID since we don't have user auth
+      const ip =
+        request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'anonymous'
+      posthog.capture({
+        distinctId: ip,
+        event: 'ai_workout_generated',
+        properties: {
+          goal: goal,
+          level: level,
+          equipment: equipment,
+          response_length: rawText.length,
+          source: 'gemini_api',
+        },
+      })
+      await posthog.flush()
+    } catch (posthogError) {
+      // Don't fail the request if PostHog tracking fails
+      console.warn('PostHog tracking error:', posthogError)
+    }
 
     // Set rate limit cookie after successful generation
     const nextResponse = NextResponse.json({ workout: rawText })

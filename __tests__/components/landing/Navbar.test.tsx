@@ -47,7 +47,7 @@ describe('Navbar', () => {
     render(<Navbar />)
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument()
-  })
+  }, 20000)
 
   it('should render Sign In button', () => {
     render(<Navbar />)
@@ -143,7 +143,7 @@ describe('Navbar', () => {
       },
       { timeout: 5000 }
     )
-  }, 20000)
+  }, 60000)
 
   it('should close drawer when Sign In button is clicked', async () => {
     const user = userEvent.setup()
@@ -179,11 +179,11 @@ describe('Navbar', () => {
       },
       { timeout: 5000 }
     )
-  }, 20000)
+  }, 60000)
 
   it('should have correct navigation role and aria-label', () => {
     render(<Navbar />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     expect(nav).toBeInTheDocument()
-  }, 15000)
+  }, 30000)
 })

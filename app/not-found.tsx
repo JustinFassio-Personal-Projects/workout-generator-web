@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Home, BookOpen, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import styles from './not-found.module.scss'
 
@@ -21,17 +20,17 @@ export default function NotFound() {
         </p>
         <div className={styles.actions}>
           <Link href="/">
-            <Button variant="primary" size="lg" icon={Home} iconPosition="left">
+            <Button variant="primary" size="lg">
               Go Home
             </Button>
           </Link>
           <Link href="/blog">
-            <Button variant="secondary" size="lg" icon={BookOpen} iconPosition="left">
+            <Button variant="secondary" size="lg">
               Visit Blog
             </Button>
           </Link>
           <Link href="/#pricing">
-            <Button variant="tertiary" size="lg" icon={Sparkles} iconPosition="left">
+            <Button variant="tertiary" size="lg">
               View Pricing
             </Button>
           </Link>

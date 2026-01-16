@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useRef, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Video } from '@/data/videos'
 import {
   trackVideoStart,
@@ -18,6 +19,7 @@ interface VideoCardProps {
 }
 
 export const VideoCard: React.FC<VideoCardProps> = ({ video, index = 0 }) => {
+  const router = useRouter()
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [hasPlayed, setHasPlayed] = useState(false)
@@ -29,6 +31,21 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video, index = 0 }) => {
   const hasPlayedRef = useRef<boolean>(false)
   const isBrandVideo = video.category === 'brand'
   const location = 'videos_section'
+
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Don't navigate if clicking on video controls or video element directly
+    const target = e.target as HTMLElement
+    if (
+      target.tagName === 'VIDEO' ||
+      target.closest('video') ||
+      target.closest('.video-controls') ||
+      target.classList.contains('video-controls')
+    ) {
+      return
+    }
+    // Navigate to watch page
+    router.push(`/videos/${video.id}`)
+  }
 
   // Reset tracking state when video changes
   useEffect(() => {
@@ -231,6 +248,17 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video, index = 0 }) => {
       className={`${styles.videoCard} ${isBrandVideo ? styles.brandVideo : ''}`}
       data-aos="fade-up"
       data-aos-delay={index * 100}
+      onClick={handleCardClick}
+      style={{ cursor: 'pointer' }}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          router.push(`/videos/${video.id}`)
+        }
+      }}
+      aria-label={`Watch ${video.title} - Click to view full video`}
     >
       <div className={styles.videoWrapper}>
         <video
@@ -246,6 +274,10 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video, index = 0 }) => {
           poster={video.thumbnailUrl}
           title={video.title}
           aria-label={video.title}
+          onClick={e => {
+            // Stop propagation to prevent card click when clicking video controls
+            e.stopPropagation()
+          }}
         >
           <track kind="captions" />
           Your browser does not support the video tag.

@@ -3,47 +3,20 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import {
-  videos,
   getFeaturedVideo,
   getFeaturedExerciseVideos,
   getFeaturedWorkoutVideos,
   getVideosByCategory,
   VideoCategory,
-  Video,
 } from '@/data/videos'
 import { VideoCard } from './VideoCard'
 import { Button } from '@/components/ui/Button/Button'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import styles from './Videos.module.scss'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
-
-// Static upload date for structured data to prevent hydration mismatch
-const STATIC_UPLOAD_DATE = '2024-01-01T00:00:00.000Z'
-
-// Generate VideoObject structured data for SEO
-const generateVideoStructuredData = (video: Video) => {
-  const videoUrl = video.videoUrl.startsWith('http')
-    ? video.videoUrl
-    : `${baseUrl}${video.videoUrl}`
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'VideoObject',
-    name: video.title,
-    description: video.description || video.title,
-    // Only include thumbnailUrl if it exists and is valid
-    ...(video.thumbnailUrl && {
-      thumbnailUrl: video.thumbnailUrl.startsWith('http')
-        ? video.thumbnailUrl
-        : `${baseUrl}${video.thumbnailUrl}`,
-    }),
-    uploadDate: STATIC_UPLOAD_DATE,
-    contentUrl: videoUrl,
-    embedUrl: videoUrl,
-    ...(video.duration && { duration: `PT${video.duration}S` }),
-  }
-}
+// Note: VideoObject structured data is removed from homepage
+// Videos on homepage are supplementary content, not watch pages
+// Structured data is only included on dedicated watch pages at /videos/[id]
 
 export const Videos: React.FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<VideoCategory>>(new Set())
@@ -76,27 +49,8 @@ export const Videos: React.FC = () => {
     })
   }
 
-  // Generate structured data for all videos
-  const allVideosForSEO = [
-    ...(featuredVideo ? [featuredVideo] : []),
-    ...featuredVideos,
-    ...categories.flatMap(category => getVideosByCategory(category.key)),
-  ]
-
-  // Remove duplicates by ID
-  const uniqueVideos = Array.from(new Map(allVideosForSEO.map(video => [video.id, video])).values())
-
   return (
     <section id="videos" className={styles.videos}>
-      {/* VideoObject structured data for SEO */}
-      {uniqueVideos.length > 0 && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(uniqueVideos.map(video => generateVideoStructuredData(video))),
-          }}
-        />
-      )}
       <LogoWatermark position="top-right" opacity={0.05} size={350} rotation={-10} />
       <div className={styles.container}>
         <div className={styles.header} data-aos="fade-up">

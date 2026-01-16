@@ -14,6 +14,9 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   weight: ['300', '500', '700'],
   variable: '--font-display',
+  // Do not preload this secondary display font to avoid impacting the critical rendering path.
+  // The primary font (Inter) is preloaded by default, which is sufficient for initial render.
+  preload: false,
 })
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
@@ -98,6 +101,7 @@ export const metadata: Metadata = {
     images: [`${baseUrl}/og-image.jpg`],
   },
   other: {
+    'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'default',
     'format-detection': 'telephone=no',

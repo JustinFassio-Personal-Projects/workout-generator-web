@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { createPublicClient } from '@/lib/supabase/public'
+import { videos } from '@/data/videos'
 
 // ISR: Revalidate every 60 seconds (fallback)
 // Primary revalidation happens on-demand when admin publishes
@@ -32,9 +33,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }
 
-  // If Supabase is not configured, return just static pages
+  // Video watch pages (always included, not dependent on Supabase)
+  const videoPages: MetadataRoute.Sitemap = videos.map(video => ({
+    url: `${baseUrl}/videos/${video.id}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
+
+  // If Supabase is not configured, return just static pages + videos
   if (!supabase) {
-    return [homepage, blogPage, videosPage]
+    return [homepage, blogPage, videosPage, ...videoPages]
   }
 
   // Fetch dynamic content
@@ -80,5 +89,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [homepage, blogPage, videosPage, ...blogPosts, ...authorPages, ...categoryPages]
+  return [
+    homepage,
+    blogPage,
+    videosPage,
+    ...blogPosts,
+    ...authorPages,
+    ...categoryPages,
+    ...videoPages,
+  ]
 }

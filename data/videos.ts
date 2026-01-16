@@ -96,3 +96,7 @@ export const getFeaturedExerciseVideos = (): Video[] => {
 export const getFeaturedWorkoutVideos = (): Video[] => {
   return videos.filter(video => video.category === 'featured-workout' && video.featured)
 }
+
+export const getVideoById = (id: string): Video | undefined => {
+  return videos.find(video => video.id === id)
+}

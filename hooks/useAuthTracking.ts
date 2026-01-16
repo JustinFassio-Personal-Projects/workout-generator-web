@@ -21,6 +21,19 @@ interface UseAuthTrackingOptions {
 }
 
 /**
+ * Metadata for user account creation tracking
+ * Extended version includes PostHog-specific fields
+ */
+interface UserAccountCreatedMetadata {
+  source?: string
+  method?: string
+  location?: string
+  subscription_tier?: string
+  fitness_level?: string
+  signup_date?: string
+}
+
+/**
  * Hook to track authentication events
  * Can be used in components that handle login/signup flows
  *
@@ -53,27 +66,11 @@ export const useAuthTracking = (options: UseAuthTrackingOptions = {}) => {
   const trackUserAccountCreated = useCallback(
     (
       userIdOrMetadata?: string | { source?: string; method?: string; location?: string },
-      metadata?: {
-        source?: string
-        method?: string
-        location?: string
-        subscription_tier?: string
-        fitness_level?: string
-        signup_date?: string
-      }
+      metadata?: UserAccountCreatedMetadata
     ) => {
       // Handle both signatures: (userId, metadata) or (metadata)
       let userId: string | undefined
-      let finalMetadata:
-        | {
-            source?: string
-            method?: string
-            location?: string
-            subscription_tier?: string
-            fitness_level?: string
-            signup_date?: string
-          }
-        | undefined
+      let finalMetadata: UserAccountCreatedMetadata | undefined
 
       if (typeof userIdOrMetadata === 'string') {
         // First parameter is userId

@@ -82,10 +82,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
                 location: 'pricing',
               })
 
-              // PostHog: Track subscription_purchased intent for paid plans
+              // PostHog: Track subscription purchase intent for paid plans (CTA click)
               // Note: Actual purchase tracking should be done via Stripe webhook
               if (plan.price > 0 && (isLoginLink || isSignupLink)) {
-                posthog.capture('subscription_purchased', {
+                posthog.capture('subscription_purchase_initiated', {
                   plan: plan.name.toLowerCase(),
                   price: plan.price,
                   period: plan.period,
@@ -123,10 +123,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, index }) => {
                 location: 'pricing',
               })
 
-              // PostHog: Track subscription_purchased intent for paid plans
+              // PostHog: Track subscription purchase intent for paid plans (CTA click)
               // Note: Actual purchase tracking should be done via Stripe webhook
               if (plan.price > 0) {
-                posthog.capture('subscription_purchased', {
+                posthog.capture('subscription_purchase_initiated', {
                   plan: plan.name.toLowerCase(),
                   price: plan.price,
                   period: plan.period,

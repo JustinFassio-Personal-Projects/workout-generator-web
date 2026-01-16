@@ -85,9 +85,9 @@ export const ReportV2LiveDemo: React.FC = () => {
 
       setWorkout(formattedText)
 
-      // PostHog: Track workout_saved when workout is displayed/viewed
+      // PostHog: Track workout_viewed when workout is displayed/viewed
       try {
-        posthog.capture('workout_saved', {
+        posthog.capture('workout_viewed', {
           goal: goal,
           level: level,
           equipment: equipment,

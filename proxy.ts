@@ -7,10 +7,13 @@ export async function proxy(request: NextRequest) {
 
   // Helper function to create redirect response
   const createRedirect = (destination: string, permanent = true) => {
-    const url = new URL(destination, request.url)
-    // Preserve query parameters for internal redirects (e.g., ?ref=source, ?utm_source=...)
+    // Detect if destination is an external URL (starts with http:// or https://)
+    const isExternal = /^https?:\/\//i.test(destination)
+    // For external URLs, use destination directly; for internal, use request.url as base
+    const url = isExternal ? new URL(destination) : new URL(destination, request.url)
+    // Preserve query parameters only for internal redirects (e.g., ?ref=source, ?utm_source=...)
     // External redirects (full URLs) should not preserve query params to avoid leaking data
-    if (search && destination.startsWith('/')) {
+    if (!isExternal && search) {
       url.search = search
     }
     return NextResponse.redirect(url, { status: permanent ? 301 : 302 })
@@ -93,7 +96,14 @@ export async function proxy(request: NextRequest) {
     '/the-power-of-functional-fitness': '/blog/the-power-of-functional-fitness',
     '/ai-fitness-trainers': '/blog/ai-fitness-trainers',
     '/tacp-school-house-workout-1990s': '/blog/tacp-school-house-workout-1990s',
+    // Keep misspelling in both source and destination to match:
+    // 1. Actual WordPress URL from Google Search Console (source)
+    // 2. Actual blog post slug in database (destination - see next.config.js)
     '/football-accelleration-decelleration-workout':
+      '/blog/football-accelleration-decelleration-workout',
+    // Defensive redirect for correctly spelled version (if someone types it correctly)
+    // Still redirects to misspelled slug since that's what exists in the database
+    '/football-acceleration-deceleration-workout':
       '/blog/football-accelleration-decelleration-workout',
     '/can-ai-generated-workouts-boost-gym-revenue':
       '/blog/can-ai-generated-workouts-boost-gym-revenue',
@@ -182,6 +192,11 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public files (images, etc.)
+     *
+     * Performance note: This middleware runs on most requests to handle WordPress redirects.
+     * Redirect checks are O(1) string comparisons and return early for non-matches.
+     * Admin authentication only executes for /admin routes (see early return at line 120).
+     * Static assets are excluded by the matcher pattern above, so they never hit this middleware.
      */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
   ],

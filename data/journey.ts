@@ -8,7 +8,6 @@ export interface JourneyStep {
   description: string
   icon: LucideIcon
   features: string[]
-  comingSoonFeatures?: string[] // Features that should show "(Coming Soon)"
   accentColor: string
 }
 
@@ -56,7 +55,6 @@ export const journeySteps: JourneyStep[] = [
       'Form corrections',
       'Rest timer included',
     ],
-    comingSoonFeatures: ['Video demonstrations', 'Rest timer included'],
     accentColor: '#16a34a',
   },
   {
@@ -67,7 +65,6 @@ export const journeySteps: JourneyStep[] = [
       'Monitor your improvements with detailed analytics, workout history, and achievement milestones.',
     icon: TrendingUp,
     features: ['Progress charts', 'Workout history', 'Achievement badges', 'Performance insights'],
-    comingSoonFeatures: ['Progress charts', 'Achievement badges', 'Performance insights'],
     accentColor: '#15803d',
   },
   {
@@ -83,7 +80,6 @@ export const journeySteps: JourneyStep[] = [
       'New challenges',
       'Continuous improvement',
     ],
-    comingSoonFeatures: ['Goal completion', 'Community recognition'],
     accentColor: '#84cc16',
   },
 ]

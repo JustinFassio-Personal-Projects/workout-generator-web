@@ -1,7 +1,7 @@
 'use client'
 
 import React, { FormEvent } from 'react'
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Send } from 'lucide-react'
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Send, Youtube } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { trackVercelEvent, trackNavigationClick } from '@/lib/analytics'
 import styles from './Footer.module.scss'
@@ -63,14 +63,23 @@ export const Footer: React.FC = () => {
     ],
   }
 
-  // Social links - uncomment and add real URLs when available
-  // const socialLinks = [
-  //   { icon: Facebook, href: 'https://facebook.com/yourpage', label: 'Facebook' },
-  //   { icon: Twitter, href: 'https://twitter.com/yourhandle', label: 'Twitter' },
-  //   { icon: Instagram, href: 'https://instagram.com/yourhandle', label: 'Instagram' },
-  //   { icon: Linkedin, href: 'https://linkedin.com/company/yourcompany', label: 'LinkedIn' },
-  // ]
-  const socialLinks: { icon: typeof Facebook; href: string; label: string }[] = []
+  // Social links
+  const socialLinks = [
+    { icon: Youtube, href: 'https://www.youtube.com/@aiworkoutgen', label: 'YouTube' },
+    { icon: Instagram, href: 'https://www.instagram.com/aiworkoutgenerator/', label: 'Instagram' },
+    {
+      icon: Linkedin,
+      href: 'https://www.linkedin.com/in/justinfassio/',
+      label: 'LinkedIn Personal',
+    },
+    {
+      icon: Linkedin,
+      href: 'https://www.linkedin.com/company/ai-workout-generator/',
+      label: 'LinkedIn Company',
+    },
+    { icon: Facebook, href: 'https://www.facebook.com/aiworkoutgenerator', label: 'Facebook' },
+    { icon: Twitter, href: 'https://x.com/AI_Workout', label: 'Twitter' },
+  ]
 
   return (
     <footer id="footer" className={styles.footer}>
@@ -93,6 +102,8 @@ export const Footer: React.FC = () => {
                     href={social.href}
                     aria-label={social.label}
                     className={styles.socialLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     onClick={() => handleSocialLinkClick(social.label)}
                   >
                     <Icon size={20} />

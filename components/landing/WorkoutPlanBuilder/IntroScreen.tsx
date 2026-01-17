@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Play, Globe, PersonStanding, Info } from 'lucide-react'
+import { Play, Globe, PersonStanding } from 'lucide-react'
 import styles from './IntroScreen.module.scss'
 
 interface IntroScreenProps {
@@ -34,15 +34,6 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
     }
   }, [])
 
-  const scrollToSection = (sectionId: string) => {
-    setTimeout(() => {
-      const sectionElement = document.getElementById(sectionId)
-      if (sectionElement) {
-        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-    }, 100)
-  }
-
   const handleEnter = () => {
     // Navigate directly to onboarding wizard route
     // Note: We intentionally skip onComplete() here because:
@@ -53,12 +44,6 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
     router.push('/onboard')
   }
 
-  const handleLearnMore = () => {
-    onComplete()
-    // Scroll to hero section after intro hides
-    scrollToSection('hero')
-  }
-
   const strands = Array.from({ length: 12 })
   const particles = Array.from({ length: 20 })
 
@@ -67,6 +52,16 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
       {/* Background layers */}
       <div className={styles.backgroundGradient}></div>
       <div className={styles.gridPattern}></div>
+
+      {/* Top Badge (Phase 3) */}
+      {phase === 3 && (
+        <div className={styles.topBadge}>
+          <div className={styles.badge}>
+            <Globe className={styles.badgeIcon} />
+            <span className={styles.badgeText}>Live Bio-Feedback Active</span>
+          </div>
+        </div>
+      )}
 
       {/* Main animation container */}
       <div className={styles.animationContainer}>
@@ -101,7 +96,7 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
             ))}
         </div>
 
-        {/* Person icon with progress bars (Phase 2+) */}
+        {/* Person icon (Phase 2+) */}
         <div className={`${styles.personContainer} ${phase >= 2 ? styles.visible : styles.hidden}`}>
           <div className={styles.personCard}>
             <div className={styles.scanLine}></div>
@@ -109,17 +104,6 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
             <div className={styles.personIconWrapper}>
               <div className={styles.personIconBorder}></div>
               <PersonStanding className={styles.personIcon} />
-            </div>
-            <div className={styles.progressBars}>
-              <div className={styles.progressBar}>
-                <div className={`${styles.progressFill} ${styles.fill1}`}></div>
-              </div>
-              <div className={styles.progressBar}>
-                <div className={`${styles.progressFill} ${styles.fill2}`}></div>
-              </div>
-              <div className={styles.progressBar}>
-                <div className={`${styles.progressFill} ${styles.fill3}`}></div>
-              </div>
             </div>
             <div className={styles.spinnerContainer}>
               <div className={styles.spinner}>
@@ -158,29 +142,22 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
       {/* Bottom content (Phase 3) */}
       <div className={`${styles.bottomContent} ${phase === 3 ? styles.visible : styles.hidden}`}>
         <h1 className={styles.title}>
-          Workout <span className={styles.gradientText}>Generator</span>
+          AI PERSONAL <br />
+          <span className={styles.gradientText}>TRAINER</span>
         </h1>
         <div className={styles.taglineContainer}>
-          <p className={styles.tagline}>Personalized Fitness. Powered by AI.</p>
-          <div className={styles.badge}>
-            <Globe className={styles.badgeIcon} />
-            <span className={styles.badgeText}>Advanced AI Workout Engine</span>
-          </div>
+          <p className={styles.tagline}>
+            Experience the Live Coach Engine that adapts your sets, reps, and weights in real-time
+            based on your fatigue.
+          </p>
         </div>
         <div className={styles.ctaButtonGroup}>
           <button onClick={handleEnter} className={styles.ctaButton}>
             <div className={styles.ctaButtonBg}></div>
             <div className={styles.ctaButtonBorder}></div>
             <div className={styles.ctaButtonContent}>
-              <span className={styles.ctaButtonText}>START BUILDING</span>
+              <span className={styles.ctaButtonText}>Generate Workout</span>
               <Play className={styles.ctaButtonIcon} />
-            </div>
-          </button>
-          <button onClick={handleLearnMore} className={styles.learnMoreButton}>
-            <div className={styles.learnMoreButtonBorder}></div>
-            <div className={styles.learnMoreButtonContent}>
-              <span className={styles.learnMoreButtonText}>Learn More</span>
-              <Info className={styles.learnMoreButtonIcon} />
             </div>
           </button>
         </div>
@@ -188,7 +165,7 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 
       {/* Skip button */}
       <button onClick={onComplete} className={styles.skipButton}>
-        Skip Intro
+        Free Workout
       </button>
     </div>
   )

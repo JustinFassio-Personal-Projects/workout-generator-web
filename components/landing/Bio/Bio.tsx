@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight, Check } from 'lucide-react'
+import { ArrowRight, Check, Linkedin, Youtube, Instagram, Facebook, Twitter } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import { trackButtonClick } from '@/lib/analytics'
@@ -20,6 +20,69 @@ export const Bio: React.FC = () => {
       workoutBuilderSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
+
+  const handleLinkedInClick = () => {
+    trackButtonClick('Connect on LinkedIn', 'bio')
+  }
+
+  const handleYoutubeClick = () => {
+    trackButtonClick('YouTube', 'bio')
+  }
+
+  const handleInstagramClick = () => {
+    trackButtonClick('Instagram', 'bio')
+  }
+
+  const handleLinkedInCompanyClick = () => {
+    trackButtonClick('LinkedIn Company', 'bio')
+  }
+
+  const handleFacebookClick = () => {
+    trackButtonClick('Facebook', 'bio')
+  }
+
+  const handleTwitterClick = () => {
+    trackButtonClick('Twitter', 'bio')
+  }
+
+  const socialLinks = [
+    {
+      icon: Youtube,
+      href: 'https://www.youtube.com/@aiworkoutgen',
+      label: 'YouTube',
+      onClick: handleYoutubeClick,
+    },
+    {
+      icon: Instagram,
+      href: 'https://www.instagram.com/aiworkoutgenerator/',
+      label: 'Instagram',
+      onClick: handleInstagramClick,
+    },
+    {
+      icon: Linkedin,
+      href: 'https://www.linkedin.com/in/justinfassio/',
+      label: 'LinkedIn Personal',
+      onClick: handleLinkedInClick,
+    },
+    {
+      icon: Linkedin,
+      href: 'https://www.linkedin.com/company/ai-workout-generator/',
+      label: 'LinkedIn Company',
+      onClick: handleLinkedInCompanyClick,
+    },
+    {
+      icon: Facebook,
+      href: 'https://www.facebook.com/aiworkoutgenerator',
+      label: 'Facebook',
+      onClick: handleFacebookClick,
+    },
+    {
+      icon: Twitter,
+      href: 'https://x.com/AI_Workout',
+      label: 'Twitter',
+      onClick: handleTwitterClick,
+    },
+  ]
 
   const credentials = [
     'Certified trainer since 1996 (ACSM CPT)',
@@ -86,6 +149,35 @@ export const Bio: React.FC = () => {
             <Button variant="secondary" size="md" onClick={handleGenerateWorkoutClick}>
               Generate My First Workout
             </Button>
+            <a
+              href="https://www.linkedin.com/in/justinfassio/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleLinkedInClick}
+              style={{ textDecoration: 'none' }}
+            >
+              <Button variant="secondary" size="md" icon={Linkedin} iconPosition="left">
+                Connect on LinkedIn
+              </Button>
+            </a>
+          </div>
+          <div className={styles.socialLinks}>
+            {socialLinks.map((social, index) => {
+              const Icon = social.icon
+              return (
+                <a
+                  key={index}
+                  href={social.href}
+                  aria-label={social.label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={social.onClick}
+                  className={styles.socialLink}
+                >
+                  <Icon size={20} />
+                </a>
+              )
+            })}
           </div>
         </div>
       </div>

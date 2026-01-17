@@ -39,11 +39,33 @@ function initPostHog() {
   globalThis.__POSTHOG_INITIALIZED__ = true
 }
 
+// Initialize PostHog after React hydration to avoid hydration mismatches
+// PostHog injects scripts dynamically which can cause hydration mismatches
+// Delay initialization until well after React hydration completes
 if (typeof window !== 'undefined') {
+  // Use a longer delay to ensure React hydration warnings have already fired
+  // This prevents PostHog's script injection from interfering with hydration
+  const initAfterHydration = () => {
+    // Wait for window load + additional delay to ensure hydration is complete
+    if (document.readyState === 'complete') {
+      // Additional delay ensures we're well past hydration phase
+      setTimeout(initPostHog, 500)
+    } else {
+      window.addEventListener(
+        'load',
+        () => {
+          setTimeout(initPostHog, 500)
+        },
+        { once: true }
+      )
+    }
+  }
+
+  // Defer initialization start until after current execution stack
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initPostHog)
+    document.addEventListener('DOMContentLoaded', initAfterHydration)
   } else {
-    initPostHog()
+    initAfterHydration()
   }
 }
 

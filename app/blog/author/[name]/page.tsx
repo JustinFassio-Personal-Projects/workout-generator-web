@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Linkedin, Youtube, Instagram, Facebook, Twitter } from 'lucide-react'
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
 import { getAllAuthors, getPostsByAuthor, getAuthorBySlug, authorToSlug } from '@/lib/blog/queries'
 import styles from './author-page.module.scss'
@@ -167,6 +168,66 @@ export default async function AuthorPage({ params }: PageProps) {
           </nav>
           <h1 className={styles.title}>Articles by {author.name}</h1>
           {author.bio && <p className={styles.bio}>{author.bio}</p>}
+
+          {author.name === 'Justin Fassio' && (
+            <div className={styles.socialLinks} style={{ marginTop: '1rem' }}>
+              <a
+                href="https://www.youtube.com/@aiworkoutgen"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className={styles.socialLink}
+              >
+                <Youtube size={20} />
+              </a>
+              <a
+                href="https://www.instagram.com/aiworkoutgenerator/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className={styles.socialLink}
+              >
+                <Instagram size={20} />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/justinfassio/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn Personal"
+                className={styles.socialLink}
+              >
+                <Linkedin size={20} />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/ai-workout-generator/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn Company"
+                className={styles.socialLink}
+              >
+                <Linkedin size={20} />
+              </a>
+              <a
+                href="https://www.facebook.com/aiworkoutgenerator"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className={styles.socialLink}
+              >
+                <Facebook size={20} />
+              </a>
+              <a
+                href="https://x.com/AI_Workout"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Twitter"
+                className={styles.socialLink}
+              >
+                <Twitter size={20} />
+              </a>
+            </div>
+          )}
+
           <p className={styles.postCount}>
             {posts.length} {posts.length === 1 ? 'article' : 'articles'}
           </p>

@@ -94,7 +94,7 @@ export default function Home() {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     '@id': baseUrl,
-    name: 'Workout Generator - AI-Powered Fitness Plans',
+    name: 'Workout Generator - Trainer-Built Fitness Plans',
     description:
       'Create personalized AI-powered workout plans tailored to your goals, fitness level, and equipment. Start your fitness journey today!',
     url: baseUrl,

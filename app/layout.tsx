@@ -25,7 +25,7 @@ const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
 
 export const metadata: Metadata = {
   title: {
-    default: 'Workout Generator - AI-Powered Fitness Plans',
+    default: 'Workout Generator - Trainer-Built Fitness Plans',
     template: '%s | Workout Generator',
   },
   description:
@@ -129,11 +129,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     description:
       'AI-powered workout plans tailored to your goals, fitness level, and available equipment.',
     sameAs: [
-      // Add social media profiles here when available
       // 'https://www.facebook.com/workoutgenerator',
       // 'https://twitter.com/workoutgenerator',
       // 'https://www.instagram.com/workoutgenerator',
     ],
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '8000',
+    },
   }
 
   // WebSite structured data (JSON-LD)
@@ -172,7 +176,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} ${spaceGrotesk.variable}`}>
+      <body className={`${inter.className} ${spaceGrotesk.variable}`} suppressHydrationWarning>
         {/* Skip to Content Link - Accessibility */}
         <a href="#main-content" className="skip-to-content">
           Skip to main content

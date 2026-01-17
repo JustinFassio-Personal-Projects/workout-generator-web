@@ -51,16 +51,25 @@
 }
 
 .overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 600px;
+  margin: 0 auto;
   background: var(--bg-dark);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-top: var(--spacing-2xl);
   overflow: hidden;
   font-family: var(--font-sans);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--glass-border-base);
+
+  @media (min-width: 768px) {
+    max-width: 700px;
+  }
 }
 
 .backgroundGradient {
@@ -114,6 +123,7 @@
   align-items: center;
   justify-content: center;
   perspective: 1000px;
+  margin: var(--spacing-lg) auto;
 
   @media (min-width: 640px) {
     width: 320px;
@@ -245,7 +255,7 @@
 .personCard {
   position: relative;
   width: 128px;
-  height: 192px;
+  height: 128px;
   background: #000000;
   border: 1px solid rgba(34, 197, 94, 0.3);
   border-radius: var(--radius-xl);
@@ -254,13 +264,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: var(--spacing-lg);
+  justify-content: center;
+  padding: var(--spacing-lg);
   gap: var(--spacing-md);
 
   @media (min-width: 768px) {
     width: 160px;
-    height: 224px;
-    padding-top: var(--spacing-xl);
+    height: 160px;
+    padding: var(--spacing-xl);
   }
 }
 
@@ -416,25 +427,25 @@
 // Bottom content
 .bottomContent {
   position: absolute;
-  bottom: 64px;
+  bottom: var(--spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: all 1s;
   padding: 0 var(--spacing-lg);
-
-  @media (min-width: 768px) {
-    bottom: 80px;
-  }
+  width: 100%;
+  max-width: 100%;
 
   &.hidden {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateX(-50%) translateY(40px);
   }
 
   &.visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
 }
 
@@ -469,13 +480,21 @@
 
 .tagline {
   color: rgba(148, 163, 184, 1);
-  font-size: var(--font-size-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  max-width: 600px;
 
   @media (min-width: 768px) {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-lg);
   }
+}
+
+.topBadge {
+  position: absolute;
+  top: var(--spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 }
 
 .badge {
@@ -506,10 +525,25 @@
   width: 12px;
   height: 12px;
   color: var(--color-primary-500);
+  filter: drop-shadow(0 0 8px rgba(34, 197, 94, 1));
+  animation: pulseGlow 2s ease-in-out infinite;
 
   @media (min-width: 768px) {
     width: 12px;
     height: 12px;
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(34, 197, 94, 1)) drop-shadow(0 0 12px rgba(34, 197, 94, 0.8));
+    opacity: 1;
+  }
+  50% {
+    filter: drop-shadow(0 0 24px rgba(34, 197, 94, 1)) drop-shadow(0 0 40px rgba(34, 197, 94, 1))
+      drop-shadow(0 0 60px rgba(34, 197, 94, 0.8));
+    opacity: 1;
   }
 }
 

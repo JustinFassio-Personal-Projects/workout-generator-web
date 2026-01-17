@@ -279,8 +279,13 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video, index = 0 }) => {
             e.stopPropagation()
           }}
         >
-          <track kind="captions" />
-          Your browser does not support the video tag.
+          <p>
+            Your browser does not support the video tag. You can still view the video at{' '}
+            <a href={video.videoUrl} target="_blank" rel="noopener noreferrer">
+              this link
+            </a>
+            .
+          </p>
         </video>
       </div>
       {!isBrandVideo && (

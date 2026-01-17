@@ -24,6 +24,21 @@ const loadModule = async () => {
   await import('../instrumentation-client')
 }
 
+// Helper to wait for async initialization with delays
+const waitForInit = async () => {
+  // First setTimeout(0) for deferring initialization start
+  await new Promise(resolve => setTimeout(resolve, 10))
+
+  // If document is not complete, trigger load event
+  if (document.readyState !== 'complete') {
+    window.dispatchEvent(new Event('load'))
+    await new Promise(resolve => setTimeout(resolve, 10))
+  }
+
+  // Wait for the final 500ms setTimeout delay
+  await new Promise(resolve => setTimeout(resolve, 600))
+}
+
 describe('instrumentation-client', () => {
   beforeEach(() => {
     initMock.mockClear()
@@ -48,6 +63,9 @@ describe('instrumentation-client', () => {
       handler(new Event('DOMContentLoaded') as Event)
     }
 
+    // Wait for async initialization with delays
+    await waitForInit()
+
     expect(initMock).toHaveBeenCalledTimes(1)
     expect((globalThis as { __POSTHOG_INITIALIZED__?: boolean }).__POSTHOG_INITIALIZED__).toBe(true)
 
@@ -60,6 +78,9 @@ describe('instrumentation-client', () => {
     const addListenerSpy = vi.spyOn(document, 'addEventListener')
     await loadModule()
 
+    // Wait for async initialization with delays (setTimeout(0) + setTimeout(500))
+    await waitForInit()
+
     expect(initMock).toHaveBeenCalledTimes(1)
     const calls = addListenerSpy.mock.calls as unknown as Array<[unknown, unknown]>
     expect(calls.some(call => String(call[0]) === 'DOMContentLoaded')).toBe(false)
@@ -71,9 +92,11 @@ describe('instrumentation-client', () => {
     setReadyState('complete')
 
     await loadModule()
+    await waitForInit()
     expect(initMock).toHaveBeenCalledTimes(1)
 
     await loadModule()
+    await waitForInit()
     expect(initMock).toHaveBeenCalledTimes(1)
   })
 })

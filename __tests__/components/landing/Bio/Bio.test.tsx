@@ -69,6 +69,11 @@ vi.mock('@/components/ui/LogoWatermark/LogoWatermark', () => ({
 vi.mock('lucide-react', () => ({
   ArrowRight: () => <span data-testid="arrow-icon">→</span>,
   Check: () => <span data-testid="check-icon">✓</span>,
+  Linkedin: () => <div data-testid="linkedin-icon">Linkedin</div>,
+  Youtube: () => <div data-testid="youtube-icon">Youtube</div>,
+  Instagram: () => <div data-testid="instagram-icon">Instagram</div>,
+  Facebook: () => <div data-testid="facebook-icon">Facebook</div>,
+  Twitter: () => <div data-testid="twitter-icon">Twitter</div>,
 }))
 
 describe('Bio', () => {

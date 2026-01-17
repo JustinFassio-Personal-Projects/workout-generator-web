@@ -28,16 +28,16 @@ describe('WorkoutPlanBuilder', () => {
   // Helper function to dismiss intro screen
   const dismissIntro = async (user?: ReturnType<typeof userEvent.setup>) => {
     const userInstance = user || userEvent.setup()
-    // Check if intro screen is shown by looking for skip button or START BUILDING button
+    // Check if intro screen is shown by looking for skip button or Free Workout button
     try {
-      const skipButton = await waitFor(() => screen.getByText(/Skip Intro/i), { timeout: 1000 })
+      const skipButton = await waitFor(() => screen.getByText(/Free Workout/i), { timeout: 1000 })
       if (skipButton) {
         await act(async () => {
           await userInstance.click(skipButton)
         })
         await waitFor(
           () => {
-            expect(screen.queryByText(/Skip Intro/i)).not.toBeInTheDocument()
+            expect(screen.queryByText(/Free Workout/i)).not.toBeInTheDocument()
           },
           { timeout: 2000 }
         )

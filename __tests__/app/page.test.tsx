@@ -181,7 +181,7 @@ describe('Home Page', () => {
     if (homepageScript) {
       const content = JSON.parse(homepageScript.textContent || '{}')
       expect(content['@type']).toBe('WebPage')
-      expect(content.name).toBe('Workout Generator - AI-Powered Fitness Plans')
+      expect(content.name).toBe('Workout Generator - Trainer-Built Fitness Plans')
     }
   })
 

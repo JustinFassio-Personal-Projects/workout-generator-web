@@ -145,7 +145,13 @@ export default async function VideoWatchPage({ params }: PageProps) {
                 aria-label={video.title}
               >
                 <source src={videoUrl} type="video/mp4" />
-                Your browser does not support the video tag.
+                <p>
+                  Your browser does not support the video tag. You can still view the video at{' '}
+                  <a href={videoUrl} target="_blank" rel="noopener noreferrer">
+                    this link
+                  </a>
+                  .
+                </p>
               </video>
             </div>
 

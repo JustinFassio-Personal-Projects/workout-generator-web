@@ -153,15 +153,17 @@ export const WorkoutPlanBuilder: React.FC = () => {
   return (
     <section id="workout-builder" className={styles.section}>
       {showIntro ? (
-        <IntroScreen
-          onComplete={() => {
-            // PostHog: Track when user starts the workout builder
-            posthog.capture('workout_builder_started', {
-              location: 'workout_plan_builder',
-            })
-            setShowIntro(false)
-          }}
-        />
+        <div className={styles.container}>
+          <IntroScreen
+            onComplete={() => {
+              // PostHog: Track when user starts the workout builder
+              posthog.capture('workout_builder_started', {
+                location: 'workout_plan_builder',
+              })
+              setShowIntro(false)
+            }}
+          />
+        </div>
       ) : (
         <>
           <LogoWatermark position="bottom-left" opacity={0.04} size={350} rotation={15} />

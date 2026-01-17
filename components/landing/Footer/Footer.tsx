@@ -1,7 +1,7 @@
 'use client'
 
 import React, { FormEvent } from 'react'
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Send, Youtube } from 'lucide-react'
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Send, Youtube, Star } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { trackVercelEvent, trackNavigationClick } from '@/lib/analytics'
 import styles from './Footer.module.scss'
@@ -79,6 +79,11 @@ export const Footer: React.FC = () => {
     },
     { icon: Facebook, href: 'https://www.facebook.com/aiworkoutgenerator', label: 'Facebook' },
     { icon: Twitter, href: 'https://x.com/AI_Workout', label: 'Twitter' },
+    {
+      icon: Star,
+      href: 'https://www.yelp.com/biz/san-diego-core-fitness-san-diego-san-diego?osq=San+Diego+Core+Fitness',
+      label: 'Yelp Reviews',
+    },
   ]
 
   return (

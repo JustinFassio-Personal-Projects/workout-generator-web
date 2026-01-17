@@ -2,7 +2,16 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight, Check, Linkedin, Youtube, Instagram, Facebook, Twitter } from 'lucide-react'
+import {
+  ArrowRight,
+  Check,
+  Linkedin,
+  Youtube,
+  Instagram,
+  Facebook,
+  Twitter,
+  Star,
+} from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import { trackButtonClick } from '@/lib/analytics'
@@ -45,6 +54,10 @@ export const Bio: React.FC = () => {
     trackButtonClick('Twitter', 'bio')
   }
 
+  const handleYelpClick = () => {
+    trackButtonClick('Yelp Reviews', 'bio')
+  }
+
   const socialLinks = [
     {
       icon: Youtube,
@@ -81,6 +94,12 @@ export const Bio: React.FC = () => {
       href: 'https://x.com/AI_Workout',
       label: 'Twitter',
       onClick: handleTwitterClick,
+    },
+    {
+      icon: Star,
+      href: 'https://www.yelp.com/biz/san-diego-core-fitness-san-diego-san-diego?osq=San+Diego+Core+Fitness',
+      label: 'Yelp Reviews',
+      onClick: handleYelpClick,
     },
   ]
 

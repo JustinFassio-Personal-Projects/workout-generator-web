@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Linkedin, Youtube, Instagram, Facebook, Twitter } from 'lucide-react'
+import { Linkedin, Youtube, Instagram, Facebook, Twitter, Star } from 'lucide-react'
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
 import { getAllAuthors, getPostsByAuthor, getAuthorBySlug, authorToSlug } from '@/lib/blog/queries'
 import styles from './author-page.module.scss'
@@ -224,6 +224,15 @@ export default async function AuthorPage({ params }: PageProps) {
                 className={styles.socialLink}
               >
                 <Twitter size={20} />
+              </a>
+              <a
+                href="https://www.yelp.com/biz/san-diego-core-fitness-san-diego-san-diego?osq=San+Diego+Core+Fitness"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Yelp Reviews"
+                className={styles.socialLink}
+              >
+                <Star size={20} />
               </a>
             </div>
           )}

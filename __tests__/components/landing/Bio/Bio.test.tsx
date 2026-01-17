@@ -74,6 +74,7 @@ vi.mock('lucide-react', () => ({
   Instagram: () => <div data-testid="instagram-icon">Instagram</div>,
   Facebook: () => <div data-testid="facebook-icon">Facebook</div>,
   Twitter: () => <div data-testid="twitter-icon">Twitter</div>,
+  Star: () => <div data-testid="star-icon">Star</div>,
 }))
 
 describe('Bio', () => {

@@ -133,6 +133,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       // 'https://twitter.com/workoutgenerator',
       // 'https://www.instagram.com/workoutgenerator',
     ],
+    // Aggregate rating based on founder's Yelp reviews for San Diego Core Fitness
+    // Source: https://www.yelp.com/biz/san-diego-core-fitness-san-diego-san-diego?osq=San+Diego+Core+Fitness
+    // 4 Yelp accounts: 3 with 5 stars, 1 with 4.7 stars = 4.9 average
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.9',

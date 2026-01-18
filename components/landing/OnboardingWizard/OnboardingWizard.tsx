@@ -137,6 +137,7 @@ export const OnboardingWizard: React.FC = () => {
   const handleContinue = useCallback(() => {
     if (validateStepOne()) {
       // Track step progression
+      // Note: step_name is inline as it's single-use and matches existing codebase pattern
       trackGA4Event('onboarding_step_completed', {
         step: 1,
         step_name: 'Fitness Goals & Equipment',
@@ -177,6 +178,7 @@ export const OnboardingWizard: React.FC = () => {
       trackGA4Event('onboarding_preview_viewed', {
         fitness_goals: formData.fitness_goals,
         equipment_count: formData.equipment_access.length,
+        equipment_access: formData.equipment_access,
         fitness_level: formData.fitness_level,
       })
       setShowPreview(true)

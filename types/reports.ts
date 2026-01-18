@@ -37,6 +37,6 @@ export const reports: Report[] = [
       "Generic AI chatbots often invent dangerous exercises. Learn why 'hallucinations' happen in fitness data and how our trainer-verified engine prevents injuries.",
     date: '2026-01-22',
     dateModified: '2026-01-22',
-    image: '/female-situp.jpg',
+    image: '/Girl Post Training.jpg',
   },
 ]

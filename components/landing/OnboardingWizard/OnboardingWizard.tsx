@@ -14,6 +14,7 @@ import type {
 import { DEFAULT_ONBOARDING_DATA } from '@/types/onboarding'
 import { buildSignupUrl } from '@/lib/buildSignupUrl'
 import { getPreselectData } from '@/lib/equipmentPreselect'
+import { trackGA4Event } from '@/lib/analytics'
 import { Dumbbell } from 'lucide-react'
 import { StepOne } from './StepOne'
 import { StepTwo } from './StepTwo'
@@ -63,6 +64,20 @@ export const OnboardingWizard: React.FC = () => {
   // Store timeout IDs for cleanup
   const timeoutRefs = useRef<NodeJS.Timeout[]>([])
 
+  // Track if first interaction has been recorded (prevents duplicate events)
+  const hasTrackedFirstInteraction = useRef(false)
+
+  // Track first interaction for GA4 bounce prevention
+  const handleFirstInteraction = useCallback(() => {
+    if (!hasTrackedFirstInteraction.current) {
+      trackGA4Event('onboarding_start', {
+        event_category: 'Onboarding',
+        event_label: 'First Interaction',
+      })
+      hasTrackedFirstInteraction.current = true
+    }
+  }, [])
+
   // Validation functions
   const validateStepOne = useCallback((): boolean => {
     const newErrors: FormErrors = {}
@@ -93,22 +108,39 @@ export const OnboardingWizard: React.FC = () => {
   }, [formData.age])
 
   // Step 1 handlers
-  const handleGoalsChange = useCallback((goals: FitnessGoal[]) => {
-    setFormData(prev => ({ ...prev, fitness_goals: goals }))
-    setErrors(prev => ({ ...prev, fitness_goals: '' }))
-  }, [])
+  const handleGoalsChange = useCallback(
+    (goals: FitnessGoal[]) => {
+      handleFirstInteraction()
+      setFormData(prev => ({ ...prev, fitness_goals: goals }))
+      setErrors(prev => ({ ...prev, fitness_goals: '' }))
+    },
+    [handleFirstInteraction]
+  )
 
-  const handleLevelChange = useCallback((level: FitnessLevel) => {
-    setFormData(prev => ({ ...prev, fitness_level: level }))
-  }, [])
+  const handleLevelChange = useCallback(
+    (level: FitnessLevel) => {
+      handleFirstInteraction()
+      setFormData(prev => ({ ...prev, fitness_level: level }))
+    },
+    [handleFirstInteraction]
+  )
 
-  const handleEquipmentChange = useCallback((equipment: string[]) => {
-    setFormData(prev => ({ ...prev, equipment_access: equipment }))
-    setErrors(prev => ({ ...prev, equipment_access: '' }))
-  }, [])
+  const handleEquipmentChange = useCallback(
+    (equipment: string[]) => {
+      handleFirstInteraction()
+      setFormData(prev => ({ ...prev, equipment_access: equipment }))
+      setErrors(prev => ({ ...prev, equipment_access: '' }))
+    },
+    [handleFirstInteraction]
+  )
 
   const handleContinue = useCallback(() => {
     if (validateStepOne()) {
+      // Track step progression
+      trackGA4Event('onboarding_step_completed', {
+        step: 1,
+        step_name: 'Fitness Goals & Equipment',
+      })
       setCurrentStep(2)
     }
   }, [validateStepOne])
@@ -141,9 +173,15 @@ export const OnboardingWizard: React.FC = () => {
 
   const handleSubmit = useCallback(() => {
     if (validateStepTwo()) {
+      // Track preview viewed
+      trackGA4Event('onboarding_preview_viewed', {
+        fitness_goals: formData.fitness_goals,
+        equipment_count: formData.equipment_access.length,
+        fitness_level: formData.fitness_level,
+      })
       setShowPreview(true)
     }
-  }, [validateStepTwo])
+  }, [validateStepTwo, formData.fitness_goals, formData.equipment_access, formData.fitness_level])
 
   // Preview handlers
   const handleEdit = useCallback(() => {
@@ -174,6 +212,15 @@ export const OnboardingWizard: React.FC = () => {
 
     // PostHog: Track create account click - key conversion event
     posthog.capture('onboarding_create_account_clicked', {
+      fitness_goals: formData.fitness_goals,
+      fitness_level: formData.fitness_level,
+      equipment_access: formData.equipment_access,
+      activity_level: formData.current_activity_level,
+      location: 'onboarding_wizard',
+    })
+
+    // GA4: Track create account click - prevents bounce and tracks conversion
+    trackGA4Event('onboarding_create_account_clicked', {
       fitness_goals: formData.fitness_goals,
       fitness_level: formData.fitness_level,
       equipment_access: formData.equipment_access,

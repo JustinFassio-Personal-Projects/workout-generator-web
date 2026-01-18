@@ -25,27 +25,11 @@ type FormErrors = Record<string, string>
 export const OnboardingWizard: React.FC = () => {
   const searchParams = useSearchParams()
 
-  // Form state - initialize with preselect data if available from URL
-  const [formData, setFormData] = useState<WebsiteOnboardingData>(() => {
-    // Read preselect value from URL on initial mount
-    const preselectValue =
-      typeof window !== 'undefined'
-        ? new URLSearchParams(window.location.search).get('preselect')
-        : null
+  // Form state - always start with default to ensure consistent SSR/client hydration
+  const [formData, setFormData] = useState<WebsiteOnboardingData>(DEFAULT_ONBOARDING_DATA)
 
-    if (preselectValue) {
-      const { fitnessLevel, categories } = getPreselectData(preselectValue)
-      return {
-        ...DEFAULT_ONBOARDING_DATA,
-        fitness_level: fitnessLevel,
-        equipment_access: categories,
-      }
-    }
-
-    return DEFAULT_ONBOARDING_DATA
-  })
-
-  // Update form data when searchParams change (for client-side navigation)
+  // Initialize from URL params after mount to avoid hydration mismatch
+  // Using useEffect ensures this only runs on client after hydration
   useEffect(() => {
     const preselectValue = searchParams?.get('preselect')
     if (preselectValue) {

@@ -66,7 +66,8 @@ const jsonLd = {
         'https://www.youtube.com/@aiworkoutgen',
         'https://www.facebook.com/aiworkoutgenerator',
         'https://www.linkedin.com/company/ai-workout-generator/',
-        'https://www.yelp.com/biz/san-diego-core-fitness-san-diego-san-diego?osq=San+Diego+Core+Fitness',
+        // Yelp URL removed: San Diego Core Fitness is a different business entity.
+        // sameAs should only contain URLs for the same entity per Schema.org spec.
       ],
     },
     {

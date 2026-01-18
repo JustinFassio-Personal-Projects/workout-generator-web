@@ -5,6 +5,7 @@ import { BlogPost } from '@/features/blog/types'
 import { categoryToSlug } from '@/features/blog/lib/getBlogPosts'
 import { GainsSimulator } from './GainsSimulator'
 import { HallucinationQuiz } from './HallucinationQuiz'
+import { ArrowRight, Dumbbell } from 'lucide-react'
 import styles from './BlogPostContent.module.scss'
 
 interface BlogPostContentProps {
@@ -55,6 +56,31 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post }) => {
             {component && index < contentParts.length - 1 && component}
           </React.Fragment>
         ))}
+
+        {/* Internal Link CTA to Equipment Hub */}
+        <div className="my-8 p-6 bg-slate-900/50 border border-slate-800 rounded-xl">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-brand-primary/10 rounded-lg text-brand-primary">
+              <Dumbbell size={24} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                Build Muscle with the Gear You Own
+              </h3>
+              <p className="text-slate-300 mb-4">
+                Don't let limited equipment hold you back. Our AI adjusts your workout plan based on
+                exactly what you have available—whether it's a full gym, just dumbbells, or
+                bodyweight only.
+              </p>
+              <Link
+                href="/equipment"
+                className="inline-flex items-center gap-2 text-brand-primary font-bold hover:text-brand-light transition-colors"
+              >
+                Browse Equipment-Specific Workouts <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Related Topics Section */}

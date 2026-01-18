@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { createPublicClient } from '@/lib/supabase/public'
 import { videos } from '@/data/videos'
+import { reports } from '@/types/reports'
+import { getAllMilestoneSlugs } from '@/data/story/milestones'
 
 // ISR: Revalidate every 60 seconds (fallback)
 // Primary revalidation happens on-demand when admin publishes
@@ -26,12 +28,45 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }
 
-  const videosPage: MetadataRoute.Sitemap[0] = {
-    url: `${baseUrl}#videos`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }
+  // Static pages - always included
+  const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/equipment`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/onboard`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/exercise-challenge`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/founder-story`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/reports`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+  ]
 
   // Video watch pages (always included, not dependent on Supabase)
   const videoPages: MetadataRoute.Sitemap = videos.map(video => ({
@@ -41,9 +76,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // If Supabase is not configured, return just static pages + videos
+  // Reports pages (static data)
+  const reportPages: MetadataRoute.Sitemap = reports.map(report => ({
+    url: `${baseUrl}/reports/${report.slug}`,
+    lastModified: new Date(report.dateModified || report.date),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
+
+  // Story milestone pages (static data)
+  const storyPages: MetadataRoute.Sitemap = getAllMilestoneSlugs().map(slug => ({
+    url: `${baseUrl}/story/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }))
+
+  // If Supabase is not configured, return static pages + videos + reports + story
   if (!supabase) {
-    return [homepage, blogPage, videosPage, ...videoPages]
+    return [homepage, blogPage, ...staticPages, ...videoPages, ...reportPages, ...storyPages]
   }
 
   // Fetch dynamic content
@@ -92,10 +143,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     homepage,
     blogPage,
-    videosPage,
+    ...staticPages,
     ...blogPosts,
     ...authorPages,
     ...categoryPages,
     ...videoPages,
+    ...reportPages,
+    ...storyPages,
   ]
 }

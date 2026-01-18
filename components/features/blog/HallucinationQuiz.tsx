@@ -98,7 +98,10 @@ export const HallucinationQuiz: React.FC = () => {
             >
               {isCorrect ? 'Correct!' : 'Wrong!'}
             </h4>
-            <p className="text-slate-300 mb-6 max-w-md">{question.feedbackText}</p>
+            <p className="text-slate-300 mb-6 max-w-md">
+              <span className="font-semibold">{question.feedbackTitle}</span>{' '}
+              {question.feedbackText}
+            </p>
             <button
               onClick={nextQuestion}
               className="bg-[#0a0e1a] text-white px-6 py-2 rounded-full hover:bg-[#1a1e2a] transition-colors flex items-center gap-2 border border-white/10"

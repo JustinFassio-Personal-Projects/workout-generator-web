@@ -12,7 +12,7 @@ When users complete the onboarding wizard on the website, they are redirected to
 | ------------------- | ----------------- | -------------------------------------------- | --------------------------------------------------- |
 | `fitness_level`     | string            | User's fitness level                         | `beginner`, `intermediate`, `advanced`, `athlete`   |
 | `equipment_access`  | string            | Comma-separated list of equipment categories | `general,strength,functional`                       |
-| `activity_level`    | string            | Current activity level                       | `moderarily_active`, `very_active`, etc.            |
+| `activity_level`    | string            | Current activity level                       | `moderately_active`, `very_active`, etc.            |
 | `fitness_goals`     | string            | Comma-separated list of fitness goals        | `Build muscle,Lose fat`                             |
 | `age`               | number (optional) | User's age                                   | `30`                                                |
 | `gender`            | string (optional) | User's gender                                | `male`, `female`, `non_binary`, `prefer_not_to_say` |
@@ -27,7 +27,7 @@ When users complete the onboarding wizard on the website, they are redirected to
 ### Example URL
 
 ```
-https://aiworkoutgen.app/signup?fitness_level=beginner&equipment_access=general,strength,functional&activity_level=moderarily_active&fitness_goals=Build%20muscle,Lose%20fat&units_weight=lb&units_height=in&units_distance=mi&units_temperature=f&source=website_builder&theme=dark&tab=signup
+https://aiworkoutgen.app/signup?fitness_level=beginner&equipment_access=general,strength,functional&activity_level=moderately_active&fitness_goals=Build%20muscle,Lose%20fat&units_weight=lb&units_height=in&units_distance=mi&units_temperature=f&source=website_builder&theme=dark&tab=signup
 ```
 
 ## Fitness Levels

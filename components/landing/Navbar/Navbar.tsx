@@ -109,11 +109,11 @@ export const Navbar: React.FC = () => {
         Reports
       </Link>
       <Link
-        href="/exercise-challenge"
-        onClick={() => handleNavClick('/exercise-challenge', 'Submit an Exercise')}
+        href="/equipment"
+        onClick={() => handleNavClick('/equipment', 'Equipment')}
         className={navLinkBaseClasses}
       >
-        Submit an Exercise
+        Equipment
       </Link>
     </>
   )
@@ -149,11 +149,11 @@ export const Navbar: React.FC = () => {
         Reports
       </Link>
       <Link
-        href="/exercise-challenge"
-        onClick={() => handleNavClick('/exercise-challenge', 'Submit an Exercise')}
+        href="/equipment"
+        onClick={() => handleNavClick('/equipment', 'Equipment')}
         className={`${navLinkBaseClasses} w-full justify-center`}
       >
-        Submit an Exercise
+        Equipment
       </Link>
     </>
   )

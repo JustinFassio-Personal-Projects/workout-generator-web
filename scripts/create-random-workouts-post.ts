@@ -104,7 +104,7 @@ Get a trainer-verified, progressive plan generated in seconds. No credit card re
   seo_description:
     "Stop 'confusing' your muscles and start growing them. Learn why the SAID principle trumps random workouts and how to use progressive overload for real results.",
   status: 'published' as const,
-  published_at: '2024-10-15T00:00:00Z',
+  published_at: '2026-01-14T00:00:00Z',
   tags: ['Progressive Overload', 'Training Science', 'SAID Principle', 'Muscle Growth'],
   featured_image: null,
 }

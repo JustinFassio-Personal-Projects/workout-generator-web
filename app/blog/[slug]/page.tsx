@@ -208,7 +208,8 @@ export default async function BlogPostPage({ params }: PageProps) {
     post.slug.includes('best-ai-workout-generator') ||
     post.slug.includes('research') ||
     post.slug.includes('analysis') ||
-    post.slug.includes('system-vs-random')
+    post.slug.includes('system-vs-random') ||
+    post.slug.includes('random-workouts-kill-progress')
 
   // Article structured data (JSON-LD)
   const articleSchema: ArticleSchema = {

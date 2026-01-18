@@ -30,11 +30,8 @@ export const ReportV2Hero: React.FC<ReportV2HeroProps> = ({ report, scrollToSect
       </div>
       <div className={styles.heroContent}>
         <span className={styles.badge}>2026 Market Analysis</span>
-        <h1 className={styles.title}>
-          {report.title.split(':')[0]}:<br />
-          <span className={styles.titleAccent}>
-            {report.title.split(':')[1]?.trim() || report.title}
-          </span>
+        <h1 className={`${styles.title} ${styles.titleAccent}`}>
+          {report.title.replace(/:$/, '').trim()}
         </h1>
         {report.excerpt && <p className={styles.excerpt}>{report.excerpt}</p>}
         <div className={styles.buttonGroup}>

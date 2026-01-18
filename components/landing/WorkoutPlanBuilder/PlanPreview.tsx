@@ -24,9 +24,10 @@ export const PlanPreview: React.FC<PlanPreviewProps> = ({ data, onEdit, onCreate
   const activityLabel =
     activityLevelOptions.find(o => o.value === data.current_activity_level)?.label ||
     data.current_activity_level
-  const equipmentLabel =
-    equipmentAccessOptions.find(o => o.value === data.equipment_access)?.label ||
-    data.equipment_access
+  // Format equipment categories for display (handle array format)
+  const equipmentLabel = Array.isArray(data.equipment_access)
+    ? data.equipment_access.join(', ')
+    : String(data.equipment_access)
 
   // Format goals for display
   const goalsDisplay =

@@ -8,7 +8,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'beginner',
       current_activity_level: 'moderately_active',
       fitness_goals: ['Build muscle', 'Lose fat'],
-      equipment_access: 'home',
+      equipment_access: ['general', 'strength'],
       preferred_units: {
         weight: 'lb',
         height: 'in',
@@ -23,7 +23,7 @@ describe('buildSignupUrl', () => {
     expect(url).toContain('activity_level=moderately_active')
     // URLSearchParams encodes spaces as + and commas as %2C
     expect(url).toContain('fitness_goals=Build+muscle%2CLose+fat')
-    expect(url).toContain('equipment_access=home')
+    expect(url).toContain('equipment_access=general%2Cstrength')
     expect(url).toContain('units_weight=lb')
     expect(url).toContain('units_height=in')
     expect(url).toContain('units_distance=mi')
@@ -35,7 +35,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'intermediate',
       current_activity_level: 'very_active',
       fitness_goals: ['Increase strength'],
-      equipment_access: 'full_gym',
+      equipment_access: ['general', 'strength', 'functional', 'cardio'],
       gender: 'male',
       preferred_units: {
         weight: 'kg',
@@ -54,7 +54,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'advanced',
       current_activity_level: 'extremely_active',
       fitness_goals: ['Improve endurance'],
-      equipment_access: 'minimal',
+      equipment_access: ['general', 'strength'],
       age: 28,
       preferred_units: {
         weight: 'lb',
@@ -73,7 +73,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'athlete',
       current_activity_level: 'sedentary',
       fitness_goals: ['Improve overall fitness'],
-      equipment_access: 'none',
+      equipment_access: ['general'],
       gender: 'female',
       age: 35,
       preferred_units: {
@@ -94,7 +94,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'beginner',
       current_activity_level: 'lightly_active',
       fitness_goals: ['Move better / reduce pain'],
-      equipment_access: 'home',
+      equipment_access: ['general', 'strength'],
       preferred_units: {
         weight: 'lb',
         height: 'in',
@@ -113,7 +113,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'intermediate',
       current_activity_level: 'moderately_active',
       fitness_goals: ['Build muscle', 'Lose fat', 'Improve endurance', 'Increase strength'],
-      equipment_access: 'full_gym',
+      equipment_access: ['general', 'strength', 'functional', 'cardio'],
       preferred_units: {
         weight: 'lb',
         height: 'in',
@@ -134,7 +134,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'beginner',
       current_activity_level: 'sedentary',
       fitness_goals: ['Get back in shape'],
-      equipment_access: 'none',
+      equipment_access: ['general'],
       preferred_units: {
         weight: 'kg',
         height: 'cm',
@@ -155,7 +155,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'intermediate',
       current_activity_level: 'very_active',
       fitness_goals: ['Build muscle'],
-      equipment_access: 'home',
+      equipment_access: ['general', 'strength'],
       gender: 'non_binary',
       preferred_units: {
         weight: 'lb',
@@ -174,7 +174,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'beginner',
       current_activity_level: 'moderately_active',
       fitness_goals: ['Lose fat'],
-      equipment_access: 'minimal',
+      equipment_access: ['general', 'strength'],
       gender: 'prefer_not_to_say',
       preferred_units: {
         weight: 'lb',
@@ -193,7 +193,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'beginner',
       current_activity_level: 'lightly_active',
       fitness_goals: ['Improve overall fitness'],
-      equipment_access: 'none',
+      equipment_access: ['general'],
       age: 13,
       preferred_units: {
         weight: 'lb',
@@ -212,7 +212,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'beginner',
       current_activity_level: 'sedentary',
       fitness_goals: ['Move better / reduce pain'],
-      equipment_access: 'home',
+      equipment_access: ['general', 'strength'],
       age: 120,
       preferred_units: {
         weight: 'lb',
@@ -231,7 +231,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'beginner',
       current_activity_level: 'moderately_active',
       fitness_goals: ['Build muscle'],
-      equipment_access: 'home',
+      equipment_access: ['general', 'strength'],
       preferred_units: {
         weight: 'lb',
         height: 'in',
@@ -249,7 +249,7 @@ describe('buildSignupUrl', () => {
       fitness_level: 'beginner',
       current_activity_level: 'moderately_active',
       fitness_goals: ['Build muscle'],
-      equipment_access: 'home',
+      equipment_access: ['general', 'strength'],
       preferred_units: {
         weight: 'lb',
         height: 'in',

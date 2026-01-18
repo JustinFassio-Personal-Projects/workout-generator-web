@@ -21,12 +21,16 @@ export const InteractiveHero: React.FC<InteractiveHeroProps> = ({ post }) => {
 
   const heroImage = post.image || DEFAULT_IMAGE
 
+  // Ensure title has no trailing colon and render only once
+  // Remove any colon at the end, trim whitespace
+  const displayTitle = post.title ? post.title.replace(/:$/, '').trim() : ''
+
   return (
     <header className={styles.hero}>
       <div className={styles.heroImageWrapper}>
         <Image
           src={heroImage}
-          alt={post.title}
+          alt={displayTitle}
           fill
           priority
           sizes="100vw"
@@ -37,17 +41,12 @@ export const InteractiveHero: React.FC<InteractiveHeroProps> = ({ post }) => {
       <div className={styles.heroContent}>
         <div className={styles.sectionCenter}>
           <span className={`${styles.badge} ${styles.badgePrimary}`}>2026 Market Analysis</span>
-          <h1 className={styles.sectionTitle}>
-            {post.title.includes(':') ? (
-              <>
-                {post.title.split(':')[0]}:<br />
-                <span style={{ color: 'var(--color-accent)' }}>
-                  {post.title.split(':').slice(1).join(':').trim()}
-                </span>
-              </>
-            ) : (
-              post.title
-            )}
+          <h1
+            className={styles.sectionTitle}
+            style={{ color: 'var(--color-accent)' }}
+            data-testid="interactive-hero-title"
+          >
+            {displayTitle}
           </h1>
           {post.excerpt && <p className={styles.sectionText}>{post.excerpt}</p>}
           <div className={styles.buttonGroup}>

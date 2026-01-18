@@ -13,7 +13,7 @@ export function buildSignupUrl(data: WebsiteOnboardingData): string {
   params.set('fitness_level', data.fitness_level)
   params.set('activity_level', data.current_activity_level)
   params.set('fitness_goals', data.fitness_goals.join(','))
-  params.set('equipment_access', data.equipment_access)
+  params.set('equipment_access', data.equipment_access.join(',')) // Array of category strings joined with comma
 
   // Unit preferences
   params.set('units_weight', data.preferred_units.weight)

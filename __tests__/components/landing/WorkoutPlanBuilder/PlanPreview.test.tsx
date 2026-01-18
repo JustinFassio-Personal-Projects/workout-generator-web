@@ -16,7 +16,7 @@ describe('PlanPreview', () => {
     fitness_level: 'beginner',
     current_activity_level: 'moderately_active',
     fitness_goals: ['Build muscle', 'Lose fat'],
-    equipment_access: 'home',
+    equipment_access: ['general', 'strength'],
     preferred_units: {
       weight: 'lb',
       height: 'in',
@@ -76,7 +76,7 @@ describe('PlanPreview', () => {
 
   it('should display equipment access', () => {
     render(<PlanPreview {...defaultProps} />)
-    expect(screen.getByText(/Home gym/i)).toBeInTheDocument()
+    expect(screen.getByText(/general, strength/i)).toBeInTheDocument()
   })
 
   it('should call onCreateAccount when create account button is clicked', async () => {
@@ -136,10 +136,10 @@ describe('PlanPreview', () => {
   it('should handle different equipment access options', () => {
     const data: WebsiteOnboardingData = {
       ...defaultData,
-      equipment_access: 'full_gym',
+      equipment_access: ['general', 'strength', 'functional', 'cardio'],
     }
     render(<PlanPreview {...defaultProps} data={data} />)
-    expect(screen.getByText(/Full gym access/i)).toBeInTheDocument()
+    expect(screen.getByText(/general, strength, functional, cardio/i)).toBeInTheDocument()
   })
 
   it('should handle different activity levels', () => {

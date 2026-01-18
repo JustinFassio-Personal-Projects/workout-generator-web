@@ -1,18 +1,19 @@
 'use client'
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import posthog from 'posthog-js'
 import type {
   WebsiteOnboardingData,
   FitnessGoal,
   FitnessLevel,
   ActivityLevel,
-  EquipmentAccess,
   Gender,
   PreferredUnits,
 } from '@/types/onboarding'
 import { DEFAULT_ONBOARDING_DATA } from '@/types/onboarding'
 import { buildSignupUrl } from '@/lib/buildSignupUrl'
+import { getPreselectData } from '@/lib/equipmentPreselect'
 import { Dumbbell } from 'lucide-react'
 import { StepOne } from './StepOne'
 import { StepTwo } from './StepTwo'
@@ -22,8 +23,40 @@ import Loading from './Loading'
 type FormErrors = Record<string, string>
 
 export const OnboardingWizard: React.FC = () => {
-  // Form state
-  const [formData, setFormData] = useState<WebsiteOnboardingData>(DEFAULT_ONBOARDING_DATA)
+  const searchParams = useSearchParams()
+
+  // Form state - initialize with preselect data if available from URL
+  const [formData, setFormData] = useState<WebsiteOnboardingData>(() => {
+    // Read preselect value from URL on initial mount
+    const preselectValue =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('preselect')
+        : null
+
+    if (preselectValue) {
+      const { fitnessLevel, categories } = getPreselectData(preselectValue)
+      return {
+        ...DEFAULT_ONBOARDING_DATA,
+        fitness_level: fitnessLevel,
+        equipment_access: categories,
+      }
+    }
+
+    return DEFAULT_ONBOARDING_DATA
+  })
+
+  // Update form data when searchParams change (for client-side navigation)
+  useEffect(() => {
+    const preselectValue = searchParams?.get('preselect')
+    if (preselectValue) {
+      const { fitnessLevel, categories } = getPreselectData(preselectValue)
+      setFormData(prev => ({
+        ...prev,
+        fitness_level: fitnessLevel,
+        equipment_access: categories,
+      }))
+    }
+  }, [searchParams])
   const [currentStep, setCurrentStep] = useState<1 | 2>(1)
   const [showPreview, setShowPreview] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -54,9 +87,13 @@ export const OnboardingWizard: React.FC = () => {
       newErrors.fitness_goals = 'Please select at least one fitness goal'
     }
 
+    if (formData.equipment_access.length === 0) {
+      newErrors.equipment_access = 'Please select at least one equipment category'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
-  }, [formData.fitness_goals])
+  }, [formData.fitness_goals, formData.equipment_access])
 
   const validateStepTwo = useCallback((): boolean => {
     const newErrors: FormErrors = {}
@@ -81,8 +118,9 @@ export const OnboardingWizard: React.FC = () => {
     setFormData(prev => ({ ...prev, fitness_level: level }))
   }, [])
 
-  const handleEquipmentChange = useCallback((equipment: EquipmentAccess) => {
+  const handleEquipmentChange = useCallback((equipment: string[]) => {
     setFormData(prev => ({ ...prev, equipment_access: equipment }))
+    setErrors(prev => ({ ...prev, equipment_access: '' }))
   }, [])
 
   const handleContinue = useCallback(() => {

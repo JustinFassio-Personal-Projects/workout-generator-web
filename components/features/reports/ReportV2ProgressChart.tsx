@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,6 +28,17 @@ ChartJS.register(
 
 export const ReportV2ProgressChart: React.FC = () => {
   const chartRef = useRef<ChartJS<'line'>>(null)
+  const [visibleDatasets, setVisibleDatasets] = useState({
+    random: true,
+    system: true,
+  })
+
+  const toggleDataset = (dataset: 'random' | 'system') => {
+    setVisibleDatasets(prev => ({
+      ...prev,
+      [dataset]: !prev[dataset],
+    }))
+  }
 
   const data = {
     labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'],
@@ -40,6 +51,7 @@ export const ReportV2ProgressChart: React.FC = () => {
         tension: 0.4,
         pointRadius: 3,
         borderDash: [5, 5],
+        hidden: !visibleDatasets.random,
       },
       {
         label: 'True System (Progressive Overload)',
@@ -50,6 +62,7 @@ export const ReportV2ProgressChart: React.FC = () => {
         tension: 0.1,
         fill: true,
         pointRadius: 4,
+        hidden: !visibleDatasets.system,
       },
     ],
   }
@@ -102,17 +115,35 @@ export const ReportV2ProgressChart: React.FC = () => {
     },
   }
 
+  // Update chart when visibility changes
+  useEffect(() => {
+    if (chartRef.current) {
+      const chart = chartRef.current
+      chart.data.datasets[0].hidden = !visibleDatasets.random
+      chart.data.datasets[1].hidden = !visibleDatasets.system
+      chart.update()
+    }
+  }, [visibleDatasets])
+
   return (
     <div className={styles.card}>
       <div className={styles.chartContainer}>
         <Line ref={chartRef} data={data} options={options} />
       </div>
       <div className={styles.legend}>
-        <div className={styles.legendItem}>
+        <div
+          className={`${styles.legendItem} ${visibleDatasets.random ? styles.legendItemActive : styles.legendItemInactive}`}
+          onClick={() => toggleDataset('random')}
+          style={{ cursor: 'pointer' }}
+        >
           <span className={styles.legendDotRandom}></span>
           <span className={styles.legendText}>Random Generation (High Fatigue, Low Gain)</span>
         </div>
-        <div className={styles.legendItem}>
+        <div
+          className={`${styles.legendItem} ${visibleDatasets.system ? styles.legendItemActive : styles.legendItemInactive}`}
+          onClick={() => toggleDataset('system')}
+          style={{ cursor: 'pointer' }}
+        >
           <span className={styles.legendDotSystem}></span>
           <span className={styles.legendTextBold}>Algorithmic System (Optimized)</span>
         </div>

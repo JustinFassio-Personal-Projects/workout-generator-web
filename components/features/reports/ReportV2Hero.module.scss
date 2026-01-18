@@ -87,10 +87,11 @@
 
 .excerpt {
   font-size: var(--font-size-xl);
-  color: #57534e; // Stone-600
+  color: #fafaf9; // Stone-50 - Light color for contrast over dark hero image
   max-width: 672px; // max-w-2xl
   margin: 0 auto var(--spacing-xl);
   line-height: var(--line-height-relaxed);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .buttonGroup {

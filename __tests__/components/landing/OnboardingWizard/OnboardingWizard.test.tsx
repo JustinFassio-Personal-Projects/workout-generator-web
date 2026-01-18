@@ -373,7 +373,7 @@ describe('OnboardingWizard', () => {
     }
 
     // Update equipment
-    const equipmentText = screen.getByText('Equipment Access')
+    const equipmentText = screen.getByText('Equipment Categories')
     const equipmentSelect = equipmentText
       .closest('div')
       ?.querySelector('select') as HTMLSelectElement

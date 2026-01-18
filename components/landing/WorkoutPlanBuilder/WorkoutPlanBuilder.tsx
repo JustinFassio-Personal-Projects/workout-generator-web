@@ -70,7 +70,14 @@ export const WorkoutPlanBuilder: React.FC = () => {
   }, [])
 
   const handleEquipmentChange = useCallback((equipment: EquipmentAccess) => {
-    setFormData(prev => ({ ...prev, equipment_access: equipment }))
+    // Map old enum values to new category arrays for backward compatibility
+    const categoryMap: Record<EquipmentAccess, string[]> = {
+      none: ['general'],
+      minimal: ['general', 'strength'],
+      home: ['general', 'strength', 'functional'],
+      full_gym: ['general', 'strength', 'functional', 'cardio'],
+    }
+    setFormData(prev => ({ ...prev, equipment_access: categoryMap[equipment] || ['general'] }))
   }, [])
 
   const handleContinue = useCallback(() => {
@@ -208,7 +215,18 @@ export const WorkoutPlanBuilder: React.FC = () => {
                   <StepOne
                     fitnessGoals={formData.fitness_goals}
                     fitnessLevel={formData.fitness_level}
-                    equipmentAccess={formData.equipment_access}
+                    equipmentAccess={
+                      // Map array back to enum for backward compatibility with WorkoutPlanBuilder's StepOne
+                      formData.equipment_access.includes('cardio') &&
+                      formData.equipment_access.length >= 4
+                        ? 'full_gym'
+                        : formData.equipment_access.includes('functional') &&
+                            formData.equipment_access.length >= 3
+                          ? 'home'
+                          : formData.equipment_access.length >= 2
+                            ? 'minimal'
+                            : 'none'
+                    }
                     errors={errors}
                     onGoalsChange={handleGoalsChange}
                     onLevelChange={handleLevelChange}

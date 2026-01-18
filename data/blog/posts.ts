@@ -885,7 +885,7 @@ Nourish your body intentionally, train intelligently, and watch your results acc
     title: "Best AI Workout Generator (2026): What Actually Works vs. What's Just Random",
     excerpt:
       'The era of "chatting with a bot for a workout" is over. We analyzed the 2026 landscape to separate generic Large Language Model wrappers from true algorithmic training systems.',
-    image: '/HIIT_Workout.png',
+    image: '/female-situp.jpg',
     dateModified: '2026-01-10',
     content: `# Best AI Workout Generator (2026): What Actually Works vs. What's Just Random
 

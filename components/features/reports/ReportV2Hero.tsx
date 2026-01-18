@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { Report } from '@/types/reports'
 import styles from './ReportV2Hero.module.scss'
 
@@ -9,9 +10,24 @@ interface ReportV2HeroProps {
   scrollToSection: (sectionId: string) => void
 }
 
+const DEFAULT_IMAGE = '/og-image.jpg'
+
 export const ReportV2Hero: React.FC<ReportV2HeroProps> = ({ report, scrollToSection }) => {
+  const heroImage = report.image || DEFAULT_IMAGE
+
   return (
     <header className={styles.hero}>
+      <div className={styles.heroImageWrapper}>
+        <Image
+          src={heroImage}
+          alt={report.title}
+          fill
+          priority
+          sizes="100vw"
+          className={styles.heroImage}
+        />
+        <div className={styles.heroImageOverlay} />
+      </div>
       <div className={styles.heroContent}>
         <span className={styles.badge}>2026 Market Analysis</span>
         <h1 className={styles.title}>

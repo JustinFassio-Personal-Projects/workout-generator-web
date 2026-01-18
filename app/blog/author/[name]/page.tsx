@@ -89,6 +89,8 @@ export default async function AuthorPage({ params }: PageProps) {
   }
 
   // Transform posts for BlogPostList
+  // In development, use relative paths for local images; in production, use absolute URLs
+  const isDevelopment = process.env.NODE_ENV === 'development'
   const transformedPosts = posts.map(post => ({
     id: post.id,
     slug: post.slug,
@@ -103,7 +105,9 @@ export default async function AuthorPage({ params }: PageProps) {
     image: post.featured_image
       ? post.featured_image.startsWith('http')
         ? post.featured_image
-        : `${baseUrl}${post.featured_image}`
+        : isDevelopment
+          ? post.featured_image
+          : `${baseUrl}${post.featured_image}`
       : undefined,
   }))
 

@@ -17,6 +17,7 @@ import {
 import { buildEquipmentWizardUrl, EQUIPMENT_TYPES } from '@/lib/buildEquipmentWizardUrl'
 import { equipmentData, equipmentByCategory, allCategories } from '@/data/equipment'
 import styles from './page.module.scss'
+import { Button } from '@/components/ui/Button/Button'
 
 // ItemList schema for SEO - includes all equipment
 const itemListSchema = {
@@ -376,6 +377,23 @@ export default function EquipmentPage() {
                 <span>Equipment-specific volume and intensity adjustments</span>
               </li>
             </ul>
+          </div>
+        </section>
+
+        {/* Final CTA Section */}
+        <section className={styles.finalCtaSection}>
+          <div className={styles.finalCtaContainer}>
+            <h2 className={styles.finalCtaTitle}>Ready to build your plan?</h2>
+            <p className={styles.finalCtaText}>
+              Select your equipment in the wizard and get a customized workout plan in seconds.
+            </p>
+            <div className={styles.finalCtaButtons}>
+              <Link href="/onboard">
+                <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right">
+                  Start Workout Builder
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
       </main>

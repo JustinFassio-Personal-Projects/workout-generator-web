@@ -86,8 +86,48 @@ export const Footer: React.FC = () => {
     },
   ]
 
+  // LocalBusiness Structured Data
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'AI Workout Generator',
+    image: 'https://aiworkoutgenerator.com/og-image.jpg',
+    '@id': 'https://aiworkoutgenerator.com',
+    url: 'https://aiworkoutgenerator.com',
+    telephone: '', // Add if available
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'San Diego',
+      addressRegion: 'CA',
+      addressCountry: 'US',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 32.7157, // San Diego coordinates
+      longitude: -117.1611,
+    },
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '00:00',
+      closes: '23:59',
+    },
+    sameAs: [
+      'https://www.linkedin.com/company/ai-workout-generator/',
+      'https://x.com/AI_Workout',
+      'https://www.instagram.com/aiworkoutgenerator/',
+      'https://www.youtube.com/@aiworkoutgen',
+      'https://www.facebook.com/aiworkoutgenerator',
+      'https://www.yelp.com/biz/san-diego-core-fitness-san-diego-san-diego?osq=San+Diego+Core+Fitness',
+    ],
+  }
+
   return (
     <footer id="footer" className={styles.footer}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       <div className={styles.container}>
         <div className={styles.topSection}>
           <div className={styles.brand}>

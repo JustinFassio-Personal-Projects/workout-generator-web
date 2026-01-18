@@ -59,7 +59,7 @@ describe('sitemap.ts', () => {
     const sitemap = (await import('@/app/sitemap')).default
     const result = await sitemap()
 
-    // Should have at least homepage, blog page, and videos
+    // Should have at least homepage, blog page, and static pages
     expect(result.length).toBeGreaterThanOrEqual(3)
 
     // Check homepage
@@ -78,12 +78,12 @@ describe('sitemap.ts', () => {
       priority: 0.8,
     })
 
-    // Check videos
+    // Check first static page (should be /about after removing invalid #videos anchor)
     expect(result[2]).toEqual({
-      url: expect.stringContaining('#videos'),
+      url: expect.stringContaining('/about'),
       lastModified: expect.any(Date),
-      changeFrequency: 'weekly',
-      priority: 0.8,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     })
   })
 

@@ -18,6 +18,16 @@ interface MicroInterviewProps {
   onComplete: () => void
 }
 
+function toAnalyticsSlug(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 80)
+}
+
 const QUESTIONS = {
   goal_primary: {
     question: 'What are you training for right now?',
@@ -348,6 +358,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
                   key={index}
                   selected={formData[currentQuestionKey] === option}
                   onClick={() => handleAnswer(currentQuestionKey, option)}
+                  data-analytics={`exercise_challenge_microq_${currentQuestionKey}_${toAnalyticsSlug(option)}`}
                 >
                   {option}
                 </Chip>
@@ -355,7 +366,12 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
             </div>
 
             {currentQuestionIndex > 0 && (
-              <button type="button" onClick={handleBack} className={styles.backButton}>
+              <button
+                type="button"
+                onClick={handleBack}
+                className={styles.backButton}
+                data-analytics="exercise_challenge_microq_back"
+              >
                 ← Back
               </button>
             )}
@@ -377,6 +393,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
                   key={index}
                   selected={formData.payment_trigger_primary === option}
                   onClick={() => handleOptionalQ4Answer(option)}
+                  data-analytics={`exercise_challenge_microq_payment_trigger_primary_${toAnalyticsSlug(option)}`}
                 >
                   {option}
                 </Chip>
@@ -384,7 +401,12 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
             </div>
 
             <div className={styles.q4Actions}>
-              <button type="button" onClick={handleSkipQ4} className={styles.skipButton}>
+              <button
+                type="button"
+                onClick={handleSkipQ4}
+                className={styles.skipButton}
+                data-analytics="exercise_challenge_microq_q4_skip"
+              >
                 Skip
               </button>
             </div>
@@ -399,6 +421,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
                 type="button"
                 onClick={() => setShowFreeText(true)}
                 className={styles.tellUsMoreLink}
+                data-analytics="exercise_challenge_microq_open_free_text"
               >
                 Tell us more (optional)
               </button>
@@ -412,6 +435,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
                   value={formData.expectation_free_text || ''}
                   onChange={e => handleFreeTextChange(e.target.value)}
                   onBlur={handleFreeTextSave}
+                  data-analytics="exercise_challenge_microq_free_text"
                   className={styles.freeTextArea}
                   placeholder="Example: Build me a simple plan I can stick to."
                   maxLength={500}
@@ -436,6 +460,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
                 type="button"
                 onClick={() => setShowExerciseSuggestion(true)}
                 className={styles.tellUsMoreLink}
+                data-analytics="exercise_challenge_microq_open_exercise_suggestion"
               >
                 Want to suggest an exercise we should add? (optional)
               </button>
@@ -450,6 +475,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
                   value={formData.exercise_suggestion || ''}
                   onChange={e => handleExerciseSuggestionChange(e.target.value)}
                   onBlur={handleExerciseSuggestionSave}
+                  data-analytics="exercise_challenge_microq_exercise_suggestion"
                   className={styles.exerciseSuggestionInput}
                   placeholder="Example: Sled push, Copenhagen plank, Jefferson curl…"
                 />
@@ -466,6 +492,7 @@ export const MicroInterview: React.FC<MicroInterviewProps> = ({
               onClick={handleSubmit}
               disabled={isSubmitting || isUploadingImage || !canSubmit}
               loading={isSubmitting || isUploadingImage}
+              data-analytics="exercise_challenge_microq_submit"
             >
               {isUploadingImage ? 'Uploading image...' : isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import Script from 'next/script'
+import { Suspense } from 'react'
 import { Analytics } from '@vercel/analytics/next'
 import { BotIdClient } from 'botid/client'
 import './globals.scss'
@@ -8,6 +9,7 @@ import { Navbar } from '@/components/landing/Navbar/Navbar'
 import { GroupedFAB } from '@/components/ui/GroupedFAB/GroupedFAB'
 import { AOSStyles } from '@/components/ui/AOSStyles/AOSStyles'
 import { FlagRestorer } from '@/components/ui/FlagRestorer/FlagRestorer'
+import { FirstPartyAnalytics } from '@/components/analytics/FirstPartyAnalytics'
 
 const inter = Inter({ subsets: ['latin'] })
 const spaceGrotesk = Space_Grotesk({
@@ -256,6 +258,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div id="main-content">{children}</div>
         <GroupedFAB />
         <Analytics />
+        <Suspense fallback={null}>
+          <FirstPartyAnalytics />
+        </Suspense>
       </body>
     </html>
   )

@@ -54,6 +54,7 @@ export const StepOne: React.FC<StepOneProps> = ({
                 key={option.value}
                 type="button"
                 onClick={() => toggleGoal(option.value)}
+                data-analytics={`onboard_goal_${option.value}`}
                 aria-pressed={isSelected}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 whitespace-nowrap ${
                   isSelected
@@ -89,6 +90,7 @@ export const StepOne: React.FC<StepOneProps> = ({
               <select
                 value={fitnessLevel}
                 onChange={e => onLevelChange(e.target.value as FitnessLevel)}
+                data-analytics="onboard_select_fitness_level"
                 className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-green transition-colors truncate pr-8 appearance-none"
               >
                 {fitnessLevelOptions.map(option => (
@@ -120,6 +122,7 @@ export const StepOne: React.FC<StepOneProps> = ({
               <select
                 value={equipmentAccess}
                 onChange={e => onEquipmentChange(e.target.value as EquipmentAccess)}
+                data-analytics="onboard_select_equipment_access"
                 className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-green transition-colors truncate pr-8 appearance-none"
               >
                 {equipmentAccessOptions.map(option => (
@@ -144,6 +147,7 @@ export const StepOne: React.FC<StepOneProps> = ({
         <button
           type="submit"
           onClick={onContinue}
+          data-analytics="onboard_step1_continue"
           className="w-full md:w-auto bg-gradient-to-r from-brand-green to-brand-lime text-brand-dark px-8 py-4 rounded-2xl font-bold font-display tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <Activity className="w-5 h-5" />

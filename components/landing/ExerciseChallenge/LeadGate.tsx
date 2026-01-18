@@ -163,6 +163,7 @@ export const LeadGate: React.FC<LeadGateProps> = ({ onLeadCaptured }) => {
               type="text"
               value={firstName}
               onChange={e => setFirstName(e.target.value)}
+              data-analytics="exercise_challenge_leadgate_first_name"
               className={styles.input}
               required
               disabled={isSubmitting}
@@ -179,6 +180,7 @@ export const LeadGate: React.FC<LeadGateProps> = ({ onLeadCaptured }) => {
               type="email"
               value={email}
               onChange={handleEmailChange}
+              data-analytics="exercise_challenge_leadgate_email"
               className={`${styles.input} ${emailError ? styles.inputError : ''}`}
               required
               disabled={isSubmitting}
@@ -193,6 +195,7 @@ export const LeadGate: React.FC<LeadGateProps> = ({ onLeadCaptured }) => {
                 type="checkbox"
                 checked={consentEmailPlan}
                 onChange={e => setConsentEmailPlan(e.target.checked)}
+                data-analytics="exercise_challenge_leadgate_consent_email_plan"
                 disabled={isSubmitting}
                 className={styles.checkbox}
               />
@@ -219,6 +222,7 @@ export const LeadGate: React.FC<LeadGateProps> = ({ onLeadCaptured }) => {
             className={styles.submitButton}
             disabled={isSubmitting || !turnstileToken}
             loading={isSubmitting}
+            data-analytics="exercise_challenge_leadgate_continue"
           >
             Continue
           </Button>

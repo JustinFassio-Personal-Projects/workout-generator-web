@@ -57,6 +57,7 @@ export const StepOne: React.FC<StepOneProps> = ({
                 type="button"
                 className={`${styles.chip} ${isSelected ? styles.chipSelected : ''}`}
                 onClick={() => toggleGoal(option.value)}
+                data-analytics={`home_builder_goal_${option.value}`}
                 aria-pressed={isSelected}
               >
                 {isSelected && <Check size={16} className={styles.chipIcon} />}
@@ -78,6 +79,7 @@ export const StepOne: React.FC<StepOneProps> = ({
           className={styles.select}
           value={fitnessLevel}
           onChange={e => onLevelChange(e.target.value as FitnessLevel)}
+          data-analytics="home_builder_select_fitness_level"
         >
           {fitnessLevelOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -98,6 +100,7 @@ export const StepOne: React.FC<StepOneProps> = ({
           className={styles.select}
           value={equipmentAccess}
           onChange={e => onEquipmentChange(e.target.value as EquipmentAccess)}
+          data-analytics="home_builder_select_equipment_access"
         >
           {equipmentAccessOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -110,7 +113,13 @@ export const StepOne: React.FC<StepOneProps> = ({
 
       {/* Continue Button */}
       <div className={styles.formActions}>
-        <Button variant="primary" size="lg" onClick={onContinue} className={styles.continueButton}>
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={onContinue}
+          className={styles.continueButton}
+          data-analytics="home_builder_step1_continue"
+        >
           Continue
         </Button>
       </div>

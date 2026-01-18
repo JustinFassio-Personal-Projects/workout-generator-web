@@ -66,6 +66,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
               <select
                 value={activityLevel}
                 onChange={e => onActivityChange(e.target.value as ActivityLevel)}
+                data-analytics="onboard_select_activity_level"
                 className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-green transition-colors truncate pr-8 appearance-none"
               >
                 {activityLevelOptions.map(option => (
@@ -99,6 +100,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
               <select
                 value={gender || 'prefer_not_to_say'}
                 onChange={e => onGenderChange(e.target.value as Gender)}
+                data-analytics="onboard_select_gender"
                 className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-lime transition-colors truncate pr-8 appearance-none"
               >
                 {genderOptions.map(option => (
@@ -132,6 +134,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
             type="number"
             value={age ?? ''}
             onChange={handleAgeChange}
+            data-analytics="onboard_input_age"
             min={13}
             max={120}
             placeholder="Enter your age"
@@ -158,6 +161,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
               key={`weight-${option.value}`}
               type="button"
               onClick={() => onUnitsChange({ weight: option.value })}
+              data-analytics={`onboard_units_weight_${option.value}`}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 ${
                 isActive
                   ? 'bg-brand-green/20 border-brand-green/50 text-brand-lime'
@@ -179,6 +183,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
               key={`height-${option.value}`}
               type="button"
               onClick={() => onUnitsChange({ height: option.value })}
+              data-analytics={`onboard_units_height_${option.value}`}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 ${
                 isActive
                   ? 'bg-brand-green/20 border-brand-green/50 text-brand-lime'
@@ -197,6 +202,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
         <button
           type="button"
           onClick={onBack}
+          data-analytics="onboard_step2_back"
           className="bg-slate-800 border border-white/10 text-white rounded-2xl font-bold px-6 py-4 hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -205,6 +211,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
         <button
           type="submit"
           onClick={onSubmit}
+          data-analytics="onboard_step2_preview"
           className="flex-1 md:flex-initial bg-gradient-to-r from-brand-green to-brand-lime text-brand-dark px-8 py-4 rounded-2xl font-bold font-display tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <svg

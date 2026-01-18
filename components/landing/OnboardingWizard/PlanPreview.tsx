@@ -116,6 +116,7 @@ export const PlanPreview: React.FC<PlanPreviewProps> = ({ data, onEdit, onCreate
         <button
           type="button"
           onClick={onCreateAccount}
+          data-analytics="onboard_create_account"
           className="flex-1 md:flex-initial bg-gradient-to-r from-brand-green to-brand-lime text-brand-dark px-8 py-4 rounded-2xl font-bold font-display tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <span>CREATE ACCOUNT TO GENERATE WORKOUT</span>
@@ -124,6 +125,7 @@ export const PlanPreview: React.FC<PlanPreviewProps> = ({ data, onEdit, onCreate
         <button
           type="button"
           onClick={onEdit}
+          data-analytics="onboard_edit_answers"
           className="bg-slate-800 border border-white/10 text-white rounded-2xl font-bold px-6 py-4 hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
         >
           <Edit3 className="w-5 h-5" />

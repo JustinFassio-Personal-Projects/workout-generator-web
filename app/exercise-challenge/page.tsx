@@ -167,6 +167,7 @@ export default function ExerciseChallengePage() {
                     size="lg"
                     onClick={handleCtaGenerateWorkout}
                     className={styles.ctaButton}
+                    data-analytics="exercise_challenge_generate_workout_now"
                   >
                     Generate a workout now
                   </Button>
@@ -175,6 +176,7 @@ export default function ExerciseChallengePage() {
                     size="lg"
                     onClick={handleCtaViewPricing}
                     className={styles.ctaButton}
+                    data-analytics="exercise_challenge_view_pricing"
                   >
                     View pricing
                   </Button>

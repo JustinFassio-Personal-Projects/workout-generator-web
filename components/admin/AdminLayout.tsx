@@ -7,6 +7,7 @@ import { User } from '@supabase/supabase-js'
 import {
   Zap,
   LayoutDashboard,
+  BarChart3,
   FileText,
   Users,
   ChevronLeft,
@@ -45,6 +46,7 @@ export function AdminLayout({ children, user, role }: AdminLayoutProps) {
     icon: typeof LayoutDashboard
   }> = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/admin/blog', label: 'Blog Posts', icon: FileText },
     { href: '/admin/leads', label: 'Leads', icon: Users },
   ]

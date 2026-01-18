@@ -26,7 +26,11 @@ export const ExerciseChallengeSection: React.FC = () => {
               Contribute exercises to our library and get rewarded. Submit an exercise, and if we
               publish it, you&apos;ll get free Pro access.
             </p>
-            <Link href="/exercise-challenge" onClick={handleCTAClick}>
+            <Link
+              href="/exercise-challenge"
+              onClick={handleCTAClick}
+              data-analytics="homepage_exercise_challenge_cta"
+            >
               <Button variant="primary" size="lg">
                 Submit an Exercise
               </Button>

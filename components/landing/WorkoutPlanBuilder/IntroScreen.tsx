@@ -152,7 +152,11 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
           </p>
         </div>
         <div className={styles.ctaButtonGroup}>
-          <button onClick={handleEnter} className={styles.ctaButton}>
+          <button
+            onClick={handleEnter}
+            className={styles.ctaButton}
+            data-analytics="home_builder_intro_generate_workout"
+          >
             <div className={styles.ctaButtonBg}></div>
             <div className={styles.ctaButtonBorder}></div>
             <div className={styles.ctaButtonContent}>
@@ -164,7 +168,11 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
       </div>
 
       {/* Skip button */}
-      <button onClick={onComplete} className={styles.skipButton}>
+      <button
+        onClick={onComplete}
+        className={styles.skipButton}
+        data-analytics="home_builder_intro_free_workout"
+      >
         Free Workout
       </button>
     </div>

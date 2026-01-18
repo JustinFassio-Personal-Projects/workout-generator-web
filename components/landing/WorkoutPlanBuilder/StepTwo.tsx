@@ -63,6 +63,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
           className={styles.select}
           value={activityLevel}
           onChange={e => onActivityChange(e.target.value as ActivityLevel)}
+          data-analytics="home_builder_select_activity_level"
         >
           {activityLevelOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -83,6 +84,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
           className={styles.select}
           value={gender || 'prefer_not_to_say'}
           onChange={e => onGenderChange(e.target.value as Gender)}
+          data-analytics="home_builder_select_gender"
         >
           {genderOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -103,6 +105,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
           className={styles.input}
           value={age ?? ''}
           onChange={handleAgeChange}
+          data-analytics="home_builder_input_age"
           min={13}
           max={120}
           placeholder="Enter your age"
@@ -126,6 +129,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
                     preferredUnits.weight === option.value ? styles.toggleActive : ''
                   }`}
                   onClick={() => onUnitsChange({ weight: option.value })}
+                  data-analytics={`home_builder_units_weight_${option.value}`}
                 >
                   {option.label}
                 </button>
@@ -145,6 +149,7 @@ export const StepTwo: React.FC<StepTwoProps> = ({
                     preferredUnits.height === option.value ? styles.toggleActive : ''
                   }`}
                   onClick={() => onUnitsChange({ height: option.value })}
+                  data-analytics={`home_builder_units_height_${option.value}`}
                 >
                   {option.label}
                 </button>
@@ -156,10 +161,23 @@ export const StepTwo: React.FC<StepTwoProps> = ({
 
       {/* Form Actions */}
       <div className={styles.formActions}>
-        <Button variant="secondary" size="lg" onClick={onBack} icon={ArrowLeft} iconPosition="left">
+        <Button
+          variant="secondary"
+          size="lg"
+          onClick={onBack}
+          icon={ArrowLeft}
+          iconPosition="left"
+          data-analytics="home_builder_step2_back"
+        >
           Back
         </Button>
-        <Button variant="primary" size="lg" onClick={onSubmit} className={styles.submitButton}>
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={onSubmit}
+          className={styles.submitButton}
+          data-analytics="home_builder_step2_preview"
+        >
           See My Plan
         </Button>
       </div>

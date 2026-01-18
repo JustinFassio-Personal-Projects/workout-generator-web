@@ -87,10 +87,18 @@ export const PlanPreview: React.FC<PlanPreviewProps> = ({ data, onEdit, onCreate
           icon={ArrowRight}
           iconPosition="right"
           className={styles.createAccountButton}
+          data-analytics="home_builder_create_account"
         >
           Create account to generate workout
         </Button>
-        <Button variant="secondary" size="md" onClick={onEdit} icon={Edit3} iconPosition="left">
+        <Button
+          variant="secondary"
+          size="md"
+          onClick={onEdit}
+          icon={Edit3}
+          iconPosition="left"
+          data-analytics="home_builder_edit_answers"
+        >
           Edit answers
         </Button>
       </div>

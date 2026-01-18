@@ -94,7 +94,7 @@ export const Footer: React.FC = () => {
     image: 'https://aiworkoutgenerator.com/og-image.jpg',
     '@id': 'https://aiworkoutgenerator.com',
     url: 'https://aiworkoutgenerator.com',
-    telephone: '', // Add if available
+    // telephone omitted - optional field, only include when value is available
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'San Diego',
@@ -118,7 +118,8 @@ export const Footer: React.FC = () => {
       'https://www.instagram.com/aiworkoutgenerator/',
       'https://www.youtube.com/@aiworkoutgen',
       'https://www.facebook.com/aiworkoutgenerator',
-      'https://www.yelp.com/biz/san-diego-core-fitness-san-diego-san-diego?osq=San+Diego+Core+Fitness',
+      // Yelp URL removed: San Diego Core Fitness is a different business entity.
+      // sameAs should only contain URLs for the same entity per Schema.org spec.
     ],
   }
 

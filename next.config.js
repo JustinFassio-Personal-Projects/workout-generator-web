@@ -25,7 +25,19 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'ui-avatars.com',
+      },
+      {
+        protocol: 'https',
         hostname: 'qbklyimfazrkutwqictw.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'workoutgenerator.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'aiworkoutgenerator.com',
       },
     ],
     formats: ['image/avif', 'image/webp'],

@@ -46,6 +46,7 @@ describe('Navbar', () => {
   it('should render navigation links', () => {
     render(<Navbar />)
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument()
   }, 20000)
 

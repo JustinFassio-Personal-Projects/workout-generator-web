@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { BlogPostHero } from '@/components/features/blog/BlogPostHero'
 import { BlogPostContent } from '@/components/features/blog/BlogPostContent'
-import { BlogPostContentInteractive } from '@/components/features/blog/BlogPostContentInteractive'
+import { BlogPostContentInteractiveServer } from '@/components/features/blog/BlogPostContentInteractiveServer'
 import { RelatedPosts } from '@/components/features/blog/RelatedPosts'
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from '@/lib/blog/queries'
 import { notFound } from 'next/navigation'
@@ -10,6 +10,81 @@ import { notFound } from 'next/navigation'
 export const dynamic = 'force-dynamic'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
+
+// Schema.org type definitions for structured data
+interface SchemaPerson {
+  '@type': 'Person'
+  name: string
+}
+
+interface SchemaImageObject {
+  '@type': 'ImageObject'
+  url: string
+}
+
+interface SchemaOrganization {
+  '@type': 'Organization'
+  name: string
+  logo: SchemaImageObject
+}
+
+interface SchemaWebPage {
+  '@type': 'WebPage'
+  '@id': string
+}
+
+interface SchemaPropertyValue {
+  '@type': 'PropertyValue'
+  name: string
+  unitText: string
+  description: string
+}
+
+interface SchemaDataDownload {
+  '@type': 'DataDownload'
+  contentUrl: string
+  encodingFormat: string
+  description: string
+}
+
+interface SchemaDataset {
+  '@type': 'Dataset'
+  name: string
+  description: string
+  variableMeasured: SchemaPropertyValue[]
+  distribution: SchemaDataDownload
+}
+
+interface SchemaThing {
+  '@type': 'Thing'
+  name: string
+  description: string
+}
+
+interface SchemaSpeakableSpecification {
+  '@type': 'SpeakableSpecification'
+  cssSelector: string[]
+}
+
+interface ArticleSchema {
+  '@context': 'https://schema.org'
+  '@type': 'Article'
+  headline: string
+  description: string
+  image: string
+  datePublished: string
+  dateModified: string
+  wordCount: number
+  timeRequired: string
+  author: SchemaPerson
+  publisher: SchemaOrganization
+  mainEntityOfPage: SchemaWebPage
+  articleSection: string
+  keywords: string
+  mainEntity?: SchemaDataset
+  about?: SchemaThing[]
+  speakable?: SchemaSpeakableSpecification
+}
 
 // Dynamic generation - posts are fetched at request time with ISR
 export async function generateStaticParams() {
@@ -37,11 +112,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const url = `${baseUrl}/blog/${post.slug}`
 
   // Handle both absolute URLs and relative paths for images
+  // In development, use relative paths for local images; in production, use absolute URLs
+  const isDevelopment = process.env.NODE_ENV === 'development'
   const postImage = post.featured_image
     ? post.featured_image.startsWith('http')
       ? post.featured_image
-      : `${baseUrl}${post.featured_image}`
-    : `${baseUrl}/og-image.jpg`
+      : isDevelopment
+        ? post.featured_image
+        : `${baseUrl}${post.featured_image}`
+    : isDevelopment
+      ? '/og-image.jpg'
+      : `${baseUrl}/og-image.jpg`
 
   // Use SEO overrides if available
   const title = post.seo_title || `${post.title} | Blog`
@@ -104,19 +185,33 @@ export default async function BlogPostPage({ params }: PageProps) {
   const url = `${baseUrl}/blog/${post.slug}`
 
   // Handle both absolute URLs and relative paths for images
+  // In development, use relative paths for local images; in production, use absolute URLs
+  const isDevelopment = process.env.NODE_ENV === 'development'
   const postImage = post.featured_image
     ? post.featured_image.startsWith('http')
       ? post.featured_image
-      : `${baseUrl}${post.featured_image}`
-    : `${baseUrl}/og-image.jpg`
+      : isDevelopment
+        ? post.featured_image
+        : `${baseUrl}${post.featured_image}`
+    : isDevelopment
+      ? '/og-image.jpg'
+      : `${baseUrl}/og-image.jpg`
 
   // Calculate word count from content
   const wordCount = post.content.split(/\s+/).filter(word => word.length > 0).length
   // Calculate reading time (average reading speed: 200 words per minute)
   const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200))
 
+  // Determine if post should use interactive style
+  // Check for slug patterns that indicate interactive/research posts
+  const isInteractivePost =
+    post.slug.includes('best-ai-workout-generator') ||
+    post.slug.includes('research') ||
+    post.slug.includes('analysis') ||
+    post.slug.includes('system-vs-random')
+
   // Article structured data (JSON-LD)
-  const articleSchema = {
+  const articleSchema: ArticleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
@@ -144,6 +239,62 @@ export default async function BlogPostPage({ params }: PageProps) {
     },
     articleSection: post.category?.name || 'Uncategorized',
     keywords: post.tags.join(', '),
+    // Add interactive content schema extensions for interactive posts
+    ...(isInteractivePost && {
+      mainEntity: {
+        '@type': 'Dataset',
+        name: 'AI Workout Generator Analysis Data',
+        description: 'Data supporting interactive charts and comparisons in fitness app analysis',
+        variableMeasured: [
+          {
+            '@type': 'PropertyValue',
+            name: 'retention_rate',
+            unitText: 'percentage',
+            description: 'User retention rate over time',
+          },
+          {
+            '@type': 'PropertyValue',
+            name: 'strength_gains',
+            unitText: 'percentage',
+            description: 'Strength improvement percentage',
+          },
+          {
+            '@type': 'PropertyValue',
+            name: 'time_period',
+            unitText: 'months',
+            description: 'Time period for analysis',
+          },
+        ],
+        distribution: {
+          '@type': 'DataDownload',
+          contentUrl: `${baseUrl}/blog/${post.slug}`,
+          encodingFormat: 'text/html',
+          description: 'Interactive data visualization available on the article page',
+        },
+      },
+      about: [
+        {
+          '@type': 'Thing',
+          name: 'Progressive Overload Algorithms',
+          description: 'System-based training algorithms that adapt workout intensity over time',
+        },
+        {
+          '@type': 'Thing',
+          name: 'AI Fitness Applications',
+          description: 'Artificial intelligence applications for fitness and workout generation',
+        },
+        {
+          '@type': 'Thing',
+          name: 'Training System Comparison',
+          description:
+            'Comparison between random workout generation and systematic training approaches',
+        },
+      ],
+      speakable: {
+        '@type': 'SpeakableSpecification',
+        cssSelector: ['.sectionTitle', '.sectionText', '.listText'],
+      },
+    }),
   }
 
   // BreadcrumbList structured data (JSON-LD)
@@ -210,14 +361,6 @@ export default async function BlogPostPage({ params }: PageProps) {
     image: p.featured_image || undefined,
   }))
 
-  // Determine if post should use interactive style
-  // Check for slug patterns that indicate interactive/research posts
-  const isInteractivePost =
-    post.slug.includes('best-ai-workout-generator') ||
-    post.slug.includes('research') ||
-    post.slug.includes('analysis') ||
-    post.slug.includes('system-vs-random')
-
   return (
     <>
       <script
@@ -229,7 +372,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       {isInteractivePost ? (
-        <BlogPostContentInteractive post={transformedPost} />
+        <BlogPostContentInteractiveServer post={transformedPost} />
       ) : (
         <>
           <BlogPostHero post={transformedPost} />

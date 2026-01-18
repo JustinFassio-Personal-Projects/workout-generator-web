@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { BlogPostList } from '@/components/features/blog/BlogPostList'
 import { getAllCategories, getPostsByCategory, getCategoryBySlug } from '@/lib/blog/queries'
@@ -78,6 +79,8 @@ export default async function CategoryPage({ params }: PageProps) {
   }
 
   // Transform posts for BlogPostList
+  // In development, use relative paths for local images; in production, use absolute URLs
+  const isDevelopment = process.env.NODE_ENV === 'development'
   const transformedPosts = posts.map(post => ({
     id: post.id,
     slug: post.slug,
@@ -92,7 +95,9 @@ export default async function CategoryPage({ params }: PageProps) {
     image: post.featured_image
       ? post.featured_image.startsWith('http')
         ? post.featured_image
-        : `${baseUrl}${post.featured_image}`
+        : isDevelopment
+          ? post.featured_image
+          : `${baseUrl}${post.featured_image}`
       : undefined,
   }))
 
@@ -145,6 +150,10 @@ export default async function CategoryPage({ params }: PageProps) {
     },
   }
 
+  // Use hero image for Fitness Technology category
+  const isFitnessTechnology = slug === 'fitness-technology'
+  const heroImage = isFitnessTechnology ? '/san-diego-core-fitness-hero-1920x1200.webp' : null
+
   return (
     <>
       <script
@@ -155,7 +164,22 @@ export default async function CategoryPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
-      <section className={styles.categoryHeader}>
+      <section
+        className={`${styles.categoryHeader} ${heroImage ? styles.categoryHeaderWithImage : ''}`}
+      >
+        {heroImage && (
+          <div className={styles.heroImageWrapper}>
+            <Image
+              src={heroImage}
+              alt={`${category.name} category`}
+              fill
+              priority
+              sizes="100vw"
+              className={styles.heroImage}
+            />
+            <div className={styles.heroImageOverlay} />
+          </div>
+        )}
         <div className={styles.container}>
           <nav className={styles.breadcrumb} aria-label="Breadcrumb">
             <Link href="/">Home</Link>

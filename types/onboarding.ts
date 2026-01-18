@@ -19,8 +19,27 @@ export type ActivityLevel =
   | 'very_active'
   | 'extremely_active'
 
-// Equipment access options
+// Equipment access options (deprecated - now using array of category strings)
 export type EquipmentAccess = 'none' | 'minimal' | 'home' | 'full_gym'
+
+// Equipment category strings (from equipment catalog)
+export type EquipmentCategory =
+  | 'general'
+  | 'strength'
+  | 'functional'
+  | 'cardio'
+  | 'calisthenics'
+  | 'yoga'
+  | 'pilates'
+  | 'mobility'
+  | 'strongman'
+  | 'olympic'
+  | 'recovery'
+  | 'combat'
+  | 'rehab'
+  | 'outdoor'
+  | 'aquatic'
+  | 'smart'
 
 // Gender options (optional field)
 export type Gender = 'male' | 'female' | 'non_binary' | 'prefer_not_to_say'
@@ -41,7 +60,7 @@ export interface WebsiteOnboardingData {
   fitness_level: FitnessLevel
   current_activity_level: ActivityLevel
   fitness_goals: FitnessGoal[]
-  equipment_access: EquipmentAccess
+  equipment_access: string[] // Array of equipment category strings
 }
 
 // Default values for form initialization
@@ -57,5 +76,5 @@ export const DEFAULT_ONBOARDING_DATA: WebsiteOnboardingData = {
   fitness_level: 'beginner',
   current_activity_level: 'moderately_active',
   fitness_goals: [],
-  equipment_access: 'home',
+  equipment_access: ['general', 'strength'], // Default categories for beginner level
 }

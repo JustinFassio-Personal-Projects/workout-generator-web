@@ -50,7 +50,7 @@ export const Footer: React.FC = () => {
       { label: 'Contact', href: '#' },
     ],
     resources: [
-      { label: 'Submit an Exercise', href: '/exercise-challenge' },
+      { label: 'Equipment', href: '/equipment' },
       { label: 'Documentation', href: '#' },
       { label: 'Help Center', href: '#' },
       { label: 'Community', href: '#' },

@@ -3,8 +3,10 @@ import type {
   FitnessLevel,
   ActivityLevel,
   EquipmentAccess,
+  EquipmentCategory,
   Gender,
 } from '@/types/onboarding'
+import { getAvailableCategoriesByFitnessLevel, getCategoryLabel } from './equipment-categories'
 
 export interface LabeledOption<T> {
   value: T
@@ -39,13 +41,28 @@ export const activityLevelOptions: LabeledOption<ActivityLevel>[] = [
   { value: 'extremely_active', label: 'Extremely active (daily intense)' },
 ]
 
-// Equipment access options
+// Equipment access options (deprecated - use getEquipmentCategoryOptions instead)
 export const equipmentAccessOptions: LabeledOption<EquipmentAccess>[] = [
   { value: 'none', label: 'No equipment (bodyweight only)' },
   { value: 'minimal', label: 'Minimal (resistance bands, etc.)' },
   { value: 'home', label: 'Home gym (dumbbells, bench)' },
   { value: 'full_gym', label: 'Full gym access' },
 ]
+
+/**
+ * Get available equipment category options based on fitness level.
+ * Categories are revealed cumulatively - each level includes all previous categories plus new ones.
+ *
+ * @param fitnessLevel - The user's fitness level
+ * @returns Array of category options available for the fitness level
+ */
+export function getEquipmentCategoryOptions(fitnessLevel: FitnessLevel): LabeledOption<string>[] {
+  const categories = getAvailableCategoriesByFitnessLevel(fitnessLevel)
+  return categories.map(category => ({
+    value: category,
+    label: getCategoryLabel(category),
+  }))
+}
 
 // Gender options (optional)
 export const genderOptions: LabeledOption<Gender>[] = [

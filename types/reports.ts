@@ -25,8 +25,8 @@ export const reports: Report[] = [
     title: "Why 'Random' Workouts Kill Progress (and How to Fix It)",
     excerpt:
       "Stop 'confusing' your muscles and start growing them. Learn why the SAID principle trumps random workouts and how to use progressive overload for real results.",
-    date: '2026-01-15',
-    dateModified: '2026-01-15',
+    date: '2026-01-14',
+    dateModified: '2026-01-14',
     image: '/female-situp.jpg',
   },
   {

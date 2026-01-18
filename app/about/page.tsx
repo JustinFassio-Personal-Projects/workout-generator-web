@@ -436,7 +436,7 @@ export default function AboutPage() {
                 <h3 className="font-bold text-white mb-4">Latest from the Founder</h3>
                 <div className="space-y-4">
                   <Link href="/blog/random-workouts-kill-progress" className="block group">
-                    <span className="text-xs text-[#849288]">October 2024</span>
+                    <span className="text-xs text-[#849288]">January 2026</span>
                     <p className="font-medium text-[#F5F5F4] group-hover:text-[#0ea5e9] transition-colors">
                       Why &quot;Random&quot; Workouts Kill Progress (and How to Fix It)
                     </p>

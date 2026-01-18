@@ -3,11 +3,8 @@
 import React from 'react'
 import { ArrowRight, Edit3, Target, Dumbbell, Activity, Wrench } from 'lucide-react'
 import type { WebsiteOnboardingData } from '@/types/onboarding'
-import {
-  fitnessLevelOptions,
-  activityLevelOptions,
-  equipmentAccessOptions,
-} from '@/data/onboarding-options'
+import { fitnessLevelOptions, activityLevelOptions } from '@/data/onboarding-options'
+import { getCategoryLabel } from '@/data/equipment-categories'
 
 interface PlanPreviewProps {
   data: WebsiteOnboardingData
@@ -22,9 +19,19 @@ export const PlanPreview: React.FC<PlanPreviewProps> = ({ data, onEdit, onCreate
   const activityLabel =
     activityLevelOptions.find(o => o.value === data.current_activity_level)?.label ||
     data.current_activity_level
-  const equipmentLabel =
-    equipmentAccessOptions.find(o => o.value === data.equipment_access)?.label ||
-    data.equipment_access
+  // Format equipment categories for display
+  const equipmentDisplay = Array.isArray(data.equipment_access)
+    ? data.equipment_access.length === 1
+      ? getCategoryLabel(data.equipment_access[0])
+      : data.equipment_access.length === 2
+        ? `${getCategoryLabel(data.equipment_access[0])} & ${getCategoryLabel(data.equipment_access[1])}`
+        : data.equipment_access
+            .slice(0, -1)
+            .map(cat => getCategoryLabel(cat))
+            .join(', ') +
+          ' & ' +
+          getCategoryLabel(data.equipment_access[data.equipment_access.length - 1])
+    : String(data.equipment_access)
 
   // Format goals for display
   const goalsDisplay =
@@ -105,7 +112,9 @@ export const PlanPreview: React.FC<PlanPreviewProps> = ({ data, onEdit, onCreate
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Equipment
               </span>
-              <span className="text-base font-bold text-white line-clamp-2">{equipmentLabel}</span>
+              <span className="text-base font-bold text-white line-clamp-2">
+                {equipmentDisplay}
+              </span>
             </div>
           </div>
         </div>

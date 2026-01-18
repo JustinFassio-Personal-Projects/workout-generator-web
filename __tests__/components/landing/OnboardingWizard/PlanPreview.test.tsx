@@ -16,7 +16,7 @@ describe('OnboardingWizard PlanPreview', () => {
     fitness_level: 'beginner',
     current_activity_level: 'moderately_active',
     fitness_goals: ['Build muscle', 'Lose fat'],
-    equipment_access: 'home',
+    equipment_access: ['general', 'strength'],
     preferred_units: {
       weight: 'lb',
       height: 'in',
@@ -77,7 +77,7 @@ describe('OnboardingWizard PlanPreview', () => {
 
   it('should display equipment access label', () => {
     render(<PlanPreview {...defaultProps} />)
-    expect(screen.getByText('Home gym (dumbbells, bench)')).toBeInTheDocument()
+    expect(screen.getByText(/General.*Universal.*Strength Training/i)).toBeInTheDocument()
   })
 
   it('should call onCreateAccount when create account button is clicked', async () => {

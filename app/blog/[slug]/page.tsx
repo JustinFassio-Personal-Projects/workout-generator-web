@@ -11,6 +11,81 @@ export const dynamic = 'force-dynamic'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
+// Schema.org type definitions for structured data
+interface SchemaPerson {
+  '@type': 'Person'
+  name: string
+}
+
+interface SchemaImageObject {
+  '@type': 'ImageObject'
+  url: string
+}
+
+interface SchemaOrganization {
+  '@type': 'Organization'
+  name: string
+  logo: SchemaImageObject
+}
+
+interface SchemaWebPage {
+  '@type': 'WebPage'
+  '@id': string
+}
+
+interface SchemaPropertyValue {
+  '@type': 'PropertyValue'
+  name: string
+  unitText: string
+  description: string
+}
+
+interface SchemaDataDownload {
+  '@type': 'DataDownload'
+  contentUrl: string
+  encodingFormat: string
+  description: string
+}
+
+interface SchemaDataset {
+  '@type': 'Dataset'
+  name: string
+  description: string
+  variableMeasured: SchemaPropertyValue[]
+  distribution: SchemaDataDownload
+}
+
+interface SchemaThing {
+  '@type': 'Thing'
+  name: string
+  description: string
+}
+
+interface SchemaSpeakableSpecification {
+  '@type': 'SpeakableSpecification'
+  cssSelector: string[]
+}
+
+interface ArticleSchema {
+  '@context': 'https://schema.org'
+  '@type': 'Article'
+  headline: string
+  description: string
+  image: string
+  datePublished: string
+  dateModified: string
+  wordCount: number
+  timeRequired: string
+  author: SchemaPerson
+  publisher: SchemaOrganization
+  mainEntityOfPage: SchemaWebPage
+  articleSection: string
+  keywords: string
+  mainEntity?: SchemaDataset
+  about?: SchemaThing[]
+  speakable?: SchemaSpeakableSpecification
+}
+
 // Dynamic generation - posts are fetched at request time with ISR
 export async function generateStaticParams() {
   // Return empty array for dynamic generation
@@ -136,7 +211,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     post.slug.includes('system-vs-random')
 
   // Article structured data (JSON-LD)
-  const articleSchema: Record<string, unknown> = {
+  const articleSchema: ArticleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,

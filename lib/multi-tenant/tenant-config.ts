@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { unstable_cache } from 'next/cache'
 
 export interface TenantConfig {
@@ -14,7 +14,13 @@ export interface TenantConfig {
 }
 
 export async function getTenantByDomain(domain: string): Promise<TenantConfig | null> {
-  const supabase = await createServerSupabaseClient()
+  // Use public client (no cookies) since tenant data is public and doesn't require user session
+  // This allows it to work inside unstable_cache() without violating Next.js cache rules
+  const supabase = createPublicClient()
+
+  if (!supabase) {
+    return null
+  }
 
   const { data, error } = await supabase
     .from('tenants')

@@ -5,8 +5,10 @@ const SIGNUP_BASE_URL = 'https://aiworkoutgen.app/signup'
 /**
  * Builds the signup URL with query parameters from the onboarding data.
  * Parameters are mapped to match the app's expected receiver format.
+ * @param data - Onboarding form data
+ * @param tenantId - Optional tenant ID for multi-tenant support
  */
-export function buildSignupUrl(data: WebsiteOnboardingData): string {
+export function buildSignupUrl(data: WebsiteOnboardingData, tenantId?: string): string {
   const params = new URLSearchParams()
 
   // Required fields
@@ -39,6 +41,11 @@ export function buildSignupUrl(data: WebsiteOnboardingData): string {
   // - tab: Sets the initial active tab (signup vs signin)
   params.set('theme', 'dark')
   params.set('tab', 'signup')
+
+  // Multi-tenant support: Add tenant_id if provided
+  if (tenantId) {
+    params.set('tenant_id', tenantId)
+  }
 
   return `${SIGNUP_BASE_URL}?${params.toString()}`
 }

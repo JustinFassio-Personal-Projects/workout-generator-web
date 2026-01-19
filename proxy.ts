@@ -4,6 +4,66 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   const normalizedPath = pathname.toLowerCase().replace(/\/$/, '') // Remove trailing slash and normalize case
+  const hostname = request.headers.get('host') || ''
+
+  // ============================================================================
+  // MULTI-TENANT ROUTING (handled first, before redirects)
+  // ============================================================================
+
+  // Skip multi-tenant routing for Next.js internal routes
+  // Note: /api routes are excluded by the matcher pattern (line 249), so API routes
+  // never reach this middleware. All current API routes are platform-level (admin, blog,
+  // support) and don't require tenant context. If tenant-specific API routes are needed
+  // in the future (e.g., /api/tenant/workouts), remove 'api' from the matcher exclusion
+  // and add explicit tenant vs platform routing logic here.
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/favicon.ico') ||
+    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js|woff|woff2|ttf|eot)$/)
+  ) {
+    // Fall through to existing redirect logic below
+  } else {
+    // Normalize hostname (remove port, www)
+    const normalizedHost = normalizeHostname(hostname)
+    const ADMIN_DOMAIN = 'admin.localhost'
+    const PLATFORM_DOMAINS = ['localhost', 'myplatform.com', 'www.myplatform.com']
+
+    // 1. Admin domain → /admin routes
+    if (normalizedHost === ADMIN_DOMAIN || normalizedHost.startsWith('admin.')) {
+      if (!pathname.startsWith('/admin')) {
+        const url = request.nextUrl.clone()
+        url.pathname = `/admin${pathname === '/' ? '' : pathname}`
+        // Rewrite and continue - admin auth will be checked at the end of this function
+        // after the redirect logic (since rewritten pathname will be /admin/*)
+        return NextResponse.rewrite(url)
+      }
+      // Already on /admin route - continue to redirect logic, then admin auth check
+    }
+    // 2. Platform domains → Existing homepage (no rewrite, continue to redirect logic)
+    // Check if it's a non-platform domain (tenant) while treating localhost:3001 as platform.
+    // Note: We intentionally combine normalizedHost (without port) with the raw hostname port check
+    // to distinguish `client-a.localhost:3001` (tenant) from `localhost:3001` (platform).
+    // Simplifying this condition would misclassify localhost tenant vs platform traffic.
+    else if (
+      !PLATFORM_DOMAINS.includes(normalizedHost) &&
+      !(normalizedHost === 'localhost' && hostname.includes(':3001'))
+    ) {
+      // 3. Tenant domains → /sites/[domain] routes (OPTIMISTIC REWRITE)
+      // No database query here - validation happens in page component
+      const url = request.nextUrl.clone()
+      url.pathname = `/sites/${normalizedHost}${pathname === '/' ? '' : pathname}`
+
+      const response = NextResponse.rewrite(url)
+      response.headers.set('x-tenant-domain', normalizedHost)
+      return response
+    }
+    // Platform domains fall through to existing redirect logic
+  }
+
+  // ============================================================================
+  // EXISTING REDIRECT LOGIC (WordPress redirects, admin auth, etc.)
+  // ============================================================================
 
   // Helper function to create redirect response
   const createRedirect = (destination: string, permanent = true) => {
@@ -183,21 +243,29 @@ export async function proxy(request: NextRequest) {
   return response
 }
 
+// Helper function to normalize hostname for multi-tenant routing
+function normalizeHostname(hostname: string): string {
+  const withoutPort = hostname.split(':')[0]
+  const withoutWww = withoutPort.replace(/^www\./, '')
+  return withoutWww.toLowerCase()
+}
+
 export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
+     * - api (API routes - excluded because all current routes are platform-level;
+     *   see comment at line 13-18 for tenant API route considerations)
+     * - _next (Next.js internal routes - static files, data fetching, HMR, etc.)
      * - favicon.ico (favicon file)
-     * - public files (images, etc.)
+     * - public files (images, fonts, etc.)
      *
-     * Performance note: This middleware runs on most requests to handle WordPress redirects.
-     * Redirect checks are O(1) string comparisons and return early for non-matches.
-     * Admin authentication only executes for /admin routes (see early return at line 120).
-     * Static assets are excluded by the matcher pattern above, so they never hit this middleware.
+     * Performance note: This proxy runs on most requests to handle WordPress redirects
+     * and multi-tenant routing. Redirect checks are O(1) string comparisons and return early
+     * for non-matches. Multi-tenant routing executes first (lines 9-54), then WordPress redirects,
+     * then admin authentication only executes for /admin routes (see early return at line 175).
+     * Static assets are excluded by the matcher pattern above, so they never hit this proxy.
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
+    '/((?!api|_next|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff|woff2|ttf|eot)$).*)',
   ],
 }

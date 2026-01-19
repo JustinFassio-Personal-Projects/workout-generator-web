@@ -23,7 +23,11 @@ import Loading from './Loading'
 
 type FormErrors = Record<string, string>
 
-export const OnboardingWizard: React.FC = () => {
+interface OnboardingWizardProps {
+  tenantId?: string // Optional tenant ID for multi-tenant support
+}
+
+export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ tenantId }) => {
   const searchParams = useSearchParams()
 
   // Form state - always start with default to ensure consistent SSR/client hydration
@@ -230,7 +234,7 @@ export const OnboardingWizard: React.FC = () => {
       location: 'onboarding_wizard',
     })
 
-    const signupUrl = buildSignupUrl(formData)
+    const signupUrl = buildSignupUrl(formData, tenantId)
 
     // Start loading sequence - slowed down animation
     setIsLoading(true)

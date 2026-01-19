@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button/Button'
 import { trackButtonClick } from '@/lib/analytics'
 import styles from './Hero.module.scss'
@@ -16,8 +17,19 @@ export const CredibilityCard: React.FC = () => {
 
   return (
     <div className={styles.credibilityCard}>
-      {/* Image Section - Full-bleed background */}
-      <div className={styles.credibilityImageSection} />
+      {/* Image Section */}
+      <div className={styles.credibilityImageSection}>
+        <Image
+          src="/justin-fassio-ai-workout-generator-founder-san-diego-trainer.jpg"
+          alt="Justin Fassio - Certified Personal Trainer and Founder of AIWorkoutGenerator in San Diego, CA"
+          fill
+          priority
+          quality={90}
+          className={styles.credibilityImage}
+          sizes="(max-width: 968px) 240px, 40vw"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+        />
+      </div>
 
       {/* Content Section */}
       <div className={styles.credibilityContent}>

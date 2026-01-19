@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   ArrowRight,
   Check,
@@ -115,8 +116,56 @@ export const Bio: React.FC = () => {
       <LogoWatermark position="center" opacity={0.03} size={400} rotation={0} />
       <div className={styles.container}>
         <div className={styles.layout}>
-          {/* Image Section - Full-bleed background */}
-          <div className={styles.imageSection} data-aos="fade-right" />
+          {/* Image Section - Main profile image with gallery */}
+          <div className={styles.imageSection} data-aos="fade-right">
+            <div className={styles.mainImageWrapper}>
+              <Image
+                src="/justin-fassio-ai-workout-generator-founder-san-diego-trainer.jpg"
+                alt="Justin Fassio - Certified Personal Trainer and Founder of AIWorkoutGenerator in San Diego, CA"
+                fill
+                priority
+                quality={90}
+                className={styles.mainImage}
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+              />
+            </div>
+            <div className={styles.imageGallery}>
+              <div className={styles.galleryImage}>
+                <Image
+                  src="/justin Profile Section 2.png"
+                  alt="Justin Fassio training clients in San Diego"
+                  fill
+                  quality={85}
+                  className={styles.galleryImg}
+                  sizes="(max-width: 768px) 50vw, 150px"
+                  style={{ objectFit: 'cover', objectPosition: 'center' }}
+                />
+              </div>
+              <div className={styles.galleryImage}>
+                <Image
+                  src="/Justin Profile Section 3.png"
+                  alt="Justin Fassio - Personal Trainer and Fitness Coach"
+                  fill
+                  quality={85}
+                  className={styles.galleryImg}
+                  sizes="(max-width: 768px) 50vw, 150px"
+                  style={{ objectFit: 'cover', objectPosition: 'center' }}
+                />
+              </div>
+              <div className={styles.galleryImage}>
+                <Image
+                  src="/Justin Profile Section 4.png"
+                  alt="Justin Fassio - Military Fitness Trainer and Coach"
+                  fill
+                  quality={85}
+                  className={styles.galleryImg}
+                  sizes="(max-width: 768px) 50vw, 150px"
+                  style={{ objectFit: 'cover', objectPosition: 'center' }}
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Content Section */}
           <div className={styles.content} data-aos="fade-left">

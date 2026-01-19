@@ -97,7 +97,10 @@ describe('FounderStoryPage', () => {
     expect(result.getByText('Training Boot Camp Instructors in San Diego, CA')).toBeInTheDocument()
     const image = result.container.querySelector('img')
     expect(image).toBeInTheDocument()
-    expect(image).toHaveAttribute('src', '/Justin Profile Section 5.png')
+    expect(image).toHaveAttribute(
+      'src',
+      '/justin-fassio-ai-workout-generator-founder-san-diego-trainer.jpg'
+    )
   })
 
   it('should render narrative section', () => {

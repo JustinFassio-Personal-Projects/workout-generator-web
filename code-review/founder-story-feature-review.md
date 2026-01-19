@@ -246,7 +246,7 @@ The function combines manual relationships with automatic fallback:
 Multiple profile images are used:
 
 - `Justin Profile Section 1.png` (homepage Bio)
-- `Justin Profile Section 5.png` (founder story page)
+- `/justin-fassio-ai-workout-generator-founder-san-diego-trainer.jpg` (founder story page)
 - Images are quite large (2-3 MB each)
 
 **Questions:**

@@ -11,6 +11,11 @@ export async function proxy(request: NextRequest) {
   // ============================================================================
 
   // Skip multi-tenant routing for Next.js internal routes
+  // Note: /api routes are excluded by the matcher pattern (line 249), so API routes
+  // never reach this middleware. All current API routes are platform-level (admin, blog,
+  // support) and don't require tenant context. If tenant-specific API routes are needed
+  // in the future (e.g., /api/tenant/workouts), remove 'api' from the matcher exclusion
+  // and add explicit tenant vs platform routing logic here.
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
@@ -36,7 +41,10 @@ export async function proxy(request: NextRequest) {
       // Already on /admin route - continue to redirect logic, then admin auth check
     }
     // 2. Platform domains → Existing homepage (no rewrite, continue to redirect logic)
-    // Check if it's a platform domain OR just localhost:3001 without a subdomain
+    // Check if it's a non-platform domain (tenant) while treating localhost:3001 as platform.
+    // Note: We intentionally combine normalizedHost (without port) with the raw hostname port check
+    // to distinguish `client-a.localhost:3001` (tenant) from `localhost:3001` (platform).
+    // Simplifying this condition would misclassify localhost tenant vs platform traffic.
     else if (
       !PLATFORM_DOMAINS.includes(normalizedHost) &&
       !(normalizedHost === 'localhost' && hostname.includes(':3001'))
@@ -246,7 +254,8 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
+     * - api (API routes - excluded because all current routes are platform-level;
+     *   see comment at line 13-18 for tenant API route considerations)
      * - _next (Next.js internal routes - static files, data fetching, HMR, etc.)
      * - favicon.ico (favicon file)
      * - public files (images, fonts, etc.)

@@ -43,11 +43,13 @@ export async function getTenantByDomain(domain: string): Promise<TenantConfig | 
 // Cached version for performance
 // Note: Tags must be static - dynamic tags based on parameters are not supported by unstable_cache
 // For on-demand revalidation, use revalidateTag('tenant-config') to invalidate all tenant caches
-export const getTenantByDomainCached = unstable_cache(
-  async (domain: string) => getTenantByDomain(domain),
-  ['tenant-config'],
-  {
-    revalidate: 300, // 5 minutes
-    tags: ['tenant-config'], // Static tag for cache invalidation
-  }
-)
+export async function getTenantByDomainCached(domain: string) {
+  return unstable_cache(
+    async () => getTenantByDomain(domain),
+    ['tenant-config', domain], // Include domain in cache key to prevent cross-tenant cache collisions
+    {
+      revalidate: 300, // 5 minutes
+      tags: ['tenant-config'], // Static tag for cache invalidation
+    }
+  )()
+}

@@ -43,6 +43,12 @@ export default async function TenantPage({ params }: { params: { domain: string 
   // Use tenant_id if available (Supabase), otherwise use domain (mock data)
   const tenantIdentifier = tenant.id || tenantDomain
 
+  // Firebase app base URL for the workout application.
+  // In local development this should be http://localhost:3000, and in production it
+  // should point at the deployed Firebase app domain (e.g. https://aiworkoutgen.app).
+  // We default to localhost to keep the tracer bullet working if the env var is missing.
+  const firebaseAppBaseUrl = process.env.NEXT_PUBLIC_FIREBASE_APP_URL || 'http://localhost:3000'
+
   return (
     <div style={{ padding: 40, color: tenant.primary_color }}>
       <h1>Welcome to {tenant.name}</h1>
@@ -52,7 +58,7 @@ export default async function TenantPage({ params }: { params: { domain: string 
       {/* THE HANDSHAKE: Link to Firebase App */}
       {/* Pass tenant_id if available (from Supabase), otherwise pass domain (mock data) */}
       <Link
-        href={`http://localhost:3000/login?tenant_id=${tenantIdentifier}`}
+        href={`${firebaseAppBaseUrl}/login?tenant_id=${tenantIdentifier}`}
         style={{
           background: tenant.primary_color,
           color: 'white',

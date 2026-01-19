@@ -1,4 +1,10 @@
 -- Create tenants table for multi-tenant platform
+--
+-- DEPENDENCY: This migration requires the admin_users table to exist.
+-- The admin_users table is created in migration 20260104082749_create_blog_schema.sql.
+-- The RLS policy "Admins can manage tenants" (line 33-41) references admin_users,
+-- so this migration must run after the blog schema migration.
+--
 CREATE TABLE tenants (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   domain TEXT UNIQUE NOT NULL,

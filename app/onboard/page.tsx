@@ -26,7 +26,8 @@ export default async function OnboardPage() {
   const headersList = await headers()
   const tenantDomain = headersList.get('x-tenant-domain')
 
-  // Fetch tenant if on tenant domain
+  // Fetch tenant config only if on a tenant domain (not platform domain)
+  // When tenantDomain is null (platform domain), skip database query for performance
   let tenantId: string | undefined
   if (tenantDomain) {
     const tenant = await getTenantByDomainCached(tenantDomain)

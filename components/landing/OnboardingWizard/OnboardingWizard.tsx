@@ -20,6 +20,7 @@ import { StepOne } from './StepOne'
 import { StepTwo } from './StepTwo'
 import { PlanPreview } from './PlanPreview'
 import Loading from './Loading'
+import styles from './OnboardingWizard.module.scss'
 
 type FormErrors = Record<string, string>
 
@@ -278,14 +279,14 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ tenantId }) 
 
   // Dark mode is always on - no light mode support
   return (
-    <div className="min-h-screen bg-brand-dark text-slate-200 font-sans selection:bg-brand-green selection:text-white pb-20 relative overflow-x-hidden animate-in fade-in duration-1000">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-green/5 via-brand-dark to-black z-0"></div>
-
+    <div
+      className={`${styles.onboardingWizard} text-slate-200 font-sans selection:bg-brand-green selection:text-white pb-20 relative overflow-x-hidden animate-in fade-in duration-1000`}
+    >
       <main className="px-3 sm:px-6 py-4 md:py-8 relative z-10">
         <div className="max-w-6xl mx-auto transition-all duration-500 min-h-[50vh] md:min-h-[70vh] flex flex-col justify-center">
           {/* Header Section - EXACT match to fitcopilot-vision App.tsx (lines 295-310) */}
           <div className="text-center mb-6 md:mb-16 space-y-3 md:space-y-8 animate-in slide-in-from-bottom-8 duration-700 fade-in">
-            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-brand-lime text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
+            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/15 border border-white/20 text-[var(--color-accent)] text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
               <Dumbbell className="w-3 h-3 md:w-4 md:h-4" /> Professional Kinetic Analysis Engine
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-8xl font-display font-bold text-white tracking-tight leading-[0.95] md:leading-[0.9]">
@@ -294,10 +295,12 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ tenantId }) 
                 Human Motion.
               </span>
             </h1>
-            <p className="text-sm md:text-2xl text-slate-400 max-w-3xl mx-auto font-light leading-relaxed px-4">
-              Built to understand complex kinetic movements, biomechanics, and technical cues. From
-              foundational lifts to elite-level performance.
-            </p>
+            <div className="inline-flex items-center justify-center max-w-3xl mx-auto px-4 py-2 md:py-3 rounded-lg bg-white/15 border border-white/20 text-slate-200 text-sm md:text-xl font-light leading-relaxed shadow-sm backdrop-blur-sm">
+              <p className="text-[var(--color-gray-300)]">
+                Built to understand complex kinetic movements, biomechanics, and technical cues.
+                From foundational lifts to elite-level performance.
+              </p>
+            </div>
           </div>
 
           {/* Form Container - EXACT match to fitcopilot-vision App.tsx (lines 313-414) */}

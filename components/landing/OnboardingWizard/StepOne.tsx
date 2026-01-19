@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useMemo, useEffect, useRef, useState } from 'react'
-import { GraduationCap, Dumbbell, Activity, ChevronDown, ChevronRight } from 'lucide-react'
+import React, { useMemo, useEffect } from 'react'
+import { GraduationCap, Dumbbell, Activity, ChevronDown } from 'lucide-react'
 import type { FitnessGoal, FitnessLevel } from '@/types/onboarding'
 import {
   fitnessGoalOptions,
@@ -36,39 +36,6 @@ export const StepOne: React.FC<StepOneProps> = ({
     [fitnessLevel]
   )
 
-  // Refs and state for scroll detection
-  const categoriesScrollRef = useRef<HTMLDivElement>(null)
-  const [showRightArrow, setShowRightArrow] = useState(false)
-
-  // Check if there's more content to scroll
-  useEffect(() => {
-    const checkScroll = () => {
-      const scrollContainer = categoriesScrollRef.current
-      if (scrollContainer) {
-        const hasMoreContent =
-          scrollContainer.scrollWidth > scrollContainer.clientWidth &&
-          scrollContainer.scrollLeft <
-            scrollContainer.scrollWidth - scrollContainer.clientWidth - 10 // 10px threshold
-        setShowRightArrow(hasMoreContent)
-      }
-    }
-
-    // Check on mount and when categories change
-    checkScroll()
-
-    const scrollContainer = categoriesScrollRef.current
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', checkScroll)
-      // Also check on resize
-      window.addEventListener('resize', checkScroll)
-
-      return () => {
-        scrollContainer.removeEventListener('scroll', checkScroll)
-        window.removeEventListener('resize', checkScroll)
-      }
-    }
-  }, [availableCategories])
-
   // Filter selected categories to only include those available for current fitness level
   useEffect(() => {
     const availableCategoryValues = availableCategories.map(cat => cat.value)
@@ -98,13 +65,13 @@ export const StepOne: React.FC<StepOneProps> = ({
 
   return (
     <div className="relative flex flex-col">
-      {/* Fitness Goals - Horizontal scrolling */}
+      {/* Fitness Goals - Always stacked vertically */}
       <div className="flex flex-col gap-2 px-4 md:px-12 pb-4 -mt-1 md:-mt-2 mb-4">
         <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest shrink-0">
           Fitness Goals:
         </span>
-        {/* Horizontal scrolling container */}
-        <div className="flex items-center gap-2 overflow-x-auto w-full pb-2 -mx-4 md:-mx-12 px-4 md:px-12 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        {/* Vertical flex-wrap container */}
+        <div className="flex flex-wrap items-center gap-2 w-full pb-2">
           {fitnessGoalOptions.map(option => {
             const isSelected = fitnessGoals.includes(option.value)
             return (
@@ -133,8 +100,8 @@ export const StepOne: React.FC<StepOneProps> = ({
         <p className="text-xs text-red-400 mt-1 px-4 md:px-12 mb-2">{errors.fitness_goals}</p>
       )}
 
-      {/* Dropdown Row Container - EXACT match (line 359) */}
-      <div className="flex flex-col md:flex-row gap-2 p-2 mt-2">
+      {/* Dropdown Row Container - Always stacked vertically */}
+      <div className="flex flex-col gap-2 p-2 mt-2">
         {/* Fitness Level - Dark mode only */}
         <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-brand-green/30 transition-colors relative overflow-hidden group/item">
           <div className="p-2 bg-slate-800 rounded-lg text-brand-green shrink-0 shadow-sm">
@@ -184,24 +151,9 @@ export const StepOne: React.FC<StepOneProps> = ({
               )}
             </div>
           </div>
-          {/* Horizontal scrolling container for equipment categories */}
+          {/* Vertical flex-wrap container for equipment categories */}
           <div className="relative">
-            {/* Pulsing right arrow indicator */}
-            {showRightArrow && (
-              <div className="absolute right-0 top-0 bottom-0 flex items-center pointer-events-none z-10 bg-gradient-to-l from-slate-950/90 via-slate-950/60 to-transparent w-16 pr-3">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-brand-green/40 blur-lg rounded-full animate-pulse"></div>
-                  <ChevronRight
-                    className="w-7 h-7 text-brand-green relative z-10 animate-pulse"
-                    strokeWidth={3}
-                  />
-                </div>
-              </div>
-            )}
-            <div
-              ref={categoriesScrollRef}
-              className="flex items-center gap-2 overflow-x-auto w-full pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-            >
+            <div className="flex flex-wrap items-center gap-2 w-full pb-1">
               {availableCategories.map(option => {
                 const isSelected = equipmentAccess.includes(option.value)
                 return (
@@ -231,12 +183,12 @@ export const StepOne: React.FC<StepOneProps> = ({
           )}
         </div>
 
-        {/* Continue Button - EXACT match to "VISUALIZE KINETICS" (line 406) */}
+        {/* Continue Button - Always full width */}
         <button
           type="submit"
           onClick={onContinue}
           data-analytics="onboard_step1_continue"
-          className="w-full md:w-auto bg-gradient-to-r from-brand-green to-brand-lime text-brand-dark px-8 py-4 rounded-2xl font-bold font-display tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full bg-gradient-to-r from-brand-green to-brand-lime text-brand-dark px-8 py-4 rounded-2xl font-bold font-display tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <Activity className="w-5 h-5" />
           <span>CONTINUE</span>

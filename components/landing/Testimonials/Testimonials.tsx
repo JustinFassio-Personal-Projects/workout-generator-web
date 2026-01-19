@@ -65,7 +65,8 @@ export const Testimonials: React.FC = () => {
             <span className={styles.gradientText}> Thousands</span>
           </h2>
           <p className={styles.subtitle}>
-            See what our community has to say about their fitness transformation journey.
+            See what our community has to say about their fitness transformation journey with the
+            founder, Justin Fassio.
           </p>
         </div>
         <div className={styles.carouselWrapper}>

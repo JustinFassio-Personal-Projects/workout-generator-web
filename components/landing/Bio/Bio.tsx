@@ -133,7 +133,7 @@ export const Bio: React.FC = () => {
             <div className={styles.imageGallery}>
               <div className={styles.galleryImage}>
                 <Image
-                  src="/justin Profile Section 2.png"
+                  src="/justin-profile-section-2.png"
                   alt="Justin Fassio training clients in San Diego"
                   fill
                   quality={85}
@@ -144,7 +144,7 @@ export const Bio: React.FC = () => {
               </div>
               <div className={styles.galleryImage}>
                 <Image
-                  src="/Justin Profile Section 3.png"
+                  src="/justin-profile-section-3.png"
                   alt="Justin Fassio - Personal Trainer and Fitness Coach"
                   fill
                   quality={85}
@@ -155,7 +155,7 @@ export const Bio: React.FC = () => {
               </div>
               <div className={styles.galleryImage}>
                 <Image
-                  src="/Justin Profile Section 4.png"
+                  src="/justin-profile-section-4.png"
                   alt="Justin Fassio - Military Fitness Trainer and Coach"
                   fill
                   quality={85}

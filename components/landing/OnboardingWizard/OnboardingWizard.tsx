@@ -275,7 +275,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ tenantId }) 
       window.location.href = signupUrl
     }, 10000)
     timeoutRefs.current.push(timeout5)
-  }, [formData])
+  }, [formData, tenantId])
 
   // Dark mode is always on - no light mode support
   return (

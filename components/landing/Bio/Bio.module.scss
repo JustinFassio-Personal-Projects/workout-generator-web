@@ -75,23 +75,84 @@
 .imageSection {
   position: relative;
   width: 100%;
-  background-image: url('/justin-profile-hero-three-quarter.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
   min-height: 600px;
 
   @media (max-width: 1024px) {
     min-height: 0;
     aspect-ratio: 3 / 4;
     order: -1;
-    background-position: top center;
   }
 
   @media (max-width: 640px) {
     aspect-ratio: 2 / 3;
-    background-position: top center;
   }
+}
+
+.mainImageWrapper {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 500px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+
+  @media (max-width: 1024px) {
+    min-height: 0;
+    flex: 1;
+  }
+}
+
+.mainImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+.imageGallery {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 1024px) {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+}
+
+.galleryImage {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 2px solid var(--glass-border-base);
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
+    box-shadow: 0 8px 16px rgba(132, 204, 22, 0.2);
+  }
+
+  @media (max-width: 1024px) {
+    width: 120px;
+    height: 120px;
+  }
+
+  @media (max-width: 640px) {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+.galleryImg {
+  object-fit: cover;
+  object-position: center;
 }
 
 .content {

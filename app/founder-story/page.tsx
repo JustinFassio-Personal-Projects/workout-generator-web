@@ -123,7 +123,7 @@ export default function FounderStoryPage() {
               </p>
               <div className={styles.profileImageWrapper}>
                 <Image
-                  src="/Justin Profile Section 5.png"
+                  src="/justin-fassio-ai-workout-generator-founder-san-diego-trainer.jpg"
                   alt="Justin Fassio - Founder of AIWorkoutGenerator"
                   width={500}
                   height={375}

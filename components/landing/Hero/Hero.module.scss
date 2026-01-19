@@ -392,27 +392,29 @@
 .credibilityImageSection {
   position: relative;
   width: 100%;
-  background-image: url('/justin-profile-hero-three-quarter.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   min-height: 300px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
 
   @media (max-width: 968px) {
     min-height: 0;
-    aspect-ratio: 2 / 3; // 2:3 aspect ratio for 512x768 image
+    aspect-ratio: 16 / 9;
     order: -1;
-    background-position: top center;
-    max-width: 240px;
+    max-width: 100%;
     margin: 0 auto;
+    border-radius: var(--radius-lg);
   }
 
   @media (max-width: 640px) {
-    aspect-ratio: 2 / 3; // 2:3 aspect ratio for 512x768 image
-    background-position: top center;
-    max-width: 180px;
-    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    border-radius: var(--radius-md);
   }
+}
+
+.credibilityImage {
+  object-fit: cover;
+  object-position: center;
 }
 
 .credibilityContent {

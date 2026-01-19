@@ -75,6 +75,7 @@
 .backgroundGradient {
   position: absolute;
   inset: 0;
+  background-color: var(--bg-gradient-end);
   background: radial-gradient(
     circle at center,
     rgba(34, 197, 94, 0.2) 0%,

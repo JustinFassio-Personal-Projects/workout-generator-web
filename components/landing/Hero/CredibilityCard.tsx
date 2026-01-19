@@ -26,7 +26,7 @@ export const CredibilityCard: React.FC = () => {
           priority
           quality={90}
           className={styles.credibilityImage}
-          sizes="(max-width: 968px) 240px, 40vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 968px) 500px, 40vw"
           style={{ objectFit: 'cover', objectPosition: 'center' }}
         />
       </div>

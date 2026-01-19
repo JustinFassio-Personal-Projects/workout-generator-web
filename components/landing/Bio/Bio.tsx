@@ -138,7 +138,7 @@ export const Bio: React.FC = () => {
                   fill
                   quality={85}
                   className={styles.galleryImg}
-                  sizes="(max-width: 768px) 50vw, 150px"
+                  sizes="(max-width: 640px) 100px, (max-width: 1024px) 120px, 150px"
                   style={{ objectFit: 'cover', objectPosition: 'center' }}
                 />
               </div>
@@ -149,7 +149,7 @@ export const Bio: React.FC = () => {
                   fill
                   quality={85}
                   className={styles.galleryImg}
-                  sizes="(max-width: 768px) 50vw, 150px"
+                  sizes="(max-width: 640px) 100px, (max-width: 1024px) 120px, 150px"
                   style={{ objectFit: 'cover', objectPosition: 'center' }}
                 />
               </div>
@@ -160,7 +160,7 @@ export const Bio: React.FC = () => {
                   fill
                   quality={85}
                   className={styles.galleryImg}
-                  sizes="(max-width: 768px) 50vw, 150px"
+                  sizes="(max-width: 640px) 100px, (max-width: 1024px) 120px, 150px"
                   style={{ objectFit: 'cover', objectPosition: 'center' }}
                 />
               </div>

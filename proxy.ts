@@ -10,8 +10,8 @@ export async function proxy(request: NextRequest) {
   // MULTI-TENANT ROUTING (handled first, before redirects)
   // ============================================================================
 
-  // Skip multi-tenant routing for Next.js internal routes
-  // Note: /api routes are excluded by the matcher pattern (line 249), so API routes
+  // Skip multi-tenant routing for Next.js internal routes and static assets
+  // Note: /api routes are excluded by the matcher pattern (line 269), so API routes
   // never reach this middleware. All current API routes are platform-level (admin, blog,
   // support) and don't require tenant context. If tenant-specific API routes are needed
   // in the future (e.g., /api/tenant/workouts), remove 'api' from the matcher exclusion
@@ -20,14 +20,21 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/favicon.ico') ||
-    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js|woff|woff2|ttf|eot)$/)
+    pathname === '/manifest.json' ||
+    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js|json|woff|woff2|ttf|eot)$/)
   ) {
     // Fall through to existing redirect logic below
   } else {
     // Normalize hostname (remove port, www)
     const normalizedHost = normalizeHostname(hostname)
     const ADMIN_DOMAIN = 'admin.localhost'
-    const PLATFORM_DOMAINS = ['localhost', 'myplatform.com', 'www.myplatform.com']
+    // Note: normalizeHostname() removes 'www.' prefix, so we only need base domain here
+    const PLATFORM_DOMAINS = [
+      'localhost',
+      'myplatform.com',
+      'aiworkoutgenerator.com',
+      'workoutgenerator.com',
+    ]
 
     // 1. Admin domain → /admin routes
     if (normalizedHost === ADMIN_DOMAIN || normalizedHost.startsWith('admin.')) {
@@ -266,6 +273,6 @@ export const config = {
      * then admin authentication only executes for /admin routes (see early return at line 175).
      * Static assets are excluded by the matcher pattern above, so they never hit this proxy.
      */
-    '/((?!api|_next|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff|woff2|ttf|eot)$).*)',
+    '/((?!api|_next|favicon.ico|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|json|woff|woff2|ttf|eot)$).*)',
   ],
 }

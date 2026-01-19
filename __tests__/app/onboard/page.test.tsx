@@ -7,6 +7,13 @@ vi.mock('@/components/landing/OnboardingWizard/OnboardingWizard', () => ({
   OnboardingWizard: () => <div>OnboardingWizard</div>,
 }))
 
+// Mock next/headers for server component usage in tests
+vi.mock('next/headers', () => ({
+  headers: () => ({
+    get: vi.fn().mockReturnValue(null),
+  }),
+}))
+
 // Mock AOS
 vi.mock('aos', () => ({
   default: {
@@ -32,8 +39,11 @@ describe('OnboardPage', () => {
     }
   })
 
-  it('should render OnboardingWizard component', () => {
-    render(<OnboardPage />)
+  it('should render OnboardingWizard component', async () => {
+    // OnboardPage is an async server component, so we need to
+    // await the JSX it returns before rendering in the test environment.
+    const ui = await OnboardPage()
+    render(ui)
     expect(screen.getByText('OnboardingWizard')).toBeInTheDocument()
   })
 

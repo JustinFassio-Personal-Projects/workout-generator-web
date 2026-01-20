@@ -34,10 +34,14 @@ export const Navbar: React.FC = () => {
   }
 
   const handleNavClick = (destination: string, label: string) => {
-    closeDrawer()
-    trackNavigationClick(destination, 'nav_link', 'navbar', {
-      link_label: label,
-    })
+    try {
+      closeDrawer()
+      trackNavigationClick(destination, 'nav_link', 'navbar', {
+        link_label: label,
+      })
+    } catch (error) {
+      console.error('handleNavClick error:', error)
+    }
   }
 
   const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -115,6 +119,13 @@ export const Navbar: React.FC = () => {
       >
         Equipment
       </Link>
+      <Link
+        href="/faq"
+        onClick={() => handleNavClick('/faq', 'FAQ')}
+        className={navLinkBaseClasses}
+      >
+        FAQ
+      </Link>
     </>
   )
 
@@ -154,6 +165,13 @@ export const Navbar: React.FC = () => {
         className={`${navLinkBaseClasses} w-full justify-center`}
       >
         Equipment
+      </Link>
+      <Link
+        href="/faq"
+        onClick={() => handleNavClick('/faq', 'FAQ')}
+        className={`${navLinkBaseClasses} w-full justify-center`}
+      >
+        FAQ
       </Link>
     </>
   )

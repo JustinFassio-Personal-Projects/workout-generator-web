@@ -1,6 +1,34 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Platform routes that should be accessible on tenant domains too
+// These routes should NOT be rewritten to /sites/[domain]
+const PLATFORM_ROUTES: readonly string[] = [
+  '/faq',
+  '/blog',
+  '/about',
+  '/reports',
+  '/equipment',
+  '/onboard',
+  '/videos',
+  '/exercise-challenge',
+  '/founder-story',
+  '/story',
+]
+
+// Set for O(1) exact match lookup
+const PLATFORM_ROUTES_SET = new Set<string>(PLATFORM_ROUTES)
+
+// Helper function to check if a pathname is a platform route
+function isPlatformRoute(pathname: string): boolean {
+  // O(1) exact match check
+  if (PLATFORM_ROUTES_SET.has(pathname)) {
+    return true
+  }
+  // O(n) prefix check (but array is constant, created once)
+  return PLATFORM_ROUTES.some(route => pathname.startsWith(route + '/'))
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   const normalizedPath = pathname.toLowerCase().replace(/\/$/, '') // Remove trailing slash and normalize case
@@ -56,14 +84,19 @@ export async function proxy(request: NextRequest) {
       !PLATFORM_DOMAINS.includes(normalizedHost) &&
       !(normalizedHost === 'localhost' && hostname.includes(':3001'))
     ) {
-      // 3. Tenant domains → /sites/[domain] routes (OPTIMISTIC REWRITE)
-      // No database query here - validation happens in page component
-      const url = request.nextUrl.clone()
-      url.pathname = `/sites/${normalizedHost}${pathname === '/' ? '' : pathname}`
+      // If this is a platform route, don't rewrite - let it fall through to platform handling
+      if (isPlatformRoute(pathname)) {
+        // Fall through to platform route handling (no rewrite)
+      } else {
+        // 3. Tenant domains → /sites/[domain] routes (OPTIMISTIC REWRITE)
+        // No database query here - validation happens in page component
+        const url = request.nextUrl.clone()
+        url.pathname = `/sites/${normalizedHost}${pathname === '/' ? '' : pathname}`
 
-      const response = NextResponse.rewrite(url)
-      response.headers.set('x-tenant-domain', normalizedHost)
-      return response
+        const response = NextResponse.rewrite(url)
+        response.headers.set('x-tenant-domain', normalizedHost)
+        return response
+      }
     }
     // Platform domains fall through to existing redirect logic
   }
@@ -118,7 +151,6 @@ export async function proxy(request: NextRequest) {
     '/home': '/',
     '/api-documentation': '/',
     '/contact': '/',
-    '/faq': '/',
     '/privacy-policy': '/',
     '/physical-information': '/',
     '/prompt': '/',

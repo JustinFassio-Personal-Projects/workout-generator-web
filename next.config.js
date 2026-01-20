@@ -387,11 +387,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/faq',
-        destination: '/',
-        permanent: true,
-      },
-      {
         source: '/privacy-policy',
         destination: '/',
         permanent: true,

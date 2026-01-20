@@ -1,3 +1,18 @@
+/**
+ * Landing Page FAQ Data (Legacy)
+ *
+ * This file contains FAQ items specifically for the landing page FAQ section.
+ * This is a condensed, simplified version for homepage display.
+ *
+ * For the main FAQ page with full questions, see:
+ * - @/data/faq-data.ts (masterFAQData)
+ *
+ * For contextual FAQs (topic-specific), see:
+ * - @/data/contextual-faqs.ts
+ *
+ * Used by: @/components/landing/FAQ/FAQ.tsx
+ */
+
 export interface FAQItem {
   id: string
   question: string

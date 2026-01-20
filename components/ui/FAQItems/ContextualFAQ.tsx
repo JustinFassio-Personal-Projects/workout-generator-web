@@ -42,9 +42,9 @@ export const ContextualFAQ: React.FC<ContextualFAQProps> = ({ topic, title, clas
       />
 
       <section className={`mt-12 ${className}`}>
-        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
-          <h2 className="text-2xl font-bold text-[#1C1917] mb-6">{displayTitle}</h2>
-          <div className="divide-y divide-gray-100">
+        <div className="bg-[#0f172a] rounded-2xl p-6 md:p-8 shadow-sm border border-white/10">
+          <h2 className="text-2xl font-bold text-white mb-6">{displayTitle}</h2>
+          <div className="divide-y divide-white/10">
             {questions.map((item, index) => (
               <FaqItem key={index} question={item.question} answer={item.answer} />
             ))}

@@ -1,9 +1,11 @@
 'use client'
 
 import React from 'react'
+import { ArrowRight } from 'lucide-react'
 import { faqItems } from '@/data/faq'
 import { Accordion } from '@/components/ui/Accordion/Accordion'
 import type { AccordionItem } from '@/components/ui/Accordion/Accordion'
+import { Button } from '@/components/ui/Button/Button'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
 import posthog from 'posthog-js'
 import { trackButtonClick } from '@/lib/analytics'
@@ -17,6 +19,21 @@ export const FAQ: React.FC = () => {
     posthog.capture('faq_cta_clicked', {
       button_text: buttonText,
       location: 'faq',
+    })
+
+    const workoutBuilderSection = document.getElementById('workout-builder')
+    if (workoutBuilderSection) {
+      workoutBuilderSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  const handleCTAClick = () => {
+    trackButtonClick('Generate My AI Workout', 'faq_cta')
+
+    // PostHog: Track FAQ section CTA click
+    posthog.capture('faq_section_cta_clicked', {
+      button_text: 'Generate My AI Workout',
+      location: 'faq_section',
     })
 
     const workoutBuilderSection = document.getElementById('workout-builder')
@@ -49,6 +66,26 @@ export const FAQ: React.FC = () => {
           <p className={styles.subtitle}>Quick answers to help you get started with confidence.</p>
         </div>
         <Accordion items={accordionItems} />
+
+        {/* CTA Section */}
+        <div className={styles.ctaSection} data-aos="fade-up" data-aos-delay="100">
+          <div className={styles.ctaContent}>
+            <h3 className={styles.ctaTitle}>Ready to get started?</h3>
+            <p className={styles.ctaSubtitle}>
+              Generate your personalized AI workout plan in under 2 minutes.
+            </p>
+            <Button
+              variant="primary"
+              size="lg"
+              icon={ArrowRight}
+              iconPosition="right"
+              onClick={handleCTAClick}
+              className={styles.ctaButton}
+            >
+              Generate My AI Workout
+            </Button>
+          </div>
+        </div>
       </div>
     </section>
   )

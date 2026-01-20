@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
 import { Activity } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { Drawer } from '@/components/ui/Drawer/Drawer'
@@ -15,6 +16,26 @@ import styles from './Navbar.module.scss'
 
 export const Navbar: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // #region agent log
+  useEffect(() => {
+    fetch('http://127.0.0.1:7245/ingest/7f9597b0-d816-4a30-aef3-3472e2aaae84', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'Navbar.tsx:20',
+        message: 'Navbar mounted',
+        data: { pathname },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'E',
+      }),
+    }).catch(() => {})
+  }, [pathname])
+  // #endregion
 
   const toggleDrawer = () => {
     const newState = !isDrawerOpen
@@ -34,10 +55,104 @@ export const Navbar: React.FC = () => {
   }
 
   const handleNavClick = (destination: string, label: string) => {
-    closeDrawer()
-    trackNavigationClick(destination, 'nav_link', 'navbar', {
-      link_label: label,
-    })
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/7f9597b0-d816-4a30-aef3-3472e2aaae84', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'Navbar.tsx:36',
+        message: 'handleNavClick called',
+        data: { destination, label },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'A,B,C',
+      }),
+    }).catch(() => {})
+    // #endregion
+    try {
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/7f9597b0-d816-4a30-aef3-3472e2aaae84', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'Navbar.tsx:39',
+          message: 'closeDrawer before',
+          data: { destination, label },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'B',
+        }),
+      }).catch(() => {})
+      // #endregion
+      closeDrawer()
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/7f9597b0-d816-4a30-aef3-3472e2aaae84', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'Navbar.tsx:42',
+          message: 'closeDrawer after',
+          data: { destination, label },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'B',
+        }),
+      }).catch(() => {})
+      // #endregion
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/7f9597b0-d816-4a30-aef3-3472e2aaae84', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'Navbar.tsx:45',
+          message: 'trackNavigationClick before',
+          data: { destination, label },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'A,C',
+        }),
+      }).catch(() => {})
+      // #endregion
+      trackNavigationClick(destination, 'nav_link', 'navbar', {
+        link_label: label,
+      })
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/7f9597b0-d816-4a30-aef3-3472e2aaae84', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'Navbar.tsx:50',
+          message: 'trackNavigationClick after',
+          data: { destination, label },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'A,C',
+        }),
+      }).catch(() => {})
+      // #endregion
+    } catch (error) {
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/7f9597b0-d816-4a30-aef3-3472e2aaae84', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'Navbar.tsx:53',
+          message: 'handleNavClick error',
+          data: { error: error?.toString(), destination, label },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'A,C',
+        }),
+      }).catch(() => {})
+      // #endregion
+      console.error('handleNavClick error:', error)
+    }
   }
 
   const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -115,6 +230,13 @@ export const Navbar: React.FC = () => {
       >
         Equipment
       </Link>
+      <Link
+        href="/faq"
+        onClick={() => handleNavClick('/faq', 'FAQ')}
+        className={navLinkBaseClasses}
+      >
+        FAQ
+      </Link>
     </>
   )
 
@@ -154,6 +276,13 @@ export const Navbar: React.FC = () => {
         className={`${navLinkBaseClasses} w-full justify-center`}
       >
         Equipment
+      </Link>
+      <Link
+        href="/faq"
+        onClick={() => handleNavClick('/faq', 'FAQ')}
+        className={`${navLinkBaseClasses} w-full justify-center`}
+      >
+        FAQ
       </Link>
     </>
   )

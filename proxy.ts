@@ -56,14 +56,34 @@ export async function proxy(request: NextRequest) {
       !PLATFORM_DOMAINS.includes(normalizedHost) &&
       !(normalizedHost === 'localhost' && hostname.includes(':3001'))
     ) {
-      // 3. Tenant domains → /sites/[domain] routes (OPTIMISTIC REWRITE)
-      // No database query here - validation happens in page component
-      const url = request.nextUrl.clone()
-      url.pathname = `/sites/${normalizedHost}${pathname === '/' ? '' : pathname}`
+      // Platform routes that should be accessible on tenant domains too
+      // These routes should NOT be rewritten to /sites/[domain]
+      const platformRoutes = [
+        '/faq',
+        '/blog',
+        '/about',
+        '/reports',
+        '/equipment',
+        '/onboard',
+        '/videos',
+        '/exercise-challenge',
+        '/founder-story',
+        '/story',
+      ]
 
-      const response = NextResponse.rewrite(url)
-      response.headers.set('x-tenant-domain', normalizedHost)
-      return response
+      // If this is a platform route, don't rewrite - let it fall through to platform handling
+      if (platformRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+        // Fall through to platform route handling (no rewrite)
+      } else {
+        // 3. Tenant domains → /sites/[domain] routes (OPTIMISTIC REWRITE)
+        // No database query here - validation happens in page component
+        const url = request.nextUrl.clone()
+        url.pathname = `/sites/${normalizedHost}${pathname === '/' ? '' : pathname}`
+
+        const response = NextResponse.rewrite(url)
+        response.headers.set('x-tenant-domain', normalizedHost)
+        return response
+      }
     }
     // Platform domains fall through to existing redirect logic
   }
@@ -118,7 +138,6 @@ export async function proxy(request: NextRequest) {
     '/home': '/',
     '/api-documentation': '/',
     '/contact': '/',
-    '/faq': '/',
     '/privacy-policy': '/',
     '/physical-information': '/',
     '/prompt': '/',

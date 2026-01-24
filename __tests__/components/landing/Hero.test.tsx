@@ -34,7 +34,9 @@ describe('Hero', () => {
 
   it('should render hero title', () => {
     render(<Hero />)
-    expect(screen.getByText(/Stop Guessing\. Start Growing\./i)).toBeInTheDocument()
+    // Text is split across elements, so we check for each part
+    expect(screen.getByText(/Stop Guessing\./i)).toBeInTheDocument()
+    expect(screen.getByText(/Start Growing\./i)).toBeInTheDocument()
     expect(screen.getByText(/The Science-Based AI Workout Generator/i)).toBeInTheDocument()
   })
 

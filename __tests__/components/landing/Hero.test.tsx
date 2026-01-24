@@ -34,55 +34,49 @@ describe('Hero', () => {
 
   it('should render hero title', () => {
     render(<Hero />)
-    expect(
-      screen.getByText(/AI Workout Generator for Personalized Strength & Conditioning/i)
-    ).toBeInTheDocument()
-    expect(screen.getByText(/Built by Certified Trainers/i)).toBeInTheDocument()
+    expect(screen.getByText(/Stop Guessing\. Start Growing\./i)).toBeInTheDocument()
+    expect(screen.getByText(/The Science-Based AI Workout Generator/i)).toBeInTheDocument()
   })
 
   it('should render hero H2', () => {
     render(<Hero />)
-    expect(
-      screen.getByText(
-        /Smart, safe workout plans powered by adaptive AI — grounded in real coaching experience/i
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Instantly build personalized/i)).toBeInTheDocument()
+    expect(screen.getByText(/Hypertrophy & Strength/i)).toBeInTheDocument()
   })
 
   it('should render hero subtitle', () => {
     render(<Hero />)
-    expect(
-      screen.getByText(/Create adaptive workout plans that evolve with your progress/i)
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(/based on real training principles, not random AI guesses/i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Instantly build personalized/i)).toBeInTheDocument()
+    expect(screen.getByText(/Closed-Loop Engine/i)).toBeInTheDocument()
   })
 
   it('should render CTA buttons', () => {
     render(<Hero />)
-    expect(screen.getByRole('button', { name: /Generate My AI Workout/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /See How It Works/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Build My Free Custom Plan/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /See the Logic/i })).toBeInTheDocument()
   })
 
   it('should render stats', () => {
     render(<Hero />)
-    expect(screen.getByText(/Trained 8,000\+ athletes/i)).toBeInTheDocument()
-    expect(screen.getByText(/15,000\+ workouts generated/i)).toBeInTheDocument()
-    expect(screen.getByText(/4\.9★ average rating/i)).toBeInTheDocument()
+    expect(screen.getByText(/8,000\+/i)).toBeInTheDocument()
+    expect(screen.getByText(/Athletes Optimized/i)).toBeInTheDocument()
+    expect(screen.getByText(/15k\+/i)).toBeInTheDocument()
+    expect(screen.getByText(/Plans Generated/i)).toBeInTheDocument()
+    expect(screen.getByText(/4\.9\/5/i)).toBeInTheDocument()
+    expect(screen.getByText(/TrustPilot Score/i)).toBeInTheDocument()
   })
 
-  it('should call trackButtonClick when Generate My AI Workout button is clicked', () => {
+  it('should call trackButtonClick when Build My Free Custom Plan button is clicked', () => {
     const { trackButtonClick } = analyticsModule
     render(<Hero />)
 
-    const generateButton = screen.getByRole('button', { name: /Generate My AI Workout/i })
+    const generateButton = screen.getByRole('button', { name: /Build My Free Custom Plan/i })
     fireEvent.click(generateButton)
 
-    expect(trackButtonClick).toHaveBeenCalledWith('Generate My AI Workout', 'hero')
+    expect(trackButtonClick).toHaveBeenCalledWith('Build My Free Custom Plan', 'hero')
   })
 
-  it('should call trackButtonClick and scroll to journey section when See How It Works button is clicked', () => {
+  it('should call trackButtonClick and scroll to journey section when See the Logic button is clicked', () => {
     const { trackButtonClick } = analyticsModule
 
     // Mock getElementById and scrollIntoView
@@ -93,10 +87,10 @@ describe('Hero', () => {
 
     render(<Hero />)
 
-    const seeButton = screen.getByRole('button', { name: /See How It Works/i })
+    const seeButton = screen.getByRole('button', { name: /See the Logic/i })
     fireEvent.click(seeButton)
 
-    expect(trackButtonClick).toHaveBeenCalledWith('See How It Works', 'hero')
+    expect(trackButtonClick).toHaveBeenCalledWith('See the Logic', 'hero')
     expect(document.getElementById).toHaveBeenCalledWith('journey')
     expect(mockScrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
   })

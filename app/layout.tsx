@@ -36,12 +36,14 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
 
 export const metadata: Metadata = {
+  // Title Template: Forces the "AI Workout Generator" to appear on every page
   title: {
-    default: 'Workout Generator - Trainer-Built Fitness Plans',
-    template: '%s | Workout Generator',
+    default: 'AI Workout Generator | Free Science-Based Strength Plans',
+    template: '%s | AI Workout Generator',
   },
+  // The "Click-Through" Hook
   description:
-    'Create personalized AI-powered workout plans tailored to your goals, fitness level, and equipment. Start your fitness journey today!',
+    'Build trainer-verified hypertrophy & strength programs in 30 seconds. The #1 free AI workout generator. No sign-up required.',
   keywords: [
     'workout',
     'fitness',
@@ -58,8 +60,8 @@ export const metadata: Metadata = {
     'workout strategies',
     'health and wellness',
   ],
-  authors: [{ name: 'Workout Generator' }],
-  applicationName: 'Workout Generator',
+  authors: [{ name: 'AI Workout Generator' }],
+  applicationName: 'AI Workout Generator',
   robots: {
     index: true,
     follow: true,
@@ -89,27 +91,27 @@ export const metadata: Metadata = {
     apple: [{ url: '/favicon-180.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/manifest.json',
+  // Open Graph (Social Cards)
   openGraph: {
-    title: 'Workout Generator - AI-Powered Fitness Plans',
-    description:
-      'Create personalized AI-powered workout plans tailored to your goals, fitness level, and equipment. Start your fitness journey today!',
-    type: 'website',
+    title: 'Stop Guessing. Start Training.',
+    description: 'Generate a 12-week science-based program tailored to your equipment.',
     url: baseUrl,
-    siteName: 'Workout Generator',
+    siteName: 'AI Workout Generator',
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`,
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Workout Generator - AI-Powered Fitness Plans',
+        alt: 'AI Workout Generator - Free Science-Based Strength Plans',
       },
     ],
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Workout Generator - AI-Powered Fitness Plans',
-    description:
-      'Create personalized AI-powered workout plans tailored to your goals. Start your fitness journey today!',
+    title: 'Stop Guessing. Start Training.',
+    description: 'Generate a 12-week science-based program tailored to your equipment.',
     images: [`${baseUrl}/og-image.jpg`],
   },
   other: {

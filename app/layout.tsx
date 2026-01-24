@@ -110,9 +110,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Stop Guessing. Start Training.',
-    description: 'Generate a 12-week science-based program tailored to your equipment.',
-    images: [`${baseUrl}/og-image.jpg`],
+    title: 'The AI Workout Generator (Free)',
+    description: 'Stop guessing. Build a science-based hypertrophy plan in 30 seconds.',
+    site: '@aiworkoutgen', // Business account
+    creator: '@AI_Workout', // Personal/creator account
+    images: [`${baseUrl}/twitter-og.png`],
   },
   other: {
     'mobile-web-app-capable': 'yes',

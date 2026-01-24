@@ -79,6 +79,59 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }))
 
+// Mock HTMLCanvasElement for Chart.js components
+// jsdom doesn't implement canvas APIs, so we provide minimal mocks
+HTMLCanvasElement.prototype.getContext = vi.fn((contextType: string) => {
+  if (contextType === '2d') {
+    return {
+      canvas: document.createElement('canvas'),
+      fillRect: vi.fn(),
+      clearRect: vi.fn(),
+      getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(4) })),
+      putImageData: vi.fn(),
+      createImageData: vi.fn(() => ({ data: new Uint8ClampedArray(4), width: 1, height: 1 })),
+      setTransform: vi.fn(),
+      drawImage: vi.fn(),
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      closePath: vi.fn(),
+      stroke: vi.fn(),
+      fill: vi.fn(),
+      measureText: vi.fn(() => ({ width: 0 })),
+      transform: vi.fn(),
+      translate: vi.fn(),
+      scale: vi.fn(),
+      rotate: vi.fn(),
+      arc: vi.fn(),
+      fillText: vi.fn(),
+      strokeText: vi.fn(),
+      createLinearGradient: vi.fn(() => ({
+        addColorStop: vi.fn(),
+      })),
+      createRadialGradient: vi.fn(() => ({
+        addColorStop: vi.fn(),
+      })),
+      createPattern: vi.fn(),
+      clip: vi.fn(),
+      isPointInPath: vi.fn(() => false),
+    } as any
+  }
+  return null
+})
+
+// Mock canvas dimensions
+Object.defineProperty(HTMLCanvasElement.prototype, 'width', {
+  writable: true,
+  value: 200,
+})
+Object.defineProperty(HTMLCanvasElement.prototype, 'height', {
+  writable: true,
+  value: 200,
+})
+
 // Mock global fetch to prevent network errors in CI
 // Individual tests can override this mock as needed
 global.fetch = vi.fn().mockResolvedValue({

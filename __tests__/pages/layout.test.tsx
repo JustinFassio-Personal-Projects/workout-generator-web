@@ -12,6 +12,10 @@ vi.mock('next/font/google', () => ({
     className: 'space-grotesk-font',
     variable: '--font-space-grotesk',
   })),
+  Cinzel: vi.fn(() => ({
+    className: 'cinzel-font',
+    variable: '--font-serif-display',
+  })),
 }))
 
 // Mock Supabase client

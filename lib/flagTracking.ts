@@ -1,13 +1,19 @@
 /**
  * Flag Tracking Utilities
- * Utilities for emitting feature flags to the DOM for Vercel Web Analytics
+ *
+ * DEPRECATED: This file contains Vercel-specific flag tracking utilities.
+ * With the migration to Statsig, these functions are no longer needed as
+ * Statsig handles flag evaluation and exposure logging automatically.
+ *
+ * These functions are kept for backward compatibility during the migration
+ * but should be removed once all components have been updated.
  */
 
-import { FLAG_NAMES, type FlagName } from './flags'
+import { FLAG_NAMES, type FlagName } from './flag-names'
 
 /**
- * Emit a feature flag to the DOM so Vercel Web Analytics can detect it
- * Flags are emitted as data attributes that Web Analytics automatically reads
+ * @deprecated Use Statsig flags instead. Statsig handles flag evaluation automatically.
+ * This function is kept for backward compatibility only.
  *
  * @param flagName - The name of the flag (kebab-case)
  * @param value - The value of the flag (boolean or string)
@@ -58,7 +64,7 @@ export const removeFlagFromDOM = (flagName: string): void => {
 }
 
 /**
- * Get all flags currently in the DOM
+ * @deprecated Use Statsig flags instead.
  *
  * @returns Array of flag names currently in the DOM
  */
@@ -79,7 +85,7 @@ export const getFlagsFromDOM = (): string[] => {
 }
 
 /**
- * Store flag in localStorage for persistence across page loads
+ * @deprecated Use Statsig flags instead. Statsig handles flag persistence automatically.
  *
  * @param flagName - The name of the flag
  * @param value - The value of the flag
@@ -98,7 +104,7 @@ export const storeFlagInLocalStorage = (flagName: FlagName, value: boolean | str
 }
 
 /**
- * Retrieve flag from localStorage
+ * @deprecated Use Statsig flags instead.
  *
  * @param flagName - The name of the flag
  * @returns The flag value or null if not found
@@ -118,7 +124,7 @@ export const getFlagFromLocalStorage = (flagName: FlagName): string | null => {
 }
 
 /**
- * Restore flags from localStorage and emit them to DOM
+ * @deprecated Use Statsig flags instead. Statsig handles flag restoration automatically.
  * Call this on page load to restore flags from previous sessions
  */
 export const restoreFlagsFromLocalStorage = (): void => {

@@ -57,6 +57,14 @@ vi.mock('@/components/landing/Footer/Footer', () => ({
   Footer: () => <div data-testid="footer">Footer</div>,
 }))
 
+vi.mock('@/components/landing/ScienceChart/ScienceChart', () => ({
+  ScienceChart: () => <div data-testid="science-chart">ScienceChart</div>,
+}))
+
+vi.mock('@/components/landing/EquipmentAdaptive/EquipmentAdaptive', () => ({
+  EquipmentAdaptive: () => <div data-testid="equipment-adaptive">EquipmentAdaptive</div>,
+}))
+
 vi.mock('@/data/faq', () => ({
   faqItems: [
     { question: 'Test Question 1', answer: 'Test Answer 1' },

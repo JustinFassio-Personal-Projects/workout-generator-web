@@ -2,15 +2,12 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Dumbbell, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import { FloatingIcons } from './FloatingIcons'
 import { LogoWatermark } from '@/components/ui/LogoWatermark/LogoWatermark'
-import { CredibilityCard } from './CredibilityCard'
 import posthog from 'posthog-js'
 import { trackButtonClick, analytics } from '@/lib/analytics'
-import { emitFlagToDOM, storeFlagInLocalStorage } from '@/lib/flagTracking'
-import { FLAG_NAMES } from '@/lib/flags'
 import styles from './Hero.module.scss'
 
 export const Hero: React.FC = () => {
@@ -32,32 +29,32 @@ export const Hero: React.FC = () => {
       </div>
       <LogoWatermark position="bottom-right" opacity={0.06} size={400} rotation={-15} />
       <FloatingIcons />
-      <div className={styles.heroLogo}>
-        <Image
-          src="/logo.png"
-          alt="AI Workout Generator"
-          width={200}
-          height={80}
-          className={styles.logoImage}
-          priority
-        />
-      </div>
       <div className={styles.heroContent}>
         <div className={styles.heroText} data-aos="fade-up">
-          <div className={styles.heroBrandMark}>
-            <Image
-              src="/favicon-48.png"
-              alt=""
-              width={16}
-              height={16}
-              className={styles.brandMarkIcon}
-            />
-            AIWorkoutGenerator™
+          {/* Trust Badges / SEO Hook */}
+          <div className="flex flex-col items-center gap-3 mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium animate-fade-in-up will-change-[transform,opacity]">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+              Vetted by U.S. Army Master Fitness Trainer.
+            </div>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium animate-fade-in-up will-change-[transform,opacity]"
+              style={{ animationDelay: '100ms' }}
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              100% Hallucination-Free.
+            </div>
           </div>
           <h1 className={styles.heroTitle}>
-            AI Workout Generator for Personalized Strength & Conditioning —{' '}
-            <span className={styles.gradientText}>Built by Certified Trainers</span>
+            Stop Guessing. <span className="text-white">Start Growing.</span>
+            <br />
+            <span className={styles.gradientText}>The Science-Based AI Workout Generator.</span>
           </h1>
+          <p className={styles.heroSubtitle}>
+            Instantly build personalized <strong>Hypertrophy & Strength</strong> cycles tailored to
+            your equipment. Our <strong>Closed-Loop Engine</strong> eliminates algorithmic errors,
+            ensuring every rep is biomechanically valid and safe.
+          </p>
           <div className={styles.heroActions}>
             <div className={styles.ctaLink} data-aos="fade-up" data-aos-delay="100">
               <Button
@@ -65,19 +62,15 @@ export const Hero: React.FC = () => {
                 size="lg"
                 icon={ArrowRight}
                 iconPosition="right"
+                className={styles.shimmerButton}
                 onClick={() => {
-                  // Set feature flag for "Start Building" click (client-side)
-                  // Emit to DOM for Vercel Web Analytics to detect
-                  emitFlagToDOM(FLAG_NAMES.INTRO_START_BUILDING_CLICKED, true)
-                  storeFlagInLocalStorage(FLAG_NAMES.INTRO_START_BUILDING_CLICKED, true)
-
-                  // Track the event with flag
+                  // Track the event
                   analytics.trackIntroStartBuilding()
-                  trackButtonClick('Generate My AI Workout', 'hero')
+                  trackButtonClick('Build My Free Custom Plan', 'hero')
 
                   // PostHog: Track hero CTA click - top of funnel event
                   posthog.capture('hero_generate_workout_clicked', {
-                    button_text: 'Generate My AI Workout',
+                    button_text: 'Build My Free Custom Plan',
                     location: 'hero',
                   })
 
@@ -88,7 +81,7 @@ export const Hero: React.FC = () => {
                   }
                 }}
               >
-                Generate My AI Workout
+                Build My Free Custom Plan
               </Button>
             </div>
             <div className={styles.demoButtonWrapper} data-aos="fade-up" data-aos-delay="200">
@@ -96,18 +89,13 @@ export const Hero: React.FC = () => {
                 variant="secondary"
                 size="lg"
                 onClick={() => {
-                  // Set feature flag for "Learn more" click (client-side)
-                  // Emit to DOM for Vercel Web Analytics to detect
-                  emitFlagToDOM(FLAG_NAMES.INTRO_LEARN_MORE_CLICKED, true)
-                  storeFlagInLocalStorage(FLAG_NAMES.INTRO_LEARN_MORE_CLICKED, true)
-
-                  // Track the event with flag
+                  // Track the event
                   analytics.trackIntroLearnMore()
-                  trackButtonClick('See How It Works', 'hero')
+                  trackButtonClick('See the Logic', 'hero')
 
                   // PostHog: Track hero secondary CTA click
                   posthog.capture('hero_see_how_it_works_clicked', {
-                    button_text: 'See How It Works',
+                    button_text: 'See the Logic',
                     location: 'hero',
                   })
 
@@ -119,27 +107,61 @@ export const Hero: React.FC = () => {
                 }}
                 className={styles.seeHowItWorksButton}
               >
-                <Image
-                  src="/favicon-48.png"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className={styles.buttonIcon}
-                />
-                See How It Works
+                See the Logic
               </Button>
             </div>
           </div>
-          <h2 className={styles.heroH2}>
-            Smart, safe workout plans powered by adaptive AI — grounded in real coaching experience
-          </h2>
-          <p className={styles.heroSubtitle}>
-            Create adaptive workout plans that evolve with your progress, goals, and equipment —
-            based on real training principles, not random AI guesses.
-          </p>
-          <CredibilityCard />
-          <div className={styles.heroStats}>
-            Trained 8,000+ athletes • 15,000+ workouts generated • 4.9★ average rating
+          {/* <CredibilityCard /> */}{' '}
+          {/* Commented out - testing showed fewer signups with this component */}
+          <div className={styles.statsGrid}>
+            <div className={styles.statItem}>
+              <p className={styles.statNumber}>8,000+</p>
+              <p className={styles.statLabel}>Athletes Optimized</p>
+            </div>
+            <div className={styles.statItem}>
+              <p className={styles.statNumber}>15k+</p>
+              <p className={styles.statLabel}>Plans Generated</p>
+            </div>
+            <div className={styles.statItem}>
+              <p className={styles.statNumber}>4.9/5</p>
+              <p className={styles.statLabel}>TrustPilot Score</p>
+            </div>
+            <div className={styles.statItem}>
+              <p className={styles.statNumber}>Zero</p>
+              <p className={styles.statLabel}>Hallucinations</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Feature Highlights Section */}
+      <div className={styles.featureHighlights}>
+        <div className={styles.featureHighlightsContainer}>
+          <div className={styles.featureCard}>
+            <div className={`${styles.featureIcon} ${styles.featureIconBlue}`}>
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+            <div>
+              <p className={styles.featureTitle}>Anti-Hallucination Engine</p>
+              <p className={styles.featureDescription}>Biomechanically verified exercises only.</p>
+            </div>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={`${styles.featureIcon} ${styles.featureIconGreen}`}>
+              <Dumbbell className="w-6 h-6" />
+            </div>
+            <div>
+              <p className={styles.featureTitle}>Equipment Adaptive</p>
+              <p className={styles.featureDescription}>Dumbbells, Bodyweight, or Full Gym.</p>
+            </div>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={`${styles.featureIcon} ${styles.featureIconPurple}`}>
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div>
+              <p className={styles.featureTitle}>Progressive Overload</p>
+              <p className={styles.featureDescription}>Smart volume scaling & periodization.</p>
+            </div>
           </div>
         </div>
       </div>

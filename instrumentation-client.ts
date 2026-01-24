@@ -4,6 +4,28 @@ declare global {
   var __POSTHOG_INITIALIZED__: boolean
   interface Window {
     posthog: PostHogInterface
+    __POSTHOG_WEB_VITALS_CALLBACK?: (metric: any) => void
+  }
+}
+
+// Set up web vitals callback IMMEDIATELY when this module loads
+// PostHog checks for this callback during initialization, so it must exist before PostHog.init() is called
+// We handle web vitals manually via Next.js useReportWebVitals hook, so we disable PostHog's automatic capture
+if (typeof window !== 'undefined') {
+  // Create the callback that PostHog expects
+  // This will be called by the WebVitals component when metrics are available
+  window.__POSTHOG_WEB_VITALS_CALLBACK = (metric: any) => {
+    // Send web vitals to PostHog when the callback is invoked
+    if (window.posthog) {
+      window.posthog.capture('$web_vitals', {
+        name: metric.name,
+        value: metric.value,
+        id: metric.id,
+        delta: metric.delta,
+        rating: metric.rating,
+        navigationType: metric.navigationType,
+      })
+    }
   }
 }
 
@@ -18,6 +40,10 @@ function initPostHog() {
     defaults: '2025-05-24',
     // Enables capturing unhandled exceptions via Error Tracking
     capture_exceptions: true,
+    // Disable PostHog's automatic web vitals capture - we handle it manually via WebVitals component
+    capture_performance: {
+      web_vitals: false,
+    },
     // Turn on debug in development mode
     debug: process.env.NODE_ENV === 'development',
     loaded: function (posthog) {

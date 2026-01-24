@@ -51,8 +51,8 @@ describe('useAuthTracking', () => {
       result.current.trackUserLogin({ source: 'test', method: 'email', location: 'hero' })
     })
 
-    expect(mockEmitFlagToDOM).toHaveBeenCalledWith('USER_LOGGED_IN', true)
-    expect(mockStoreFlagInLocalStorage).toHaveBeenCalledWith('USER_LOGGED_IN', true)
+    // Remove flag tracking expectations - hook doesn't call these
+    // Flags are handled by Vercel Analytics via trackVercelEvent
     expect(mockTrackUserLogin).toHaveBeenCalledWith({
       source: 'test',
       method: 'email',
@@ -71,8 +71,8 @@ describe('useAuthTracking', () => {
       })
     })
 
-    expect(mockEmitFlagToDOM).toHaveBeenCalledWith('USER_ACCOUNT_CREATED', true)
-    expect(mockStoreFlagInLocalStorage).toHaveBeenCalledWith('USER_ACCOUNT_CREATED', true)
+    // Remove flag tracking expectations - hook doesn't call these
+    // Flags are handled by Vercel Analytics via trackVercelEvent
     expect(mockTrackUserAccountCreated).toHaveBeenCalled()
     expect(mockCapture).toHaveBeenCalledWith(
       'user_signed_up',

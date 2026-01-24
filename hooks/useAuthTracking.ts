@@ -6,8 +6,6 @@
 import { useEffect, useCallback } from 'react'
 import posthog from 'posthog-js'
 import { analytics } from '@/lib/analytics'
-import { emitFlagToDOM, storeFlagInLocalStorage } from '@/lib/flagTracking'
-import { FLAG_NAMES } from '@/lib/flags'
 
 interface UseAuthTrackingOptions {
   /**
@@ -47,11 +45,6 @@ export const useAuthTracking = (options: UseAuthTrackingOptions = {}) => {
    */
   const trackUserLogin = useCallback(
     (metadata?: { source?: string; method?: string; location?: string }) => {
-      // Set feature flag (client-side)
-      // Emit to DOM for Vercel Web Analytics to detect
-      emitFlagToDOM(FLAG_NAMES.USER_LOGGED_IN, true)
-      storeFlagInLocalStorage(FLAG_NAMES.USER_LOGGED_IN, true)
-
       // Track the event
       analytics.trackUserLogin(metadata)
     },
@@ -80,11 +73,6 @@ export const useAuthTracking = (options: UseAuthTrackingOptions = {}) => {
         // First parameter is metadata (backward compatible)
         finalMetadata = userIdOrMetadata
       }
-
-      // Set feature flag (client-side)
-      // Emit to DOM for Vercel Web Analytics to detect
-      emitFlagToDOM(FLAG_NAMES.USER_ACCOUNT_CREATED, true)
-      storeFlagInLocalStorage(FLAG_NAMES.USER_ACCOUNT_CREATED, true)
 
       // Track the event
       analytics.trackUserAccountCreated(finalMetadata)

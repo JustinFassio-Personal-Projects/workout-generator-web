@@ -15,9 +15,10 @@
 
 // Typography Scale
 :root {
-  --font-sans:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
+  // Font families are set via Next.js font optimization in app/layout.tsx
+  // --font-sans: Inter (set via inter.variable)
+  // --font-display: Space Grotesk (set via spaceGrotesk.variable)
+  // --font-serif-display: Cinzel (set via cinzel.variable)
 
   --font-size-xs: 0.75rem; // 12px
   --font-size-sm: 0.875rem; // 14px

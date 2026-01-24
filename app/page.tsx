@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 import { Hero } from '@/components/landing/Hero/Hero'
+import { ScienceChart } from '@/components/landing/ScienceChart/ScienceChart'
+import { EquipmentAdaptive } from '@/components/landing/EquipmentAdaptive/EquipmentAdaptive'
 import { FAQ } from '@/components/landing/FAQ/FAQ'
 import { WorkoutPlanBuilder } from '@/components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder'
 import { Features } from '@/components/landing/Features/Features'
@@ -45,8 +47,12 @@ export default function Home() {
               offset: 100,
             })
           } catch (error) {
-            // Handle initialization errors gracefully (log warning for debugging)
-            console.warn('AOS initialization error:', error)
+            // Handle initialization errors gracefully
+            // Silently fail - AOS is non-critical for page functionality
+            if (process.env.NODE_ENV === 'development') {
+              // Only log in development for debugging
+              console.warn('AOS initialization error:', error)
+            }
           }
         })
       }
@@ -155,6 +161,8 @@ export default function Home() {
       />
       <main className="min-h-screen">
         <Hero />
+        <ScienceChart />
+        <EquipmentAdaptive />
         <FAQ />
         <WorkoutPlanBuilder />
         <Features />

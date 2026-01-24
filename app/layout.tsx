@@ -114,7 +114,14 @@ export const metadata: Metadata = {
     description: 'Stop guessing. Build a science-based hypertrophy plan in 30 seconds.',
     site: '@aiworkoutgen', // Business account
     creator: '@AI_Workout', // Personal/creator account
-    images: [`${baseUrl}/twitter-og.png`],
+    images: [
+      {
+        url: `${baseUrl}/twitter-og.png`,
+        width: 1200,
+        height: 630,
+        alt: 'AI Workout Generator - Free Science-Based Strength Plans',
+      },
+    ],
   },
   other: {
     'mobile-web-app-capable': 'yes',

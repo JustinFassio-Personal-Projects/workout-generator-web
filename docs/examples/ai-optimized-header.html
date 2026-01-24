@@ -303,7 +303,7 @@
             <div class="max-w-7xl mx-auto px-4 text-center">
                 <span class="text-2xl block mb-4">⚡</span>
                 <p class="text-slate-500 text-sm">
-                    © 2024 AIWorkoutGenerator. Science-based training for everyone.
+                    © <span id="copyright-year">2024</span> AIWorkoutGenerator. Science-based training for everyone.
                 </p>
                 <div class="flex justify-center gap-6 mt-6">
                     <a href="#" class="text-slate-400 hover:text-white text-sm">Privacy</a>
@@ -389,6 +389,12 @@
 
         // --- CHART INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Set dynamic copyright year
+            const yearElement = document.getElementById('copyright-year');
+            if (yearElement) {
+                yearElement.textContent = new Date().getFullYear();
+            }
+            
             const ctx = document.getElementById('scienceChart').getContext('2d');
             
             // Gradient for the AI line

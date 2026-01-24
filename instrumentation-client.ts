@@ -8,42 +8,9 @@ declare global {
   }
 }
 
-// Suppress PostHog's web vitals warning
-// PostHog tries to automatically capture web vitals but we handle it manually via Next.js hook
-// This prevents the "web vitals callbacks not loaded" console error
-// We need to set this up BEFORE any PostHog code runs
-if (typeof window !== 'undefined') {
-  // Store original console.error before PostHog can override it
-  const originalConsoleError = console.error.bind(console)
-
-  // Override console.error to filter out PostHog web vitals warnings
-  console.error = function (...args: any[]) {
-    // Check if this is the PostHog web vitals warning
-    // The error can come in different formats, so we check all args
-    const errorString = args
-      .map(arg => {
-        if (typeof arg === 'string') return arg
-        if (arg?.toString) return arg.toString()
-        return String(arg)
-      })
-      .join(' ')
-
-    if (
-      errorString.includes('[PostHog.js]') &&
-      (errorString.includes('[Web Vitals]') || errorString.includes('Web Vitals')) &&
-      (errorString.includes('web vitals callbacks not loaded') ||
-        errorString.includes('callbacks not loaded'))
-    ) {
-      // Suppress this specific warning - we handle web vitals via WebVitals component
-      return
-    }
-    // Call original console.error for all other errors
-    originalConsoleError.apply(console, args)
-  }
-}
-
 // Set up web vitals callback IMMEDIATELY when this module loads
 // PostHog checks for this callback during initialization, so it must exist before PostHog.init() is called
+// We handle web vitals manually via Next.js useReportWebVitals hook, so we disable PostHog's automatic capture
 if (typeof window !== 'undefined') {
   // Create the callback that PostHog expects
   // This will be called by the WebVitals component when metrics are available
@@ -73,6 +40,10 @@ function initPostHog() {
     defaults: '2025-05-24',
     // Enables capturing unhandled exceptions via Error Tracking
     capture_exceptions: true,
+    // Disable PostHog's automatic web vitals capture - we handle it manually via WebVitals component
+    capture_performance: {
+      web_vitals: false,
+    },
     // Turn on debug in development mode
     debug: process.env.NODE_ENV === 'development',
     loaded: function (posthog) {

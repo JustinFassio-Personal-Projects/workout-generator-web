@@ -160,7 +160,7 @@ export const ScienceChart: React.FC = () => {
       chart.options.scales!.y!.title!.text = currentGoalData.yAxisLabel
       chart.update()
     }
-  }, [selectedGoal, currentGoalData])
+  }, [selectedGoal]) // currentGoalData is derived from selectedGoal, so only selectedGoal is needed
 
   const handleGoalChange = (goal: GoalType) => {
     setSelectedGoal(goal)

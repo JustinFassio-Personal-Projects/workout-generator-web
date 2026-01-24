@@ -21,10 +21,11 @@ import { FLAG_NAMES } from './flag-names'
  * Uses anonymous user identification (no userID) for this site
  * which doesn't have user authentication
  */
-export const identify = dedupe((async () => ({
-  userID: undefined, // Anonymous users
-  customIDs: {}, // Empty custom IDs for anonymous users
-})) satisfies Identify<StatsigUser>)
+export const identify = dedupe((() =>
+  Promise.resolve({
+    userID: undefined, // Anonymous users
+    customIDs: {}, // Empty custom IDs for anonymous users
+  })) satisfies Identify<StatsigUser>)
 
 /**
  * Creates a Statsig feature flag getter function

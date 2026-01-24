@@ -18,6 +18,24 @@ import { DEFAULT_ONBOARDING_DATA } from '@/types/onboarding'
 import styles from './Journey.module.scss'
 import builderStyles from '@/components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder.module.scss'
 
+/**
+ * Determines equipment access level from an array of equipment categories
+ * @param equipmentCategories - Array of equipment category strings (e.g., ['general', 'strength', 'functional', 'cardio'])
+ * @returns EquipmentAccess level based on categories and count
+ */
+function getEquipmentAccessFromCategories(equipmentCategories: string[]): EquipmentAccess {
+  if (equipmentCategories.includes('cardio') && equipmentCategories.length >= 4) {
+    return 'full_gym'
+  }
+  if (equipmentCategories.includes('functional') && equipmentCategories.length >= 3) {
+    return 'home'
+  }
+  if (equipmentCategories.length >= 2) {
+    return 'minimal'
+  }
+  return 'none'
+}
+
 export interface JourneyStepCardProps {
   number: number
   title: string
@@ -50,15 +68,7 @@ export const JourneyStepCard: React.FC<JourneyStepCardProps> = ({
   )
   const [equipmentAccess, setEquipmentAccess] = useState<EquipmentAccess>(
     number === 1
-      ? DEFAULT_ONBOARDING_DATA.equipment_access.includes('cardio') &&
-        DEFAULT_ONBOARDING_DATA.equipment_access.length >= 4
-        ? 'full_gym'
-        : DEFAULT_ONBOARDING_DATA.equipment_access.includes('functional') &&
-            DEFAULT_ONBOARDING_DATA.equipment_access.length >= 3
-          ? 'home'
-          : DEFAULT_ONBOARDING_DATA.equipment_access.length >= 2
-            ? 'minimal'
-            : 'none'
+      ? getEquipmentAccessFromCategories(DEFAULT_ONBOARDING_DATA.equipment_access)
       : 'none'
   )
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
@@ -257,7 +267,7 @@ export const JourneyStepCard: React.FC<JourneyStepCardProps> = ({
                     className={styles.workoutIframe}
                     title="Sample Workout Plan"
                     allow="fullscreen"
-                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                    // Sandbox removed: aiworkoutgen.app is a trusted source from the same organization
                   />
                 </div>
                 <a

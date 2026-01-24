@@ -1,0 +1,323 @@
+.scienceSection {
+  background: var(--bg-dark);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: var(--spacing-5xl) 0 0 0;
+  position: relative;
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-3xl) 0 0 0;
+  }
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+
+  @media (max-width: 768px) {
+    padding: 0 var(--spacing-md);
+  }
+}
+
+.textContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-4xl);
+  text-align: left;
+  max-width: 800px;
+
+  @media (max-width: 768px) {
+    margin-bottom: var(--spacing-3xl);
+    text-align: left;
+  }
+}
+
+.heading {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+.description {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+
+  strong {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  @media (max-width: 768px) {
+    font-size: var(--font-size-base);
+  }
+}
+
+.featureHighlights {
+  background: var(--bg-dark);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 20;
+  padding: var(--spacing-2xl) 0;
+  width: 100%;
+  margin-top: 0;
+}
+
+.featureHighlightsContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-2xl);
+
+  @media (min-width: 768px) {
+    gap: var(--spacing-3xl);
+  }
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: var(--spacing-xl);
+  }
+}
+
+.featureCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: left;
+  transition: all var(--transition-base);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  flex: 0 1 auto;
+
+  &:hover {
+    .featureIcon {
+      transform: scale(1.1);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    flex: 1 1 100%;
+    max-width: 280px;
+  }
+}
+
+.featureIcon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.featureIconPurple {
+  background: rgba(168, 85, 247, 0.1);
+  color: rgb(192, 132, 252);
+
+  .featureCard:hover & {
+    background: rgba(168, 85, 247, 0.2);
+    color: rgb(196, 181, 253);
+  }
+}
+
+.featureIconBlue {
+  background: rgba(59, 130, 246, 0.1);
+  color: rgb(96, 165, 250);
+
+  .featureCard:hover & {
+    background: rgba(59, 130, 246, 0.2);
+    color: rgb(147, 197, 253);
+  }
+}
+
+.featureTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+
+  @media (max-width: 768px) {
+    font-size: var(--font-size-base);
+  }
+}
+
+.featureDescription {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: var(--line-height-relaxed);
+
+  strong {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  @media (max-width: 768px) {
+    font-size: var(--font-size-xs);
+  }
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-sm) 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+
+  li {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    line-height: var(--line-height-relaxed);
+    position: relative;
+    padding-left: var(--spacing-md);
+
+    &::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: rgb(96, 165, 250); // Blue-400 to match icon
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+    }
+
+    strong {
+      color: var(--text-primary);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    @media (max-width: 768px) {
+      font-size: 0.7rem;
+      padding-left: var(--spacing-sm);
+    }
+  }
+}
+
+.chartWrapper {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto var(--spacing-4xl);
+
+  @media (max-width: 768px) {
+    margin-bottom: var(--spacing-3xl);
+  }
+}
+
+.chartContainer {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-xl);
+  width: 100%;
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-lg);
+  }
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.chartTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.chartBadge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  background: rgba(16, 185, 129, 0.1);
+  color: rgb(52, 211, 153);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.goalSelectors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    gap: var(--spacing-xs);
+  }
+}
+
+.goalSelector {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-xs);
+  border-radius: 9999px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(30, 41, 59, 0.7);
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(148, 163, 184, 0.5);
+    color: var(--text-primary);
+  }
+}
+
+.goalSelectorActive {
+  background: rgb(37, 99, 235); // Blue-600
+  color: white;
+  border-color: rgb(37, 99, 235);
+
+  &:hover {
+    background: rgb(29, 78, 216); // Blue-700
+    border-color: rgb(29, 78, 216);
+  }
+}
+
+.chartInner {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  max-height: 400px;
+
+  @media (max-width: 768px) {
+    height: 300px;
+  }
+}
+
+.chartNote {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-align: center;
+  margin: var(--spacing-lg) 0 0 0;
+  opacity: 0.7;
+}

@@ -1,5 +1,5 @@
 import { LucideIcon } from 'lucide-react'
-import { UserPlus, Target, Dumbbell, Trophy, TrendingUp } from 'lucide-react'
+import { UserPlus, Activity, Target, Dumbbell, Trophy, TrendingUp } from 'lucide-react'
 
 export interface JourneyStep {
   id: string
@@ -43,8 +43,8 @@ export const journeySteps: JourneyStep[] = [
     accentColor: '#22c55e',
   },
   {
-    id: '3',
-    number: 3,
+    id: '4',
+    number: 4,
     title: 'Start Training',
     description:
       'Begin your fitness journey with guided workouts, exercise demonstrations, and real-time form tips.',
@@ -58,8 +58,8 @@ export const journeySteps: JourneyStep[] = [
     accentColor: '#16a34a',
   },
   {
-    id: '4',
-    number: 4,
+    id: '5',
+    number: 5,
     title: 'Track Progress',
     description:
       'Monitor your improvements with detailed analytics, workout history, and achievement milestones.',
@@ -68,8 +68,8 @@ export const journeySteps: JourneyStep[] = [
     accentColor: '#15803d',
   },
   {
-    id: '5',
-    number: 5,
+    id: '6',
+    number: 6,
     title: 'Achieve Results',
     description:
       'Reach your fitness goals and celebrate your success with our community of motivated individuals.',

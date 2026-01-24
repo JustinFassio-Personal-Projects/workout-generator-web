@@ -21,6 +21,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@flags-sdk/statsig": "^0.2.5",
     "@openai/chatkit-react": "^1.2.3",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",

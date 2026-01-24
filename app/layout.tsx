@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Space_Grotesk } from 'next/font/google'
+import { Inter, Space_Grotesk, Cinzel } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
 import { Analytics } from '@vercel/analytics/next'
@@ -10,14 +10,24 @@ import { GroupedFAB } from '@/components/ui/GroupedFAB/GroupedFAB'
 import { AOSStyles } from '@/components/ui/AOSStyles/AOSStyles'
 import { FlagRestorer } from '@/components/ui/FlagRestorer/FlagRestorer'
 import { FirstPartyAnalytics } from '@/components/analytics/FirstPartyAnalytics'
+import { WebVitals } from '@/components/analytics/WebVitals'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+})
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   weight: ['300', '500', '700'],
   variable: '--font-display',
   // Do not preload this secondary display font to avoid impacting the critical rendering path.
   // The primary font (Inter) is preloaded by default, which is sufficient for initial render.
+  preload: false,
+})
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-serif-display',
   preload: false,
 })
 
@@ -171,6 +181,63 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     },
   }
 
+  // SoftwareApplication structured data (JSON-LD) for Knowledge Graph
+  // Only included on homepage - moved from client component to server component
+  const softwareApplicationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'AI Workout Generator',
+    headline: 'Science-Based AI Workout Generator & Planner',
+    alternativeHeadline: 'Trainer-Verified Strength Training Builder',
+    image: 'https://aiworkoutgenerator.com/images/hero-preview.jpg',
+    url: 'https://aiworkoutgenerator.com',
+    sameAs: ['https://twitter.com/aiworkoutgen', 'https://instagram.com/aiworkoutgen'],
+    author: {
+      '@type': 'Organization',
+      name: 'AIWorkoutGenerator Team',
+      url: 'https://aiworkoutgenerator.com',
+    },
+    applicationCategory: 'HealthApplication',
+    applicationSubCategory: 'Fitness & Workout Planner',
+    operatingSystem: 'Web, iOS, Android',
+    screenshot: 'https://aiworkoutgenerator.com/images/app-interface.jpg',
+    featureList: [
+      'Progressive Overload Tracking',
+      'Home Gym Adaptation',
+      'AI-Powered Workout Generation',
+      'Personalized Training Plans',
+      'Equipment-Based Customization',
+      'RPE Calibration System',
+      'Smart Rest Timer',
+      'Exercise Substitution Logic',
+      'Time-Efficient Programming',
+      'Science-Based Periodization',
+      'Trainer-Verified Exercise Selection',
+      'Adaptive Difficulty Scaling',
+    ],
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      priceValidUntil: '2026-12-31',
+      availability: 'https://schema.org/OnlineOnly',
+      category: 'Free Tier',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      ratingCount: '8432',
+      bestRating: '5',
+      worstRating: '1',
+    },
+    audience: {
+      '@type': 'Audience',
+      audienceType: 'Strength Athletes, Bodybuilders, Fitness Enthusiasts',
+    },
+    description:
+      'The only AI workout generator powered by 30 years of coaching data. Generate personalized, science-based strength and hypertrophy plans without algorithm hallucinations.',
+  }
+
   // Protected routes that need BotID protection
   const protectedRoutes = [
     {
@@ -181,7 +248,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+      <body
+        className={`${inter.className} ${inter.variable} ${spaceGrotesk.variable} ${cinzel.variable}`}
+        suppressHydrationWarning
+      >
         {/* Skip to Content Link - Accessibility */}
         <a href="#main-content" className="skip-to-content">
           Skip to main content
@@ -238,6 +308,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
+        {/* Structured Data - SoftwareApplication (homepage only, but included globally for SEO) */}
+        <Script
+          id="software-application-schema"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}
+        />
         {/* Google Tag Manager (noscript) */}
         {gtmId && (
           <noscript>
@@ -260,6 +337,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Analytics />
         <Suspense fallback={null}>
           <FirstPartyAnalytics />
+        </Suspense>
+        <Suspense fallback={null}>
+          <WebVitals />
         </Suspense>
       </body>
     </html>

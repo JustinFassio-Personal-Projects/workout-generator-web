@@ -117,17 +117,28 @@
   padding: var(--spacing-xl);
   cursor: pointer;
   transition: all var(--transition-base);
-  overflow: hidden;
+  overflow: hidden; // Default to hidden
 
   &:hover {
     transform: translateX(8px);
   }
 
+  // For step 1, 2, 3 with form, allow overflow to show full form content
+  &--withForm {
+    overflow: visible;
+  }
+
   &--expanded {
     .stepFeatures {
-      max-height: 500px;
+      max-height: 500px; // Default expanded height
       opacity: 1;
       margin-top: var(--spacing-lg);
+    }
+
+    // For step 1, 2, 3 with form, allow more height and visible overflow
+    &.stepCard--withForm .stepFeatures {
+      max-height: 2000px;
+      overflow: visible; // Explicitly visible here
     }
 
     .expandButton {
@@ -249,4 +260,73 @@
   color: var(--text-tertiary);
   font-style: italic;
   margin-left: var(--spacing-xs);
+}
+
+.formSeparator {
+  height: 1px;
+  background: var(--glass-border-base);
+  margin: var(--spacing-xl) 0;
+  width: 100%;
+}
+
+.workoutPreview {
+  width: 100%;
+  padding: var(--spacing-lg) 0;
+}
+
+.workoutPreviewTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.workoutPreviewDescription {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.workoutIframeWrapper {
+  width: 100%;
+  min-height: 600px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--glass-bg-base);
+  border: 1px solid var(--glass-border-base);
+  position: relative;
+  margin-bottom: var(--spacing-md);
+
+  @media (max-width: 768px) {
+    min-height: 500px;
+  }
+}
+
+.workoutIframe {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  border: none;
+  display: block;
+
+  @media (max-width: 768px) {
+    min-height: 500px;
+  }
+}
+
+.workoutLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  font-weight: var(--font-weight-semibold);
+
+  &:hover {
+    color: var(--color-accent-light);
+    text-decoration: underline;
+  }
 }

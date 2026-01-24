@@ -25,7 +25,17 @@
   }
 
   body {
-    font-family: var(--font-sans);
+    font-family: var(
+      --font-sans,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      'Helvetica Neue',
+      Arial,
+      sans-serif
+    );
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
     color: var(--text-primary);
@@ -210,6 +220,15 @@ a {
 }
 
 // Blog Layout Styles
+// Font utility classes
+.font-display {
+  font-family: var(--font-display, var(--font-sans));
+}
+
+.font-serif-display {
+  font-family: var(--font-serif-display, Georgia, 'Times New Roman', serif);
+}
+
 .blog-layout {
   background: var(--bg-dark);
   background-image:

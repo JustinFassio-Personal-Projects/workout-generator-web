@@ -28,7 +28,7 @@ This is why generic AI chatbots fail at fitness. They hallucinate a "new" workou
 
 At **AI Workout Generator**, we built a memory system. When you generate a "Strength" block, we keep the core compound movements stable while rotating the accessory work. This gives you the novelty you _want_ (dopamine) with the consistency you _need_ (hypertrophy).
 
-## Stop Guessing. Start Growing.
+## Stop Guessing. Start Training.
 
 Get a trainer-verified, progressive plan generated in seconds. No credit card required.
 

@@ -46,7 +46,7 @@ export const Hero: React.FC = () => {
             </div>
           </div>
           <h1 className={styles.heroTitle}>
-            Stop Guessing. <span className="text-white">Start Growing.</span>
+            Stop Guessing. <span className="text-white">Start Training.</span>
             <br />
             <span className={styles.gradientText}>The Science-Based AI Workout Generator.</span>
           </h1>

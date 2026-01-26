@@ -36,7 +36,7 @@ describe('Hero', () => {
     render(<Hero />)
     // Text is split across elements, so we check for each part
     expect(screen.getByText(/Stop Guessing\./i)).toBeInTheDocument()
-    expect(screen.getByText(/Start Growing\./i)).toBeInTheDocument()
+    expect(screen.getByText(/Start Training\./i)).toBeInTheDocument()
     expect(screen.getByText(/The Science-Based AI Workout Generator/i)).toBeInTheDocument()
   })
 

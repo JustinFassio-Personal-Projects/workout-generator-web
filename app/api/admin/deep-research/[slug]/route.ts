@@ -22,12 +22,12 @@ export async function GET(request: Request, { params }: RouteParams) {
     const supabase = await createServerSupabaseClient()
     const { data: adminUser } = await supabase
       .from('admin_users')
-      .select('id')
+      .select('id, role')
       .eq('id', user.id)
       .single()
 
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    if (!adminUser || adminUser.role !== 'admin') {
+      return NextResponse.json({ error: 'Only admins can access deep research' }, { status: 403 })
     }
 
     const adminClient = createAdminClient()
@@ -62,12 +62,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
     const supabase = await createServerSupabaseClient()
     const { data: adminUser } = await supabase
       .from('admin_users')
-      .select('id')
+      .select('id, role')
       .eq('id', user.id)
       .single()
 
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    if (!adminUser || adminUser.role !== 'admin') {
+      return NextResponse.json({ error: 'Only admins can update deep research' }, { status: 403 })
     }
 
     const rawData = await request.json()
@@ -118,7 +118,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       html_content: rawData.html_content,
       seo_title: rawData.seo_title || null,
       seo_description: rawData.seo_description || null,
-      status: rawData.status,
+      status: rawData.status as 'draft' | 'published',
       equipment_zones: rawData.equipment_zones || [],
       experience_levels: rawData.experience_levels || [],
       injuries_addressed: rawData.injuries_addressed || [],

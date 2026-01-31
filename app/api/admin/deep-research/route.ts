@@ -83,6 +83,13 @@ export async function POST(request: Request) {
       )
     }
 
+    if (data.status !== 'draft' && data.status !== 'published') {
+      return NextResponse.json(
+        { error: 'Missing or invalid required field: status must be "draft" or "published"' },
+        { status: 400 }
+      )
+    }
+
     if (typeof data.html_content === 'string' && data.html_content.length > HTML_CONTENT_MAX_SIZE) {
       return NextResponse.json(
         { error: 'HTML content exceeds maximum size (500KB)' },
@@ -94,9 +101,10 @@ export async function POST(request: Request) {
       data.published_at = new Date().toISOString()
     }
 
-    // Include optional metadata
+    // Include required and optional metadata; status is validated above
     const insertData = {
       ...data,
+      status: data.status as 'draft' | 'published',
       equipment_zones: data.equipment_zones || [],
       experience_levels: data.experience_levels || [],
       injuries_addressed: data.injuries_addressed || [],

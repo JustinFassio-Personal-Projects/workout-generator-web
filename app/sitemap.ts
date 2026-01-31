@@ -3,6 +3,7 @@ import { createPublicClient } from '@/lib/supabase/public'
 import { videos } from '@/data/videos'
 import { reports } from '@/types/reports'
 import { getAllMilestoneSlugs } from '@/data/story/milestones'
+import { getAllPublishedSlugs } from '@/lib/deep-research/queries'
 
 // ISR: Revalidate every 60 seconds (fallback)
 // Primary revalidation happens on-demand when admin publishes
@@ -62,6 +63,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/reports`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/deep-research`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
@@ -140,6 +147,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
+  // Deep research pages (dynamic)
+  const deepResearchSlugs = await getAllPublishedSlugs()
+  const deepResearchPages: MetadataRoute.Sitemap = deepResearchSlugs.map(slug => ({
+    url: `${baseUrl}/deep-research/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
+
   return [
     homepage,
     blogPage,
@@ -150,5 +166,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...videoPages,
     ...reportPages,
     ...storyPages,
+    ...deepResearchPages,
   ]
 }

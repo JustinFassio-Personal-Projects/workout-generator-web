@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   BarChart3,
   FileText,
+  FileSearch,
   Users,
   ChevronLeft,
   ChevronRight,
@@ -48,6 +49,7 @@ export function AdminLayout({ children, user, role }: AdminLayoutProps) {
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/admin/blog', label: 'Blog Posts', icon: FileText },
+    { href: '/admin/deep-research', label: 'Deep Research', icon: FileSearch },
     { href: '/admin/leads', label: 'Leads', icon: Users },
   ]
 

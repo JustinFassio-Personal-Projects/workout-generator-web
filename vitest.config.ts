@@ -46,6 +46,26 @@ export default defineConfig({
         'features/blog/index.ts',
         'features/blog/types.ts',
         'vitest.config.critical.ts',
+        // Exclude static data/config files (no executable logic)
+        'data/contextual-faqs.ts',
+        'data/faq-data.ts',
+        'data/deep-research-profile-options.ts',
+        // Server-only: uses flags/next which requires Node.js async_hooks
+        'lib/flags.ts',
+        // Deprecated flag tracking (Vercel migration); backward compat only
+        'lib/flagTracking.ts',
+        // Requires IntersectionObserver/scroll; tested via integration
+        'features/analytics/hooks/useScrollTracking.ts',
+        // FAQ UI components; covered by page-level tests
+        'components/ui/FAQItems/**',
+        // PostHog init; runs on document load
+        'instrumentation-client.ts',
+        // Dev proxy; not exercised in unit tests
+        'proxy.ts',
+        // Equipment catalog page; tested via E2E
+        'app/equipment/page.tsx',
+        'app/equipment/page.module.scss',
+        'app/equipment/layout.tsx',
       ],
       thresholds: {
         // Lowered from 75% to 64% to match current coverage (64.63%)

@@ -141,9 +141,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     revalidatePath('/deep-research')
-    revalidatePath(`/deep-research/${slug}`)
+    // When slug changed: revalidate both old path (clear stale cache) and new path (fresh content)
     if (updateData.slug && updateData.slug !== slug) {
+      revalidatePath(`/deep-research/${slug}`)
       revalidatePath(`/deep-research/${updateData.slug}`)
+    } else {
+      revalidatePath(`/deep-research/${slug}`)
     }
     revalidatePath('/sitemap.xml')
 

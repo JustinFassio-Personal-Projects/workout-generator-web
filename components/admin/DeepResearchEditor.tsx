@@ -507,7 +507,7 @@ export function DeepResearchEditor({ item }: DeepResearchEditorProps) {
                   value={daysPerWeekMin ?? ''}
                   onChange={e => {
                     const v = e.target.value ? parseInt(e.target.value, 10) : null
-                    setDaysPerWeekMin(v && !isNaN(v) ? v : null)
+                    setDaysPerWeekMin(typeof v === 'number' && !isNaN(v) ? v : null)
                   }}
                   placeholder="Min"
                   className={styles.rangeInput}
@@ -520,7 +520,7 @@ export function DeepResearchEditor({ item }: DeepResearchEditorProps) {
                   value={daysPerWeekMax ?? ''}
                   onChange={e => {
                     const v = e.target.value ? parseInt(e.target.value, 10) : null
-                    setDaysPerWeekMax(v && !isNaN(v) ? v : null)
+                    setDaysPerWeekMax(typeof v === 'number' && !isNaN(v) ? v : null)
                   }}
                   placeholder="Max"
                   className={styles.rangeInput}

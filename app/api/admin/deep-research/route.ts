@@ -81,15 +81,17 @@ export async function POST(request: Request) {
       data.title.trim().length === 0 ||
       typeof data.slug !== 'string' ||
       data.slug.trim().length === 0 ||
-      typeof data.excerpt !== 'string' ||
-      data.excerpt.trim().length === 0 ||
       typeof data.html_content !== 'string' ||
       data.html_content.trim().length === 0
     ) {
       return NextResponse.json(
-        { error: 'Missing or invalid required fields: title, slug, excerpt, html_content' },
+        { error: 'Missing or invalid required fields: title, slug, html_content' },
         { status: 400 }
       )
+    }
+
+    if (data.excerpt != null && typeof data.excerpt !== 'string') {
+      return NextResponse.json({ error: 'excerpt must be a string if provided' }, { status: 400 })
     }
 
     if (data.status !== 'draft' && data.status !== 'published') {
@@ -111,8 +113,13 @@ export async function POST(request: Request) {
     }
 
     // Include required and optional metadata; status is validated above
+    const excerpt =
+      typeof data.excerpt === 'string' && data.excerpt.trim().length > 0
+        ? data.excerpt.trim()
+        : null
     const insertData = {
       ...data,
+      excerpt,
       status: data.status as 'draft' | 'published',
       equipment_zones: data.equipment_zones || [],
       experience_levels: data.experience_levels || [],

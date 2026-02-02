@@ -141,8 +141,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     revalidatePath('/deep-research')
-    // Revalidate only the path that exists after update (new slug if changed, else same slug)
+    // When slug changed: revalidate both old path (clear stale cache) and new path (fresh content)
     if (updateData.slug && updateData.slug !== slug) {
+      revalidatePath(`/deep-research/${slug}`)
       revalidatePath(`/deep-research/${updateData.slug}`)
     } else {
       revalidatePath(`/deep-research/${slug}`)

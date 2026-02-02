@@ -42,6 +42,13 @@ vi.mock('@supabase/supabase-js', () => {
             select: vi.fn(() => Promise.resolve({ data: mockCategories })),
           }
         }
+        if (table === 'deep_research') {
+          return {
+            select: vi.fn(() => ({
+              eq: vi.fn(() => Promise.resolve({ data: [{ slug: 'test-deep-research' }] })),
+            })),
+          }
+        }
         return {
           select: vi.fn(() => Promise.resolve({ data: [] })),
         }

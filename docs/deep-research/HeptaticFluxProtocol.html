@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hepatic Flux Protocol | 28-Day Program</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Stone & Root Vegetable Accents (Beet Red, Turmeric Orange, Leafy Green) -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Protocol Identity.
+         2. The Mechanism: Interactive explanation of the Lipid-Phytonutrient Bridge using CSS cards/flow.
+         3. 28-Day Interactive Calendar: The core utility. Users select a week (1-4) and day to see specific meals/juices. 
+            Rationale: The user needs a day-by-day execution plan. Extending the 14-day source to 28 days as requested.
+         4. Juice Laboratory: Detailed cards for the 5 recipes with a Chart.js Radar Chart to visualize clinical impact profiles.
+         5. Implementation Rules: Accordion details for the "Verdict" section. 
+    -->
+    <!-- Visualization & Content Choices: 
+         - Radar Charts: Used in the Juice section to visualize abstract qualities like "Bile Stimulation" vs "Inflammation Reduction" based on ingredients.
+         - Interactive Grid: For the calendar to manage the 28-day density.
+         - CSS Flow: For the Mechanism section to avoid SVG requirement.
+         - Confirming NO SVG/Mermaid.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9; /* stone-50 */
+            color: #1c1917; /* stone-900 */
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 300px;
+        }
+        .active-tab {
+            border-bottom: 2px solid #be123c; /* rose-700 */
+            color: #be123c;
+        }
+        .day-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        /* Custom scrollbar for recipe list if needed */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-xl font-bold text-stone-800 tracking-tight">HEPATIC<span class="text-rose-700">FLUX</span></span>
+                </div>
+                <div class="hidden sm:flex space-x-8 items-center">
+                    <button onclick="scrollToSection('mechanism')" class="text-stone-500 hover:text-stone-900 px-3 py-2 text-sm font-medium">The Science</button>
+                    <button onclick="scrollToSection('calendar')" class="text-stone-500 hover:text-stone-900 px-3 py-2 text-sm font-medium">28-Day Protocol</button>
+                    <button onclick="scrollToSection('recipes')" class="text-stone-500 hover:text-stone-900 px-3 py-2 text-sm font-medium">Juice Formulas</button>
+                    <button onclick="scrollToSection('rules')" class="text-stone-500 hover:text-stone-900 px-3 py-2 text-sm font-medium">Rules</button>
+                </div>
+                <!-- Mobile menu button placeholder (simplified for single file) -->
+                <div class="flex items-center sm:hidden">
+                    <button onclick="scrollToSection('calendar')" class="text-rose-700 font-semibold text-sm">Start Now</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-stone-100 border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center">
+            <div class="md:w-2/3 pr-8">
+                <h1 class="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+                    The 28-Day <br><span class="text-rose-700">Hepatic Flux Protocol</span>
+                </h1>
+                <p class="text-lg text-stone-600 mb-6 leading-relaxed">
+                    A clinical precision program tailored for NAFLD management. Leveraging intermittent fasting, lipophilic antioxidant pairing, and targeted Phase II detoxification to maximize fat export and restore the gut-liver axis.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-stone-200 flex items-center">
+                        <span class="text-2xl mr-2">⏱️</span>
+                        <div>
+                            <div class="text-xs text-stone-500 uppercase font-bold">Juice Timing</div>
+                            <div class="font-semibold">11:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-stone-200 flex items-center">
+                        <span class="text-2xl mr-2">🥚</span>
+                        <div>
+                            <div class="text-xs text-stone-500 uppercase font-bold">The Catalyst</div>
+                            <div class="font-semibold">+ 2 Eggs</div>
+                        </div>
+                    </div>
+                    <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-stone-200 flex items-center">
+                        <span class="text-2xl mr-2">🥗</span>
+                        <div>
+                            <div class="text-xs text-stone-500 uppercase font-bold">Meal 1</div>
+                            <div class="font-semibold">Fiber Matrix</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="md:w-1/3 mt-8 md:mt-0 bg-white p-6 rounded-xl shadow-lg border-l-4 border-rose-700">
+                <h3 class="text-xl font-bold mb-3">Current Status</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-stone-600">Protocol Duration</span>
+                            <span class="font-bold">28 Days</span>
+                        </div>
+                        <div class="w-full bg-stone-200 rounded-full h-2">
+                            <div class="bg-rose-700 h-2 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-stone-600">
+                        <p class="mb-2"><strong>Goal:</strong> Maximize hepatic fat export via VLDL.</p>
+                        <p><strong>Method:</strong> Lipid-Phytonutrient Bridge.</p>
+                    </div>
+                    <button onclick="scrollToSection('calendar')" class="w-full bg-stone-900 text-white py-2 rounded hover:bg-stone-700 transition">View Schedule</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+
+        <!-- Mechanism Section -->
+        <section id="mechanism" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <h2 class="text-3xl font-bold text-stone-900 mb-4">The Mechanism: The Lipid-Phytonutrient Bridge</h2>
+                    <p class="text-stone-600">
+                        Clinical data confirms that potent hepatic antioxidants (Curcumin, Betalains, Carotenoids) are lipophilic. 
+                        In isolation, absorption is poor. This protocol pairs specific nutrient extraction with a lipid matrix.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                    <!-- Step 1 -->
+                    <div class="bg-stone-50 p-6 rounded-xl border border-stone-200 relative group hover:border-rose-300 transition-colors">
+                        <div class="absolute -top-4 left-6 bg-stone-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
+                        <h3 class="mt-4 text-xl font-bold text-stone-800 mb-2">The Fast</h3>
+                        <p class="text-stone-600 text-sm">Prior to 11:00 AM, the body is in a fasted state. Rapid gastric emptying increases the potential bioavailability of water-soluble vitamins (C & Folate).</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="bg-stone-50 p-6 rounded-xl border border-stone-200 relative group hover:border-orange-300 transition-colors">
+                        <div class="absolute -top-4 left-6 bg-stone-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
+                        <h3 class="mt-4 text-xl font-bold text-stone-800 mb-2">The Bridge</h3>
+                        <p class="text-stone-600 text-sm">
+                            <strong>Juice + 2 Eggs.</strong> The eggs provide choline and phospholipids. This "Lipid Bridge" allows the fat-soluble antioxidants from the juice to be absorbed effectively.
+                        </p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="bg-stone-50 p-6 rounded-xl border border-stone-200 relative group hover:border-emerald-300 transition-colors">
+                        <div class="absolute -top-4 left-6 bg-stone-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">3</div>
+                        <h3 class="mt-4 text-xl font-bold text-stone-800 mb-2">The Export</h3>
+                        <p class="text-stone-600 text-sm">Choline packages liver triglycerides into VLDL particles. The antioxidants protect hepatocytes during this high-energy export process.</p>
+                    </div>
+                </div>
+
+                <!-- Rationale Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 bg-orange-50 border border-orange-100 rounded-lg">
+                        <h4 class="font-bold text-orange-900 text-sm mb-1 uppercase">Extraction</h4>
+                        <p class="text-xs text-orange-800">Cold-Press only. Preserves 94% of enzymes and limits oxidation compared to centrifugal.</p>
+                    </div>
+                    <div class="p-4 bg-rose-50 border border-rose-100 rounded-lg">
+                        <h4 class="font-bold text-rose-900 text-sm mb-1 uppercase">Juice Timing</h4>
+                        <p class="text-xs text-rose-800">11:00 AM Post-Fasting. Optimizes gastric emptying and absorption kinetics.</p>
+                    </div>
+                    <div class="p-4 bg-yellow-50 border border-yellow-100 rounded-lg">
+                        <h4 class="font-bold text-yellow-900 text-sm mb-1 uppercase">The Egg Add</h4>
+                        <p class="text-xs text-yellow-800">2 Soft-Boiled. Critical source of Choline for VLDL formation.</p>
+                    </div>
+                    <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-lg">
+                        <h4 class="font-bold text-emerald-900 text-sm mb-1 uppercase">NAFLD Guard</h4>
+                        <p class="text-xs text-emerald-800">Low Fructose. Prevents overwhelming the ketohexokinase pathway.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Calendar Section -->
+        <section id="calendar" class="py-16 bg-stone-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-stone-900">28-Day Clinical Calendar</h2>
+                    <p class="text-stone-600 mt-2">
+                        Select a week to view your daily "serums" and meal matrix. The protocol alternates between "Activation" and "Flux & Repair" phases.
+                    </p>
+                </div>
+
+                <!-- Week Selector -->
+                <div class="flex space-x-2 mb-6 overflow-x-auto pb-2">
+                    <button onclick="renderWeek(1)" id="week-btn-1" class="week-btn px-6 py-3 rounded-full bg-white border border-stone-200 font-medium text-stone-600 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-rose-500 whitespace-nowrap active-week">
+                        Week 1: Activation
+                    </button>
+                    <button onclick="renderWeek(2)" id="week-btn-2" class="week-btn px-6 py-3 rounded-full bg-white border border-stone-200 font-medium text-stone-600 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-rose-500 whitespace-nowrap">
+                        Week 2: Flux & Repair
+                    </button>
+                    <button onclick="renderWeek(3)" id="week-btn-3" class="week-btn px-6 py-3 rounded-full bg-white border border-stone-200 font-medium text-stone-600 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-rose-500 whitespace-nowrap">
+                        Week 3: Activation (Repeat)
+                    </button>
+                    <button onclick="renderWeek(4)" id="week-btn-4" class="week-btn px-6 py-3 rounded-full bg-white border border-stone-200 font-medium text-stone-600 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-rose-500 whitespace-nowrap">
+                        Week 4: Flux & Repair (Repeat)
+                    </button>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- Calendar Grid -->
+                    <div id="calendar-grid" class="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- JS injected days -->
+                    </div>
+
+                    <!-- Daily Detail View (Sticky) -->
+                    <div class="lg:w-1/3">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-stone-200 sticky top-24">
+                            <div id="day-detail-content">
+                                <h3 class="text-lg font-bold text-stone-400 uppercase tracking-widest mb-1">Select a Day</h3>
+                                <p class="text-stone-500 text-sm">Click any day card on the left to see the specific nutritional breakdown.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recipes Section -->
+        <section id="recipes" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-stone-900">The Juice Formulary</h2>
+                    <p class="text-stone-600 mt-2">
+                        Five optimized clinical recipes targeting specific liver enzyme pathways.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Recipe List -->
+                    <div class="lg:col-span-1 space-y-2">
+                        <button onclick="showRecipe(0)" class="w-full text-left p-4 rounded-lg bg-stone-50 hover:bg-rose-50 border border-stone-200 transition-colors focus:bg-rose-50 focus:border-rose-300 recipe-selector active-recipe" data-index="0">
+                            <div class="font-bold text-stone-800">The Biotransformation Standard</div>
+                            <div class="text-xs text-stone-500">Justin's Optimized Base</div>
+                        </button>
+                        <button onclick="showRecipe(1)" class="w-full text-left p-4 rounded-lg bg-stone-50 hover:bg-rose-50 border border-stone-200 transition-colors focus:bg-rose-50 focus:border-rose-300 recipe-selector" data-index="1">
+                            <div class="font-bold text-stone-800">Cruciferous Sulfur Shield</div>
+                            <div class="text-xs text-stone-500">GST Induction</div>
+                        </button>
+                        <button onclick="showRecipe(2)" class="w-full text-left p-4 rounded-lg bg-stone-50 hover:bg-rose-50 border border-stone-200 transition-colors focus:bg-rose-50 focus:border-rose-300 recipe-selector" data-index="2">
+                            <div class="font-bold text-stone-800">The Hepatic Flow</div>
+                            <div class="text-xs text-stone-500">Bile Stimulation</div>
+                        </button>
+                        <button onclick="showRecipe(3)" class="w-full text-left p-4 rounded-lg bg-stone-50 hover:bg-rose-50 border border-stone-200 transition-colors focus:bg-rose-50 focus:border-rose-300 recipe-selector" data-index="3">
+                            <div class="font-bold text-stone-800">Nitric Oxide Recovery</div>
+                            <div class="text-xs text-stone-500">Vasodilation</div>
+                        </button>
+                        <button onclick="showRecipe(4)" class="w-full text-left p-4 rounded-lg bg-stone-50 hover:bg-rose-50 border border-stone-200 transition-colors focus:bg-rose-50 focus:border-rose-300 recipe-selector" data-index="4">
+                            <div class="font-bold text-stone-800">Anti-Inflammatory Root Tonic</div>
+                            <div class="text-xs text-stone-500">High-Dose Curcumin</div>
+                        </button>
+                    </div>
+
+                    <!-- Recipe Detail & Chart -->
+                    <div class="lg:col-span-2 bg-stone-50 rounded-xl border border-stone-200 p-8 flex flex-col md:flex-row gap-8">
+                        <div class="md:w-1/2">
+                            <h3 id="recipe-title" class="text-2xl font-bold text-rose-800 mb-2">Recipe Title</h3>
+                            <p id="recipe-goal" class="text-sm font-semibold text-stone-600 mb-4 bg-white inline-block px-3 py-1 rounded-full border border-stone-200">Goal: Description</p>
+                            
+                            <h4 class="font-bold text-stone-800 mb-2 uppercase text-xs tracking-wider">Ingredients</h4>
+                            <ul id="recipe-ingredients" class="space-y-2 text-stone-700 text-sm mb-6">
+                                <!-- Ingredients injected here -->
+                            </ul>
+
+                            <div id="recipe-clinical-add" class="p-3 bg-yellow-50 border-l-4 border-yellow-400 text-sm text-stone-800 hidden">
+                                <strong>Clinical Add:</strong> <span></span>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2 flex flex-col items-center justify-center bg-white rounded-lg p-4 shadow-sm">
+                            <h4 class="text-xs font-bold text-stone-400 uppercase mb-4">Clinical Profile</h4>
+                            <!-- Chart Container -->
+                            <div class="chart-container">
+                                <canvas id="recipeChart"></canvas>
+                            </div>
+                            <p class="text-xs text-stone-400 mt-4 text-center">Relative strength based on active ingredients.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rules Section -->
+        <section id="rules" class="py-16 bg-stone-100">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-stone-900 mb-8 text-center">Implementation Protocols</h2>
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-rose-100 rounded-full p-2 mt-1">
+                                <span class="text-xl">⏱️</span>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-bold text-stone-900">Immediate Consumption</h3>
+                                <p class="text-stone-600 mt-1">Vitamin C begins a 2% hourly decay immediately after juicing. Consume your serum within 15 minutes of extraction to ensure potency.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-emerald-100 rounded-full p-2 mt-1">
+                                <span class="text-xl">🥬</span>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-bold text-stone-900">The Fiber Buffer</h3>
+                                <p class="text-stone-600 mt-1">Juicing removes insoluble fiber. Meal 1 ("The Big Salad") is <strong>non-negotiable</strong>. It provides prebiotic fiber for SCFA production to heal the gut lining.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 rounded-full p-2 mt-1">
+                                <span class="text-xl">🥩</span>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-bold text-stone-900">Protein Density</h3>
+                                <p class="text-stone-600 mt-1">Phase II detoxification is "nutrient-hungry". Meat-heavy meals (Sunday Gravy, Beef Stew) provide Glycine and Taurine needed to neutralize toxins.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-red-100 rounded-full p-2 mt-1">
+                                <span class="text-xl">🚫</span>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-bold text-stone-900">NAFLD Safety Protocol</h3>
+                                <p class="text-stone-600 mt-1">Do not add honey, agave, or high-sugar fruits. Fructose malabsorption can lead to bloating and increased hepatic fat deposition.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-4">Generated for Justin Fassio</p>
+            <p class="text-sm opacity-60">Consult a healthcare professional before starting any new dietary protocol.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA ---
+
+        const recipes = [
+            {
+                title: "The Biotransformation Standard",
+                subtitle: "Justin's Optimized Base",
+                goal: "Daily baseline for Phase II conjugation.",
+                ingredients: ["1/4 small beet (with greens)", "4 stalks celery", "1 cup raw spinach", "1-inch fresh ginger", "1-inch fresh turmeric", "1 whole lime (peeled)", "1 large cucumber"],
+                data: [4, 3, 5, 2, 4] // [Detox, Bile, Inflammation, NO/Vascular, Taste]
+            },
+            {
+                title: "The Cruciferous Sulfur Shield",
+                subtitle: "GST Induction",
+                goal: "Induces glutathione-S-transferase (GST) enzymes to protect hepatocytes.",
+                ingredients: ["1/4 small green cabbage", "1 cup kale (stems included)", "1/2 bunch parsley", "1/2 green apple (for pectin)", "1 lemon (peeled)", "2 stalks celery"],
+                data: [5, 2, 3, 2, 2] 
+            },
+            {
+                title: "The Hepatic Flow",
+                subtitle: "Bile Stimulation",
+                goal: "Choleretic effect; stimulates bile to excrete processed toxins and cholesterol.",
+                ingredients: ["1 raw artichoke heart (trimmed)", "2-3 dandelion leaves (or root)", "1 cucumber", "1 cup romaine", "1 lime (peeled)", "1-inch ginger"],
+                data: [3, 5, 3, 2, 1] 
+            },
+            {
+                title: "The Nitric Oxide & Vascular Recovery",
+                subtitle: "Vascular Recovery",
+                goal: "Enhances NO-mediated vasodilation for athletic performance and portal vein health.",
+                ingredients: ["1 medium beet", "1/2 cup cilantro", "3 stalks celery", "1 lemon (peeled)", "1/2-inch ginger"],
+                data: [3, 3, 3, 5, 4] 
+            },
+            {
+                title: "The Anti-Inflammatory Root Tonic",
+                subtitle: "High-Dose Curcumin",
+                goal: "High-dose curcumin to reduce hepatic necroinflammation.",
+                clinicalAdd: "1 pinch black pepper (added to glass)",
+                ingredients: ["2-inch fresh turmeric", "1-inch fresh ginger", "2 large carrots", "1/2 green apple", "1/2 lime (peeled)"],
+                data: [3, 3, 5, 2, 4] 
+            }
+        ];
+
+        // 14-Day Cycle Data (Repeats for 28 days)
+        const week1Schedule = [
+            { day: 1, juice: "The Biotransformation Standard", meal1: "Standard Clinic Big Salad + Chicken", meal2: "Biotransformation Beef Stew" },
+            { day: 2, juice: "The Cruciferous Sulfur Shield", meal1: "Standard Clinic Big Salad + Tuna", meal2: "Skin-On Chicken Thighs" },
+            { day: 3, juice: "The Biotransformation Standard", meal1: "Sourdough French Toast (Berry Compote)", meal2: "No-Rice Burrito Bowl" },
+            { day: 4, juice: "The Hepatic Flow (Artichoke focus)", meal1: "Standard Clinic Big Salad + Chicken", meal2: "Lemon Chicken & Wild Rice Soup" },
+            { day: 5, juice: "The Biotransformation Standard", meal1: "Standard Clinic Big Salad + Tuna", meal2: "Sunday Gravy (Bolognese)" },
+            { day: 6, juice: "The Anti-Inflammatory Root Tonic", meal1: "Standard Clinic Big Salad + Chicken", meal2: "Biotransformation Beef Stew" },
+            { day: 7, juice: "The Hepatic Flow (Artichoke focus)", meal1: "Sourdough French Toast (Berry Compote)", meal2: "Skin-On Chicken Thighs" }
+        ];
+
+        const week2Schedule = [
+            { day: 8, juice: "The Nitric Oxide Recovery", meal1: "Standard Clinic Big Salad + Tuna", meal2: "No-Rice Burrito Bowl" },
+            { day: 9, juice: "The Cruciferous Sulfur Shield", meal1: "Standard Clinic Big Salad + Chicken", meal2: "Lemon Chicken & Wild Rice Soup" },
+            { day: 10, juice: "The Biotransformation Standard", meal1: "Standard Clinic Big Salad + Tuna", meal2: "Sunday Gravy (Bolognese)" },
+            { day: 11, juice: "The Anti-Inflammatory Root Tonic", meal1: "Standard Clinic Big Salad + Chicken", meal2: "Skin-On Chicken Thighs" },
+            { day: 12, juice: "The Nitric Oxide Recovery", meal1: "Standard Clinic Big Salad + Tuna", meal2: "Biotransformation Beef Stew" },
+            { day: 13, juice: "The Hepatic Flow (Artichoke focus)", meal1: "Sourdough French Toast (Berry Compote)", meal2: "No-Rice Burrito Bowl" },
+            { day: 14, juice: "The Biotransformation Standard", meal1: "Standard Clinic Big Salad + Chicken", meal2: "Sunday Gravy (Bolognese)" }
+        ];
+
+        // --- CHART SETUP ---
+        let recipeChartInstance = null;
+
+        function initRecipeChart(initialData) {
+            const ctx = document.getElementById('recipeChart').getContext('2d');
+            recipeChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Detoxification', 'Bile Flow', 'Inflammation', 'Vascular/NO', 'Palatability'],
+                    datasets: [{
+                        label: 'Clinical Strength',
+                        data: initialData,
+                        fill: true,
+                        backgroundColor: 'rgba(190, 18, 60, 0.2)', // Rose-700
+                        borderColor: 'rgb(190, 18, 60)',
+                        pointBackgroundColor: 'rgb(190, 18, 60)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(190, 18, 60)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: { borderWidth: 2 }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- UI FUNCTIONS ---
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showRecipe(index) {
+            const r = recipes[index];
+            
+            // Update Text
+            document.getElementById('recipe-title').innerText = r.title;
+            document.getElementById('recipe-goal').innerText = `Goal: ${r.goal}`;
+            
+            const ingList = document.getElementById('recipe-ingredients');
+            ingList.innerHTML = '';
+            r.ingredients.forEach(i => {
+                const li = document.createElement('li');
+                li.innerText = `• ${i}`;
+                ingList.appendChild(li);
+            });
+
+            // Clinical Add check
+            const caDiv = document.getElementById('recipe-clinical-add');
+            if(r.clinicalAdd) {
+                caDiv.classList.remove('hidden');
+                caDiv.querySelector('span').innerText = r.clinicalAdd;
+            } else {
+                caDiv.classList.add('hidden');
+            }
+
+            // Update Chart
+            if (recipeChartInstance) {
+                recipeChartInstance.data.datasets[0].data = r.data;
+                recipeChartInstance.update();
+            }
+
+            // Update Active State on Buttons
+            document.querySelectorAll('.recipe-selector').forEach((btn, i) => {
+                if (i === index) btn.classList.add('bg-rose-50', 'border-rose-300', 'ring-1', 'ring-rose-300');
+                else btn.classList.remove('bg-rose-50', 'border-rose-300', 'ring-1', 'ring-rose-300');
+            });
+        }
+
+        let currentWeek = 1;
+
+        function renderWeek(weekNum) {
+            currentWeek = weekNum;
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = ''; // Clear
+
+            // Handle Active Button State
+            document.querySelectorAll('.week-btn').forEach(btn => btn.classList.remove('bg-rose-600', 'text-white', 'border-transparent'));
+            document.querySelectorAll('.week-btn').forEach(btn => btn.classList.add('bg-white', 'text-stone-600', 'border-stone-200'));
+            
+            const activeBtn = document.getElementById(`week-btn-${weekNum}`);
+            activeBtn.classList.remove('bg-white', 'text-stone-600', 'border-stone-200');
+            activeBtn.classList.add('bg-rose-600', 'text-white', 'border-transparent');
+
+            // Determine Schedule (Odd weeks = Week 1 schedule, Even weeks = Week 2 schedule)
+            const schedule = (weekNum % 2 !== 0) ? week1Schedule : week2Schedule;
+            const dayOffset = (weekNum - 1) * 7;
+
+            schedule.forEach((dayData, index) => {
+                const realDayNum = dayOffset + (index + 1);
+                
+                const card = document.createElement('button');
+                card.className = "day-card text-left p-4 rounded-xl border border-stone-200 bg-white hover:border-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-500 w-full";
+                card.onclick = () => showDayDetail(realDayNum, dayData);
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold text-stone-400 uppercase">Day ${realDayNum}</span>
+                        ${dayData.juice.includes('Biotransformation') ? '<span class="w-2 h-2 rounded-full bg-rose-500"></span>' : '<span class="w-2 h-2 rounded-full bg-emerald-500"></span>'}
+                    </div>
+                    <div class="font-bold text-stone-800 text-lg mb-1 leading-tight">${dayData.juice.split('(')[0]}</div>
+                    <div class="text-xs text-stone-500 truncate">Dinner: ${dayData.meal2}</div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Automatically select first day of the week
+            showDayDetail(dayOffset + 1, schedule[0]);
+        }
+
+        function showDayDetail(dayNum, data) {
+            const container = document.getElementById('day-detail-content');
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-6 border-b border-stone-100 pb-4">
+                    <h3 class="text-3xl font-serif font-bold text-stone-900">Day ${dayNum}</h3>
+                    <div class="px-3 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full uppercase tracking-wide">
+                        ${currentWeek % 2 !== 0 ? 'Activation Phase' : 'Flux & Repair Phase'}
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="relative pl-6 border-l-2 border-rose-200">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-rose-500 border-2 border-white"></div>
+                        <h4 class="text-sm font-bold text-stone-400 uppercase mb-1">11:00 AM • Juice Serum</h4>
+                        <p class="text-lg font-semibold text-stone-800">${data.juice}</p>
+                        <p class="text-sm text-stone-600 mt-1">+ 2 Soft-Boiled Eggs <span class="text-xs text-rose-600 font-bold">(Essential)</span></p>
+                    </div>
+
+                    <div class="relative pl-6 border-l-2 border-stone-200">
+                         <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-400 border-2 border-white"></div>
+                        <h4 class="text-sm font-bold text-stone-400 uppercase mb-1">Meal 1 • Volume</h4>
+                        <p class="text-lg font-semibold text-stone-800">${data.meal1}</p>
+                        <p class="text-xs text-stone-500 mt-1 italic">Focus: Fiber matrix for gut repair.</p>
+                    </div>
+
+                    <div class="relative pl-6 border-l-2 border-stone-200">
+                         <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-900 border-2 border-white"></div>
+                        <h4 class="text-sm font-bold text-stone-400 uppercase mb-1">Meal 2 • Recovery</h4>
+                        <p class="text-lg font-semibold text-stone-800">${data.meal2}</p>
+                        <p class="text-xs text-stone-500 mt-1 italic">Focus: Protein & Phase II Amino Acids.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-4 bg-stone-50 rounded-lg border border-stone-200 text-sm text-stone-600">
+                    <strong>Tip:</strong> Ensure juice is cold-pressed and consumed within 15 minutes.
+                </div>
+            `;
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            // Initialize Chart with Recipe 0 data
+            initRecipeChart(recipes[0].data);
+            
+            // Show first recipe
+            showRecipe(0);
+
+            // Render Week 1
+            renderWeek(1);
+        };
+
+    </script>
+</body>
+</html>

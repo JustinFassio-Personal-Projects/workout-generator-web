@@ -34,13 +34,14 @@ export function DeepResearchContent({ htmlContent }: DeepResearchContentProps) {
           newScript.async = false
           document.body.appendChild(newScript)
         } else if (oldScript.textContent) {
+          const prevOnload = (window as unknown as { onload?: () => void }).onload
           newScript.textContent = oldScript.textContent
           document.body.appendChild(newScript)
-          const onload = (window as unknown as { onload?: () => void }).onload
-          if (typeof onload === 'function') {
-            ;(window as unknown as { onload?: () => void }).onload = undefined
-            onload()
-          }
+          // Pasted Chart.js scripts often use window.onload = fn; but the doc is already
+          // loaded, so the event never fires. Invoke the handler and restore previous.
+          const handler = (window as unknown as { onload?: () => void }).onload
+          ;(window as unknown as { onload?: () => void }).onload = prevOnload
+          if (typeof handler === 'function') handler()
           document.body.removeChild(newScript)
         }
       })
@@ -65,6 +66,8 @@ export function DeepResearchContent({ htmlContent }: DeepResearchContentProps) {
       <div
         ref={wrapperRef}
         className={styles.wrapper}
+        role="article"
+        aria-label="Article content"
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
     </>

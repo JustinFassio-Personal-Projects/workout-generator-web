@@ -79,6 +79,13 @@ function computeRelevanceScore(article: DeepResearch, profile: DeepResearchProfi
   return score
 }
 
+function compareByDate(a: DeepResearch, b: DeepResearch, ascending: boolean): number {
+  const aDate = a.published_at || a.created_at
+  const bDate = b.published_at || b.created_at
+  const diff = new Date(aDate).getTime() - new Date(bDate).getTime()
+  return ascending ? diff : -diff
+}
+
 function getMaxRelevanceScore(profile: DeepResearchProfile): number {
   let max = 0
   if (profile.equipment_zone) max++
@@ -222,24 +229,10 @@ function DeepResearchPageClientInner({ items }: DeepResearchPageClientProps) {
     }))
     if (sortOption === 'relevance' && maxScore > 0) {
       withScores.sort((a, b) => b.score - a.score)
-    } else if (sortOption === 'relevance') {
-      withScores.sort((a, b) => {
-        const aDate = a.item.published_at || a.item.created_at
-        const bDate = b.item.published_at || b.item.created_at
-        return new Date(bDate).getTime() - new Date(aDate).getTime()
-      })
-    } else if (sortOption === 'newest') {
-      withScores.sort((a, b) => {
-        const aDate = a.item.published_at || a.item.created_at
-        const bDate = b.item.published_at || b.item.created_at
-        return new Date(bDate).getTime() - new Date(aDate).getTime()
-      })
+    } else if (sortOption === 'relevance' || sortOption === 'newest') {
+      withScores.sort((a, b) => compareByDate(a.item, b.item, false))
     } else if (sortOption === 'oldest') {
-      withScores.sort((a, b) => {
-        const aDate = a.item.published_at || a.item.created_at
-        const bDate = b.item.published_at || b.item.created_at
-        return new Date(aDate).getTime() - new Date(bDate).getTime()
-      })
+      withScores.sort((a, b) => compareByDate(a.item, b.item, true))
     } else if (sortOption === 'title') {
       withScores.sort((a, b) => a.item.title.localeCompare(b.item.title))
     }

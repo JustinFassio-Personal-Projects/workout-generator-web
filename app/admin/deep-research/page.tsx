@@ -39,7 +39,7 @@ export default async function AdminDeepResearchPage() {
     .eq('id', user.id)
     .single()
 
-  if (!adminUser) {
+  if (!adminUser || adminUser.role !== 'admin') {
     redirect('/admin/login?error=unauthorized')
   }
 

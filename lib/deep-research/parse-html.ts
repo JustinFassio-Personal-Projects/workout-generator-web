@@ -2,7 +2,15 @@ import type { ParsedHtml } from '@/types/deep-research'
 
 /**
  * Parse pasted HTML to extract title, excerpt, and body content.
- * Runs client-side (uses DOMParser) or server-side (regex fallback).
+ *
+ * Uses different strategies depending on the environment:
+ * - **Client-side (browser):** Uses DOMParser for accurate DOM-based parsing.
+ * - **Server-side (Node/SSR):** Falls back to regex parsing since DOMParser is
+ *   not available (no DOM in Node.js). Regex may miss edge cases but handles
+ *   typical HTML from admin-pasted content.
+ *
+ * @param html - Raw HTML string (e.g., from clipboard or file)
+ * @returns Parsed title, excerpt (from meta description), and body HTML
  */
 export function parsePastedHtml(html: string): ParsedHtml {
   const trimmed = html.trim()

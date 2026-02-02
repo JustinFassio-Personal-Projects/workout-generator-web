@@ -39,7 +39,8 @@ export function DeepResearchList({ initialItems }: DeepResearchListProps) {
         router.refresh()
       }
     } catch (error) {
-      console.error('Failed to delete deep research:', error)
+      const message = error instanceof Error ? error.message : 'Unknown error'
+      console.error('Failed to delete deep research:', message)
     } finally {
       setDeleting(false)
     }

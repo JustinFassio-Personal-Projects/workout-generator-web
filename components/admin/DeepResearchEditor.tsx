@@ -18,6 +18,9 @@ import {
 } from '@/data/deep-research-profile-options'
 import styles from './DeepResearchEditor.module.scss'
 
+/** Auto-save debounce for drafts: 30s balances data loss risk vs API load during active editing */
+const AUTO_SAVE_DELAY_MS = 30000
+
 interface DeepResearchEditorProps {
   item?: DeepResearch
 }
@@ -263,7 +266,7 @@ export function DeepResearchEditor({ item }: DeepResearchEditorProps) {
   useEffect(() => {
     if (hasChanges && status === 'draft' && isEditing) {
       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current)
-      autoSaveTimerRef.current = setTimeout(() => handleSave('draft'), 30000)
+      autoSaveTimerRef.current = setTimeout(() => handleSave('draft'), AUTO_SAVE_DELAY_MS)
     }
     return () => {
       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current)

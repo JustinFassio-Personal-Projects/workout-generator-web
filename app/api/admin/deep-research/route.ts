@@ -16,12 +16,12 @@ export async function GET(request: Request) {
     const supabase = await createServerSupabaseClient()
     const { data: adminUser } = await supabase
       .from('admin_users')
-      .select('id')
+      .select('id, role')
       .eq('id', user.id)
       .single()
 
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    if (!adminUser || adminUser.role !== 'admin') {
+      return NextResponse.json({ error: 'Only admins can list deep research' }, { status: 403 })
     }
 
     const adminClient = createAdminClient()
@@ -66,19 +66,28 @@ export async function POST(request: Request) {
     const supabase = await createServerSupabaseClient()
     const { data: adminUser } = await supabase
       .from('admin_users')
-      .select('id')
+      .select('id, role')
       .eq('id', user.id)
       .single()
 
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    if (!adminUser || adminUser.role !== 'admin') {
+      return NextResponse.json({ error: 'Only admins can create deep research' }, { status: 403 })
     }
 
     const data = await request.json()
 
-    if (!data.title || !data.slug || !data.excerpt || !data.html_content) {
+    if (
+      typeof data.title !== 'string' ||
+      data.title.trim().length === 0 ||
+      typeof data.slug !== 'string' ||
+      data.slug.trim().length === 0 ||
+      typeof data.excerpt !== 'string' ||
+      data.excerpt.trim().length === 0 ||
+      typeof data.html_content !== 'string' ||
+      data.html_content.trim().length === 0
+    ) {
       return NextResponse.json(
-        { error: 'Missing required fields: title, slug, excerpt, html_content' },
+        { error: 'Missing or invalid required fields: title, slug, excerpt, html_content' },
         { status: 400 }
       )
     }

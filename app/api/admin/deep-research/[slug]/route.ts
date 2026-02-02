@@ -118,7 +118,10 @@ export async function PUT(request: Request, { params }: RouteParams) {
       html_content: rawData.html_content,
       seo_title: rawData.seo_title || null,
       seo_description: rawData.seo_description || null,
-      status: rawData.status as 'draft' | 'published',
+      status:
+        rawData.status === 'draft' || rawData.status === 'published'
+          ? (rawData.status as 'draft' | 'published')
+          : currentItem.status,
       equipment_zones: rawData.equipment_zones || [],
       experience_levels: rawData.experience_levels || [],
       injuries_addressed: rawData.injuries_addressed || [],

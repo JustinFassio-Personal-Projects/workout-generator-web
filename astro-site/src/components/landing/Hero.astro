@@ -1,0 +1,147 @@
+---
+// Hero component - Pure Astro (static HTML, no JS)
+---
+
+<section id="hero" class="hero-section relative min-h-[90vh] flex flex-col justify-center overflow-hidden">
+  <!-- Background Image -->
+  <div class="absolute inset-0 z-0">
+    <img
+      src="/ai_workout_generator_hero_1.png"
+      alt="AI-powered workout generator showing personalized fitness plan interface"
+      class="w-full h-full object-cover"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-dark)] via-[var(--bg-dark)]/80 to-[var(--bg-dark)]/40"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="container-custom relative z-10 py-16 md:py-24">
+    <div class="max-w-4xl mx-auto text-center">
+      <!-- Trust Badges -->
+      <div class="flex flex-col items-center gap-3 mb-8">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium">
+          <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+          Vetted by U.S. Army Master Fitness Trainer.
+        </div>
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          100% Hallucination-Free.
+        </div>
+      </div>
+      
+      <!-- Headline -->
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+        Stop Guessing. <span class="text-white">Start Training.</span>
+        <br />
+        <span class="gradient-text">The Science-Based AI Workout Generator.</span>
+      </h1>
+      
+      <!-- Subtitle -->
+      <p class="text-lg md:text-xl text-secondary max-w-2xl mx-auto mb-8">
+        Instantly build personalized <strong class="text-primary">Hypertrophy & Strength</strong> cycles tailored to
+        your equipment. Our <strong class="text-primary">Closed-Loop Engine</strong> eliminates algorithmic errors,
+        ensuring every rep is biomechanically valid and safe.
+      </p>
+      
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+        <a 
+          href="#workout-builder"
+          class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-all hover:-translate-y-0.5 shadow-lg hover:shadow-[var(--color-accent)]/20"
+        >
+          Build My Free Custom Plan
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+        <a 
+          href="#journey"
+          class="inline-flex items-center justify-center px-8 py-4 rounded-xl border border-[var(--glass-border-hover)] text-[var(--text-primary)] font-semibold hover:bg-[var(--glass-bg-hover)] transition-colors"
+        >
+          See the Logic
+        </a>
+      </div>
+      
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
+        <div class="text-center">
+          <p class="text-2xl md:text-3xl font-bold text-[var(--color-accent)]">8,000+</p>
+          <p class="text-sm text-tertiary">Athletes Optimized</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl md:text-3xl font-bold text-[var(--color-accent)]">15k+</p>
+          <p class="text-sm text-tertiary">Plans Generated</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl md:text-3xl font-bold text-[var(--color-accent)]">4.9/5</p>
+          <p class="text-sm text-tertiary">TrustPilot Score</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl md:text-3xl font-bold text-[var(--color-accent)]">Zero</p>
+          <p class="text-sm text-tertiary">Hallucinations</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Feature Highlights Bar -->
+  <div class="relative z-10 bg-[var(--glass-bg-base)] backdrop-blur-md border-t border-b border-[var(--glass-border-base)] py-6">
+    <div class="container-custom">
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold">Anti-Hallucination Engine</p>
+            <p class="text-sm text-tertiary">Biomechanically verified exercises only.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6.5 6.5H17.5V17.5H6.5V6.5Z M4 9H6.5V15H4V9Z M17.5 9H20V15H17.5V9Z M2 10.5H4V13.5H2V10.5Z M20 10.5H22V13.5H20V10.5Z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold">Equipment Adaptive</p>
+            <p class="text-sm text-tertiary">Dumbbells, Bodyweight, or Full Gym.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold">Progressive Overload</p>
+            <p class="text-sm text-tertiary">Smart volume scaling & periodization.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-section {
+    background: var(--bg-dark);
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+</style>

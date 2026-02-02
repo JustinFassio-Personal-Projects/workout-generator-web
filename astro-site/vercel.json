@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/admin/:path*",
+      "destination": "https://aiworkoutgenerator-admin.vercel.app/admin/:path*"
+    },
+    {
+      "source": "/api/admin/:path*",
+      "destination": "https://aiworkoutgenerator-admin.vercel.app/api/admin/:path*"
+    }
+  ]
+}

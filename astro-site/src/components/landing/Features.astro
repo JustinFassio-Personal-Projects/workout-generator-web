@@ -1,0 +1,91 @@
+---
+// Features component - Pure Astro (static HTML)
+const features = [
+  {
+    id: '1',
+    title: 'AI-Powered Generation',
+    description:
+      'Create personalized workouts instantly with our advanced AI algorithm that adapts to your fitness level and goals.',
+    icon: 'zap',
+  },
+  {
+    id: '2',
+    title: 'Goal Tracking',
+    description:
+      'Set and track your fitness goals with detailed analytics and progress reports to keep you motivated.',
+    icon: 'target',
+  },
+  {
+    id: '3',
+    title: 'Community Support',
+    description:
+      'Join a thriving community of fitness enthusiasts sharing workouts, tips, and celebrating achievements together.',
+    icon: 'users',
+  },
+  {
+    id: '4',
+    title: 'Progress Analytics',
+    description:
+      'Visualize your fitness journey with comprehensive charts and insights that show your improvement over time.',
+    icon: 'chart',
+  },
+  {
+    id: '5',
+    title: 'Mobile Friendly',
+    description:
+      'Access your workouts anywhere, anytime with our fully responsive design that works perfectly on all devices.',
+    icon: 'mobile',
+  },
+  {
+    id: '6',
+    title: 'Customizable Plans',
+    description:
+      'Tailor every workout to your preferences, equipment availability, and schedule with our flexible customization options.',
+    icon: 'sparkles',
+  },
+];
+
+const getIcon = (name: string) => {
+  const icons: Record<string, string> = {
+    zap: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
+    target: '<circle cx="12" cy="12" r="10" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="6" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="2" fill="currentColor"/>',
+    users: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+    chart: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 20V10M12 20V4M6 20v-6"/>',
+    mobile: '<rect x="5" y="2" width="14" height="20" rx="2" ry="2" stroke-width="2" fill="none"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="2"/>',
+    sparkles: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>',
+  };
+  return icons[name] || icons.zap;
+};
+---
+
+<section id="features" class="section-padding">
+  <div class="container-custom">
+    <div class="text-center mb-12 md:mb-16">
+      <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
+        Features
+      </span>
+      <h2 class="mt-4 text-3xl md:text-4xl font-extrabold">
+        Everything You Need to <span class="gradient-text">Transform</span> Your Training
+      </h2>
+      <p class="mt-4 text-lg text-secondary max-w-2xl mx-auto">
+        Our AI-powered platform combines cutting-edge technology with proven fitness science to deliver results.
+      </p>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {features.map((feature) => (
+        <div class="glass-card p-6 group">
+          <div class="w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] mb-4 group-hover:bg-[var(--color-accent)]/20 transition-colors">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" set:html={getIcon(feature.icon)} />
+          </div>
+          <h3 class="text-lg font-bold mb-2 group-hover:text-[var(--color-accent)] transition-colors">
+            {feature.title}
+          </h3>
+          <p class="text-secondary text-sm">
+            {feature.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

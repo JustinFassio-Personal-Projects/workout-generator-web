@@ -1,0 +1,140 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogHero from '@/components/blog/BlogHero.astro';
+import BlogCard from '@/components/blog/BlogCard.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { getAllPublishedPosts, toTransformedPost } from '@/lib/blog/queries';
+
+// Enable SSR for dynamic data fetching
+export const prerender = false;
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// Fetch posts from Supabase (with fallback to static data)
+const posts = await getAllPublishedPosts(Astro.cookies);
+const transformedPosts = posts.map(toTransformedPost);
+
+// Blog/CollectionPage structured data (JSON-LD)
+const blogSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'Workout Generator Blog',
+  description:
+    'Discover fitness tips, workout strategies, and expert advice to help you achieve your fitness goals.',
+  url: `${baseUrl}/blog`,
+  publisher: {
+    '@type': 'Organization',
+    name: 'Workout Generator',
+    logo: {
+      '@type': 'ImageObject',
+      url: `${baseUrl}/logo.png`,
+    },
+  },
+  blogPost: posts.map((post) => ({
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt,
+    url: `${baseUrl}/blog/${post.slug}`,
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at,
+    author: {
+      '@type': 'Person',
+      name: post.author?.name || 'Unknown',
+    },
+    articleSection: post.category?.name || 'Uncategorized',
+    image: post.featured_image
+      ? post.featured_image.startsWith('http')
+        ? post.featured_image
+        : `${baseUrl}${post.featured_image}`
+      : `${baseUrl}/og-image.jpg`,
+  })),
+};
+
+// BreadcrumbList structured data (JSON-LD)
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: baseUrl,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Blog',
+      item: `${baseUrl}/blog`,
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Blog | Fitness Tips & Workout Strategies"
+  description="Discover expert fitness tips, workout strategies, and AI-powered training advice to help you achieve your goals. Start your journey today!"
+  canonicalUrl={`${baseUrl}/blog`}
+  structuredData={[blogSchema, breadcrumbSchema]}
+>
+  <main class="min-h-screen">
+    <BlogHero />
+    
+    <!-- Blog Posts Grid -->
+    <section class="section-padding">
+      <div class="container-custom">
+        {transformedPosts.length > 0 ? (
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {transformedPosts.map((post) => (
+              <BlogCard
+                slug={post.slug}
+                title={post.title}
+                excerpt={post.excerpt}
+                date={post.date}
+                author={post.author}
+                category={post.category}
+                image={post.image}
+                tags={post.tags}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-16">
+            <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-[var(--glass-bg-hover)] flex items-center justify-center text-muted">
+              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold mb-2">No posts yet</h2>
+            <p class="text-secondary">Check back soon for fitness tips and workout strategies.</p>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 md:py-24 bg-gradient-to-br from-[var(--color-accent)]/5 to-[var(--color-primary-400)]/5">
+      <div class="container-custom">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
+            Ready to Start Training?
+          </h2>
+          <p class="text-lg text-secondary mb-8">
+            Generate your personalized AI workout plan based on your goals and equipment.
+          </p>
+          <a 
+            href="/onboard"
+            class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-all hover:-translate-y-0.5 shadow-lg"
+          >
+            Generate Your Plan
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <Footer />
+  </main>
+</BaseLayout>

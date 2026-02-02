@@ -1,0 +1,231 @@
+---
+// Import styles
+import '@/styles/globals.scss';
+
+// Import fonts
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/space-grotesk/300.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/cinzel/400.css';
+import '@fontsource/cinzel/500.css';
+import '@fontsource/cinzel/600.css';
+import '@fontsource/cinzel/700.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+  structuredData?: object | object[];
+}
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+const gaId = import.meta.env.PUBLIC_GA_ID;
+const gtmId = import.meta.env.PUBLIC_GTM_ID;
+
+const {
+  title,
+  description = 'Build trainer-verified hypertrophy & strength programs in 30 seconds. The #1 free AI workout generator. No sign-up required.',
+  canonicalUrl = Astro.url.href,
+  ogImage = '/og-image.jpg',
+  ogType = 'website',
+  noindex = false,
+  structuredData,
+} = Astro.props;
+
+// Full title with template
+const fullTitle = title.includes('AI Workout Generator') 
+  ? title 
+  : `${title} | AI Workout Generator`;
+
+// Organization structured data (JSON-LD)
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Workout Generator',
+  url: baseUrl,
+  logo: `${baseUrl}/logo.png`,
+  description: 'AI-powered workout plans tailored to your goals, fitness level, and available equipment.',
+  sameAs: [],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '8000',
+  },
+};
+
+// WebSite structured data (JSON-LD)
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Workout Generator',
+  url: baseUrl,
+  description: 'Transform your fitness journey with AI-powered workout plans tailored to your goals, fitness level, and available equipment.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Workout Generator',
+    logo: {
+      '@type': 'ImageObject',
+      url: `${baseUrl}/logo.png`,
+    },
+  },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${baseUrl}/blog?search={search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+// Combine all structured data
+const allStructuredData = [
+  organizationSchema,
+  websiteSchema,
+  ...(Array.isArray(structuredData) ? structuredData : structuredData ? [structuredData] : []),
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    
+    <!-- Primary Meta Tags -->
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle} />
+    <meta name="description" content={description} />
+    <meta name="keywords" content="workout, fitness, AI, exercise, training, gym, workout plans, fitness blog, exercise routines, personalized workouts, home workouts, fitness tips, workout strategies, health and wellness" />
+    <meta name="author" content="AI Workout Generator" />
+    <meta name="application-name" content="AI Workout Generator" />
+    
+    <!-- Robots -->
+    {noindex ? (
+      <meta name="robots" content="noindex, nofollow" />
+    ) : (
+      <meta name="robots" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+    )}
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" sizes="48x48" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+    
+    <!-- Mobile Web App -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content="Stop Guessing. Start Training." />
+    <meta property="og:description" content="Generate a 12-week science-based program tailored to your equipment." />
+    <meta property="og:image" content={ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="AI Workout Generator - Free Science-Based Strength Plans" />
+    <meta property="og:site_name" content="AI Workout Generator" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalUrl} />
+    <meta name="twitter:title" content="The AI Workout Generator (Free)" />
+    <meta name="twitter:description" content="Stop guessing. Build a science-based hypertrophy plan in 30 seconds." />
+    <meta name="twitter:image" content={`${baseUrl}/twitter-og.png`} />
+    <meta name="twitter:image:alt" content="AI Workout Generator - Free Science-Based Strength Plans" />
+    <meta name="twitter:site" content="@aiworkoutgen" />
+    <meta name="twitter:creator" content="@AI_Workout" />
+    
+    <!-- Structured Data -->
+    {allStructuredData.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+    
+    <!-- Google Tag Manager -->
+    {gtmId && (
+      <script is:inline define:vars={{ gtmId }}>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',gtmId);
+      </script>
+    )}
+    
+    <!-- Google Analytics -->
+    {gaId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+        <script is:inline define:vars={{ gaId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId, {
+            page_path: window.location.pathname,
+          });
+        </script>
+      </>
+    )}
+    
+    <!-- Font Variables for CSS -->
+    <style is:global>
+      :root {
+        --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        --font-display: 'Space Grotesk', var(--font-sans);
+        --font-serif-display: 'Cinzel', Georgia, 'Times New Roman', serif;
+      }
+      
+      body {
+        font-family: var(--font-sans);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Skip to Content Link - Accessibility -->
+    <a href="#main-content" class="skip-to-content">
+      Skip to main content
+    </a>
+    
+    <!-- Google Tag Manager (noscript) -->
+    {gtmId && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden"
+        />
+      </noscript>
+    )}
+    
+    <!-- Page Content -->
+    <slot name="navbar" />
+    
+    <div id="main-content">
+      <slot />
+    </div>
+    
+    <slot name="footer" />
+    <slot name="fab" />
+  </body>
+</html>

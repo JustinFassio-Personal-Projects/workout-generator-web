@@ -37,6 +37,7 @@
     "vitest.config.ts",
     "vitest.config.critical.ts",
     "src/test",
-    "_reference-architecture"
+    "_reference-architecture",
+    "astro-site"
   ]
 }

@@ -1,0 +1,252 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogCard from '@/components/blog/BlogCard.astro';
+import PostContent from '@/components/blog/PostContent.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { getPostBySlug, getRelatedPosts, toTransformedPost } from '@/lib/blog/queries';
+
+// Enable SSR for dynamic data fetching
+export const prerender = false;
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// Get the slug from the URL
+const { slug } = Astro.params;
+
+// Fetch the post
+const post = await getPostBySlug(slug!, Astro.cookies);
+
+// If post not found, return 404
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+// Get related posts
+const relatedPostsData = await getRelatedPosts(post, Astro.cookies, 3);
+const relatedPosts = relatedPostsData.map(toTransformedPost);
+
+// Transform the post for display
+const transformedPost = toTransformedPost(post);
+
+// Calculate word count and reading time
+const wordCount = post.content.split(/\s+/).filter((word) => word.length > 0).length;
+const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+// Format dates
+const publishedDate = post.published_at || post.created_at;
+const modifiedDate = post.updated_at || publishedDate;
+
+// Handle image URL
+const postImage = post.featured_image
+  ? post.featured_image.startsWith('http')
+    ? post.featured_image
+    : `${baseUrl}${post.featured_image}`
+  : `${baseUrl}/og-image.jpg`;
+
+// Article structured data (JSON-LD)
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.title,
+  description: post.excerpt,
+  image: postImage,
+  datePublished: publishedDate,
+  dateModified: modifiedDate,
+  wordCount,
+  timeRequired: `PT${readingTimeMinutes}M`,
+  author: {
+    '@type': 'Person',
+    name: post.author?.name || 'Unknown',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Workout Generator',
+    logo: {
+      '@type': 'ImageObject',
+      url: `${baseUrl}/logo.png`,
+    },
+  },
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': `${baseUrl}/blog/${post.slug}`,
+  },
+  articleSection: post.category?.name || 'Uncategorized',
+  keywords: post.tags.join(', '),
+};
+
+// BreadcrumbList structured data (JSON-LD)
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: baseUrl,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Blog',
+      item: `${baseUrl}/blog`,
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: post.title,
+      item: `${baseUrl}/blog/${post.slug}`,
+    },
+  ],
+};
+
+// SEO metadata
+const seoTitle = post.seo_title || `${post.title} | Blog`;
+const seoDescription =
+  post.seo_description ||
+  (post.excerpt.length > 160 ? post.excerpt.substring(0, 157).trim() + '...' : post.excerpt);
+
+// Format the display date
+const formattedDate = new Date(publishedDate).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout
+  title={seoTitle}
+  description={seoDescription}
+  canonicalUrl={`${baseUrl}/blog/${post.slug}`}
+  ogImage={postImage}
+  structuredData={[articleSchema, breadcrumbSchema]}
+>
+  <main class="min-h-screen">
+    <!-- Post Hero -->
+    <section class="section-padding bg-gradient-to-b from-[var(--glass-bg-base)] to-transparent">
+      <div class="container-custom">
+        <div class="max-w-4xl mx-auto">
+          <!-- Breadcrumb -->
+          <nav class="flex items-center gap-2 text-sm text-muted mb-8">
+            <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
+            <span>/</span>
+            <a href="/blog" class="hover:text-[var(--color-accent)] transition-colors">Blog</a>
+            <span>/</span>
+            <span class="text-secondary truncate max-w-[200px]">{post.title}</span>
+          </nav>
+          
+          <!-- Category Badge -->
+          <div class="mb-4">
+            <span class="px-3 py-1 text-xs font-medium rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+              {transformedPost.category}
+            </span>
+          </div>
+          
+          <!-- Title -->
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">
+            {post.title}
+          </h1>
+          
+          <!-- Meta -->
+          <div class="flex flex-wrap items-center gap-4 text-sm text-muted mb-8">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>{transformedPost.author}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <time datetime={publishedDate}>{formattedDate}</time>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{readingTimeMinutes} min read</span>
+            </div>
+          </div>
+          
+          <!-- Featured Image -->
+          {post.featured_image && (
+            <div class="aspect-video rounded-2xl overflow-hidden bg-[var(--glass-bg-hover)] mb-8">
+              <img
+                src={post.featured_image}
+                alt={post.title}
+                class="w-full h-full object-cover"
+                loading="eager"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Post Content -->
+    <section class="pb-16">
+      <div class="container-custom">
+        <div class="max-w-4xl mx-auto">
+          <PostContent content={post.content} />
+          
+          <!-- Tags -->
+          {post.tags && post.tags.length > 0 && (
+            <div class="mt-12 pt-8 border-t border-[var(--glass-border-base)]">
+              <h3 class="text-sm font-semibold text-muted mb-4">Tags</h3>
+              <div class="flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <span class="px-3 py-1 text-sm rounded-full bg-[var(--glass-bg-hover)] text-secondary">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <!-- Share / CTA -->
+          <div class="mt-12 p-8 rounded-2xl bg-gradient-to-br from-[var(--color-accent)]/5 to-[var(--color-primary-400)]/5 text-center">
+            <h3 class="text-xl font-bold mb-2">Ready to put this into practice?</h3>
+            <p class="text-secondary mb-6">
+              Generate your personalized AI workout plan based on your goals and equipment.
+            </p>
+            <a 
+              href="/onboard"
+              class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-all hover:-translate-y-0.5"
+            >
+              Generate Your Plan
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Posts -->
+    {relatedPosts.length > 0 && (
+      <section class="section-padding bg-[var(--glass-bg-base)]">
+        <div class="container-custom">
+          <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Related Articles</h2>
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {relatedPosts.map((relatedPost) => (
+              <BlogCard
+                slug={relatedPost.slug}
+                title={relatedPost.title}
+                excerpt={relatedPost.excerpt}
+                date={relatedPost.date}
+                author={relatedPost.author}
+                category={relatedPost.category}
+                image={relatedPost.image}
+                tags={relatedPost.tags}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <Footer />
+  </main>
+</BaseLayout>

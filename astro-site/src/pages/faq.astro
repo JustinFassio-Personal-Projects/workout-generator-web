@@ -1,0 +1,120 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { FaqItem } from '@/components/react/FaqItem';
+import { masterFAQData, faqData } from '@/data/faq-data';
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// Generate JSON-LD Schema from FAQ data
+const allQuestions = [...masterFAQData, ...faqData.flatMap(category => category.items)];
+// Remove duplicates by question text
+const uniqueQuestions = allQuestions.filter((item, index, self) => 
+  index === self.findIndex(q => q.question === item.question)
+);
+
+const schemaData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: uniqueQuestions.map(item => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer.replace(/<[^>]*>/g, ''), // Strip any HTML
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Frequently Asked Questions | AI Workout Generator"
+  description="Answers about safety, accuracy, and pricing for AI Workout Generator. Verified by certified trainers. We answer the tough questions other apps avoid."
+  canonicalUrl={`${baseUrl}/faq`}
+  structuredData={schemaData}
+>
+  <main class="min-h-screen py-12 md:py-20">
+    <div class="mx-auto max-w-3xl px-6">
+      <!-- Header -->
+      <div class="text-center mb-16">
+        <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
+          Support
+        </span>
+        <h1 class="mt-2 text-4xl font-extrabold sm:text-5xl">
+          Frequently Asked Questions
+        </h1>
+        <p class="mt-4 text-lg text-secondary">
+          Everything you need to know about our trainer-verified AI engine. We answer the tough
+          questions other apps avoid—including safety, accuracy, and whether AI can actually
+          build muscle.
+        </p>
+      </div>
+
+      <!-- Master FAQ Questions -->
+      <div class="space-y-12">
+        <section class="glass-card-strong rounded-2xl p-6 md:p-8">
+          <h2 class="text-2xl font-bold mb-6">Most Common Questions</h2>
+          <p class="text-secondary mb-6 text-sm">
+            These are the top questions people ask about AI workouts. For specific topics like
+            injuries, seniors, or powerlifting, check out our 
+            <a href="/blog" class="text-[#0ea5e9] font-semibold hover:text-[var(--color-accent)] transition-colors">blog posts</a> 
+            and 
+            <a href="/reports" class="text-[#0ea5e9] font-semibold hover:text-[var(--color-accent)] transition-colors">reports</a> 
+            where we dive deeper into specialized topics.
+          </p>
+          <div>
+            {masterFAQData.map((item) => (
+              <FaqItem 
+                client:visible
+                question={item.question} 
+                answer={item.answer} 
+              />
+            ))}
+          </div>
+        </section>
+
+        <!-- Categorized FAQ Sections -->
+        {faqData.map((category) => (
+          <section class="glass-card-strong rounded-2xl p-6 md:p-8">
+            <h2 class="text-2xl font-bold mb-6">{category.title}</h2>
+            <div>
+              {category.items.map((item) => (
+                <FaqItem 
+                  client:visible
+                  question={item.question} 
+                  answer={item.answer} 
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <!-- CTA Section -->
+      <section class="mt-16 text-center glass-card-strong rounded-2xl p-8">
+        <h2 class="text-2xl font-bold mb-4">Ready to Build Your Plan?</h2>
+        <p class="text-secondary mb-6">
+          Experience trainer-verified AI workouts tailored to your goals and equipment.
+        </p>
+        <a 
+          href="/"
+          class="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-colors"
+        >
+          Generate Your Workout
+        </a>
+      </section>
+
+      <!-- Footer Contact -->
+      <div class="mt-12 text-center">
+        <p class="text-secondary">
+          Still have questions? Email us at 
+          <a
+            href="mailto:support@aiworkoutgenerator.com"
+            class="text-[#0ea5e9] font-bold hover:text-[var(--color-accent)] transition-colors"
+          >
+            support@aiworkoutgenerator.com
+          </a>
+        </p>
+      </div>
+    </div>
+  </main>
+</BaseLayout>

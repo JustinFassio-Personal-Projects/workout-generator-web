@@ -6,6 +6,18 @@
 
 ---
 
+## 🏗️ **Hybrid Architecture**
+
+This project uses a hybrid **Astro + Next.js** architecture:
+
+- **Astro** (`astro-site/`): Public marketing pages, blog, static content, API routes (leads, blog list)
+- **Next.js** (root): Admin dashboard, complex interactive features, admin API routes
+- **Vercel Rewrites**: Routes `/admin/*` and `/api/admin/*` to the Next.js deployment
+
+**Run verification for BOTH projects before pushing** when changes touch either codebase.
+
+---
+
 ## 🚨 **MANDATORY PRE-PUSH CHECKLIST** ⚠️ **RUN BEFORE EVERY PUSH**
 
 **Before pushing ANY code, you MUST run these commands in order and verify ALL pass:**
@@ -28,17 +40,19 @@ npm run test:coverage  # MUST NOT show "ERROR: Coverage for functions"
 
 # 5. Security checks
 npm audit --audit-level=moderate  # Review moderate+ vulnerabilities
-grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"
-# MUST return empty or only show safe patterns (process.env references)
+grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ astro-site/src/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|PUBLIC_\|process.env\|import.meta.env\|OPENAI_API_KEY.*process.env"
+# MUST return empty or only show safe patterns (process.env / import.meta.env references)
 
-# 6. Build verification
-npm run build  # MUST succeed
+# 6. Build verification (both projects)
+npm run build  # Next.js MUST succeed
+cd astro-site && npm run build  # Astro MUST succeed (if astro-site exists)
 
 # 7. Check for React act() warnings in test output
 # Review test output - MUST NOT have "not wrapped in act(...)" warnings
 
 # 8. Full verification (optional but recommended)
-npm run verify  # Runs all checks above
+npm run verify  # Runs Next.js checks
+cd astro-site && npm run build  # Astro build (when astro-site exists)
 ```
 
 **⚠️ CRITICAL**: If ANY of these checks fail, DO NOT push. Fix the issue first!
@@ -73,11 +87,11 @@ npm run verify  # Runs all checks above
   - ⚠️ **CRITICAL**: Production build must succeed
 - [ ] **Security audit**: `npm audit --audit-level=moderate`
   - ⚠️ **CRITICAL**: Review moderate+ vulnerabilities - document or fix before pushing
-- [ ] **Security scan for secrets**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" src/ app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"`
-  - ⚠️ **CRITICAL**: Must return empty or only show safe patterns (process.env references)
+- [ ] **Security scan for secrets**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" src/ app/ components/ features/ astro-site/src/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|PUBLIC_\|process.env\|import.meta.env\|OPENAI_API_KEY.*process.env"`
+  - ⚠️ **CRITICAL**: Must return empty or only show safe patterns (process.env / import.meta.env references)
   - No hardcoded secrets allowed - only environment variable references
 - [ ] **Environment variable exposure check**: Verify no service keys in client-accessible code
-  - ⚠️ **CRITICAL**: Only `NEXT_PUBLIC_*` vars in client code, server-only vars in API routes
+  - ⚠️ **CRITICAL**: Next.js: only `NEXT_PUBLIC_*` in client code. Astro: only `PUBLIC_*` in client; server-only vars in `.astro` frontmatter and `pages/api/*.ts`
 
 ### **2. Code Quality Baseline**
 
@@ -96,12 +110,15 @@ npm run verify  # Runs all checks above
 
 ### **3. Code Structure Standards**
 
-- [ ] **File organization**: Follow existing patterns in `app/`, `components/`, `features/` structure
+- [ ] **File organization**: Follow existing patterns:
+  - **Next.js**: `app/`, `components/`, `features/` structure
+  - **Astro**: `astro-site/src/pages/` (pages + API routes), `astro-site/src/components/`, `astro-site/src/layouts/`
 - [ ] **Import organization**: Group imports (React, external, internal, relative)
-- [ ] **Component structure**: Use functional components with TypeScript
-- [ ] **Hook usage**: Follow React hooks rules and custom hook patterns
+- [ ] **Component structure**: Use functional components with TypeScript (React); `.astro` files for Astro components
+- [ ] **Hook usage**: Follow React hooks rules and custom hook patterns (Next.js / React islands)
 - [ ] **Type definitions**: Use proper TypeScript interfaces and types
 - [ ] **Next.js App Router**: Follow App Router conventions for pages and layouts
+- [ ] **Astro boundaries**: Server logic (Supabase, secrets) only in `.astro` frontmatter or `pages/api/*.ts`; React islands use `client:*` directives (`client:load`, `client:visible`, `client:idle`)
 
 ### **4. Testing Requirements**
 
@@ -128,12 +145,12 @@ npm run verify  # Runs all checks above
 
 ### **5.1 Blog Functionality Tests**
 
-- [ ] **Blog Post Loading**: Test `getAllPosts` returns posts correctly
-- [ ] **Blog Post Retrieval**: Test `getPostBySlug` finds posts by slug
+- [ ] **Blog (Astro)**: Blog listing (`/blog`) and post pages (`/blog/[slug]`) render; Supabase fallback works when DB unavailable
+- [ ] **Blog (Next.js, if still used)**: `getAllPosts` / `getPostBySlug` return posts; `useBlogPosts` hook and blog components render
+- [ ] **Blog Post Loading**: Test post data fetching (Astro: `getAllPublishedPosts`; Next.js: `getAllPosts`)
+- [ ] **Blog Post Retrieval**: Test `getPostBySlug` / equivalent finds posts by slug
 - [ ] **Blog Post Sorting**: Verify posts are sorted by date (newest first)
-- [ ] **Blog Hook**: Test `useBlogPosts` hook loads and handles errors
-- [ ] **Blog Components**: Test `BlogPostList` and `BlogPostCard` render correctly
-- [ ] **Blog Pages**: Test blog listing and individual post pages render
+- [ ] **Blog Components**: Test blog listing cards and individual post content render
 
 ### **5.2 Landing Page Functionality Tests**
 
@@ -160,11 +177,12 @@ npm run test:critical -- --reporter=verbose
 
 ### **5.4 Production Deployment Validation**
 
-- [ ] **Next.js Build**: Verify production build succeeds
-- [ ] **Type Safety**: All TypeScript types compile without errors
-- [ ] **Static Generation**: Blog pages generate correctly
+- [ ] **Next.js Build**: Verify production build succeeds (`npm run build`)
+- [ ] **Astro Build**: Verify Astro build succeeds (`cd astro-site && npm run build`) when astro-site exists
+- [ ] **Type Safety**: All TypeScript types compile without errors (both projects)
+- [ ] **Static/SSR**: Next.js static generation; Astro static pages + SSR routes (blog, API) build correctly
 - [ ] **Component Rendering**: All components render without errors
-- [ ] **Route Handling**: All routes are accessible
+- [ ] **Route Handling**: All routes are accessible (including `/admin/*` proxy to Next.js)
 
 ---
 
@@ -254,9 +272,9 @@ describe('ComponentName', () => {
 - [ ] **Security audit**: `npm audit --audit-level=moderate`
   - ⚠️ **CRITICAL**: Review and address moderate+ vulnerabilities before pushing
   - If vulnerabilities exist, document why they're acceptable or fix them
-- [ ] **Secret scanning**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"`
-  - ⚠️ **CRITICAL**: No hardcoded secrets allowed - only `process.env.VAR_NAME` or `NEXT_PUBLIC_*` patterns
-  - Must return empty or only show safe patterns (process.env references, NEXT*PUBLIC* vars)
+- [ ] **Secret scanning**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ astro-site/src/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|PUBLIC_\|process.env\|import.meta.env\|OPENAI_API_KEY.*process.env"`
+  - ⚠️ **CRITICAL**: No hardcoded secrets allowed - only `process.env.VAR_NAME`, `import.meta.env.VAR_NAME`, or `NEXT_PUBLIC_*` / `PUBLIC_*` patterns
+  - Must return empty or only show safe patterns
 - [ ] **React act() warnings check**: Run tests and verify no act() warnings in output
   - ⚠️ **CRITICAL**: All React state updates in tests must be properly handled
   - If warnings appear, wrap async operations in `waitFor()` or use proper async test patterns
@@ -269,7 +287,7 @@ describe('ComponentName', () => {
 3. **Secrets**: No hardcoded API keys, passwords, or secrets in code
 4. **Security**: `npm audit` should be reviewed for moderate+ vulnerabilities
 5. **React Tests**: No act() warnings in test output
-6. **Build**: `npm run build` MUST succeed
+6. **Build**: `npm run build` (Next.js) and `cd astro-site && npm run build` (Astro, when present) MUST succeed
 
 **Pre-Push Checklist** (run these in order):
 
@@ -295,14 +313,16 @@ npm run test:coverage
 # 7. Security audit
 npm audit --audit-level=moderate
 
-# 8. Secret scan
-grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"
+# 8. Secret scan (Next.js + Astro)
+grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ astro-site/src/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|PUBLIC_\|process.env\|import.meta.env\|OPENAI_API_KEY.*process.env"
 
-# 9. Build verification
+# 9. Build verification (both projects)
 npm run build
+cd astro-site && npm run build  # when astro-site exists
 
-# 10. Full verification (runs all above)
+# 10. Full verification (Next.js + Astro build)
 npm run verify
+cd astro-site && npm run build  # when astro-site exists
 ```
 
 ### **10. Manual Quality Checks**
@@ -318,6 +338,8 @@ npm run verify
 ## 📋 **File-Specific Guidelines**
 
 ### **11. Component Files**
+
+**Next.js React components** (client-side when needed):
 
 ```typescript
 // Required structure for React components
@@ -337,6 +359,17 @@ export const ComponentName: React.FC<ComponentNameProps> = ({ prop1, prop2 }) =>
     // JSX with proper accessibility attributes
   )
 }
+```
+
+**Astro React islands** (client hydration directives; no server logic in component):
+
+```astro
+<!-- In .astro file: server logic in frontmatter; React only for interactivity -->
+---
+import { MyReactComponent } from '@/components/react/MyReactComponent'
+---
+<MyReactComponent client:visible prop1={data} />
+<!-- client:load = immediate; client:visible = on scroll; client:idle = when idle -->
 ```
 
 ### **12. Hook Files**
@@ -424,11 +457,11 @@ export default function Page() {
 
 **Prevention**:
 
-- [ ] **ALWAYS scan before push**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"`
-- [ ] **Must return empty**: Only `process.env.VAR_NAME` or `NEXT_PUBLIC_*` patterns allowed
+- [ ] **ALWAYS scan before push**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ astro-site/src/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|PUBLIC_\|process.env\|import.meta.env\|OPENAI_API_KEY.*process.env"`
+- [ ] **Must return empty**: Only `process.env.VAR_NAME`, `import.meta.env.VAR_NAME`, or `NEXT_PUBLIC_*` / `PUBLIC_*` patterns allowed
 - [ ] **No hardcoded values**: Never hardcode API keys, passwords, or secrets
 
-**Fix**: Move hardcoded secrets to environment variables using `process.env.VAR_NAME`
+**Fix**: Move hardcoded secrets to environment variables (Next.js: `process.env.VAR_NAME`; Astro: `import.meta.env.VAR_NAME` in server code only)
 
 ### **14.4. React act() Warnings** ⚠️ **TEST QUALITY ISSUE**
 
@@ -496,7 +529,9 @@ export default function Page() {
 - [ ] **Proper interface definitions**: Use interfaces for object shapes
 - [ ] **Generic type usage**: Use generics where appropriate
 
-### **18. Next.js Specific Issues**
+### **18. Next.js and Astro Specific Issues**
+
+**Next.js:**
 
 - [ ] **Correct use of 'use client'**: Only use when necessary
 - [ ] **Server Component patterns**: Use async/await for data fetching in Server Components
@@ -504,30 +539,37 @@ export default function Page() {
 - [ ] **Metadata**: Include proper metadata for SEO
 - [ ] **Image optimization**: Use Next.js Image component
 
+**Astro:**
+
+- [ ] **Client directives**: Use `client:load` / `client:visible` / `client:idle` for React islands; no server logic (DB, secrets) inside client components
+- [ ] **SSR vs static**: Use `export const prerender = false` only for routes that need server-side data (blog, API)
+- [ ] **Env vars**: Use `import.meta.env.PUBLIC_*` for client; server-only vars in API routes and `.astro` frontmatter
+
 ---
 
 ## 🔒 **Security Validation Requirements**
 
 ### **19. Secret Scanning**
 
-- [ ] **Scan for service keys**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" src/ app/ components/ features/ --exclude-dir=node_modules`
-- [ ] **Check environment variable usage**: Verify only safe env vars in client code
+- [ ] **Scan for service keys**: `grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" src/ app/ components/ features/ astro-site/src/ --exclude-dir=node_modules`
+- [ ] **Check environment variable usage**: Verify only safe env vars in client code (Next.js: `NEXT_PUBLIC_*`; Astro: `PUBLIC_*` via `import.meta.env`)
 - [ ] **Validate test file security**: Ensure test utilities don't expose production secrets
 - [ ] **Review Next.js configuration**: Confirm no secrets in `next.config.js`
+- [ ] **Review Astro configuration**: Confirm no secrets in `astro.config.mjs`; env only via `import.meta.env`
 
 ### **20. Environment Variable Security**
 
-- [ ] **Client-safe variables only**: Only `NEXT_PUBLIC_*` variables in client code
-- [ ] **Server-side isolation**: Server-only variables not exposed to client
+- [ ] **Client-safe variables only**: Next.js: only `NEXT_PUBLIC_*` in client code. Astro: only `PUBLIC_*` (via `import.meta.env.PUBLIC_*`) in client-accessible code
+- [ ] **Server-side isolation**: Server-only variables not exposed to client (Next.js API routes; Astro `.astro` frontmatter and `pages/api/*.ts`)
 - [ ] **Test environment separation**: Test files use mock data, not production secrets
-- [ ] **Build-time validation**: Ensure secrets not bundled in client builds
+- [ ] **Build-time validation**: Ensure secrets not bundled in client builds (both projects)
 
-### **21. Next.js Security**
+### **21. Next.js and Astro Security**
 
-- [ ] **No API keys in client**: Verify API keys only in API routes or Server Components
-- [ ] **Proper authentication**: Use Next.js Auth if implementing auth
-- [ ] **CSRF protection**: Implement CSRF protection for forms
-- [ ] **XSS prevention**: Sanitize user input
+- [ ] **No API keys in client**: Next.js: API keys only in API routes or Server Components. Astro: only in `pages/api/*.ts` or `.astro` frontmatter; never in React islands or client scripts
+- [ ] **Proper authentication**: Use Next.js Auth if implementing auth (admin)
+- [ ] **CSRF protection**: Implement CSRF protection for forms (both)
+- [ ] **XSS prevention**: Sanitize user input (both)
 
 ---
 
@@ -546,8 +588,8 @@ export default function Page() {
   - If not, run `npm run format` and verify again
 - [ ] **TypeScript compiles**: `npm run type-check`
   - ⚠️ **CRITICAL**: Must complete without errors
-- [ ] **Build succeeds**: `npm run build`
-  - ⚠️ **CRITICAL**: Production build must complete successfully
+- [ ] **Build succeeds**: `npm run build` (Next.js) and `cd astro-site && npm run build` (Astro, when present)
+  - ⚠️ **CRITICAL**: Both production builds must complete successfully when both codebases exist
 - [ ] **Coverage maintained**: `npm run test:coverage`
   - ⚠️ **CRITICAL**: Function coverage MUST be ≥ 80%
   - Verify no "ERROR: Coverage for functions" message appears
@@ -634,14 +676,14 @@ npm run build
 4. **Before pushing**: ⚠️ **MANDATORY** - Run section 22 Final Checks in order:
    - `npm run format` → `npm run format:check` → `npm run lint` → `npm run type-check`
    - `npm run test:run` → `npm run test:coverage` → `npm audit --audit-level=moderate`
-   - Secret scan → `npm run build` → `npm run verify`
+   - Secret scan (include astro-site/src/) → `npm run build` → `cd astro-site && npm run build` → `npm run verify`
 5. **After changes**: Verify sections 22-25 (final critical path validation)
 6. **If issues arise**: Use section 26-27 (including critical path debugging)
 
 **⚠️ CRITICAL PRE-PUSH CHECKLIST** (run these commands in order before EVERY push):
 
 ```bash
-# 1. Format and verify
+# 1. Format and verify (Next.js)
 npm run format && npm run format:check
 
 # 2. Lint and type check
@@ -655,13 +697,15 @@ npm run test:coverage
 
 # 5. Security checks
 npm audit --audit-level=moderate
-grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|process.env\|OPENAI_API_KEY.*process.env"
+grep -r "SERVICE_ROLE_KEY\|SECRET_KEY\|API_KEY\|PASSWORD" app/ components/ features/ astro-site/src/ --exclude-dir=node_modules | grep -v "NEXT_PUBLIC_\|PUBLIC_\|process.env\|import.meta.env\|OPENAI_API_KEY.*process.env"
 
-# 6. Build verification
+# 6. Build verification (both projects)
 npm run build
+cd astro-site && npm run build  # when astro-site exists
 
-# 7. Full verification (runs all above)
+# 7. Full verification (Next.js + Astro build)
 npm run verify
+cd astro-site && npm run build  # when astro-site exists
 ```
 
 **⚠️ CRITICAL**: Always run `npm run test:critical` before any production deployment!
@@ -706,9 +750,9 @@ Before merging PRs, ensure:
 
 ---
 
-**Last Updated**: January 2025  
-**Version**: 1.0  
-**Status**: ✅ ACTIVE
+**Last Updated**: February 2026  
+**Version**: 1.1  
+**Status**: ✅ ACTIVE (Hybrid Astro + Next.js)
 
 ---
 

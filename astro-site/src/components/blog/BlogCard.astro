@@ -1,0 +1,94 @@
+---
+// Blog Card component - Pure Astro (static HTML)
+interface Props {
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  author: string;
+  category: string;
+  image?: string;
+  tags?: string[];
+}
+
+const { slug, title, excerpt, date, author, category, image, tags = [] } = Astro.props;
+
+// Format the date
+const formattedDate = new Date(date).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<article class="glass-card overflow-hidden group">
+  <a href={`/blog/${slug}`} class="block">
+    {/* Featured Image */}
+    {image && (
+      <div class="aspect-video overflow-hidden bg-[var(--glass-bg-hover)]">
+        <img
+          src={image}
+          alt={title}
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+        />
+      </div>
+    )}
+    
+    {/* Content */}
+    <div class="p-6">
+      {/* Category Badge */}
+      <div class="flex items-center gap-2 mb-3">
+        <span class="px-3 py-1 text-xs font-medium rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+          {category}
+        </span>
+      </div>
+      
+      {/* Title */}
+      <h2 class="text-xl font-bold mb-3 group-hover:text-[var(--color-accent)] transition-colors line-clamp-2">
+        {title}
+      </h2>
+      
+      {/* Excerpt */}
+      <p class="text-secondary text-sm mb-4 line-clamp-3">
+        {excerpt}
+      </p>
+      
+      {/* Meta */}
+      <div class="flex items-center justify-between text-xs text-muted">
+        <span>{author}</span>
+        <time datetime={date}>{formattedDate}</time>
+      </div>
+      
+      {/* Tags */}
+      {tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-[var(--glass-border-base)]">
+          {tags.slice(0, 3).map((tag) => (
+            <span class="text-xs text-tertiary">
+              #{tag}
+            </span>
+          ))}
+          {tags.length > 3 && (
+            <span class="text-xs text-tertiary">+{tags.length - 3} more</span>
+          )}
+        </div>
+      )}
+    </div>
+  </a>
+</article>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

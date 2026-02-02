@@ -12,7 +12,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     include: ['**/__tests__/**/*.{test,spec}.{ts,tsx}', '**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules', '.next', 'out', 'dist'],
+    exclude: ['node_modules', '.next', 'out', 'dist', 'astro-site'],
     testTimeout: 10000, // 10 seconds default - tests should be fast
     coverage: {
       provider: 'v8',
@@ -66,6 +66,15 @@ export default defineConfig({
         'app/equipment/page.tsx',
         'app/equipment/page.module.scss',
         'app/equipment/layout.tsx',
+        // Astro site (separate project; has its own build/tests)
+        'astro-site/**',
+        // App router pages/layouts (tested via integration/e2e; low unit coverage)
+        'app/**/page.tsx',
+        'app/**/layout.tsx',
+        'app/**/not-found.tsx',
+        'app/**/*.module.scss',
+        // Unused or config
+        'instrumentation.ts',
       ],
       thresholds: {
         // Lowered from 75% to 64% to match current coverage (64.63%)

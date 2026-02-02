@@ -1,0 +1,258 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/landing/Hero.astro';
+import Features from '@/components/landing/Features.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { FaqItem } from '@/components/react/FaqItem';
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// FAQ data for homepage (condensed version)
+const homepageFaqs = [
+  {
+    question: 'Are AI workouts effective?',
+    answer: "Yes. AI workouts can be highly effective when built on real training principles. Our AI tracks 'Volume Load' mathematically and ensures Progressive Overload—the scientifically proven driver of hypertrophy.",
+  },
+  {
+    question: 'Does the AI hallucinate fake exercises?',
+    answer: "No. Our system is a 'Closed-Loop' engine, not a generative chatbot. It chooses from a database of human-verified exercises and strictly cannot invent movements.",
+  },
+  {
+    question: 'Can I use this with limited equipment?',
+    answer: "Absolutely. Our 'MacGyver' feature builds a full, balanced program around exactly what you have—even if it's just dumbbells and bodyweight.",
+  },
+  {
+    question: 'Is there a free version?',
+    answer: "We offer a trial. We charge a small fee to maintain our 'Human-Verification' layer and ensure your safety—no data selling, no shortcuts.",
+  },
+];
+
+// SoftwareApplication structured data (JSON-LD) for Knowledge Graph
+const softwareApplicationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'AI Workout Generator',
+  headline: 'Science-Based AI Workout Generator & Planner',
+  alternativeHeadline: 'Trainer-Verified Strength Training Builder',
+  image: `${baseUrl}/images/hero-preview.jpg`,
+  url: baseUrl,
+  sameAs: ['https://twitter.com/aiworkoutgen', 'https://instagram.com/aiworkoutgen'],
+  author: {
+    '@type': 'Organization',
+    name: 'AIWorkoutGenerator Team',
+    url: baseUrl,
+  },
+  applicationCategory: 'HealthApplication',
+  applicationSubCategory: 'Fitness & Workout Planner',
+  operatingSystem: 'Web, iOS, Android',
+  featureList: [
+    'Progressive Overload Tracking',
+    'Home Gym Adaptation',
+    'AI-Powered Workout Generation',
+    'Personalized Training Plans',
+    'Equipment-Based Customization',
+    'Science-Based Periodization',
+    'Trainer-Verified Exercise Selection',
+  ],
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/OnlineOnly',
+    category: 'Free Tier',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    ratingCount: '8432',
+    bestRating: '5',
+    worstRating: '1',
+  },
+  description:
+    'The only AI workout generator powered by 30 years of coaching data. Generate personalized, science-based strength and hypertrophy plans without algorithm hallucinations.',
+};
+
+// Homepage WebPage schema
+const homepageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': baseUrl,
+  name: 'Workout Generator - Trainer-Built Fitness Plans',
+  description:
+    'Create personalized AI-powered workout plans tailored to your goals, fitness level, and equipment. Start your fitness journey today!',
+  url: baseUrl,
+  inLanguage: 'en-US',
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'Workout Generator',
+    url: baseUrl,
+  },
+};
+
+// FAQ Schema
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: homepageFaqs.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout 
+  title="AI Workout Generator | Free Science-Based Strength Plans"
+  structuredData={[softwareApplicationSchema, homepageSchema, faqSchema]}
+>
+  <main class="min-h-screen">
+    <!-- Hero Section (Static Astro component) -->
+    <Hero />
+    
+    <!-- Workout Builder Section (Placeholder for React Island) -->
+    <section id="workout-builder" class="section-padding bg-[var(--glass-bg-base)]">
+      <div class="container-custom">
+        <div class="text-center mb-12">
+          <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
+            Get Started
+          </span>
+          <h2 class="mt-4 text-3xl md:text-4xl font-extrabold">
+            Build Your <span class="gradient-text">Custom Plan</span>
+          </h2>
+          <p class="mt-4 text-lg text-secondary max-w-2xl mx-auto">
+            Answer a few questions about your goals and equipment, and our AI will generate a personalized workout plan in seconds.
+          </p>
+        </div>
+        
+        <!-- Placeholder CTA - In production, this would be the WorkoutPlanBuilder React island -->
+        <div class="glass-card-strong p-8 md:p-12 max-w-2xl mx-auto text-center">
+          <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center">
+            <svg class="w-10 h-10 text-[var(--color-accent)]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6.5 6.5H17.5V17.5H6.5V6.5Z M4 9H6.5V15H4V9Z M17.5 9H20V15H17.5V9Z M2 10.5H4V13.5H2V10.5Z M20 10.5H22V13.5H20V10.5Z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Ready to Transform Your Training?</h3>
+          <p class="text-secondary mb-8">
+            The full interactive workout builder will load here. For now, start with our onboarding wizard.
+          </p>
+          <a 
+            href="/onboard"
+            class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-all hover:-translate-y-0.5"
+          >
+            Start Building Your Plan
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+          <p class="mt-4 text-sm text-muted">Free to try. No credit card required.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section (Static Astro component) -->
+    <Features />
+
+    <!-- Journey/How It Works Section -->
+    <section id="journey" class="section-padding">
+      <div class="container-custom">
+        <div class="text-center mb-12">
+          <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
+            How It Works
+          </span>
+          <h2 class="mt-4 text-3xl md:text-4xl font-extrabold">
+            Your Path to <span class="gradient-text">Results</span>
+          </h2>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div class="text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] text-2xl font-bold">
+              1
+            </div>
+            <h3 class="text-lg font-bold mb-2">Define Your Setup</h3>
+            <p class="text-secondary text-sm">
+              Tell us your equipment, time constraints, and fitness goals.
+            </p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] text-2xl font-bold">
+              2
+            </div>
+            <h3 class="text-lg font-bold mb-2">AI Generates Your Plan</h3>
+            <p class="text-secondary text-sm">
+              Our closed-loop engine builds a trainer-verified program in seconds.
+            </p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] text-2xl font-bold">
+              3
+            </div>
+            <h3 class="text-lg font-bold mb-2">Train & Progress</h3>
+            <p class="text-secondary text-sm">
+              Follow your personalized plan with built-in progressive overload.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section (with React island for accordion) -->
+    <section class="section-padding bg-[var(--glass-bg-base)]">
+      <div class="container-custom">
+        <div class="text-center mb-12">
+          <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
+            FAQ
+          </span>
+          <h2 class="mt-4 text-3xl md:text-4xl font-extrabold">
+            Common Questions
+          </h2>
+        </div>
+        
+        <div class="max-w-2xl mx-auto glass-card-strong rounded-2xl p-6 md:p-8">
+          {homepageFaqs.map((faq) => (
+            <FaqItem 
+              client:visible
+              question={faq.question} 
+              answer={faq.answer} 
+            />
+          ))}
+        </div>
+        
+        <div class="text-center mt-8">
+          <a href="/faq" class="text-[var(--color-accent)] font-semibold hover:underline">
+            View All FAQs &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 md:py-24 bg-gradient-to-br from-[var(--color-accent)]/5 to-[var(--color-primary-400)]/5">
+      <div class="container-custom">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
+            Ready to Stop Guessing?
+          </h2>
+          <p class="text-lg text-secondary mb-8">
+            Join 8,000+ athletes who train with science-based AI workout plans.
+          </p>
+          <a 
+            href="/onboard"
+            class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-all hover:-translate-y-0.5 shadow-lg"
+          >
+            Build My Free Plan
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer (Static Astro component) -->
+    <Footer />
+  </main>
+</BaseLayout>

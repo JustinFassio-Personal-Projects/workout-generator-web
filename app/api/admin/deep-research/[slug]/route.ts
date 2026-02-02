@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createServerSupabaseClient, getServerUser } from '@/lib/supabase/server'
-
-const HTML_CONTENT_MAX_SIZE = 500 * 1024 // 500KB
+import { validateDeepResearchPayload } from '@/lib/deep-research/validation'
 
 interface RouteParams {
   params: Promise<{ slug: string }>
@@ -72,29 +71,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     const rawData = await request.json()
 
-    if (
-      typeof rawData.title !== 'string' ||
-      rawData.title.trim().length === 0 ||
-      typeof rawData.slug !== 'string' ||
-      rawData.slug.trim().length === 0 ||
-      typeof rawData.html_content !== 'string' ||
-      rawData.html_content.trim().length === 0
-    ) {
-      return NextResponse.json(
-        { error: 'Missing or invalid required fields: title, slug, html_content' },
-        { status: 400 }
-      )
-    }
-
-    if (rawData.excerpt != null && typeof rawData.excerpt !== 'string') {
-      return NextResponse.json({ error: 'excerpt must be a string if provided' }, { status: 400 })
-    }
-
-    if (rawData.html_content.length > HTML_CONTENT_MAX_SIZE) {
-      return NextResponse.json(
-        { error: 'HTML content exceeds maximum size (500KB)' },
-        { status: 400 }
-      )
+    const validation = validateDeepResearchPayload(rawData)
+    if (!validation.ok) {
+      return NextResponse.json({ error: validation.error }, { status: validation.status })
     }
 
     if (rawData.status && rawData.status !== 'draft' && rawData.status !== 'published') {

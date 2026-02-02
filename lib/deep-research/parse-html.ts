@@ -22,6 +22,7 @@ export function parsePastedHtml(html: string): ParsedHtml {
   let excerpt: string | undefined
   let bodyHtml: string
 
+  // Client vs server strategy: DOMParser in browser, regex fallback in Node (see JSDoc above).
   if (typeof DOMParser !== 'undefined') {
     const parser = new DOMParser()
     const doc = parser.parseFromString(trimmed, 'text/html')

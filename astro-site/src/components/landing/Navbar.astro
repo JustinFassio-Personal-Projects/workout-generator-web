@@ -1,0 +1,272 @@
+---
+// Shared top-level navigation - visible on every page (order matches Next.js nav)
+const navLinks = [
+  { name: 'Home', href: '/#hero' },
+  { name: 'About', href: '/about' },
+  { name: 'Blog', href: '/blog' },
+  { name: 'Reports', href: '/reports' },
+  { name: 'Deep Research', href: '/deep-research' },
+  { name: 'Equipment', href: '/equipment' },
+  { name: 'FAQ', href: '/faq' },
+];
+const currentPath = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-[var(--z-sticky)] bg-[var(--glass-bg-base)]/95 backdrop-blur-md border-b border-[var(--glass-border-base)]" role="navigation" aria-label="Main navigation">
+  <nav class="container-custom flex items-center justify-between gap-6 h-[var(--navbar-height)]">
+    <a href="/" class="flex items-center gap-3 shrink-0 group nav-logo">
+      <div class="relative scale-90 xl:scale-100">
+        <div class="absolute inset-0 bg-[var(--color-accent)] blur-lg opacity-40 group-hover:opacity-60 transition-opacity rounded-xl" aria-hidden="true"></div>
+        <div class="relative z-10 rounded-xl bg-gradient-to-br from-[var(--color-gray-900)] to-[var(--color-gray-800)] p-2.5 border border-white/10 shadow-sm">
+          <!-- Lucide Activity (heartbeat/ECG) icon - matches Next.js navbar -->
+          <svg class="w-6 h-6 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+          </svg>
+        </div>
+      </div>
+      <div class="flex flex-col">
+        <span class="font-display font-bold text-lg xl:text-2xl tracking-tight leading-none text-[var(--text-primary)]">
+          AI Workout <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary-500)] to-[var(--color-accent)]">Generator</span>
+        </span>
+        <span class="text-[8px] xl:text-[10px] uppercase tracking-[0.2em] text-muted font-medium mt-0.5">AI-Powered Fitness Plans</span>
+      </div>
+    </a>
+    <ul class="hidden xl:flex flex-1 items-center justify-center gap-2 min-w-0">
+      {navLinks.map((link) => {
+        const pathOnly = link.href.replace(/#.*/, '') || '/';
+        const isActive = pathOnly === '/' ? currentPath === '/' : (currentPath === pathOnly || currentPath.startsWith(pathOnly + '/'));
+        return (
+          <li>
+            <a
+              href={link.href}
+              class={`inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium transition-colors border border-[var(--glass-border-base)] shadow-sm whitespace-nowrap ${
+                isActive
+                  ? 'text-[var(--color-accent)] bg-[var(--color-accent)]/10'
+                  : 'text-secondary bg-[var(--glass-bg-base)] hover:text-[var(--color-accent)] hover:bg-[var(--glass-bg-hover)]'
+              }`}
+            >
+              {link.name}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+    <div class="hidden xl:flex shrink-0 items-center gap-2">
+      <a
+        href="https://aiworkoutgen.app/signup"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="nav-sign-up inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm"
+      >
+        Sign Up
+      </a>
+      <a
+        href="https://aiworkoutgen.app/login"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="nav-sign-in inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm border-0"
+      >
+        Sign In
+      </a>
+    </div>
+    <div class="xl:hidden shrink-0">
+      <button
+        type="button"
+        id="mobile-nav-toggle"
+        class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-[var(--glass-bg-base)] text-secondary border border-[var(--glass-border-base)] text-sm font-medium hover:text-[var(--color-accent)] hover:bg-[var(--glass-bg-hover)] transition-colors"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+        aria-controls="mobile-nav-drawer"
+      >
+        Menu
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- Mobile drawer: overlay + sliding panel (Next.js parity) -->
+<div
+  id="mobile-nav-overlay"
+  class="fixed inset-0 z-[var(--z-modal-backdrop)] bg-black/50 transition-[opacity,visibility] duration-300 ease-[ease] opacity-0 invisible pointer-events-none backdrop-blur-[4px] nav-drawer-backdrop"
+  aria-hidden="true"
+></div>
+<div
+  id="mobile-nav-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Main menu"
+  aria-hidden="true"
+  tabindex="-1"
+  class="fixed left-0 top-0 h-screen w-full max-w-[320px] sm:max-w-[360px] md:max-w-[400px] bg-[var(--glass-bg-hover)] backdrop-blur-xl border-r border-[var(--glass-border-hover)] shadow-2xl z-[var(--z-modal)] flex flex-col overflow-y-auto transition-transform duration-300 ease-[ease] -translate-x-full invisible pointer-events-none nav-drawer-panel"
+>
+  <div id="mobile-nav-drawer-content" class="p-6 flex flex-col gap-2 flex-1">
+    <div class="w-full mb-2 flex gap-2">
+      <a
+        href="https://aiworkoutgen.app/signup"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="nav-sign-up flex-1 inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold"
+      >
+        Sign Up
+      </a>
+      <a
+        href="https://aiworkoutgen.app/login"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="nav-sign-in flex-1 inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold"
+      >
+        Sign In
+      </a>
+    </div>
+    <div class="h-px bg-white/10 my-2" aria-hidden="true"></div>
+    <div class="flex flex-col gap-2 w-full">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class="inline-flex items-center justify-center w-full px-4 py-2 rounded-full text-sm font-medium text-secondary bg-[var(--glass-bg-base)] border border-[var(--glass-border-base)] hover:text-[var(--color-accent)] hover:bg-[var(--glass-bg-hover)] transition-colors"
+        >
+          {link.name}
+        </a>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Smooth scroll to hash when on home page (e.g. /#hero)
+  document.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+    if (hash && window.location.pathname === '/') {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  // Mobile drawer: toggle, body scroll, overlay click, Escape, focus, close on link click, resize close at xl
+  function initDrawer() {
+    const toggle = document.getElementById('mobile-nav-toggle');
+    const overlay = document.getElementById('mobile-nav-overlay');
+    const drawer = document.getElementById('mobile-nav-drawer');
+    const drawerContent = document.getElementById('mobile-nav-drawer-content');
+    const OPEN_CLASS = 'nav-drawer-open';
+
+    function isOpen() {
+      return overlay?.getAttribute('aria-hidden') === 'false';
+    }
+
+    function setOpen(open) {
+      if (!overlay || !drawer || !toggle) return;
+      overlay.setAttribute('aria-hidden', String(!open));
+      drawer.setAttribute('aria-hidden', String(!open));
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) {
+        overlay.classList.add(OPEN_CLASS);
+        drawer.classList.add(OPEN_CLASS);
+        drawer.classList.remove('-translate-x-full', 'invisible', 'pointer-events-none');
+        drawer.classList.add('translate-x-0');
+        document.body.style.overflow = 'hidden';
+        drawer.focus();
+        addEscapeListener();
+        addLinkClickListener();
+      } else {
+        overlay.classList.remove(OPEN_CLASS);
+        drawer.classList.remove(OPEN_CLASS, 'translate-x-0');
+        drawer.classList.add('-translate-x-full', 'invisible', 'pointer-events-none');
+        document.body.style.overflow = '';
+        toggle.focus();
+        removeEscapeListener();
+        removeLinkClickListener();
+      }
+    }
+
+    let previousFocus = null;
+    let escapeHandler = null;
+    let linkClickHandler = null;
+
+    function addEscapeListener() {
+      escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+          setOpen(false);
+        }
+      };
+      document.addEventListener('keydown', escapeHandler);
+    }
+    function removeEscapeListener() {
+      if (escapeHandler) {
+        document.removeEventListener('keydown', escapeHandler);
+        escapeHandler = null;
+      }
+    }
+
+    function addLinkClickListener() {
+      linkClickHandler = (e) => {
+        if (e.target.closest('a') && drawerContent?.contains(e.target.closest('a'))) {
+          setOpen(false);
+        }
+      };
+      drawerContent?.addEventListener('click', linkClickHandler);
+    }
+    function removeLinkClickListener() {
+      if (linkClickHandler && drawerContent) {
+        drawerContent.removeEventListener('click', linkClickHandler);
+        linkClickHandler = null;
+      }
+    }
+
+    toggle?.addEventListener('click', () => {
+      previousFocus = document.activeElement;
+      setOpen(!isOpen());
+    });
+
+    overlay?.addEventListener('click', () => setOpen(false));
+
+    const xlMedia = window.matchMedia('(min-width: 1280px)');
+    xlMedia.addEventListener('change', (e) => {
+      if (e.matches && isOpen()) setOpen(false);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDrawer);
+  } else {
+    initDrawer();
+  }
+</script>
+
+<style is:global>
+  /* Sign Up button: transparent bg, lime green border and font; opens auth in Sign Up mode */
+  .nav-sign-up {
+    color: var(--color-accent);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+  }
+  .nav-sign-up:hover {
+    color: var(--color-accent-light);
+    background: rgba(132, 204, 22, 0.1);
+    border-color: var(--color-accent-light);
+  }
+
+  /* Sign In button: override global a{} so text is dark on accent bg and hover is visible */
+  .nav-sign-in {
+    color: var(--bg-dark);
+    background: var(--color-accent);
+    transition: background-color var(--transition-base), color var(--transition-base);
+  }
+  .nav-sign-in:hover {
+    color: var(--bg-dark);
+    background: var(--color-accent-light);
+  }
+
+  /* Open state: must override Tailwind and apply to fixed overlay/drawer (may be outside scoped root) */
+  #mobile-nav-overlay.nav-drawer-open {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  #mobile-nav-drawer.nav-drawer-open {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+  }
+</style>

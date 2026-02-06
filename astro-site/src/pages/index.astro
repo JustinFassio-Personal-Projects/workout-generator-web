@@ -1,0 +1,207 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/landing/Hero.astro';
+import { ScienceChart } from '@/components/react/ScienceChart/ScienceChart';
+import Features from '@/components/landing/Features.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { FaqItem } from '@/components/react/FaqItem';
+import { EquipmentAdaptive } from '@/components/react/EquipmentAdaptive/EquipmentAdaptive';
+import { JourneySection } from '@/components/react/JourneySection/JourneySection';
+import { Testimonials } from '@/components/react/Testimonials/Testimonials';
+import { BlogPreview } from '@/components/react/BlogPreview/BlogPreview';
+import Pricing from '@/components/landing/Pricing.astro';
+import Bio from '@/components/landing/Bio.astro';
+import OnboardingIntroSection from '@/components/landing/OnboardingIntroSection.astro';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// BreadcrumbList structured data (JSON-LD) for homepage — matches Next.js
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [{ name: 'Home', url: baseUrl }]);
+
+// FAQ data for homepage (condensed version)
+const homepageFaqs = [
+  {
+    question: 'Are AI workouts effective?',
+    answer: "Yes. AI workouts can be highly effective when built on real training principles. Our AI tracks 'Volume Load' mathematically and ensures Progressive Overload—the scientifically proven driver of hypertrophy.",
+  },
+  {
+    question: 'Does the AI hallucinate fake exercises?',
+    answer: "No. Our system is a 'Closed-Loop' engine, not a generative chatbot. It chooses from a database of human-verified exercises and strictly cannot invent movements.",
+  },
+  {
+    question: 'Can I use this with limited equipment?',
+    answer: "Absolutely. Our 'MacGyver' feature builds a full, balanced program around exactly what you have—even if it's just dumbbells and bodyweight.",
+  },
+  {
+    question: 'Is there a free version?',
+    answer: "We offer a trial. We charge a small fee to maintain our 'Human-Verification' layer and ensure your safety—no data selling, no shortcuts.",
+  },
+];
+
+// SoftwareApplication structured data (JSON-LD) for Knowledge Graph
+const softwareApplicationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'AI Workout Generator',
+  headline: 'Science-Based AI Workout Generator & Planner',
+  alternativeHeadline: 'Trainer-Verified Strength Training Builder',
+  image: `${baseUrl}/images/hero-preview.jpg`,
+  url: baseUrl,
+  sameAs: ['https://twitter.com/aiworkoutgen', 'https://instagram.com/aiworkoutgen'],
+  author: {
+    '@type': 'Organization',
+    name: 'AIWorkoutGenerator Team',
+    url: baseUrl,
+  },
+  applicationCategory: 'HealthApplication',
+  applicationSubCategory: 'Fitness & Workout Planner',
+  operatingSystem: 'Web, iOS, Android',
+  featureList: [
+    'Progressive Overload Tracking',
+    'Home Gym Adaptation',
+    'AI-Powered Workout Generation',
+    'Personalized Training Plans',
+    'Equipment-Based Customization',
+    'Science-Based Periodization',
+    'Trainer-Verified Exercise Selection',
+  ],
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/OnlineOnly',
+    category: 'Free Tier',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    ratingCount: '8432',
+    bestRating: '5',
+    worstRating: '1',
+  },
+  description:
+    'The only AI workout generator powered by 30 years of coaching data. Generate personalized, science-based strength and hypertrophy plans without algorithm hallucinations.',
+};
+
+// Homepage WebPage schema
+const homepageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': baseUrl,
+  name: 'Workout Generator - Trainer-Built Fitness Plans',
+  description:
+    'Create personalized AI-powered workout plans tailored to your goals, fitness level, and equipment. Start your fitness journey today!',
+  url: baseUrl,
+  inLanguage: 'en-US',
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'Workout Generator',
+    url: baseUrl,
+  },
+};
+
+// FAQ Schema
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: homepageFaqs.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout 
+  title="AI Workout Generator | Free Science-Based Strength Plans"
+  structuredData={[softwareApplicationSchema, homepageSchema, breadcrumbSchema, faqSchema]}
+>
+  <main class="min-h-screen">
+    <!-- Hero Section (Static Astro component) -->
+    <Hero />
+
+    <!-- Science Chart Section (React Island: Chart.js + goal selectors, hydrates when visible) -->
+    <ScienceChart client:load />
+
+    <!-- Equipment Adaptive Section (React Island: tab switcher Full Gym / Dumbbells / Bodyweight) -->
+    <EquipmentAdaptive client:visible />
+
+    <!-- Onboarding Wizard Section (entry to /onboard — animated intro + full workflow) -->
+    <OnboardingIntroSection />
+
+    <!-- Features Section (Static Astro component) -->
+    <Features />
+
+    <!-- Journey Section (Equipment Adaptive layout: 3 tabs, left explanation, right step cards) -->
+    <JourneySection client:visible />
+
+    <!-- Testimonials Section (React Island: carousel with auto-play, prev/next, dots) -->
+    <Testimonials client:visible />
+
+    <!-- Blog Preview Section (React Island: fetches /api/blog, shows up to 3 posts, View All Posts) -->
+    <BlogPreview client:load />
+
+    <!-- FAQ Section (with React island for accordion) -->
+    <section class="section-padding bg-[var(--glass-bg-base)]">
+      <div class="container-custom">
+        <div class="text-center mb-12">
+          <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
+            FAQ
+          </span>
+          <h2 class="mt-4 text-3xl md:text-4xl font-extrabold">
+            Common Questions
+          </h2>
+        </div>
+        
+        <div class="max-w-2xl mx-auto glass-card-strong rounded-2xl p-6 md:p-8">
+          {homepageFaqs.map((faq) => (
+            <FaqItem 
+              client:visible
+              question={faq.question} 
+              answer={faq.answer} 
+            />
+          ))}
+        </div>
+        
+        <div class="text-center mt-8">
+          <a href="/faq" class="text-[var(--color-accent)] font-semibold hover:underline">
+            View All FAQs &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bio / Founder Section -->
+    <Bio />
+
+    <!-- Pricing Section -->
+    <Pricing />
+
+    <!-- CTA Section -->
+    <section class="py-16 md:py-24 bg-gradient-to-br from-[var(--color-accent)]/5 to-[var(--color-primary-400)]/5">
+      <div class="container-custom">
+        <div class="text-center max-w-2xl mx-auto" data-aos="fade-up">
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
+            Ready to Stop Guessing?
+          </h2>
+          <p class="text-lg text-secondary mb-8">
+            Join 8,000+ athletes who train with science-based AI workout plans.
+          </p>
+          <a href="/onboard" class="btn-onboard-cta">
+            Build My Free Plan
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer (Static Astro component) -->
+    <Footer />
+  </main>
+</BaseLayout>

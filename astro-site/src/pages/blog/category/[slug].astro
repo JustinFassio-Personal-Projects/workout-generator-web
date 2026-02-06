@@ -1,0 +1,112 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import BlogCard from '@/components/blog/BlogCard.astro';
+import { getCategoryBySlug, getPostsByCategory, toTransformedPost } from '@/lib/blog/queries';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/blog');
+}
+
+const category = await getCategoryBySlug(slug, Astro.cookies);
+const posts = await getPostsByCategory(slug, Astro.cookies);
+
+if (!category) {
+  return Astro.redirect('/404');
+}
+
+const transformedPosts = posts.map(toTransformedPost);
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+const pageTitle = `${category.name} | Blog`;
+const pageDescription = category.description || 
+  `Browse all ${category.name.toLowerCase()} articles on the AI Workout Generator blog. Fitness tips, workout strategies, and expert advice.`;
+
+// Breadcrumb schema
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [
+  { name: 'Home', url: baseUrl },
+  { name: 'Blog', url: `${baseUrl}/blog` },
+  { name: category.name, url: `${baseUrl}/blog/category/${slug}` },
+]);
+
+// CollectionPage schema
+const collectionSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `${category.name} Articles`,
+  description: pageDescription,
+  url: `${baseUrl}/blog/category/${slug}`,
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: transformedPosts.map((post, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'BlogPosting',
+        headline: post.title,
+        url: `${baseUrl}/blog/${post.slug}`,
+      },
+    })),
+  },
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={`${baseUrl}/blog/category/${slug}`}
+  structuredData={[breadcrumbSchema, collectionSchema]}
+>
+  <main class="min-h-screen">
+    <!-- Category Header -->
+    <section class="py-16 md:py-24 bg-[var(--glass-bg-base)]">
+      <div class="container-custom">
+        <nav class="flex items-center gap-2 text-sm text-secondary mb-8" aria-label="Breadcrumb">
+          <a href="/" class="hover:text-primary transition-colors">Home</a>
+          <span>/</span>
+          <a href="/blog" class="hover:text-primary transition-colors">Blog</a>
+          <span>/</span>
+          <span class="text-primary" aria-current="page">{category.name}</span>
+        </nav>
+
+        <h1 class="text-3xl md:text-4xl font-extrabold mb-4">
+          {category.name}
+        </h1>
+        {category.description && (
+          <p class="text-lg text-secondary max-w-2xl mb-4">{category.description}</p>
+        )}
+        <p class="text-secondary">
+          {transformedPosts.length} {transformedPosts.length === 1 ? 'article' : 'articles'}
+        </p>
+      </div>
+    </section>
+
+    <!-- Posts Grid -->
+    <section class="py-16">
+      <div class="container-custom">
+        {transformedPosts.length > 0 ? (
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {transformedPosts.map((post) => (
+              <BlogCard {...post} />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-12">
+            <p class="text-secondary text-lg">No articles found in this category.</p>
+            <a href="/blog" class="text-[var(--color-accent)] font-semibold hover:underline mt-4 inline-block">
+              ← Back to Blog
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <Footer />
+  </main>
+</BaseLayout>

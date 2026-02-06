@@ -1,0 +1,234 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { getDeepResearchBySlug } from '@/lib/deep-research/queries';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/404');
+}
+
+const item = await getDeepResearchBySlug(slug);
+
+if (!item) {
+  return Astro.redirect('/404');
+}
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+const url = `${baseUrl}/deep-research/${item.slug}`;
+const publishedTime = item.published_at || item.created_at;
+const modifiedTime = item.updated_at;
+
+const pageTitle = item.seo_title || `${item.title} | Deep Research`;
+const pageDescription = item.seo_description || 
+  (item.excerpt && item.excerpt.length > 160 
+    ? item.excerpt.substring(0, 157).trim() + '...' 
+    : item.excerpt || `Deep research: ${item.title}`);
+
+// Article structured data
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: item.title,
+  description: item.excerpt || item.title,
+  url,
+  datePublished: publishedTime,
+  dateModified: modifiedTime,
+  publisher: {
+    '@type': 'Organization',
+    name: 'AI Workout Generator',
+    logo: {
+      '@type': 'ImageObject',
+      url: `${baseUrl}/logo.png`,
+    },
+  },
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': url,
+  },
+};
+
+// Breadcrumb structured data
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [
+  { name: 'Home', url: baseUrl },
+  { name: 'Deep Research', url: `${baseUrl}/deep-research` },
+  { name: item.title, url },
+]);
+
+// Format the date for display
+const formattedDate = new Date(publishedTime).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout 
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={url}
+  ogType="article"
+  structuredData={[articleSchema, breadcrumbSchema]}
+>
+  <main class="min-h-screen">
+    <!-- Back Navigation -->
+    <div class="section-padding pt-8 pb-0">
+      <div class="container-custom">
+        <a 
+          href="/deep-research" 
+          class="inline-flex items-center gap-2 text-secondary hover:text-[var(--color-accent)] transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Deep Research
+        </a>
+      </div>
+    </div>
+
+    <!-- Article Header -->
+    <header class="section-padding text-center">
+      <div class="container-custom max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-6 text-primary">{item.title}</h1>
+        {item.excerpt && (
+          <p class="text-lg text-secondary max-w-2xl mx-auto mb-6">{item.excerpt}</p>
+        )}
+        <time datetime={publishedTime} class="text-sm text-tertiary">
+          {formattedDate}
+        </time>
+      </div>
+    </header>
+
+    <!-- Article Content -->
+    <article class="pb-16">
+      <div 
+        class="deep-research-content container-custom max-w-4xl mx-auto px-4"
+        set:html={item.html_content}
+      />
+    </article>
+
+    <!-- CTA Section -->
+    <section class="section-padding bg-[var(--glass-bg-base)]">
+      <div class="container-custom text-center max-w-2xl mx-auto">
+        <h2 class="text-2xl font-bold mb-4">Ready to Apply This Research?</h2>
+        <p class="text-secondary mb-8">
+          Create a personalized workout plan based on the latest fitness research and your unique goals.
+        </p>
+        <a
+          href="/onboard"
+          class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+        >
+          Build Your Plan
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <Footer />
+  </main>
+</BaseLayout>
+
+<style is:global>
+  .deep-research-content {
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--text-primary);
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+      font-weight: bold;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+    }
+
+    h4 {
+      font-size: 1.25rem;
+    }
+
+    p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1em;
+    }
+
+    a {
+      color: var(--color-accent);
+      text-decoration: underline;
+    }
+
+    a:hover {
+      text-decoration: none;
+    }
+
+    ul, ol {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1em;
+      padding-left: 1.5em;
+    }
+
+    li {
+      margin-bottom: 0.5em;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      margin: 1em 0;
+    }
+
+    blockquote {
+      border-left: 4px solid var(--color-accent);
+      padding-left: 1em;
+      margin: 1.5em 0;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    pre, code {
+      background: var(--glass-bg-base);
+      border-radius: 0.25rem;
+      padding: 0.2em 0.4em;
+      font-family: monospace;
+    }
+
+    pre {
+      padding: 1em;
+      overflow-x: auto;
+      margin: 1em 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: transparent;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+    }
+
+    th, td {
+      border: 1px solid var(--glass-border-base);
+      padding: 0.75em;
+      text-align: left;
+    }
+
+    th {
+      background: var(--glass-bg-base);
+      font-weight: bold;
+    }
+  }
+</style>

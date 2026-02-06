@@ -1,0 +1,206 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { EquipmentCardGrid } from '@/components/react/EquipmentCardGrid/EquipmentCardGrid';
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// Featured equipment for the hero section
+const featuredEquipment = [
+  {
+    id: 'dumbbells',
+    name: 'Dumbbells',
+    description: 'Home gym staple for isolation and compound movements',
+    icon: 'dumbbell',
+  },
+  {
+    id: 'kettlebells',
+    name: 'Kettlebells',
+    description: 'Dynamic swinging movements and functional conditioning',
+    icon: 'weight',
+  },
+  {
+    id: 'barbell',
+    name: 'Barbell & Plates',
+    description: 'Essential for squats, deadlifts, and bench press',
+    icon: 'barbell',
+  },
+  {
+    id: 'bands',
+    name: 'Resistance Bands',
+    description: 'Portable resistance for full-body training',
+    icon: 'bands',
+  },
+  {
+    id: 'machines',
+    name: 'Cables / Machines',
+    description: 'Constant tension system for endless variations',
+    icon: 'cable',
+  },
+  {
+    id: 'bodyweight',
+    name: 'Bodyweight',
+    description: 'No equipment needed - travel-friendly workouts',
+    icon: 'user',
+  },
+];
+
+// ItemList schema for SEO
+const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: featuredEquipment.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: `${item.name} Workout Generator`,
+    description: `AI-generated workout plans using ${item.name.toLowerCase()}.`,
+    url: `${baseUrl}/equipment#${item.id}`,
+  })),
+};
+---
+
+<BaseLayout
+  title="Equipment Guide | AI Workout Generator"
+  description="Build muscle with the gear you own. Select your available equipment and get AI-generated workout plans tailored to your home gym, hotel gym, or commercial facility."
+  canonicalUrl={`${baseUrl}/equipment`}
+  structuredData={itemListSchema}
+>
+  <main class="min-h-screen">
+    <!-- Hero Section -->
+    <section class="section-padding text-center">
+      <div class="container-custom">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-6">
+          Build Muscle with the Gear You Own.
+        </h1>
+        <p class="text-lg md:text-xl text-secondary max-w-3xl mx-auto">
+          Select your available equipment below, and our AI will adjust volume, intensity, and
+          exercise selection to match your home gym, hotel gym, or commercial facility.
+        </p>
+      </div>
+    </section>
+
+    <!-- Featured Equipment Grid -->
+    <section class="section-padding">
+      <div class="container-custom">
+        <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Popular Equipment</h2>
+        <EquipmentCardGrid client:visible items={featuredEquipment} />
+      </div>
+    </section>
+
+    <!-- Pillar Content Section -->
+    <section class="py-16 md:py-24 bg-[var(--glass-bg-base)]">
+      <div class="container-custom">
+        <div class="max-w-4xl mx-auto space-y-12">
+          <!-- Dumbbell Content -->
+          <div class="glass-card p-8">
+            <h2 class="text-2xl font-bold mb-4">Home Gym & Dumbbell AI Workouts</h2>
+            <p class="text-secondary">
+              Don't have a rack? Our generator creates hypertrophy-focused plans using only
+              dumbbells. We adjust the rep ranges to ensure you reach failure safely without heavy
+              loads. A 30lb dumbbell press is not the same as a barbell press—our AI understands
+              the biomechanical differences and adjusts your program accordingly.
+            </p>
+          </div>
+
+          <!-- Bodyweight Content -->
+          <div class="glass-card p-8">
+            <h2 class="text-2xl font-bold mb-4">Bodyweight & Calisthenics (No Equipment)</h2>
+            <p class="text-secondary">
+              Travel-friendly workouts that use trainer-verified progression, not just random
+              jumping jacks. Our AI creates structured bodyweight programs that progressively
+              challenge your strength and mobility, whether you're in a hotel room or your
+              living room.
+            </p>
+          </div>
+
+          <!-- Commercial Gym Content -->
+          <div class="glass-card p-8">
+            <h2 class="text-2xl font-bold mb-4">Commercial Gym Access</h2>
+            <p class="text-secondary">
+              Unlock the full potential of machine-based training. Our AI leverages cable
+              machines, leg presses, and isolation equipment to create comprehensive programs that
+              maximize muscle growth and strength gains.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trainer Logic Section -->
+    <section class="section-padding">
+      <div class="container-custom">
+        <div class="max-w-3xl mx-auto text-center">
+          <h2 class="text-2xl md:text-3xl font-bold mb-6">Why Equipment Matters: Trainer Logic</h2>
+          <p class="text-secondary mb-8">
+            A 30lb dumbbell press is not the same as a barbell press. Our AI understands the
+            biomechanical differences and adjusts your program accordingly. Created by 
+            <a href="/about" class="text-[var(--color-accent)] hover:underline">Justin Fassio</a>,
+            ACSM-certified personal trainer with 30 years of experience.
+          </p>
+          <ul class="inline-flex flex-col gap-4 text-left">
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+              <span>Smart substitutions for missing gear</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+              <span>Biomechanically-aware exercise selection</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+              <span>Equipment-specific volume and intensity adjustments</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- See adaptive engine in action (links to homepage #adaptive) -->
+    <section class="py-12 md:py-16 border-t border-white/10">
+      <div class="container-custom">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2 class="text-xl md:text-2xl font-bold mb-3">See how the AI adapts</h2>
+          <p class="text-secondary mb-6">
+            Watch the Equipment Adaptive Engine switch between Full Gym, Dumbbells, and Bodyweight
+            for a Chest & Triceps session—same goal, different exercises.
+          </p>
+          <a
+            href="/#adaptive"
+            class="inline-flex items-center gap-2 text-[var(--color-accent)] font-semibold hover:underline"
+          >
+            See it in action
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-16 md:py-24 bg-gradient-to-br from-[var(--color-accent)]/5 to-[var(--color-primary-400)]/5">
+      <div class="container-custom">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-4">Ready to build your plan?</h2>
+          <p class="text-lg text-secondary mb-8">
+            Select your equipment in the wizard and get a customized workout plan in seconds.
+          </p>
+          <a href="/onboard" class="btn-onboard-cta">
+            Start Workout Builder
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+    
+    <Footer />
+  </main>
+</BaseLayout>

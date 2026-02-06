@@ -18,6 +18,7 @@
     "test:ui": "vitest --ui",
     "verify": "npm run lint && npm run type-check && npm run format:check && npm run test:run && npm run build",
     "verify:quick": "npm run lint && npm run type-check",
+    "mcp:supabase": "node node_modules/@supabase/mcp-server-supabase/dist/transports/stdio.js",
     "prepare": "husky"
   },
   "dependencies": {
@@ -45,6 +46,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@supabase/mcp-server-supabase": "^0.6.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^16.3.1",

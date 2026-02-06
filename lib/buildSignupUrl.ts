@@ -39,8 +39,11 @@ export function buildSignupUrl(data: WebsiteOnboardingData, tenantId?: string): 
   // Note: These parameters are read by the aiworkoutgen.app repo to control:
   // - theme: Forces dark mode to match this website's theme
   // - tab: Sets the initial active tab (signup vs signin)
+  // - mode, view: Redundant signals so app can open Sign Up tab when it reads any of these
   params.set('theme', 'dark')
   params.set('tab', 'signup')
+  params.set('mode', 'signup')
+  params.set('view', 'signup')
 
   // Multi-tenant support: Add tenant_id if provided
   if (tenantId) {

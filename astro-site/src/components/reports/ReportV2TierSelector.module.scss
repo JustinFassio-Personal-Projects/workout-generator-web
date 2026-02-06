@@ -1,0 +1,202 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.tierButton {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  border: 2px solid #e7e5e4; // Stone-200
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    border-color: #fdba74; // Orange-300
+  }
+
+  &:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #ea580c; // Orange-600
+  }
+}
+
+.tierButtonActive {
+  border-color: #ea580c; // Orange-600
+  background-color: #f0fdfa; // Teal-50
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  &:hover {
+    border-color: #c2410c; // Orange-700
+  }
+}
+
+.tierLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: #a8a29e; // Stone-400
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-sm);
+}
+
+.tierLabelActive {
+  color: #0f766e; // Teal-800
+}
+
+.tierTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: #1c1917; // Stone-900
+  margin-bottom: var(--spacing-sm);
+}
+
+.tierTitleActive {
+  color: #134e4a; // Teal-900
+}
+
+.tierDesc {
+  color: #78716c; // Stone-500
+  font-size: var(--font-size-sm);
+}
+
+.tierDescActive {
+  color: #0f766e; // Teal-700
+}
+
+.detailCard {
+  background-color: #ffffff;
+  border-radius: var(--radius-2xl);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e7e5e4; // Stone-200
+  overflow: hidden;
+  transition: all 0.3s;
+  padding: var(--spacing-xl);
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.iconContainer {
+  font-size: var(--font-size-4xl);
+  background-color: #f5f5f4; // Stone-100
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+}
+
+.detailTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: #1c1917; // Stone-900
+}
+
+.divider {
+  height: 4px;
+  width: 80px;
+  background-color: #ea580c; // Orange-600
+  border-radius: 9999px;
+  margin-top: var(--spacing-sm);
+}
+
+.detailDesc {
+  font-size: var(--font-size-lg);
+  color: #292524; // Stone-700
+  margin-bottom: var(--spacing-xl);
+  line-height: var(--line-height-relaxed);
+}
+
+.prosConsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--spacing-xl);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.prosTitle {
+  font-weight: var(--font-weight-bold);
+  color: #15803d; // Green-700
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.consTitle {
+  font-weight: var(--font-weight-bold);
+  color: #dc2626; // Red-700
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.checkmark,
+.crossmark {
+  font-size: var(--font-size-base);
+}
+
+.prosList,
+.consList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.prosItem {
+  color: #57534e; // Stone-600
+  font-size: var(--font-size-sm);
+  border-left: 2px solid #bbf7d0; // Green-200
+  padding-left: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.consItem {
+  color: #57534e; // Stone-600
+  font-size: var(--font-size-sm);
+  border-left: 2px solid #fecaca; // Red-200
+  padding-left: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.verdict {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid #f5f5f4; // Stone-100
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.verdictLabel {
+  font-weight: var(--font-weight-bold);
+  color: #1c1917; // Stone-900
+}
+
+.verdictBadge {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #1c1917; // Stone-900
+  color: #ffffff;
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+}

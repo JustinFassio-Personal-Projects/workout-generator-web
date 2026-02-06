@@ -30,6 +30,9 @@ yarn-error.log*
 .env
 .env*.local
 
+# Cursor MCP config (contains SUPABASE_ACCESS_TOKEN)
+.cursor/mcp.json
+
 # vercel
 .vercel
 

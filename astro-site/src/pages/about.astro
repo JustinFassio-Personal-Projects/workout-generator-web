@@ -1,0 +1,395 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { Image } from 'astro:assets';
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// JSON-LD Schema Data
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${baseUrl}/#organization`,
+      name: 'AI Workout Generator',
+      url: baseUrl,
+      logo: `${baseUrl}/logo.png`,
+      description:
+        'A San Diego-based software company combining certified personal training experience with artificial intelligence to create safe, progressive workout plans.',
+      foundingDate: '2024',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'San Diego',
+        addressRegion: 'CA',
+        addressCountry: 'US',
+      },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        email: 'support@aiworkoutgenerator.com',
+        contactType: 'customer support',
+      },
+      founder: {
+        '@type': 'Person',
+        '@id': `${baseUrl}/#justin-fassio`,
+      },
+      sameAs: [
+        'https://x.com/AI_Workout',
+        'https://www.instagram.com/aiworkoutgenerator/',
+        'https://www.youtube.com/@aiworkoutgen',
+        'https://www.facebook.com/aiworkoutgenerator',
+        'https://www.linkedin.com/company/ai-workout-generator/',
+      ],
+    },
+    {
+      '@type': 'Person',
+      '@id': `${baseUrl}/#justin-fassio`,
+      name: 'Justin Fassio',
+      jobTitle: 'Founder & Head Trainer',
+      image: `${baseUrl}/Justin-and-Rachel-Profile.jpg`,
+      description:
+        'ACSM Certified Personal Trainer and Military Fitness Expert with over 30 years of experience in exercise science and tactical physical readiness.',
+      knowsAbout: [
+        'Exercise Science',
+        'Hypertrophy',
+        'Tactical Fitness',
+        'Artificial Intelligence Development',
+        'Corrective Exercise',
+      ],
+      alumniOf: [
+        {
+          '@type': 'Organization',
+          name: 'United States Army Master Fitness Trainer Course',
+        },
+      ],
+      worksFor: {
+        '@id': `${baseUrl}/#organization`,
+      },
+      sameAs: [
+        'https://www.linkedin.com/in/justinfassio/',
+        'https://x.com/AI_Workout',
+        'https://www.instagram.com/aiworkoutgenerator/',
+        'https://www.youtube.com/@aiworkoutgen',
+      ],
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="About AI Workout Generator | Trainer-Verified Fitness Intelligence"
+  description="AI Workout Generator combines 30 years of ACSM-certified personal training experience with advanced AI to create safe, progressive, and equipment-specific workout plans."
+  canonicalUrl={`${baseUrl}/about`}
+  structuredData={jsonLd}
+>
+  <main class="min-h-screen">
+    <div class="max-w-4xl mx-auto px-6 py-12 md:py-20 space-y-20">
+      <!-- 1. The H1: The Identity Hook -->
+      <section class="text-center space-y-6">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+          About AI Workout Generator: <br />
+          <span class="gradient-text">
+            The Trainer-Verified Fitness Engine
+          </span>
+        </h1>
+
+        <!-- 2. The Mission Statement -->
+        <div class="max-w-3xl mx-auto glass-card-strong p-6 md:p-8 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-2 h-full bg-[var(--color-accent)]"></div>
+          <p class="text-lg md:text-xl text-secondary font-medium pl-4">
+            AI Workout Generator is a San Diego-based software company founded in 2024. We
+            combine <span class="text-primary font-bold">30 years of certified personal training experience</span> 
+            with advanced artificial intelligence to create safe, progressive, and
+            equipment-specific workout plans that strictly adhere to exercise science
+            principles.
+          </p>
+        </div>
+      </section>
+
+      <!-- 3. The Expert Bio -->
+      <section class="grid md:grid-cols-12 gap-10 items-start">
+        <!-- Image Column -->
+        <div class="md:col-span-4 flex flex-col items-center md:items-start space-y-4">
+          <div class="w-full aspect-[3/4] bg-[var(--bg-dark-secondary)] rounded-xl overflow-hidden relative shadow-md group">
+            <img
+              src="/Justin-and-Rachel-Profile.jpg"
+              alt="Justin and Rachel - AI Workout Generator"
+              width="500"
+              height="600"
+              class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+              loading="eager"
+            />
+            <div class="absolute bottom-0 left-0 w-full bg-[var(--bg-dark)]/90 p-3 backdrop-blur-sm">
+              <p class="text-primary text-sm font-bold text-center">Justin Fassio</p>
+              <p class="text-[var(--color-gray-400)] text-xs text-center">Founder & Head Trainer</p>
+            </div>
+          </div>
+          
+          <!-- ACSM Certificate -->
+          <div class="w-full rounded-xl overflow-hidden relative shadow-md border border-[var(--glass-border-base)] glass-card-strong p-4">
+            <img
+              src="/ACSM CPT Certificate.jpg"
+              alt="ACSM Certified Personal Trainer Certificate"
+              width="500"
+              height="400"
+              class="w-full h-auto object-contain rounded-lg"
+              loading="lazy"
+            />
+          </div>
+          
+          <!-- Social Proof Links -->
+          <div class="flex gap-4 justify-center md:justify-start w-full">
+            <a
+              href="https://www.linkedin.com/in/justinfassio/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-secondary hover:text-[#0077b5] transition-colors text-2xl"
+              aria-label="LinkedIn"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a
+              href="https://x.com/AI_Workout"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-secondary hover:text-primary transition-colors text-2xl"
+              aria-label="X (Twitter)"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Content Column -->
+        <div class="md:col-span-8 space-y-6">
+          <div>
+            <h2 class="text-3xl font-bold mb-2">
+              The Human Intelligence Behind the Code
+            </h2>
+            <p class="text-secondary leading-relaxed">
+              In an era of generic chatbots, credentials matter. AI Workout Generator was
+              architected by Justin Fassio, a seasoned fitness professional with deep roots in
+              both military physical training and civilian exercise science.
+            </p>
+          </div>
+
+          <!-- The "Receipts" (Credentials) -->
+          <div class="glass-card-strong rounded-xl overflow-hidden">
+            <div class="bg-[var(--glass-bg-hover)] px-6 py-3 border-b border-[var(--glass-border-base)]">
+              <h3 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2">
+                <svg class="w-4 h-4 text-[var(--color-accent)]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                Verified Credentials
+              </h3>
+            </div>
+            <ul class="divide-y divide-[var(--glass-border-base)]">
+              <li class="px-6 py-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <div>
+                  <span class="block font-bold">ACSM Certified Personal Trainer</span>
+                  <span class="text-sm text-secondary">
+                    American College of Sports Medicine | 
+                    <a href="https://www.acsm.org/" target="_blank" rel="nofollow noreferrer" class="text-[var(--color-accent)] hover:underline">Verify Credential</a>
+                  </span>
+                </div>
+              </li>
+              <li class="px-6 py-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <div>
+                  <span class="block font-bold">Master Fitness Trainer</span>
+                  <span class="text-sm text-secondary">
+                    United States Army (Selected for advanced competency in exercise prescription)
+                  </span>
+                </div>
+              </li>
+              <li class="px-6 py-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <div>
+                  <span class="block font-bold">Commander's Total Fitness Program Manager</span>
+                  <span class="text-sm text-secondary">
+                    United States Air Force (Oversaw health outcomes for unit personnel)
+                  </span>
+                </div>
+              </li>
+              <li class="px-6 py-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <div>
+                  <span class="block font-bold">Founder, San Diego Core Fitness</span>
+                  <span class="text-sm text-secondary">
+                    Specialized in functional training and outdoor boot camps.
+                  </span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. The Story -->
+      <section class="glass-card-strong rounded-2xl p-8 md:p-12 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+          <img
+            src="/Justin%20Suspension%20Training%20Mission%20Bay%20San%20Diego.jpg"
+            alt=""
+            class="w-full h-full object-cover"
+            aria-hidden="true"
+            loading="lazy"
+          />
+        </div>
+        <div class="absolute inset-0 bg-[var(--bg-dark)]/70" aria-hidden="true"></div>
+        <div class="relative">
+          <h2 class="text-3xl font-bold mb-6">
+            Why I Built This: The "Safety Gap"
+          </h2>
+          <div class="prose prose-lg text-secondary space-y-4">
+            <p>
+              "I watched the rise of AI with both excitement and concern. I saw people
+              getting dangerous, hallucinated workout advice from generic chatbots that
+              didn't understand biomechanics or progressive overload. An LLM can write a
+              poem, but if it writes a bad squat program, people get hurt."
+            </p>
+            <p>
+              "I realized that for AI to be useful in fitness, it needed a governor—a layer
+              of <strong class="text-primary">'Trainer Logic'</strong> that filters the AI's
+              creativity through rigid safety protocols. I built AI Workout Generator to bridge
+              that gap."
+            </p>
+            <p>
+              "We don't just let the AI guess. We force it to adhere to the same
+              principles I used when training soldiers and civilians: 
+              <span class="font-bold text-primary">Specificity, Overload, and Safety.</span>"
+            </p>
+          </div>
+          <div class="mt-8 flex items-center gap-4">
+            <div class="h-px bg-[var(--glass-border-base)] flex-1"></div>
+            <span class="text-2xl text-[var(--color-accent)] italic font-serif-display">Justin Fassio</span>
+            <div class="h-px bg-[var(--glass-border-base)] flex-1"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. The Methodology -->
+      <section>
+        <div class="text-center mb-10">
+          <h2 class="text-3xl font-bold">How Our Engine Works</h2>
+          <p class="text-secondary mt-2">
+            Transparency in our "Hybrid-Intelligence" model.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 text-center">
+          <!-- Step 1 -->
+          <div class="glass-card p-6">
+            <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-400">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <h3 class="font-bold text-lg mb-2">1. User Inputs</h3>
+            <p class="text-sm text-secondary">
+              You define your equipment, limitations, time constraints, and goals. This creates
+              the "boundary conditions."
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="glass-card p-6">
+            <div class="w-16 h-16 bg-[var(--color-accent)]/10 rounded-full flex items-center justify-center mx-auto mb-4 text-[var(--color-accent)]">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+            </div>
+            <h3 class="font-bold text-lg mb-2">2. The Safety Layer</h3>
+            <p class="text-sm text-secondary">
+              Our proprietary logic injects trainer-verified rules (volume/load calculation)
+              before the AI is allowed to generate.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="glass-card p-6">
+            <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-green-400">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+            <h3 class="font-bold text-lg mb-2">3. Structured Output</h3>
+            <p class="text-sm text-secondary">
+              The AI generates the specific exercises, but strict formatting ensures readability
+              and logical flow.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Trust Signals & Contact -->
+      <section class="glass-card-strong rounded-2xl p-8 md:p-12">
+        <div class="grid md:grid-cols-2 gap-10">
+          <div>
+            <h2 class="text-2xl font-bold mb-4">Connect With Us</h2>
+            <p class="text-secondary mb-6">
+              We are a real business run by real humans. Whether you have a feature request or a
+              question about a specific movement, we're here.
+            </p>
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-[#0ea5e9]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span>San Diego, CA (USA)</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-[#0ea5e9]" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                <a href="mailto:support@aiworkoutgenerator.com" class="hover:text-primary hover:underline transition-colors">
+                  support@aiworkoutgenerator.com
+                </a>
+              </div>
+            </div>
+
+            <div class="mt-8 flex gap-4">
+              <a
+                href="https://x.com/AI_Workout"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-10 h-10 rounded-full bg-[var(--glass-bg-hover)] flex items-center justify-center hover:bg-[#0ea5e9] transition-colors"
+                aria-label="X (Twitter)"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </a>
+              <a
+                href="https://www.instagram.com/aiworkoutgenerator/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-10 h-10 rounded-full bg-[var(--glass-bg-hover)] flex items-center justify-center hover:bg-[#0ea5e9] transition-colors"
+                aria-label="Instagram"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </a>
+              <a
+                href="https://www.youtube.com/@aiworkoutgen"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-10 h-10 rounded-full bg-[var(--glass-bg-hover)] flex items-center justify-center hover:bg-[#0ea5e9] transition-colors"
+                aria-label="YouTube"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="glass-card p-6">
+            <h3 class="font-bold mb-4">Latest from the Founder</h3>
+            <div class="space-y-4">
+              <a href="/blog/random-workouts-kill-progress" class="block group">
+                <span class="text-xs text-muted">January 2026</span>
+                <p class="font-medium group-hover:text-[#0ea5e9] transition-colors">
+                  Why "Random" Workouts Kill Progress (and How to Fix It)
+                </p>
+              </a>
+              <hr class="border-[var(--glass-border-base)]" />
+              <a href="/blog/ai-hallucinations-health-data" class="block group">
+                <span class="text-xs text-muted">September 2024</span>
+                <p class="font-medium group-hover:text-[#0ea5e9] transition-colors">
+                  The Problem with AI Hallucinations in Health Data
+                </p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <Footer />
+  </main>
+</BaseLayout>

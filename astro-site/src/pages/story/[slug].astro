@@ -1,0 +1,240 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { 
+  milestones, 
+  getMilestoneBySlug, 
+  getRelatedChapterSlugs,
+  type Milestone 
+} from '@/data/story-milestones';
+import { getChaptersByOrder } from '@/data/story-chapters';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
+
+export function getStaticPaths() {
+  return milestones.map((milestone) => ({
+    params: { slug: milestone.slug },
+    props: { milestone },
+  }));
+}
+
+interface Props {
+  milestone: Milestone;
+}
+
+const { milestone } = Astro.props;
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+const url = `${baseUrl}/story/${milestone.slug}`;
+
+const pageTitle = milestone.seoTitle || `${milestone.title} | Founder Story`;
+const pageDescription = milestone.seoDescription || milestone.tagline || `Learn about ${milestone.title} in the founder's story.`;
+
+// Get related chapters
+const relatedChapterSlugs = getRelatedChapterSlugs(milestone);
+const chapters = getChaptersByOrder();
+const relatedChapters = chapters.filter(chapter => relatedChapterSlugs.includes(chapter.slug));
+
+// Article structured data (JSON-LD)
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: milestone.title,
+  description: milestone.tagline || milestone.title,
+  url,
+  inLanguage: 'en-US',
+  author: {
+    '@type': 'Person',
+    name: 'Justin Fassio',
+    jobTitle: 'Founder',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'AI Workout Generator',
+    logo: {
+      '@type': 'ImageObject',
+      url: `${baseUrl}/logo.png`,
+    },
+  },
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': url,
+  },
+  articleSection: 'Founder Story',
+  isPartOf: {
+    '@type': 'WebPage',
+    '@id': `${baseUrl}/founder-story`,
+    name: 'Founder Story',
+  },
+};
+
+// Breadcrumb schema
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [
+  { name: 'Home', url: baseUrl },
+  { name: 'Founder Story', url: `${baseUrl}/founder-story` },
+  { name: milestone.title, url },
+]);
+
+// Parse heroText for markdown-style bold
+function parseMarkdownText(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-primary">$1</strong>')
+    .replace(/\n/g, '<br />');
+}
+
+// Parse storyText for markdown-style formatting
+function parseStoryText(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-primary font-semibold">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-[var(--color-accent)] pl-4 italic text-secondary my-4">$1</blockquote>')
+    .replace(/^\* (.+)$/gm, '<li class="ml-4">$1</li>')
+    .replace(/\n\n/g, '</p><p class="mb-4">')
+    .replace(/\n/g, '<br />');
+}
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={url}
+  ogType="article"
+  structuredData={[articleSchema, breadcrumbSchema]}
+>
+  <main class="min-h-screen">
+    <!-- Hero Section -->
+    <section class="relative py-20 md:py-32 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-b from-[var(--glass-bg-hover)] to-transparent"></div>
+      <div class="container-custom relative">
+        <div class="max-w-4xl mx-auto text-center">
+          <span class="inline-block px-4 py-1.5 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] text-sm font-semibold mb-6">
+            Founder Story — Chapter {milestone.order}
+          </span>
+          <h1 class="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
+            {milestone.title}
+          </h1>
+          <p class="text-xl md:text-2xl text-secondary italic">
+            "{milestone.tagline}"
+          </p>
+          {milestone.heroText && (
+            <div 
+              class="mt-8 text-lg text-secondary max-w-3xl mx-auto leading-relaxed"
+              set:html={parseMarkdownText(milestone.heroText)}
+            />
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-16 md:py-24">
+      <div class="container-custom">
+        <div class="max-w-3xl mx-auto">
+          <!-- Story Text -->
+          <div class="prose prose-lg prose-invert max-w-none">
+            <div 
+              class="text-secondary leading-relaxed space-y-4"
+              set:html={`<p class="mb-4">${parseStoryText(milestone.storyText)}</p>`}
+            />
+          </div>
+
+          <!-- What I Learned -->
+          <div class="mt-16 glass-card-strong rounded-2xl p-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+              <span class="w-10 h-10 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-[var(--color-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </span>
+              What I Learned
+            </h2>
+            <ul class="space-y-3">
+              {milestone.learnedPoints.map((point) => (
+                <li class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  <span class="text-secondary" set:html={point.replace(/\*\*(.+?)\*\*/g, '<strong class="text-primary">$1</strong>')} />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- How This Shows Up in the Product -->
+          <div class="mt-8 glass-card-strong rounded-2xl p-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+              <span class="w-10 h-10 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-[var(--color-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </span>
+              How This Shows Up in the Product
+            </h2>
+            <ul class="space-y-3">
+              {milestone.productConnections.map((point) => (
+                <li class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-[var(--color-accent)] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  <span class="text-secondary" set:html={point.replace(/\*\*(.+?)\*\*/g, '<strong class="text-primary">$1</strong>')} />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- CTAs -->
+          <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+            {milestone.primaryCtaHref && milestone.primaryCtaLabel && (
+              <a href={milestone.primaryCtaHref} class="btn-onboard-cta">
+                {milestone.primaryCtaLabel}
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            )}
+            {milestone.secondaryCtaHref && milestone.secondaryCtaLabel && (
+              <a 
+                href={milestone.secondaryCtaHref}
+                class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-[var(--glass-border-base)] bg-[var(--glass-bg-base)] text-primary font-semibold hover:bg-[var(--glass-bg-hover)] transition-all hover:-translate-y-0.5"
+              >
+                {milestone.secondaryCtaLabel}
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Chapters -->
+    {relatedChapters.length > 0 && (
+      <section class="py-16 bg-[var(--glass-bg-base)]">
+        <div class="container-custom">
+          <h2 class="text-2xl font-bold text-center mb-10">Related Chapters</h2>
+          <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {relatedChapters.map((chapter) => (
+              <a 
+                href={`/story/${chapter.slug}`}
+                class="glass-card-strong rounded-xl p-6 hover:border-[var(--color-accent)] transition-all group"
+              >
+                <h3 class="font-bold text-lg group-hover:text-[var(--color-accent)] transition-colors mb-2">
+                  {chapter.title}
+                </h3>
+                <p class="text-secondary text-sm">
+                  {chapter.description}
+                </p>
+              </a>
+            ))}
+          </div>
+          <div class="text-center mt-10">
+            <a 
+              href="/founder-story"
+              class="text-[var(--color-accent)] font-semibold hover:underline"
+            >
+              ← Back to Full Story
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <Footer />
+  </main>
+</BaseLayout>

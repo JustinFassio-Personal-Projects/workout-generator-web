@@ -1,0 +1,24 @@
+---
+import { pricingPlans } from '@/data/pricing'
+import PricingCard from './PricingCard.astro'
+import styles from './Pricing.module.scss'
+---
+
+<section id="pricing" class={styles.pricing}>
+  <div class={styles.container}>
+    <div class={styles.header}>
+      <h2 class={styles.title}>
+        Choose Your
+        <span class={styles.gradientText}> Perfect Plan</span>
+      </h2>
+      <p class={styles.subtitle}>
+        Start free and upgrade as you grow. All plans include our core features.
+      </p>
+    </div>
+    <div class={styles.grid} data-aos="fade-up" data-aos-delay="100">
+      {pricingPlans.map((plan) => (
+        <PricingCard plan={plan} />
+      ))}
+    </div>
+  </div>
+</section>

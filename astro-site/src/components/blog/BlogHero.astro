@@ -1,0 +1,26 @@
+---
+// Blog Hero component - Pure Astro (static HTML)
+interface Props {
+  title?: string;
+  subtitle?: string;
+}
+
+const { 
+  title = "Fitness Tips & Workout Strategies",
+  subtitle = "Discover expert fitness tips, workout strategies, and AI-powered training advice to help you achieve your goals."
+} = Astro.props;
+---
+
+<section class="section-padding text-center bg-gradient-to-b from-[var(--glass-bg-base)] to-transparent">
+  <div class="container-custom">
+    <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
+      Blog
+    </span>
+    <h1 class="mt-4 text-4xl md:text-5xl font-extrabold">
+      {title}
+    </h1>
+    <p class="mt-6 text-lg md:text-xl text-secondary max-w-3xl mx-auto">
+      {subtitle}
+    </p>
+  </div>
+</section>

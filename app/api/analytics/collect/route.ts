@@ -189,6 +189,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to record event' }, { status: 500 })
     }
   } catch {
+    // Supabase missing (env/tables) or other config; return 500 so monitoring can detect misconfiguration.
+    // Client already ignores errors (sendBeacon/fetch.catch) and does not break the page.
+    console.error('Analytics collect: server configuration error')
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
   }
 

@@ -13,4 +13,5 @@ pnpm-lock.yaml
 .vscode
 .idea
 _reference-architecture
-
+astro-site/.astro
+astro-site/dist

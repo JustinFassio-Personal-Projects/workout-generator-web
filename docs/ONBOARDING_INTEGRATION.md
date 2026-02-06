@@ -8,26 +8,32 @@ This document describes how the website (`aiworkoutgenerator.com`) passes onboar
 
 When users complete the onboarding wizard on the website, they are redirected to the app's signup page with the following query parameters:
 
-| Parameter           | Type              | Description                                  | Example                                             |
-| ------------------- | ----------------- | -------------------------------------------- | --------------------------------------------------- |
-| `fitness_level`     | string            | User's fitness level                         | `beginner`, `intermediate`, `advanced`, `athlete`   |
-| `equipment_access`  | string            | Comma-separated list of equipment categories | `general,strength,functional`                       |
-| `activity_level`    | string            | Current activity level                       | `moderately_active`, `very_active`, etc.            |
-| `fitness_goals`     | string            | Comma-separated list of fitness goals        | `Build muscle,Lose fat`                             |
-| `age`               | number (optional) | User's age                                   | `30`                                                |
-| `gender`            | string (optional) | User's gender                                | `male`, `female`, `non_binary`, `prefer_not_to_say` |
-| `units_weight`      | string            | Weight unit preference                       | `lb`, `kg`                                          |
-| `units_height`      | string            | Height unit preference                       | `in`, `cm`                                          |
-| `units_distance`    | string            | Distance unit preference                     | `mi`, `km`                                          |
-| `units_temperature` | string            | Temperature unit preference                  | `f`, `c`                                            |
-| `source`            | string            | Analytics source                             | `website_builder`                                   |
-| `theme`             | string            | UI theme                                     | `dark`                                              |
-| `tab`               | string            | Initial tab                                  | `signup`                                            |
+| Parameter           | Type              | Description                                                                          | Example                                             |
+| ------------------- | ----------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| `fitness_level`     | string            | User's fitness level                                                                 | `beginner`, `intermediate`, `advanced`, `athlete`   |
+| `equipment_access`  | string            | Comma-separated list of equipment categories                                         | `general,strength,functional`                       |
+| `activity_level`    | string            | Current activity level                                                               | `moderately_active`, `very_active`, etc.            |
+| `fitness_goals`     | string            | Comma-separated list of fitness goals                                                | `Build muscle,Lose fat`                             |
+| `age`               | number (optional) | User's age                                                                           | `30`                                                |
+| `gender`            | string (optional) | User's gender                                                                        | `male`, `female`, `non_binary`, `prefer_not_to_say` |
+| `units_weight`      | string            | Weight unit preference                                                               | `lb`, `kg`                                          |
+| `units_height`      | string            | Height unit preference                                                               | `in`, `cm`                                          |
+| `units_distance`    | string            | Distance unit preference                                                             | `mi`, `km`                                          |
+| `units_temperature` | string            | Temperature unit preference                                                          | `f`, `c`                                            |
+| `source`            | string            | Analytics source                                                                     | `website_builder`                                   |
+| `theme`             | string            | UI theme                                                                             | `dark`                                              |
+| `tab`               | string            | Initial auth tab; when `signup`, app **must** show Sign Up tab first, not Sign In    | `signup`                                            |
+| `mode`              | string            | Redundant signal for initial auth view; when `signup`, app should show Sign Up first | `signup`                                            |
+| `view`              | string            | Redundant signal for initial auth view; when `signup`, app should show Sign Up first | `signup`                                            |
+
+### Initial auth view (Sign Up vs Sign In)
+
+Redirects from the website builder (e.g. after the user clicks "Create account to generate workout" on the onboarding page) **must** open the app's auth view with the **Sign Up** tab selected by default, not Sign In. The website sends `tab=signup`, `mode=signup`, and `view=signup` so the app can read any of these on load and set the initial auth view to Sign Up. If the app ignores these params, users arriving from the "Generate Workout" flow will see Sign In first, which is the wrong default for that journey.
 
 ### Example URL
 
 ```
-https://aiworkoutgen.app/signup?fitness_level=beginner&equipment_access=general,strength,functional&activity_level=moderately_active&fitness_goals=Build%20muscle,Lose%20fat&units_weight=lb&units_height=in&units_distance=mi&units_temperature=f&source=website_builder&theme=dark&tab=signup
+https://aiworkoutgen.app/signup?fitness_level=beginner&equipment_access=general,strength,functional&activity_level=moderately_active&fitness_goals=Build%20muscle,Lose%20fat&units_weight=lb&units_height=in&units_distance=mi&units_temperature=f&source=website_builder&theme=dark&tab=signup&mode=signup&view=signup
 ```
 
 ## Fitness Levels

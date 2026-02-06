@@ -1,3 +1,4 @@
+// Modern Sass color API (replaces deprecated lighten/darken). No other SCSS in project uses those.
 @use 'sass:color';
 
 // Design tokens

@@ -1,6 +1,9 @@
 ---
 // Import styles
+import '@/styles/global.css';
 import '@/styles/globals.scss';
+import 'aos/dist/aos.css';
+import Navbar from '@/components/landing/Navbar.astro';
 
 // Import fonts
 import '@fontsource/inter/400.css';
@@ -20,6 +23,8 @@ export interface Props {
   description?: string;
   canonicalUrl?: string;
   ogImage?: string;
+  ogTitle?: string;
+  ogDescription?: string;
   ogType?: 'website' | 'article';
   noindex?: boolean;
   structuredData?: object | object[];
@@ -28,16 +33,23 @@ export interface Props {
 const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
 const gaId = import.meta.env.PUBLIC_GA_ID;
 const gtmId = import.meta.env.PUBLIC_GTM_ID;
+const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
+const posthogHost = import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com';
 
 const {
   title,
   description = 'Build trainer-verified hypertrophy & strength programs in 30 seconds. The #1 free AI workout generator. No sign-up required.',
   canonicalUrl = Astro.url.href,
   ogImage = '/og-image.jpg',
+  ogTitle,
+  ogDescription,
   ogType = 'website',
   noindex = false,
   structuredData,
 } = Astro.props;
+
+const displayOgTitle = ogTitle ?? 'Stop Guessing. Start Training.';
+const displayOgDescription = ogDescription ?? 'Generate a 12-week science-based program tailored to your equipment.';
 
 // Full title with template
 const fullTitle = title.includes('AI Workout Generator') 
@@ -125,6 +137,9 @@ const allStructuredData = [
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
     <link rel="manifest" href="/manifest.json" />
     
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title="AI Workout Generator Blog" href="/feed.xml" />
+    
     <!-- Theme Color -->
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
     
@@ -137,8 +152,8 @@ const allStructuredData = [
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:title" content="Stop Guessing. Start Training." />
-    <meta property="og:description" content="Generate a 12-week science-based program tailored to your equipment." />
+    <meta property="og:title" content={displayOgTitle} />
+    <meta property="og:description" content={displayOgDescription} />
     <meta property="og:image" content={ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -149,8 +164,8 @@ const allStructuredData = [
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content={canonicalUrl} />
-    <meta name="twitter:title" content="The AI Workout Generator (Free)" />
-    <meta name="twitter:description" content="Stop guessing. Build a science-based hypertrophy plan in 30 seconds." />
+    <meta name="twitter:title" content={displayOgTitle} />
+    <meta name="twitter:description" content={displayOgDescription} />
     <meta name="twitter:image" content={`${baseUrl}/twitter-og.png`} />
     <meta name="twitter:image:alt" content="AI Workout Generator - Free Science-Based Strength Plans" />
     <meta name="twitter:site" content="@aiworkoutgen" />
@@ -219,7 +234,7 @@ const allStructuredData = [
     )}
     
     <!-- Page Content -->
-    <slot name="navbar" />
+    <Navbar />
     
     <div id="main-content">
       <slot />
@@ -227,5 +242,40 @@ const allStructuredData = [
     
     <slot name="footer" />
     <slot name="fab" />
+
+    <!-- AOS (Animate On Scroll) - matches Next.js init -->
+    <script>
+      import AOS from 'aos';
+      function initAOS() {
+        try {
+          AOS.init({
+            duration: 800,
+            easing: 'ease-out',
+            once: true,
+            offset: 100,
+          });
+        } catch (e) {
+          if (import.meta.env.DEV) console.warn('AOS init:', e);
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAOS);
+      } else {
+        initAOS();
+      }
+    </script>
+
+    <!-- PostHog Analytics: at end of body so init runs after first paint (non-blocking for LCP/INP) -->
+    {posthogKey && (
+      <script is:inline define:vars={{ posthogKey, posthogHost }}>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init(posthogKey, {
+          api_host: posthogHost,
+          person_profiles: 'identified_only',
+          capture_pageview: true,
+          capture_pageleave: true,
+        });
+      </script>
+    )}
   </body>
 </html>

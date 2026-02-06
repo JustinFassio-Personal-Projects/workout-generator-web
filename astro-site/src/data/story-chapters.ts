@@ -1,3 +1,4 @@
+// Chapter slugs must match story-milestones.ts slugs; founder-story links to /story/${chapter.slug}.
 export interface Chapter {
   slug: string
   title: string

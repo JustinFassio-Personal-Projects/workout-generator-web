@@ -1,0 +1,57 @@
+---
+import type { PricingPlan } from '@/data/pricing'
+import styles from './Pricing.module.scss'
+
+interface Props {
+  plan: PricingPlan
+  index?: number
+}
+
+const { plan } = Astro.props
+---
+
+<div
+  class={styles.pricingCard}
+  class:list={[plan.popular && styles['pricingCard--popular']]}
+  data-cta={`pricing-${plan.id}`}
+>
+  {plan.popular && <div class={styles.badge}>Most Popular</div>}
+  <div class={styles.cardHeader}>
+    <h3 class={styles.planName}>{plan.name}</h3>
+    <p class={styles.description}>{plan.description}</p>
+    <div class={styles.price}>
+      {plan.originalPrice != null && (
+        <span class={styles.originalPrice}>${plan.originalPrice}</span>
+      )}
+      <span class={styles.priceAmount}>${plan.price}</span>
+      <span class={styles.pricePeriod}>/{plan.period}</span>
+    </div>
+  </div>
+  <ul class={styles.featuresList}>
+    {plan.features.map((feature) => (
+      <li class={styles.featureItem}>
+        <svg class={styles.checkIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span>{feature}</span>
+      </li>
+    ))}
+  </ul>
+  <div class={styles.footer}>
+    {plan.ctaLink ? (
+      <a href={plan.ctaLink} class={styles.ctaLink}>
+        <span
+          class={`${styles.ctaButton} ${plan.ctaVariant === 'primary' ? styles['ctaButton--primary'] : styles['ctaButton--secondary']}`}
+        >
+          {plan.ctaText}
+        </span>
+      </a>
+    ) : (
+      <span
+        class={`${styles.ctaButton} ${plan.ctaVariant === 'primary' ? styles['ctaButton--primary'] : styles['ctaButton--secondary']}`}
+      >
+        {plan.ctaText}
+      </span>
+    )}
+  </div>
+</div>

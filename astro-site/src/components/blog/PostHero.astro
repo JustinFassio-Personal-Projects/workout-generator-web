@@ -1,0 +1,211 @@
+---
+// Post hero for single blog post - matches Next.js BlogPostHero layout and styling
+import { formatDate } from '@/lib/blog/formatDate';
+import type { TransformedPost } from '@/types/blog';
+
+interface Props {
+  post: TransformedPost;
+  heroImage: string;
+  readingTimeMinutes?: number;
+}
+
+const { post, heroImage, readingTimeMinutes } = Astro.props;
+const formattedDate = formatDate(post.date);
+---
+
+<section class="post-hero">
+  <div class="post-hero__image-wrapper">
+    <img
+      src={heroImage}
+      alt={post.title}
+      class="post-hero__image"
+      loading="eager"
+      fetchpriority="high"
+      width="1200"
+      height="630"
+    />
+    <div class="post-hero__overlay" aria-hidden="true" />
+  </div>
+  <div class="post-hero__content">
+    <div class="post-hero__text">
+      <span class="post-hero__category-badge">{post.category}</span>
+      <h1 class="post-hero__title">{post.title}</h1>
+      {post.excerpt && <p class="post-hero__excerpt">{post.excerpt}</p>}
+      <div class="post-hero__meta">
+        <time datetime={post.date} class="post-hero__date">{formattedDate}</time>
+        <span class="post-hero__separator" aria-hidden="true">•</span>
+        <span class="post-hero__author">By {post.author}</span>
+        {readingTimeMinutes != null && readingTimeMinutes > 0 && (
+          <>
+            <span class="post-hero__separator" aria-hidden="true">•</span>
+            <span>{readingTimeMinutes} min read</span>
+          </>
+        )}
+      </div>
+      {post.tags && post.tags.length > 0 && (
+        <div class="post-hero__tags">
+          {post.tags.map((tag) => (
+            <a href={`/blog?search=${encodeURIComponent(tag)}`} class="post-hero__tag">
+              #{tag}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .post-hero {
+    position: relative;
+    padding: var(--spacing-5xl) var(--spacing-lg);
+    overflow: hidden;
+    min-height: 400px;
+  }
+  @media (max-width: 768px) {
+    .post-hero {
+      padding: var(--spacing-3xl) var(--spacing-md);
+      min-height: 350px;
+    }
+  }
+
+  .post-hero__image-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+  }
+
+  .post-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .post-hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.75) 100%);
+    z-index: 1;
+  }
+
+  .post-hero__content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .post-hero__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    text-align: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .post-hero__category-badge {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--glass-bg-base);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border-base);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-accent);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .post-hero__title {
+    font-size: var(--font-size-6xl);
+    font-weight: var(--font-weight-extrabold);
+    line-height: var(--line-height-tight);
+    color: var(--text-primary);
+    margin: 0;
+  }
+  @media (max-width: 768px) {
+    .post-hero__title {
+      font-size: var(--font-size-4xl);
+    }
+  }
+  @media (max-width: 480px) {
+    .post-hero__title {
+      font-size: var(--font-size-3xl);
+    }
+  }
+
+  .post-hero__excerpt {
+    font-size: var(--font-size-xl);
+    color: var(--text-secondary);
+    line-height: var(--line-height-relaxed);
+    max-width: 700px;
+  }
+  @media (max-width: 968px) {
+    .post-hero__excerpt {
+      max-width: 100%;
+      font-size: var(--font-size-lg);
+    }
+  }
+
+  .post-hero__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    justify-content: center;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-base);
+  }
+
+  .post-hero__date {
+    color: var(--text-tertiary);
+  }
+
+  .post-hero__separator {
+    color: var(--text-muted);
+  }
+
+  .post-hero__author {
+    color: var(--text-tertiary);
+  }
+
+  .post-hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-xs);
+  }
+
+  .post-hero__tag {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--glass-bg-base);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border-base);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+  .post-hero__tag:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    color: var(--color-accent);
+  }
+</style>

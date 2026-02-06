@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import BlogCard from '@/components/blog/BlogCard.astro';
 import PostContent from '@/components/blog/PostContent.astro';
+import PostHero from '@/components/blog/PostHero.astro';
 import Footer from '@/components/landing/Footer.astro';
 import { getPostBySlug, getRelatedPosts, toTransformedPost } from '@/lib/blog/queries';
 
@@ -100,18 +101,11 @@ const breadcrumbSchema = {
   ],
 };
 
-// SEO metadata
+// SEO metadata (aligned with Next.js: seo_title, seo_description, excerpt fallback)
 const seoTitle = post.seo_title || `${post.title} | Blog`;
 const seoDescription =
   post.seo_description ||
   (post.excerpt.length > 160 ? post.excerpt.substring(0, 157).trim() + '...' : post.excerpt);
-
-// Format the display date
-const formattedDate = new Date(publishedDate).toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
 ---
 
 <BaseLayout
@@ -122,114 +116,76 @@ const formattedDate = new Date(publishedDate).toLocaleDateString('en-US', {
   structuredData={[articleSchema, breadcrumbSchema]}
 >
   <main class="min-h-screen">
-    <!-- Post Hero -->
-    <section class="section-padding bg-gradient-to-b from-[var(--glass-bg-base)] to-transparent">
-      <div class="container-custom">
-        <div class="max-w-4xl mx-auto">
-          <!-- Breadcrumb -->
-          <nav class="flex items-center gap-2 text-sm text-muted mb-8">
-            <a href="/" class="hover:text-[var(--color-accent)] transition-colors">Home</a>
-            <span>/</span>
-            <a href="/blog" class="hover:text-[var(--color-accent)] transition-colors">Blog</a>
-            <span>/</span>
-            <span class="text-secondary truncate max-w-[200px]">{post.title}</span>
-          </nav>
-          
-          <!-- Category Badge -->
-          <div class="mb-4">
-            <span class="px-3 py-1 text-xs font-medium rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
-              {transformedPost.category}
-            </span>
-          </div>
-          
-          <!-- Title -->
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">
-            {post.title}
-          </h1>
-          
-          <!-- Meta -->
-          <div class="flex flex-wrap items-center gap-4 text-sm text-muted mb-8">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <span>{transformedPost.author}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <time datetime={publishedDate}>{formattedDate}</time>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{readingTimeMinutes} min read</span>
-            </div>
-          </div>
-          
-          <!-- Featured Image -->
-          {post.featured_image && (
-            <div class="aspect-video rounded-2xl overflow-hidden bg-[var(--glass-bg-hover)] mb-8">
-              <img
-                src={post.featured_image}
-                alt={post.title}
-                class="w-full h-full object-cover"
-                loading="eager"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
+    <!-- Post Hero (matches Next.js BlogPostHero) -->
+    <PostHero
+      post={transformedPost}
+      heroImage={postImage}
+      readingTimeMinutes={readingTimeMinutes}
+    />
 
-    <!-- Post Content -->
+    <!-- Post Content (matches Next.js BlogPostContent layout) -->
     <section class="pb-16">
       <div class="container-custom">
-        <div class="max-w-4xl mx-auto">
-          <PostContent content={post.content} />
-          
-          <!-- Tags -->
-          {post.tags && post.tags.length > 0 && (
-            <div class="mt-12 pt-8 border-t border-[var(--glass-border-base)]">
-              <h3 class="text-sm font-semibold text-muted mb-4">Tags</h3>
-              <div class="flex flex-wrap gap-2">
+        <PostContent content={post.content} />
+
+        <div class="blog-post-aside-wrap">
+        <!-- Explore More Topics (matches Next.js Related Topics aside) -->
+        <aside class="blog-related-topics">
+          <h3 class="blog-related-topics__title">Explore More Topics</h3>
+          <div class="blog-related-topics__links">
+            {post.category?.slug && (
+              <a href={`/blog/category/${post.category.slug}`} class="blog-related-topics__category-link">
+                More in {post.category.name}
+              </a>
+            )}
+            {post.tags && post.tags.length > 0 && (
+              <div class="blog-related-topics__tag-links">
                 {post.tags.map((tag) => (
-                  <span class="px-3 py-1 text-sm rounded-full bg-[var(--glass-bg-hover)] text-secondary">
+                  <a href={`/blog?search=${encodeURIComponent(tag)}`} class="blog-related-topics__tag-link">
                     #{tag}
-                  </span>
+                  </a>
                 ))}
               </div>
-            </div>
-          )}
-          
-          <!-- Share / CTA -->
-          <div class="mt-12 p-8 rounded-2xl bg-gradient-to-br from-[var(--color-accent)]/5 to-[var(--color-primary-400)]/5 text-center">
-            <h3 class="text-xl font-bold mb-2">Ready to put this into practice?</h3>
-            <p class="text-secondary mb-6">
-              Generate your personalized AI workout plan based on your goals and equipment.
+            )}
+          </div>
+        </aside>
+
+        <!-- Internal CTA to Equipment (matches Next.js BlogPostContent CTA) -->
+        <div class="blog-cta-equipment">
+          <div class="blog-cta-equipment__icon-wrap">
+            <svg class="blog-cta-equipment__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z" />
+              <path d="m2.5 21.5 1.4-1.4" />
+              <path d="m20.1 3.9 1.4-1.4" />
+              <path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z" />
+              <path d="m9.6 14.4 4.8-4.8" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="blog-cta-equipment__title">Build Muscle with the Gear You Own</h3>
+            <p class="blog-cta-equipment__text">
+              Don't let limited equipment hold you back. Our AI adjusts your workout plan based on
+              exactly what you have available—whether it's a full gym, just dumbbells, or
+              bodyweight only.
             </p>
-            <a 
-              href="/onboard"
-              class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-all hover:-translate-y-0.5"
-            >
-              Generate Your Plan
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <a href="/equipment" class="blog-cta-equipment__link">
+              Browse Equipment-Specific Workouts
+              <svg class="w-4 h-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </a>
           </div>
         </div>
+        </div>
       </div>
     </section>
 
-    <!-- Related Posts -->
+    <!-- Related Articles (matches Next.js RelatedPosts layout) -->
     {relatedPosts.length > 0 && (
-      <section class="section-padding bg-[var(--glass-bg-base)]">
-        <div class="container-custom">
-          <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Related Articles</h2>
-          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <section class="blog-related-posts">
+        <div class="blog-related-posts__container">
+          <h2 class="blog-related-posts__title">Related Articles</h2>
+          <div class="blog-related-posts__grid">
             {relatedPosts.map((relatedPost) => (
               <BlogCard
                 slug={relatedPost.slug}
@@ -250,3 +206,144 @@ const formattedDate = new Date(publishedDate).toLocaleDateString('en-US', {
     <Footer />
   </main>
 </BaseLayout>
+
+<style>
+  /* Wrapper to align Related Topics and CTA with article (max-width 900px) */
+  .blog-post-aside-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  /* Explore More Topics (aligned with BlogPostContent.module.scss .relatedTopics) */
+  .blog-related-topics {
+    margin-top: var(--spacing-4xl);
+    padding-top: var(--spacing-2xl);
+    border-top: 1px solid var(--glass-border-base);
+  }
+  .blog-related-topics__title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+  }
+  .blog-related-topics__links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+  .blog-related-topics__category-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--glass-bg-base);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border-base);
+    border-radius: var(--radius-lg);
+    color: var(--color-accent);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    width: fit-content;
+  }
+  .blog-related-topics__category-link:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--color-accent);
+    transform: translateX(4px);
+  }
+  .blog-related-topics__tag-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  .blog-related-topics__tag-link {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--glass-bg-base);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border-base);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+  .blog-related-topics__tag-link:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    color: var(--color-accent);
+  }
+
+  /* Equipment CTA (aligned with Next.js BlogPostContent CTA) */
+  .blog-cta-equipment {
+    margin-top: var(--spacing-2xl);
+    padding: var(--spacing-lg);
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--glass-border-base);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  .blog-cta-equipment__icon-wrap {
+    padding: var(--spacing-md);
+    background: rgba(132, 204, 22, 0.1);
+    border-radius: var(--radius-lg);
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+  .blog-cta-equipment__icon {
+    width: 24px;
+    height: 24px;
+  }
+  .blog-cta-equipment__title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+  .blog-cta-equipment__text {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+    line-height: var(--line-height-relaxed);
+  }
+  .blog-cta-equipment__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--color-accent);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+  .blog-cta-equipment__link:hover {
+    color: var(--color-accent-light);
+  }
+
+  /* Related Articles (aligned with RelatedPosts.module.scss) */
+  .blog-related-posts {
+    padding: var(--spacing-4xl) var(--spacing-lg);
+    background: var(--bg-dark);
+  }
+  .blog-related-posts__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .blog-related-posts__title {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+  }
+  .blog-related-posts__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-xl);
+  }
+  @media (max-width: 768px) {
+    .blog-related-posts__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

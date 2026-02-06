@@ -1,5 +1,7 @@
 ---
 // Blog Card component - Pure Astro (static HTML)
+import { formatDate } from '@/lib/blog/formatDate';
+
 interface Props {
   slug: string;
   title: string;
@@ -12,13 +14,7 @@ interface Props {
 }
 
 const { slug, title, excerpt, date, author, category, image, tags = [] } = Astro.props;
-
-// Format the date
-const formattedDate = new Date(date).toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
+const formattedDate = formatDate(date);
 ---
 
 <article class="glass-card overflow-hidden group">

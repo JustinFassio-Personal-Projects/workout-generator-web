@@ -1,0 +1,142 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { getAllPublishedDeepResearch } from '@/lib/deep-research/queries';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
+
+export const prerender = false;
+
+const items = await getAllPublishedDeepResearch();
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+const pageTitle = 'Deep Research | AI Workout Generator';
+const pageDescription = 'In-depth research and protocols for fitness, nutrition, and health optimization. Filter by your vitals to find relevant deep research.';
+
+// Breadcrumb schema
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [
+  { name: 'Home', url: baseUrl },
+  { name: 'Deep Research', url: `${baseUrl}/deep-research` },
+]);
+
+// Collection schema
+const collectionSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Deep Research',
+  description: pageDescription,
+  url: `${baseUrl}/deep-research`,
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: items.length,
+    itemListElement: items.slice(0, 10).map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `${baseUrl}/deep-research/${item.slug}`,
+      name: item.title,
+    })),
+  },
+};
+
+// Helper to format date
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+---
+
+<BaseLayout 
+  title={pageTitle} 
+  description={pageDescription}
+  canonicalUrl={`${baseUrl}/deep-research`}
+  structuredData={[breadcrumbSchema, collectionSchema]}
+>
+  <main class="min-h-screen">
+    <!-- Header Section -->
+    <section class="section-padding text-center">
+      <div class="container-custom">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-6">Deep Research</h1>
+        <p class="text-lg text-secondary max-w-2xl mx-auto">
+          In-depth protocols and research for fitness, nutrition, and health optimization.
+        </p>
+      </div>
+    </section>
+
+    <!-- Research Items Grid -->
+    <section class="section-padding pt-0">
+      <div class="container-custom">
+        {items.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item) => (
+              <a
+                href={`/deep-research/${item.slug}`}
+                class="group block p-6 rounded-2xl border border-[var(--glass-border-base)] bg-[var(--glass-bg-base)] hover:bg-[var(--glass-bg-hover)] hover:border-[var(--color-accent)] transition-all"
+              >
+                <article>
+                  <h2 class="text-xl font-bold mb-3 text-primary group-hover:text-[var(--color-accent)] transition-colors">
+                    {item.title}
+                  </h2>
+                  {item.excerpt && (
+                    <p class="text-secondary text-sm mb-4 line-clamp-3">
+                      {item.excerpt}
+                    </p>
+                  )}
+                  <div class="flex items-center gap-4 text-xs text-tertiary">
+                    {item.published_at && (
+                      <time datetime={item.published_at}>
+                        {formatDate(item.published_at)}
+                      </time>
+                    )}
+                  </div>
+                  {/* Tags */}
+                  {item.goals && item.goals.length > 0 && (
+                    <div class="flex flex-wrap gap-2 mt-4">
+                      {item.goals.slice(0, 3).map((goal) => (
+                        <span class="px-2 py-1 text-xs rounded-full bg-[var(--glass-bg-hover)] text-secondary">
+                          {goal}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-16">
+            <p class="text-secondary mb-6">No deep research articles available yet.</p>
+            <a
+              href="/blog"
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[var(--glass-border-base)] bg-[var(--glass-bg-base)] text-secondary font-semibold hover:text-[var(--color-accent)] hover:bg-[var(--glass-bg-hover)] transition-colors"
+            >
+              Browse our blog instead
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section-padding bg-[var(--glass-bg-base)]">
+      <div class="container-custom text-center max-w-2xl mx-auto">
+        <h2 class="text-2xl font-bold mb-4">Ready to Put Research into Practice?</h2>
+        <p class="text-secondary mb-8">
+          Create a personalized workout plan based on the latest fitness research and your unique goals.
+        </p>
+        <a
+          href="/onboard"
+          class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+        >
+          Build Your Plan
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </section>
+    
+    <Footer />
+  </main>
+</BaseLayout>

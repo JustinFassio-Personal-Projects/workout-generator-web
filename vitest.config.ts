@@ -77,13 +77,11 @@ export default defineConfig({
         'instrumentation.ts',
       ],
       thresholds: {
-        // Lowered from 75% to 64% to match current coverage (64.63%)
-        // Complex UI components (ChatWidget, useScrollTracking) and edge cases require extensive mocking.
-        // Threshold will be increased incrementally as comprehensive tests are added.
-        lines: 64,
-        functions: 64,
-        branches: 64,
-        statements: 64,
+        // Set to 67% to pass git/CI with current coverage (lines/statements ~67.24%); increase as tests are added.
+        lines: 67,
+        functions: 67,
+        branches: 67,
+        statements: 67,
       },
     },
   },

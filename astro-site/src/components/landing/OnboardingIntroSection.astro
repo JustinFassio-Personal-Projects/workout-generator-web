@@ -1,0 +1,10 @@
+---
+// Onboarding Wizard section — animated intro only; "Generate Workout" / "Free Workout" link to /onboard
+import { OnboardingIntroScreen } from '@/components/react/OnboardingWizard/OnboardingIntroScreen';
+---
+
+<section id="onboarding-wizard" class="section-padding bg-gradient-to-b from-[var(--glass-bg-base)] to-transparent">
+  <div class="container-custom flex flex-col items-center justify-center">
+    <OnboardingIntroScreen client:load standalone />
+  </div>
+</section>

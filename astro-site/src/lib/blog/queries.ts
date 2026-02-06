@@ -3,6 +3,13 @@ import type { AstroCookies } from 'astro'
 import type { PostWithRelations, Category, Author, TransformedPost } from '@/types/blog'
 import { fallbackPosts } from '@/data/blog/fallback-posts'
 
+function errMsg(e: unknown): string {
+  if (e instanceof Error) return e.message
+  if (e && typeof e === 'object' && 'message' in e)
+    return String((e as { message: unknown }).message)
+  return 'Unknown error'
+}
+
 const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 /**
@@ -127,7 +134,7 @@ export async function getAllPublishedPosts(cookies: AstroCookies): Promise<PostW
       .order('published_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching posts from Supabase, using fallback data:', error)
+      console.error('Error fetching posts from Supabase, using fallback data:', errMsg(error))
       return convertStaticPostsToSupabaseFormat(fallbackPosts)
     }
 
@@ -141,7 +148,7 @@ export async function getAllPublishedPosts(cookies: AstroCookies): Promise<PostW
     return convertStaticPostsToSupabaseFormat(fallbackPosts)
   } catch (error) {
     // If Supabase client creation fails, use static data
-    console.error('Failed to connect to Supabase, using fallback data:', error)
+    console.error('Failed to connect to Supabase, using fallback data:', errMsg(error))
     return convertStaticPostsToSupabaseFormat(fallbackPosts)
   }
 }
@@ -176,7 +183,7 @@ export async function getPostBySlug(
 
     // If Supabase fails or returns no data, fall back to static data
     if (error) {
-      console.error('Error fetching post from Supabase, checking fallback data:', error)
+      console.error('Error fetching post from Supabase, checking fallback data:', errMsg(error))
     }
 
     // Check static fallback data
@@ -189,7 +196,7 @@ export async function getPostBySlug(
     return null
   } catch (error) {
     // If Supabase client creation fails, use static data
-    console.error('Failed to connect to Supabase, checking fallback data:', error)
+    console.error('Failed to connect to Supabase, checking fallback data:', errMsg(error))
     const staticPost = fallbackPosts.find(post => post.slug === slug)
     if (staticPost) {
       const converted = convertStaticPostsToSupabaseFormat([staticPost])
@@ -231,13 +238,13 @@ export async function getRelatedPosts(
       .limit(limit)
 
     if (error) {
-      console.error('Error fetching related posts:', error)
+      console.error('Error fetching related posts:', errMsg(error))
       return []
     }
 
     return transformPosts(data || [])
   } catch (error) {
-    console.error('Failed to fetch related posts:', error)
+    console.error('Failed to fetch related posts:', errMsg(error))
     return []
   }
 }
@@ -252,13 +259,173 @@ export async function getAllCategories(cookies: AstroCookies): Promise<Category[
     const { data, error } = await supabase.from('categories').select('*').order('name')
 
     if (error) {
-      console.error('Error fetching categories:', error)
+      console.error('Error fetching categories:', errMsg(error))
       return []
     }
 
     return data || []
   } catch (error) {
-    console.error('Failed to fetch categories:', error)
+    console.error('Failed to fetch categories:', errMsg(error))
+    return []
+  }
+}
+
+/**
+ * Get a category by slug
+ */
+export async function getCategoryBySlug(
+  slug: string,
+  cookies: AstroCookies
+): Promise<Category | null> {
+  try {
+    const supabase = createServerSupabaseClient(cookies)
+
+    const { data, error } = await supabase.from('categories').select('*').eq('slug', slug).single()
+
+    if (error) {
+      console.error('Error fetching category:', errMsg(error))
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error('Failed to fetch category:', errMsg(error))
+    return null
+  }
+}
+
+/**
+ * Get posts by category slug
+ */
+export async function getPostsByCategory(
+  categorySlug: string,
+  cookies: AstroCookies
+): Promise<PostWithRelations[]> {
+  try {
+    const supabase = createServerSupabaseClient(cookies)
+
+    // First get the category
+    const { data: categoryData, error: categoryError } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', categorySlug)
+      .single()
+
+    if (categoryError || !categoryData) {
+      console.error('Error fetching category for posts:', errMsg(categoryError))
+      return []
+    }
+
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
+        *,
+        category:categories(*),
+        author:authors(*)
+      `
+      )
+      .eq('status', 'published')
+      .eq('category_id', categoryData.id)
+      .order('published_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching posts by category:', errMsg(error))
+      return []
+    }
+
+    return transformPosts(data || [])
+  } catch (error) {
+    console.error('Failed to fetch posts by category:', errMsg(error))
+    return []
+  }
+}
+
+/**
+ * Get all authors
+ */
+export async function getAllAuthors(cookies: AstroCookies): Promise<Author[]> {
+  try {
+    const supabase = createServerSupabaseClient(cookies)
+
+    const { data, error } = await supabase.from('authors').select('*').order('name')
+
+    if (error) {
+      console.error('Error fetching authors:', errMsg(error))
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Failed to fetch authors:', errMsg(error))
+    return []
+  }
+}
+
+/**
+ * Get an author by slug
+ */
+export async function getAuthorBySlug(slug: string, cookies: AstroCookies): Promise<Author | null> {
+  try {
+    const supabase = createServerSupabaseClient(cookies)
+
+    const { data, error } = await supabase.from('authors').select('*').eq('slug', slug).single()
+
+    if (error) {
+      console.error('Error fetching author:', errMsg(error))
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error('Failed to fetch author:', errMsg(error))
+    return null
+  }
+}
+
+/**
+ * Get posts by author slug
+ */
+export async function getPostsByAuthor(
+  authorSlug: string,
+  cookies: AstroCookies
+): Promise<PostWithRelations[]> {
+  try {
+    const supabase = createServerSupabaseClient(cookies)
+
+    // First get the author
+    const { data: authorData, error: authorError } = await supabase
+      .from('authors')
+      .select('id')
+      .eq('slug', authorSlug)
+      .single()
+
+    if (authorError || !authorData) {
+      console.error('Error fetching author for posts:', errMsg(authorError))
+      return []
+    }
+
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
+        *,
+        category:categories(*),
+        author:authors(*)
+      `
+      )
+      .eq('status', 'published')
+      .eq('author_id', authorData.id)
+      .order('published_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching posts by author:', errMsg(error))
+      return []
+    }
+
+    return transformPosts(data || [])
+  } catch (error) {
+    console.error('Failed to fetch posts by author:', errMsg(error))
     return []
   }
 }

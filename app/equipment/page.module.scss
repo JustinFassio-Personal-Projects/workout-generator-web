@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 // Design tokens
 $color-bg-primary: #0a0e1a;
 $color-bg-secondary: #0f172a;
@@ -107,7 +109,7 @@ $radius-xl: 1.5rem;
   &:hover {
     transform: translateY(-4px);
     border-color: $color-accent;
-    background-color: lighten($color-bg-secondary, 2%);
+    background-color: color.adjust($color-bg-secondary, $lightness: 2%);
 
     .icon {
       color: $color-accent;

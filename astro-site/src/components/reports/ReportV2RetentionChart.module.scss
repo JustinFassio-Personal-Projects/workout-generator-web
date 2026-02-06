@@ -1,0 +1,25 @@
+.card {
+  background-color: #f5f5f4; // Stone-50
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  border: 1px solid #e7e5e4; // Stone-200
+}
+
+.title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: #78716c; // Stone-500
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.chartContainer {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 350px;
+  max-height: 400px;
+  margin: 0 auto;
+}

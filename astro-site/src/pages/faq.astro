@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
 import { FaqItem } from '@/components/react/FaqItem';
 import { masterFAQData, faqData } from '@/data/faq-data';
 
@@ -95,11 +96,11 @@ const schemaData = {
         <p class="text-secondary mb-6">
           Experience trainer-verified AI workouts tailored to your goals and equipment.
         </p>
-        <a 
-          href="/"
-          class="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-colors"
-        >
+        <a href="/onboard" class="btn-onboard-cta">
           Generate Your Workout
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
         </a>
       </section>
 
@@ -116,5 +117,7 @@ const schemaData = {
         </p>
       </div>
     </div>
+    
+    <Footer />
   </main>
 </BaseLayout>

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
 import { Image } from 'astro:assets';
 
 const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
@@ -13,7 +14,7 @@ const jsonLd = {
       '@id': `${baseUrl}/#organization`,
       name: 'AI Workout Generator',
       url: baseUrl,
-      logo: `${baseUrl}/assets/logo.png`,
+      logo: `${baseUrl}/logo.png`,
       description:
         'A San Diego-based software company combining certified personal training experience with artificial intelligence to create safe, progressive workout plans.',
       foundingDate: '2024',
@@ -388,5 +389,7 @@ const jsonLd = {
         </div>
       </section>
     </div>
+    
+    <Footer />
   </main>
 </BaseLayout>

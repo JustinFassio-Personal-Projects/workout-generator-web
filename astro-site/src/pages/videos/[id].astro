@@ -1,0 +1,182 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { videos, getVideoById, getVideosByCategory, type Video } from '@/data/videos';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
+
+export function getStaticPaths() {
+  return videos.map((video) => ({
+    params: { id: video.id },
+    props: { video },
+  }));
+}
+
+interface Props {
+  video: Video;
+}
+
+const { video } = Astro.props;
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// Static upload date for structured data
+const STATIC_UPLOAD_DATE = '2024-01-01T00:00:00.000Z';
+
+// Normalize URLs
+const videoUrl = video.videoUrl.startsWith('http')
+  ? video.videoUrl
+  : `${baseUrl}${video.videoUrl}`;
+
+const thumbnailUrl = video.thumbnailUrl
+  ? video.thumbnailUrl.startsWith('http')
+    ? video.thumbnailUrl
+    : `${baseUrl}${video.thumbnailUrl}`
+  : `${baseUrl}/og-image.jpg`;
+
+const pageUrl = `${baseUrl}/videos/${video.id}`;
+const pageTitle = `${video.title} | AI Workout Generator`;
+const pageDescription = video.description || video.title;
+
+// VideoObject structured data
+const videoSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: video.title,
+  description: video.description || video.title,
+  thumbnailUrl,
+  uploadDate: STATIC_UPLOAD_DATE,
+  contentUrl: videoUrl,
+  embedUrl: videoUrl,
+  ...(video.duration && { duration: `PT${video.duration}S` }),
+};
+
+// Breadcrumb schema
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [
+  { name: 'Home', url: baseUrl },
+  { name: 'Videos', url: `${baseUrl}/#videos` },
+  { name: video.title, url: pageUrl },
+]);
+
+// Get related videos from the same category
+const relatedVideos = getVideosByCategory(video.category)
+  .filter(v => v.id !== video.id)
+  .slice(0, 3);
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={pageUrl}
+  ogImage={thumbnailUrl}
+  ogType="website"
+  structuredData={[videoSchema, breadcrumbSchema]}
+>
+  <main class="min-h-screen">
+    <!-- Back Button -->
+    <div class="container-custom py-6">
+      <a 
+        href="/#videos"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--glass-border-base)] bg-[var(--glass-bg-base)] text-secondary font-medium hover:bg-[var(--glass-bg-hover)] transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Videos
+      </a>
+    </div>
+
+    <!-- Main Video Player -->
+    <div class="container-custom pb-8">
+      <div class="max-w-4xl mx-auto">
+        <!-- Video Player -->
+        <div class="glass-card-strong rounded-2xl overflow-hidden mb-6 shadow-2xl">
+          <video
+            class="w-full aspect-video"
+            controls
+            playsinline
+            preload="metadata"
+            poster={video.thumbnailUrl || undefined}
+            title={video.title}
+            aria-label={video.title}
+          >
+            <source src={video.videoUrl} type="video/mp4" />
+            <p>
+              Your browser does not support the video tag. You can still view the video at
+              <a href={videoUrl} target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)] underline">
+                this link
+              </a>.
+            </p>
+          </video>
+        </div>
+
+        <!-- Video Metadata -->
+        <div class="mb-8">
+          <h1 class="text-3xl md:text-4xl font-bold mb-4">{video.title}</h1>
+          {video.description && (
+            <p class="text-lg text-secondary mb-4">{video.description}</p>
+          )}
+          {video.duration && (
+            <p class="text-sm text-muted">
+              Duration: {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
+            </p>
+          )}
+        </div>
+
+        <!-- CTA Section -->
+        <div class="glass-card-strong rounded-2xl p-8 mb-12 text-center">
+          <h2 class="text-2xl font-bold mb-4">Ready to Build Your Workout Plan?</h2>
+          <p class="text-secondary mb-6 max-w-md mx-auto">
+            Get a personalized AI-generated workout plan tailored to your goals and equipment.
+          </p>
+          <a href="/onboard" class="btn-onboard-cta">
+            Generate Your Workout
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- Related Videos -->
+        {relatedVideos.length > 0 && (
+          <div class="mt-12">
+            <h2 class="text-2xl font-bold mb-6">Related Videos</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedVideos.map((relatedVideo) => {
+                const relatedThumbnail = relatedVideo.thumbnailUrl
+                  ? relatedVideo.thumbnailUrl.startsWith('http')
+                    ? relatedVideo.thumbnailUrl
+                    : relatedVideo.thumbnailUrl
+                  : '/og-image.jpg';
+
+                return (
+                  <a
+                    href={`/videos/${relatedVideo.id}`}
+                    class="block glass-card-strong rounded-lg overflow-hidden hover:scale-105 transition-transform"
+                  >
+                    <div class="aspect-video bg-[var(--bg-dark-secondary)] relative">
+                      <img
+                        src={relatedThumbnail}
+                        alt={relatedVideo.title}
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div class="p-4">
+                      <h3 class="font-semibold mb-2 line-clamp-2">{relatedVideo.title}</h3>
+                      {relatedVideo.description && (
+                        <p class="text-sm text-secondary line-clamp-2">
+                          {relatedVideo.description}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <Footer />
+  </main>
+</BaseLayout>

@@ -1,6 +1,13 @@
 import type { APIRoute } from 'astro'
 import { createServerSupabaseClient, validateEmail } from '@/lib/supabase/server'
 
+function errMsg(e: unknown): string {
+  if (e instanceof Error) return e.message
+  if (e && typeof e === 'object' && 'message' in e)
+    return String((e as { message: unknown }).message)
+  return 'Unknown error'
+}
+
 // Disable prerendering for API routes (they need to run on the server)
 export const prerender = false
 
@@ -73,7 +80,7 @@ async function verifyTurnstileToken(token: string): Promise<boolean> {
     const data = await response.json()
     return data.success === true
   } catch (error) {
-    console.error('Turnstile verification error:', error)
+    console.error('Turnstile verification error:', errMsg(error))
     return false
   }
 }
@@ -177,7 +184,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         )
       }
 
-      console.error('Supabase error:', error)
+      console.error('Supabase error:', errMsg(error))
       return new Response(JSON.stringify({ error: 'Failed to save lead. Please try again.' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -199,7 +206,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     )
   } catch (error) {
-    console.error('API error:', error)
+    console.error('API error:', errMsg(error))
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

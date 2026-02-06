@@ -34,9 +34,9 @@ npm run type-check  # MUST complete without errors
 # 3. Run all tests
 npm run test:run  # ALL tests must pass
 
-# 4. Verify test coverage (CRITICAL - MUST be ≥ 80%)
+# 4. Verify test coverage (CRITICAL - MUST be ≥ 67%)
 npm run test:coverage  # MUST NOT show "ERROR: Coverage for functions"
-# Verify function coverage is ≥ 80% in output
+# Verify function coverage is ≥ 67% in output
 
 # 5. Security checks
 npm audit --audit-level=moderate  # Review moderate+ vulnerabilities
@@ -60,7 +60,7 @@ cd astro-site && npm run build  # Astro build (when astro-site exists)
 **Common CI Failures to Prevent:**
 
 1. ❌ Prettier formatting errors → Run `npm run format` and `npm run format:check`
-2. ❌ Test coverage below 80% → Add tests to reach ≥ 80% function coverage
+2. ❌ Test coverage below 67% → Add tests to reach ≥ 67% function coverage
 3. ❌ Secrets in code → Remove hardcoded secrets, use `process.env` only
 4. ❌ React act() warnings → Fix async test patterns using `waitFor()`
 5. ❌ Security vulnerabilities → Review `npm audit` output
@@ -96,9 +96,9 @@ cd astro-site && npm run build  # Astro build (when astro-site exists)
 ### **2. Code Quality Baseline**
 
 - [ ] **Test coverage report**: `npm run test:coverage`
-- [ ] **Verify coverage thresholds**: All metrics (functions, statements, branches, lines) ≥ 80%
+- [ ] **Verify coverage thresholds**: All metrics (functions, statements, branches, lines) ≥ 67%
 - [ ] **Identify uncovered files/functions**: Focus on function coverage if below threshold
-  - ⚠️ **CRITICAL**: Function coverage must be ≥ 80% or CI will fail
+  - ⚠️ **CRITICAL**: Function coverage must be ≥ 67% or CI will fail
 - [ ] **Check for existing linting errors**
 - [ ] **Review TypeScript strict mode compliance**
 - [ ] **Verify Prettier formatting consistency**: `npm run format:check`
@@ -218,8 +218,8 @@ describe('ComponentName', () => {
 - [ ] **User interactions**: Test clicks, form submissions, navigation
 - [ ] **Error states**: Test error handling and loading states
 - [ ] **Edge cases**: Test boundary conditions and error scenarios
-- [ ] **Function coverage**: Ensure all functions are tested (80% threshold required)
-  - ⚠️ **CRITICAL**: Function coverage MUST be ≥ 80% or CI will fail
+- [ ] **Function coverage**: Ensure all functions are tested (67% threshold required)
+  - ⚠️ **CRITICAL**: Function coverage MUST be ≥ 67% or CI will fail
   - Run `npm run test:coverage` and verify no "ERROR: Coverage for functions" message
 - [ ] **Branch coverage**: Test all conditional paths (if/else, switch cases)
 - [ ] **Statement coverage**: Ensure all code statements are executed
@@ -262,11 +262,11 @@ describe('ComponentName', () => {
 - [ ] **Run critical path tests**: `npm run test:critical`
 - [ ] **Quick verification**: `npm run verify:quick`
 - [ ] **Test coverage check**: Ensure all thresholds are met (`npm run test:coverage`)
-  - [ ] **Function coverage ≥ 80%** (critical - CI will fail if below)
-  - [ ] **Statement coverage ≥ 80%**
-  - [ ] **Branch coverage ≥ 80%**
-  - [ ] **Line coverage ≥ 80%**
-  - ⚠️ **CRITICAL**: Function coverage must be ≥ 80% or CI will fail
+  - [ ] **Function coverage ≥ 67%** (critical - CI will fail if below)
+  - [ ] **Statement coverage ≥ 67%**
+  - [ ] **Branch coverage ≥ 67%**
+  - [ ] **Line coverage ≥ 67%**
+  - ⚠️ **CRITICAL**: Function coverage must be ≥ 67% or CI will fail
   - **MUST VERIFY**: Check output for "ERROR: Coverage for functions" - must not appear
 - [ ] **Build verification**: Confirm production build succeeds (`npm run build`)
 - [ ] **Security audit**: `npm audit --audit-level=moderate`
@@ -283,7 +283,7 @@ describe('ComponentName', () => {
 **⚠️ CRITICAL - MANDATORY CHECKS BEFORE EVERY PUSH**:
 
 1. **Formatting**: `npm run format:check` MUST pass - CI will fail otherwise
-2. **Test Coverage**: `npm run test:coverage` MUST show function coverage ≥ 80%
+2. **Test Coverage**: `npm run test:coverage` MUST show function coverage ≥ 67%
 3. **Secrets**: No hardcoded API keys, passwords, or secrets in code
 4. **Security**: `npm audit` should be reviewed for moderate+ vulnerabilities
 5. **React Tests**: No act() warnings in test output
@@ -307,7 +307,7 @@ npm run type-check
 # 5. Run all tests
 npm run test:run
 
-# 6. Check coverage (MUST be ≥ 80% for functions)
+# 6. Check coverage (MUST be ≥ 67% for functions)
 npm run test:coverage
 
 # 7. Security audit
@@ -439,14 +439,14 @@ export default function Page() {
 
 **Fix**: `npm run format` or `npx prettier --write .`
 
-### **14.2. Test Coverage Below 80%** ⚠️ **CRITICAL FAILURE**
+### **14.2. Test Coverage Below 67%** ⚠️ **CRITICAL FAILURE**
 
-**Symptom**: CI shows "ERROR: Coverage for functions (XX.XX%) does not meet global threshold (80%)"
+**Symptom**: CI shows "ERROR: Coverage for functions (XX.XX%) does not meet global threshold (67%)"
 
 **Prevention**:
 
 - [ ] **ALWAYS check before push**: `npm run test:coverage`
-- [ ] **Verify function coverage**: Must be ≥ 80% (check the "% Funcs" column)
+- [ ] **Verify function coverage**: Must be ≥ 67% (check the "% Funcs" column)
 - [ ] **If below threshold**: Add tests for uncovered functions, especially in new files
 
 **Fix**: Add tests for uncovered functions, focus on function coverage
@@ -591,7 +591,7 @@ export default function Page() {
 - [ ] **Build succeeds**: `npm run build` (Next.js) and `cd astro-site && npm run build` (Astro, when present)
   - ⚠️ **CRITICAL**: Both production builds must complete successfully when both codebases exist
 - [ ] **Coverage maintained**: `npm run test:coverage`
-  - ⚠️ **CRITICAL**: Function coverage MUST be ≥ 80%
+  - ⚠️ **CRITICAL**: Function coverage MUST be ≥ 67%
   - Verify no "ERROR: Coverage for functions" message appears
 - [ ] **No secrets in code**: Secret scan returns empty or only safe patterns
   - ⚠️ **CRITICAL**: No hardcoded API keys, passwords, or secrets
@@ -613,11 +613,11 @@ export default function Page() {
 
 ### **24. Quality Indicators**
 
-- [ ] **Test coverage thresholds met (80% minimum)**:
-  - [ ] **Function coverage ≥ 80%**: All functions must be tested
-  - [ ] **Statement coverage ≥ 80%**: All code statements executed
-  - [ ] **Branch coverage ≥ 80%**: All conditional branches tested
-  - [ ] **Line coverage ≥ 80%**: All lines of code executed
+- [ ] **Test coverage thresholds met (67% minimum)**:
+  - [ ] **Function coverage ≥ 67%**: All functions must be tested
+  - [ ] **Statement coverage ≥ 67%**: All code statements executed
+  - [ ] **Branch coverage ≥ 67%**: All conditional branches tested
+  - [ ] **Line coverage ≥ 67%**: All lines of code executed
   - [ ] **Run coverage check**: `npm run test:coverage` to verify thresholds
 - [ ] **Zero linting errors**: Clean codebase
 - [ ] **Zero TypeScript errors**: Type safety
@@ -692,7 +692,7 @@ npm run lint && npm run type-check
 # 3. Run all tests
 npm run test:run
 
-# 4. Verify coverage (MUST be ≥ 80%)
+# 4. Verify coverage (MUST be ≥ 67%)
 npm run test:coverage
 
 # 5. Security checks

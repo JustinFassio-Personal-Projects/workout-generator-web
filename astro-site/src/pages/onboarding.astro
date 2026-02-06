@@ -1,0 +1,19 @@
+---
+// Dedicated onboarding page: shows the WorkoutPlanBuilder (no redirect to signup).
+// Signup only happens when the user clicks "Create account to generate workout" in the builder.
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { WorkoutPlanBuilder } from '@/components/react/WorkoutPlanBuilder/WorkoutPlanBuilder';
+---
+
+<BaseLayout
+  title="Build Your Workout Plan | AI Workout Generator"
+  description="Answer a few questions about your goals and equipment. Create your account to generate and save your personalized AI workout plan."
+>
+  <main class="min-h-screen flex flex-col">
+    <div class="flex-1">
+      <WorkoutPlanBuilder client:load skipIntro />
+    </div>
+    <Footer />
+  </main>
+</BaseLayout>

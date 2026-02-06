@@ -5,7 +5,10 @@ const currentYear = new Date().getFullYear();
 const footerLinks = {
   product: [
     { name: 'Features', href: '/#features' },
+    { name: 'Meet the Founder', href: '/#bio' },
+    { name: 'Pricing', href: '/#pricing' },
     { name: 'Equipment Guide', href: '/equipment' },
+    { name: 'Testimonials', href: '/#testimonials' },
     { name: 'FAQ', href: '/faq' },
   ],
   company: [
@@ -32,8 +35,9 @@ const socialLinks = [
       <!-- Brand -->
       <div class="lg:col-span-2">
         <div class="flex items-center gap-2 mb-4">
-          <svg class="w-8 h-8 text-[var(--color-accent)]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M6.5 6.5H17.5V17.5H6.5V6.5Z M4 9H6.5V15H4V9Z M17.5 9H20V15H17.5V9Z M2 10.5H4V13.5H2V10.5Z M20 10.5H22V13.5H20V10.5Z"/>
+          <!-- Lucide Activity (heartbeat/ECG) icon - matches Navbar logo -->
+          <svg class="w-8 h-8 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
           </svg>
           <span class="font-bold text-lg">AI Workout Generator</span>
         </div>

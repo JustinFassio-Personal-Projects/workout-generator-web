@@ -5,7 +5,7 @@
 @use './design-system/tokens.scss';
 @use './design-system/animations.scss';
 
-@use 'tailwindcss';
+/* Tailwind is loaded from global.css so the @tailwindcss/vite plugin can process it */
 
 // CSS Reset & Base Styles (after Tailwind base)
 @layer base {
@@ -133,6 +133,47 @@ a {
   border-radius: var(--radius-xl);
 }
 
+// Onboarding CTA button: overrides global a{} so text/icon stay dark on accent background
+.btn-onboard-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--bg-dark);
+  background: var(--color-accent);
+  box-shadow: var(--shadow-lg);
+  transition:
+    color var(--transition-base),
+    background-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--bg-dark);
+    background: var(--color-accent-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--bg-dark),
+      0 0 0 4px var(--color-accent);
+  }
+
+  svg {
+    color: currentColor;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+}
+
 // Scrollbar Styling
 ::-webkit-scrollbar {
   width: 10px;
@@ -187,6 +228,19 @@ a {
     outline: 2px solid var(--text-primary);
     outline-offset: 2px;
   }
+}
+
+// Text color utilities (design system variables; used by Navbar and other components)
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-tertiary {
+  color: var(--text-tertiary);
 }
 
 // Utility Classes

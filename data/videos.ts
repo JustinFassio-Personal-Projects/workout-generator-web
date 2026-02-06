@@ -17,16 +17,16 @@ export interface Video {
   featured?: boolean // for brand video or featured videos
 }
 
-// Note: thumbnailUrl paths are required for Google Search Console VideoObject structured data.
-// Thumbnail image files (.jpg or .png) should be added to public/videos/ directory
-// to match the paths specified below (e.g., brand-video.jpg, featured-exercise-1.jpg, etc.)
+// Note: thumbnailUrl is used for video poster and VideoObject structured data.
+// Use an existing public image until per-video thumbnails (e.g. public/videos/*.jpg) are added.
+const VIDEO_PLACEHOLDER_THUMB = '/og-image.jpg'
 export const videos: Video[] = [
   {
     id: '1',
     title: 'Brand Video',
     description: 'Experience our mission and vision',
-    videoUrl: '/videos/brand-video.mp4', // Add your brand video file to public/videos/
-    thumbnailUrl: '/videos/brand-video.jpg',
+    videoUrl: '/videos/brand-video.mp4',
+    thumbnailUrl: VIDEO_PLACEHOLDER_THUMB,
     category: 'brand',
     duration: 10,
     featured: true,
@@ -35,8 +35,8 @@ export const videos: Video[] = [
     id: '2',
     title: 'Featured Exercise Video 1',
     description: 'Learn proper form and technique',
-    videoUrl: '/videos/featured-exercise-1.mp4', // Add your video file to public/videos/
-    thumbnailUrl: '/videos/featured-exercise-1.jpg',
+    videoUrl: '/videos/featured-exercise-1.mp4',
+    thumbnailUrl: VIDEO_PLACEHOLDER_THUMB,
     category: 'featured-exercise',
     featured: true,
   },
@@ -44,8 +44,8 @@ export const videos: Video[] = [
     id: '3',
     title: 'Featured Exercise Video 2',
     description: 'Master advanced movements',
-    videoUrl: '/videos/featured-exercise-2.mp4', // Add your video file to public/videos/
-    thumbnailUrl: '/videos/featured-exercise-2.jpg',
+    videoUrl: '/videos/featured-exercise-2.mp4',
+    thumbnailUrl: VIDEO_PLACEHOLDER_THUMB,
     category: 'featured-exercise',
     featured: true,
   },
@@ -53,8 +53,8 @@ export const videos: Video[] = [
     id: '4',
     title: 'Kettlebell Complex',
     description: 'Complete workout routine',
-    videoUrl: '/videos/featured-workout-1.mp4', // Add your video file to public/videos/
-    thumbnailUrl: '/videos/featured-workout-1.jpg',
+    videoUrl: '/videos/featured-workout-1.mp4',
+    thumbnailUrl: VIDEO_PLACEHOLDER_THUMB,
     category: 'featured-workout',
     featured: true,
   },
@@ -62,8 +62,8 @@ export const videos: Video[] = [
     id: '5',
     title: 'HIIT Workout',
     description: 'Advanced training session',
-    videoUrl: '/videos/featured-workout-2.mp4', // Add your video file to public/videos/
-    thumbnailUrl: '/videos/featured-workout-2.jpg',
+    videoUrl: '/videos/featured-workout-2.mp4',
+    thumbnailUrl: VIDEO_PLACEHOLDER_THUMB,
     category: 'featured-workout',
     featured: true,
   },

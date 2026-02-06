@@ -1,0 +1,73 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { ReportV2Content } from '@/components/reports/ReportV2Content';
+import { reports } from '@/types/reports';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
+
+export function getStaticPaths() {
+  return reports.map((report) => ({
+    params: { slug: report.slug },
+    props: { report },
+  }));
+}
+
+interface Props {
+  report: (typeof reports)[number];
+}
+
+const { report } = Astro.props;
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+const pageTitle = `${report.title} | Reports`;
+const canonicalUrl = `${baseUrl}/reports/${report.slug}`;
+const reportImage = report.image
+  ? report.image.startsWith('http')
+    ? report.image
+    : `${baseUrl}${report.image}`
+  : `${baseUrl}/og-image.jpg`;
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: report.title,
+  description: report.excerpt,
+  image: reportImage,
+  datePublished: report.date,
+  dateModified: report.dateModified || report.date,
+  author: {
+    '@type': 'Person',
+    name: 'Justin Fassio',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'AI Workout Generator',
+    logo: {
+      '@type': 'ImageObject',
+      url: `${baseUrl}/logo.png`,
+    },
+  },
+};
+
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [
+  { name: 'Home', url: baseUrl },
+  { name: 'Reports', url: `${baseUrl}/reports` },
+  { name: report.title, url: canonicalUrl },
+]);
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={report.excerpt}
+  canonicalUrl={canonicalUrl}
+  ogImage={report.image?.startsWith('http') ? report.image : (report.image || '/og-image.jpg')}
+  ogTitle={pageTitle}
+  ogDescription={report.excerpt}
+  ogType="article"
+  structuredData={[articleSchema, breadcrumbSchema]}
+>
+  <main>
+    <ReportV2Content report={report} client:visible />
+    <Footer />
+  </main>
+</BaseLayout>

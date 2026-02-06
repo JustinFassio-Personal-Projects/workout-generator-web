@@ -60,7 +60,7 @@ const getIcon = (name: string) => {
 
 <section id="features" class="section-padding">
   <div class="container-custom">
-    <div class="text-center mb-12 md:mb-16">
+    <div class="text-center mb-12 md:mb-16" data-aos="fade-up">
       <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
         Features
       </span>
@@ -73,8 +73,8 @@ const getIcon = (name: string) => {
     </div>
     
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {features.map((feature) => (
-        <div class="glass-card p-6 group">
+      {features.map((feature, index) => (
+        <div class="glass-card p-6 group" data-aos="fade-up" data-aos-delay={index * 100}>
           <div class="w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] mb-4 group-hover:bg-[var(--color-accent)]/20 transition-colors">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" set:html={getIcon(feature.icon)} />
           </div>

@@ -1,11 +1,23 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/landing/Hero.astro';
+import { ScienceChart } from '@/components/react/ScienceChart/ScienceChart';
 import Features from '@/components/landing/Features.astro';
 import Footer from '@/components/landing/Footer.astro';
 import { FaqItem } from '@/components/react/FaqItem';
+import { EquipmentAdaptive } from '@/components/react/EquipmentAdaptive/EquipmentAdaptive';
+import { JourneySection } from '@/components/react/JourneySection/JourneySection';
+import { Testimonials } from '@/components/react/Testimonials/Testimonials';
+import { BlogPreview } from '@/components/react/BlogPreview/BlogPreview';
+import Pricing from '@/components/landing/Pricing.astro';
+import Bio from '@/components/landing/Bio.astro';
+import OnboardingIntroSection from '@/components/landing/OnboardingIntroSection.astro';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
 
 const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+// BreadcrumbList structured data (JSON-LD) for homepage — matches Next.js
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [{ name: 'Home', url: baseUrl }]);
 
 // FAQ data for homepage (condensed version)
 const homepageFaqs = [
@@ -106,98 +118,32 @@ const faqSchema = {
 
 <BaseLayout 
   title="AI Workout Generator | Free Science-Based Strength Plans"
-  structuredData={[softwareApplicationSchema, homepageSchema, faqSchema]}
+  structuredData={[softwareApplicationSchema, homepageSchema, breadcrumbSchema, faqSchema]}
 >
   <main class="min-h-screen">
     <!-- Hero Section (Static Astro component) -->
     <Hero />
-    
-    <!-- Workout Builder Section (Placeholder for React Island) -->
-    <section id="workout-builder" class="section-padding bg-[var(--glass-bg-base)]">
-      <div class="container-custom">
-        <div class="text-center mb-12">
-          <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
-            Get Started
-          </span>
-          <h2 class="mt-4 text-3xl md:text-4xl font-extrabold">
-            Build Your <span class="gradient-text">Custom Plan</span>
-          </h2>
-          <p class="mt-4 text-lg text-secondary max-w-2xl mx-auto">
-            Answer a few questions about your goals and equipment, and our AI will generate a personalized workout plan in seconds.
-          </p>
-        </div>
-        
-        <!-- Placeholder CTA - In production, this would be the WorkoutPlanBuilder React island -->
-        <div class="glass-card-strong p-8 md:p-12 max-w-2xl mx-auto text-center">
-          <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center">
-            <svg class="w-10 h-10 text-[var(--color-accent)]" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M6.5 6.5H17.5V17.5H6.5V6.5Z M4 9H6.5V15H4V9Z M17.5 9H20V15H17.5V9Z M2 10.5H4V13.5H2V10.5Z M20 10.5H22V13.5H20V10.5Z"/>
-            </svg>
-          </div>
-          <h3 class="text-2xl font-bold mb-4">Ready to Transform Your Training?</h3>
-          <p class="text-secondary mb-8">
-            The full interactive workout builder will load here. For now, start with our onboarding wizard.
-          </p>
-          <a 
-            href="/onboard"
-            class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-all hover:-translate-y-0.5"
-          >
-            Start Building Your Plan
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-          <p class="mt-4 text-sm text-muted">Free to try. No credit card required.</p>
-        </div>
-      </div>
-    </section>
+
+    <!-- Science Chart Section (React Island: Chart.js + goal selectors, hydrates when visible) -->
+    <ScienceChart client:load />
+
+    <!-- Equipment Adaptive Section (React Island: tab switcher Full Gym / Dumbbells / Bodyweight) -->
+    <EquipmentAdaptive client:visible />
+
+    <!-- Onboarding Wizard Section (entry to /onboard — animated intro + full workflow) -->
+    <OnboardingIntroSection />
 
     <!-- Features Section (Static Astro component) -->
     <Features />
 
-    <!-- Journey/How It Works Section -->
-    <section id="journey" class="section-padding">
-      <div class="container-custom">
-        <div class="text-center mb-12">
-          <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
-            How It Works
-          </span>
-          <h2 class="mt-4 text-3xl md:text-4xl font-extrabold">
-            Your Path to <span class="gradient-text">Results</span>
-          </h2>
-        </div>
-        
-        <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <div class="text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] text-2xl font-bold">
-              1
-            </div>
-            <h3 class="text-lg font-bold mb-2">Define Your Setup</h3>
-            <p class="text-secondary text-sm">
-              Tell us your equipment, time constraints, and fitness goals.
-            </p>
-          </div>
-          <div class="text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] text-2xl font-bold">
-              2
-            </div>
-            <h3 class="text-lg font-bold mb-2">AI Generates Your Plan</h3>
-            <p class="text-secondary text-sm">
-              Our closed-loop engine builds a trainer-verified program in seconds.
-            </p>
-          </div>
-          <div class="text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] text-2xl font-bold">
-              3
-            </div>
-            <h3 class="text-lg font-bold mb-2">Train & Progress</h3>
-            <p class="text-secondary text-sm">
-              Follow your personalized plan with built-in progressive overload.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- Journey Section (Equipment Adaptive layout: 3 tabs, left explanation, right step cards) -->
+    <JourneySection client:visible />
+
+    <!-- Testimonials Section (React Island: carousel with auto-play, prev/next, dots) -->
+    <Testimonials client:visible />
+
+    <!-- Blog Preview Section (React Island: fetches /api/blog, shows up to 3 posts, View All Posts) -->
+    <BlogPreview client:load />
 
     <!-- FAQ Section (with React island for accordion) -->
     <section class="section-padding bg-[var(--glass-bg-base)]">
@@ -229,22 +175,25 @@ const faqSchema = {
       </div>
     </section>
 
+    <!-- Bio / Founder Section -->
+    <Bio />
+
+    <!-- Pricing Section -->
+    <Pricing />
+
     <!-- CTA Section -->
     <section class="py-16 md:py-24 bg-gradient-to-br from-[var(--color-accent)]/5 to-[var(--color-primary-400)]/5">
       <div class="container-custom">
-        <div class="text-center max-w-2xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto" data-aos="fade-up">
           <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
             Ready to Stop Guessing?
           </h2>
           <p class="text-lg text-secondary mb-8">
             Join 8,000+ athletes who train with science-based AI workout plans.
           </p>
-          <a 
-            href="/onboard"
-            class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-all hover:-translate-y-0.5 shadow-lg"
-          >
+          <a href="/onboard" class="btn-onboard-cta">
             Build My Free Plan
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </a>

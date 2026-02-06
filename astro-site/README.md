@@ -46,7 +46,7 @@ All commands are run from the root of the project, from a terminal:
 
 ## Security / npm audit
 
-`@astrojs/vercel` is pinned to **8.0.4** to avoid the high-severity path-to-regexp advisory (GHSA-9wv6-86v2-598j) that affects newer 8.x and 9.x releases. Running `npm audit` (or `npm audit --audit-level=moderate`) may report **2 moderate** (esbuild, GHSA-67mh-4wv8-2f99); that advisory affects the **development server** only (CORS on localhost), not production builds or deployed output. **These 2 moderate are accepted for pre-push.** Do not run `npm audit fix --force` here—it would upgrade to a version that reintroduces the high-severity path-to-regexp issue.
+`@astrojs/vercel` is pinned to **8.0.4** to avoid the high-severity path-to-regexp advisory (GHSA-9wv6-86v2-598j) that affects newer 8.x and 9.x releases. Running `npm audit` (or `npm audit --audit-level=moderate`) may report **2 moderate** (esbuild, GHSA-67mh-4wv8-2f99); that advisory affects the **development server** only (CORS on localhost), not production builds or deployed output. **These 2 moderate are accepted for pre-push.** Do not run `npm audit fix --force` here—it would upgrade to a version that reintroduces the high-severity path-to-regexp issue. **TODO:** Periodically check newer `@astrojs/vercel` 8.x/9.x releases and the status of GHSA-9wv6-86v2-598j; once a fixed version is available, update this dependency and remove or relax the pin.
 
 ## 👀 Want to learn more?
 

@@ -178,88 +178,103 @@ export async function getPostBySlug(slug: string): Promise<PostWithRelations | n
  * Get all published post slugs for static generation
  */
 export async function getAllPostSlugs(): Promise<string[]> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase.from('posts').select('slug').eq('status', 'published')
+    const { data, error } = await supabase.from('posts').select('slug').eq('status', 'published')
 
-  if (error) {
-    console.error('Error fetching slugs:', error)
+    if (error) {
+      console.error('Error fetching slugs:', error)
+      return []
+    }
+
+    return data?.map(p => p.slug) || []
+  } catch (error) {
+    console.error('Failed to connect to Supabase in getAllPostSlugs:', error)
     return []
   }
-
-  return data?.map(p => p.slug) || []
 }
 
 /**
  * Get posts by category slug
  */
 export async function getPostsByCategory(categorySlug: string): Promise<PostWithRelations[]> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  // First get the category ID
-  const { data: category } = await supabase
-    .from('categories')
-    .select('id')
-    .eq('slug', categorySlug)
-    .single()
+    // First get the category ID
+    const { data: category } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', categorySlug)
+      .single()
 
-  if (!category) return []
+    if (!category) return []
 
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      `
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
       *,
       category:categories(*),
       author:authors(*)
     `
-    )
-    .eq('status', 'published')
-    .eq('category_id', category.id)
-    .order('published_at', { ascending: false })
+      )
+      .eq('status', 'published')
+      .eq('category_id', category.id)
+      .order('published_at', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching posts by category:', error)
+    if (error) {
+      console.error('Error fetching posts by category:', error)
+      return []
+    }
+
+    return transformPosts(data || [])
+  } catch (error) {
+    console.error('Failed to connect to Supabase in getPostsByCategory:', error)
     return []
   }
-
-  return transformPosts(data || [])
 }
 
 /**
  * Get posts by author slug
  */
 export async function getPostsByAuthor(authorSlug: string): Promise<PostWithRelations[]> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  // First get the author ID
-  const { data: author } = await supabase
-    .from('authors')
-    .select('id')
-    .eq('slug', authorSlug)
-    .single()
+    // First get the author ID
+    const { data: author } = await supabase
+      .from('authors')
+      .select('id')
+      .eq('slug', authorSlug)
+      .single()
 
-  if (!author) return []
+    if (!author) return []
 
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      `
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
       *,
       category:categories(*),
       author:authors(*)
     `
-    )
-    .eq('status', 'published')
-    .eq('author_id', author.id)
-    .order('published_at', { ascending: false })
+      )
+      .eq('status', 'published')
+      .eq('author_id', author.id)
+      .order('published_at', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching posts by author:', error)
+    if (error) {
+      console.error('Error fetching posts by author:', error)
+      return []
+    }
+
+    return transformPosts(data || [])
+  } catch (error) {
+    console.error('Failed to connect to Supabase in getPostsByAuthor:', error)
     return []
   }
-
-  return transformPosts(data || [])
 }
 
 /**
@@ -269,99 +284,124 @@ export async function getRelatedPosts(
   currentPost: PostWithRelations,
   limit: number = 3
 ): Promise<PostWithRelations[]> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  // If post has no category, return empty array (can't find related posts by category)
-  if (!currentPost.category_id) {
-    return []
-  }
+    // If post has no category, return empty array (can't find related posts by category)
+    if (!currentPost.category_id) {
+      return []
+    }
 
-  // Get posts from same category, excluding current post
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      `
+    // Get posts from same category, excluding current post
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
       *,
       category:categories(*),
       author:authors(*)
     `
-    )
-    .eq('status', 'published')
-    .eq('category_id', currentPost.category_id)
-    .neq('id', currentPost.id)
-    .order('published_at', { ascending: false })
-    .limit(limit)
+      )
+      .eq('status', 'published')
+      .eq('category_id', currentPost.category_id)
+      .neq('id', currentPost.id)
+      .order('published_at', { ascending: false })
+      .limit(limit)
 
-  if (error) {
-    console.error('Error fetching related posts:', error)
+    if (error) {
+      console.error('Error fetching related posts:', error)
+      return []
+    }
+
+    return transformPosts(data || [])
+  } catch (error) {
+    console.error('Failed to connect to Supabase in getRelatedPosts:', error)
     return []
   }
-
-  return transformPosts(data || [])
 }
 
 /**
  * Get all categories
  */
 export async function getAllCategories(): Promise<Category[]> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase.from('categories').select('*').order('name')
+    const { data, error } = await supabase.from('categories').select('*').order('name')
 
-  if (error) {
-    console.error('Error fetching categories:', error)
+    if (error) {
+      console.error('Error fetching categories:', error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Failed to connect to Supabase in getAllCategories:', error)
     return []
   }
-
-  return data || []
 }
 
 /**
  * Get category by slug
  */
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase.from('categories').select('*').eq('slug', slug).single()
+    const { data, error } = await supabase.from('categories').select('*').eq('slug', slug).single()
 
-  if (error) {
-    console.error('Error fetching category:', error)
+    if (error) {
+      console.error('Error fetching category:', error)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error('Failed to connect to Supabase in getCategoryBySlug:', error)
     return null
   }
-
-  return data
 }
 
 /**
  * Get all authors
  */
 export async function getAllAuthors(): Promise<Author[]> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase.from('authors').select('*').order('name')
+    const { data, error } = await supabase.from('authors').select('*').order('name')
 
-  if (error) {
-    console.error('Error fetching authors:', error)
+    if (error) {
+      console.error('Error fetching authors:', error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Failed to connect to Supabase in getAllAuthors:', error)
     return []
   }
-
-  return data || []
 }
 
 /**
  * Get author by slug
  */
 export async function getAuthorBySlug(slug: string): Promise<Author | null> {
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase.from('authors').select('*').eq('slug', slug).single()
+    const { data, error } = await supabase.from('authors').select('*').eq('slug', slug).single()
 
-  if (error) {
-    console.error('Error fetching author:', error)
+    if (error) {
+      console.error('Error fetching author:', error)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error('Failed to connect to Supabase in getAuthorBySlug:', error)
     return null
   }
-
-  return data
 }
 
 /**
@@ -370,27 +410,32 @@ export async function getAuthorBySlug(slug: string): Promise<Author | null> {
 export async function searchPosts(query: string): Promise<PostWithRelations[]> {
   if (!query.trim()) return []
 
-  const supabase = await createServerSupabaseClient()
+  try {
+    const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      `
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
       *,
       category:categories(*),
       author:authors(*)
     `
-    )
-    .eq('status', 'published')
-    .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
-    .order('published_at', { ascending: false })
+      )
+      .eq('status', 'published')
+      .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
+      .order('published_at', { ascending: false })
 
-  if (error) {
-    console.error('Error searching posts:', error)
+    if (error) {
+      console.error('Error searching posts:', error)
+      return []
+    }
+
+    return transformPosts(data || [])
+  } catch (error) {
+    console.error('Failed to connect to Supabase in searchPosts:', error)
     return []
   }
-
-  return transformPosts(data || [])
 }
 
 /**

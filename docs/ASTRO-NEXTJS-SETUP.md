@@ -121,3 +121,20 @@ There is no single “unified” dev URL that serves both; use the two URLs abov
 - **Astro:** `astro-site/.env` / `astro-site/.env.example` — Astro (`PUBLIC_*`). Copy and fill as needed for blog, leads, Stripe, GA/GTM.
 
 Each app reads only its own env; there is no shared env file between the two.
+
+---
+
+## 5. Troubleshooting Next.js deployment
+
+### "An error occurred in the Server Components render" (production)
+
+In production, Next.js hides the real error message to avoid leaking sensitive details. To find the cause:
+
+1. **Vercel:** Open your Next.js project → **Logs** (or **Deployments** → select a deployment → **Functions** / **Runtime Logs**). The actual error and stack trace appear in server logs when the failing page or API is requested.
+2. **Local production build:** Run `npm run build` at the repo root. If the error happens at build time (e.g. during static generation), it will show locally.
+3. **Required env vars for Next.js:** The app expects these in the **Next.js** Vercel project (Settings → Environment Variables). If they are missing, Server Components that use Supabase can throw:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     Set these for admin (auth, blog CRUD, leads, deep-research) and for the public blog when using Supabase. See root `.env.example` for the full list.
+
+The public blog will fall back to static data when Supabase is unavailable or env vars are missing; admin routes require a valid Supabase client and will show an error until the vars are set.

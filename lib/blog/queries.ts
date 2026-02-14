@@ -377,10 +377,25 @@ export async function getAuthorBySlug(slug: string): Promise<Author | null> {
 }
 
 /**
+ * Sanitize user search input for use in PostgREST .or() ilike filters.
+ * Escapes ilike wildcards (%, _) and strips characters that could inject filter logic.
+ */
+function sanitizeSearchQuery(q: string): string {
+  return q
+    .replace(/\\/g, '\\\\')
+    .replace(/%/g, '\\%')
+    .replace(/_/g, '\\_')
+    .replace(/[,"()]/g, '')
+}
+
+/**
  * Search posts by query string
  */
 export async function searchPosts(query: string): Promise<PostWithRelations[]> {
   if (!query.trim()) return []
+
+  const safeQuery = sanitizeSearchQuery(query.trim())
+  if (!safeQuery) return []
 
   return withSupabaseClient('searchPosts', [], async supabase => {
     const { data, error } = await supabase
@@ -393,7 +408,7 @@ export async function searchPosts(query: string): Promise<PostWithRelations[]> {
     `
       )
       .eq('status', 'published')
-      .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
+      .or(`title.ilike.%${safeQuery}%,excerpt.ilike.%${safeQuery}%,content.ilike.%${safeQuery}%`)
       .order('published_at', { ascending: false })
 
     if (error) {

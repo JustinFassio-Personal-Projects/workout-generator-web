@@ -30,10 +30,11 @@
 
 ## Fixed
 
-| Item                    | Location              | Action                                                                                                                                                  |
-| ----------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Safe error logging      | `lib/blog/queries.ts` | Introduced `safeErrorLog()` and used it for all Supabase/connection error logging to avoid leaking stack traces or nested error details in server logs. |
-| Supabase client wrapper | `lib/blog/queries.ts` | Added file-scoped `withSupabaseClient()`; refactored 11 functions to use it; connection-failure logging and fallback centralized in one place.          |
+| Item                    | Location              | Action                                                                                                                                                                                            |
+| ----------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Safe error logging      | `lib/blog/queries.ts` | Introduced `safeErrorLog()` and used it for all Supabase/connection error logging to avoid leaking stack traces or nested error details in server logs.                                           |
+| Supabase client wrapper | `lib/blog/queries.ts` | Added file-scoped `withSupabaseClient()`; refactored 11 functions to use it; connection-failure logging and fallback centralized in one place.                                                    |
+| Search query injection  | `lib/blog/queries.ts` | Added file-scoped `sanitizeSearchQuery()`; user input in `searchPosts()` is escaped for ilike (%, \_) and stripped of PostgREST filter-breaking chars (e.g. `,`, `(`, `)`) before use in `.or()`. |
 
 ---
 
@@ -53,6 +54,16 @@
 - **No** client directives or Node APIs in client-facing code; changed code is server-only lib and docs.
 - **astro-site/.env.example:** Placeholder URL only; no secrets. Server-only note added for `SUPABASE_SERVICE_ROLE_KEY`.
 - **docs:** Markdown and links checked; tables valid.
+- **Astro / build-time:** This PR does not modify any Astro `.astro` components or frontmatter; Astro `import.meta.env` and `client:*` usage were not in scope.
+
+---
+
+## Final gatekeeper review (pre-merge)
+
+- **Critical:** Safe error logging and Supabase wrapper applied; **search query sanitization** added so user-controlled `query` in `searchPosts()` cannot inject PostgREST filter logic (ilike wildcards escaped, reserved chars stripped).
+- **Types / boundaries:** No `any`; `lib/blog/queries.ts` remains server-only.
+- **Performance:** No Big O or DB-call changes in this PR; no optimizations applied.
+- **Style:** No new cross-file abstractions; helpers remain file-scoped in `lib/blog/queries.ts`.
 
 ---
 
@@ -60,10 +71,10 @@
 
 **READY TO MERGE**
 
-- Security: Server error logging uses a minimal, safe shape.
-- Logic: Blog query fallbacks (try/catch, static data) unchanged; only logging and safe-error helper added.
+- Security: Server error logging uses a minimal, safe shape; search input is sanitized before use in `.or()` filters.
+- Logic: Blog query fallbacks unchanged; connection handling and search safety improved.
 - Types & boundaries: No new `any`; server-only code remains server-only.
-- Style: Changes match existing patterns in the file; no new cross-project abstractions.
+- Style: Changes match existing patterns; no new cross-project abstractions.
 - Build: `npm run type-check` and `npm run lint` pass (verified).
 
 **Recommendation:** Run `npm run test:run` and `npm run build` (and `cd astro-site && npm run build` if desired) once more before merge to confirm full pipeline.

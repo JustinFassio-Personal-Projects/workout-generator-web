@@ -6,6 +6,38 @@ import type { BlogPost } from '@/features/blog/types'
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com'
 
 /**
+ * Safe error detail for server logs: avoid logging full error objects (stack traces, nested causes).
+ * Log message + name only; optional cause message if present.
+ */
+function safeErrorLog(error: unknown): string {
+  if (error instanceof Error) {
+    const cause = error.cause instanceof Error ? error.cause.message : undefined
+    return cause
+      ? `${error.name}: ${error.message} (cause: ${cause})`
+      : `${error.name}: ${error.message}`
+  }
+  return String(error)
+}
+
+/**
+ * Run a callback with the server Supabase client. If client creation fails,
+ * logs with safeErrorLog and returns the provided fallback.
+ */
+async function withSupabaseClient<T>(
+  context: string,
+  fallback: T,
+  fn: (supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>) => Promise<T>
+): Promise<T> {
+  try {
+    const supabase = await createServerSupabaseClient()
+    return await fn(supabase)
+  } catch (error) {
+    console.error(`Failed to connect to Supabase in ${context}:`, safeErrorLog(error))
+    return fallback
+  }
+}
+
+/**
  * Transform Supabase post data to handle joined relations.
  * Supabase returns joined relations as arrays, but we need single objects.
  * Note: PostWithRelations requires category and author, but we handle nulls
@@ -88,9 +120,8 @@ function convertStaticPostsToSupabaseFormat(staticPosts: BlogPost[]): PostWithRe
  * Falls back to static data if Supabase is unavailable or returns no results
  */
 export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  const fallback = convertStaticPostsToSupabaseFormat(blogPosts)
+  return withSupabaseClient('getAllPublishedPosts', fallback, async supabase => {
     const { data, error } = await supabase
       .from('posts')
       .select(
@@ -104,24 +135,17 @@ export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
       .order('published_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching posts from Supabase, using fallback data:', error)
-      // Fall back to static data when Supabase fails
-      return convertStaticPostsToSupabaseFormat(blogPosts)
+      console.error('Error fetching posts from Supabase, using fallback data:', safeErrorLog(error))
+      return fallback
     }
 
-    // If Supabase returns data, use it; otherwise fall back to static data
     if (data && data.length > 0) {
       return transformPosts(data)
     }
 
-    // No data in Supabase, use static fallback
     console.warn('No posts found in Supabase, using static fallback data')
-    return convertStaticPostsToSupabaseFormat(blogPosts)
-  } catch (error) {
-    // If Supabase client creation fails, use static data
-    console.error('Failed to connect to Supabase, using fallback data:', error)
-    return convertStaticPostsToSupabaseFormat(blogPosts)
-  }
+    return fallback
+  })
 }
 
 /**
@@ -129,9 +153,11 @@ export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
  * Falls back to static data if Supabase is unavailable or returns no results
  */
 export async function getPostBySlug(slug: string): Promise<PostWithRelations | null> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  const staticFallback = (() => {
+    const p = blogPosts.find(post => post.slug === slug)
+    return p ? (convertStaticPostsToSupabaseFormat([p])[0] ?? null) : null
+  })()
+  return withSupabaseClient('getPostBySlug', staticFallback, async supabase => {
     const { data, error } = await supabase
       .from('posts')
       .select(
@@ -149,117 +175,106 @@ export async function getPostBySlug(slug: string): Promise<PostWithRelations | n
       return transformPost(data)
     }
 
-    // If Supabase fails or returns no data, fall back to static data
     if (error) {
-      console.error('Error fetching post from Supabase, checking fallback data:', error)
+      console.error(
+        'Error fetching post from Supabase, checking fallback data:',
+        safeErrorLog(error)
+      )
     }
 
-    // Check static fallback data
-    const staticPost = blogPosts.find(post => post.slug === slug)
-    if (staticPost) {
-      const converted = convertStaticPostsToSupabaseFormat([staticPost])
-      return converted[0] || null
-    }
-
-    return null
-  } catch (error) {
-    // If Supabase client creation fails, use static data
-    console.error('Failed to connect to Supabase, checking fallback data:', error)
     const staticPost = blogPosts.find(post => post.slug === slug)
     if (staticPost) {
       const converted = convertStaticPostsToSupabaseFormat([staticPost])
       return converted[0] || null
     }
     return null
-  }
+  })
 }
 
 /**
  * Get all published post slugs for static generation
  */
 export async function getAllPostSlugs(): Promise<string[]> {
-  const supabase = await createServerSupabaseClient()
+  return withSupabaseClient('getAllPostSlugs', [], async supabase => {
+    const { data, error } = await supabase.from('posts').select('slug').eq('status', 'published')
 
-  const { data, error } = await supabase.from('posts').select('slug').eq('status', 'published')
+    if (error) {
+      console.error('Error fetching slugs:', safeErrorLog(error))
+      return []
+    }
 
-  if (error) {
-    console.error('Error fetching slugs:', error)
-    return []
-  }
-
-  return data?.map(p => p.slug) || []
+    return data?.map(p => p.slug) || []
+  })
 }
 
 /**
  * Get posts by category slug
  */
 export async function getPostsByCategory(categorySlug: string): Promise<PostWithRelations[]> {
-  const supabase = await createServerSupabaseClient()
+  return withSupabaseClient('getPostsByCategory', [], async supabase => {
+    const { data: category } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', categorySlug)
+      .single()
 
-  // First get the category ID
-  const { data: category } = await supabase
-    .from('categories')
-    .select('id')
-    .eq('slug', categorySlug)
-    .single()
+    if (!category) return []
 
-  if (!category) return []
-
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      `
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
       *,
       category:categories(*),
       author:authors(*)
     `
-    )
-    .eq('status', 'published')
-    .eq('category_id', category.id)
-    .order('published_at', { ascending: false })
+      )
+      .eq('status', 'published')
+      .eq('category_id', category.id)
+      .order('published_at', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching posts by category:', error)
-    return []
-  }
+    if (error) {
+      console.error('Error fetching posts by category:', safeErrorLog(error))
+      return []
+    }
 
-  return transformPosts(data || [])
+    return transformPosts(data || [])
+  })
 }
 
 /**
  * Get posts by author slug
  */
 export async function getPostsByAuthor(authorSlug: string): Promise<PostWithRelations[]> {
-  const supabase = await createServerSupabaseClient()
+  return withSupabaseClient('getPostsByAuthor', [], async supabase => {
+    const { data: author } = await supabase
+      .from('authors')
+      .select('id')
+      .eq('slug', authorSlug)
+      .single()
 
-  // First get the author ID
-  const { data: author } = await supabase
-    .from('authors')
-    .select('id')
-    .eq('slug', authorSlug)
-    .single()
+    if (!author) return []
 
-  if (!author) return []
-
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      `
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
       *,
       category:categories(*),
       author:authors(*)
     `
-    )
-    .eq('status', 'published')
-    .eq('author_id', author.id)
-    .order('published_at', { ascending: false })
+      )
+      .eq('status', 'published')
+      .eq('author_id', author.id)
+      .order('published_at', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching posts by author:', error)
-    return []
-  }
+    if (error) {
+      console.error('Error fetching posts by author:', safeErrorLog(error))
+      return []
+    }
 
-  return transformPosts(data || [])
+    return transformPosts(data || [])
+  })
 }
 
 /**
@@ -269,99 +284,108 @@ export async function getRelatedPosts(
   currentPost: PostWithRelations,
   limit: number = 3
 ): Promise<PostWithRelations[]> {
-  const supabase = await createServerSupabaseClient()
-
-  // If post has no category, return empty array (can't find related posts by category)
   if (!currentPost.category_id) {
     return []
   }
-
-  // Get posts from same category, excluding current post
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      `
+  return withSupabaseClient('getRelatedPosts', [], async supabase => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
       *,
       category:categories(*),
       author:authors(*)
     `
-    )
-    .eq('status', 'published')
-    .eq('category_id', currentPost.category_id)
-    .neq('id', currentPost.id)
-    .order('published_at', { ascending: false })
-    .limit(limit)
+      )
+      .eq('status', 'published')
+      .eq('category_id', currentPost.category_id)
+      .neq('id', currentPost.id)
+      .order('published_at', { ascending: false })
+      .limit(limit)
 
-  if (error) {
-    console.error('Error fetching related posts:', error)
-    return []
-  }
+    if (error) {
+      console.error('Error fetching related posts:', safeErrorLog(error))
+      return []
+    }
 
-  return transformPosts(data || [])
+    return transformPosts(data || [])
+  })
 }
 
 /**
  * Get all categories
  */
 export async function getAllCategories(): Promise<Category[]> {
-  const supabase = await createServerSupabaseClient()
+  return withSupabaseClient('getAllCategories', [], async supabase => {
+    const { data, error } = await supabase.from('categories').select('*').order('name')
 
-  const { data, error } = await supabase.from('categories').select('*').order('name')
+    if (error) {
+      console.error('Error fetching categories:', safeErrorLog(error))
+      return []
+    }
 
-  if (error) {
-    console.error('Error fetching categories:', error)
-    return []
-  }
-
-  return data || []
+    return data || []
+  })
 }
 
 /**
  * Get category by slug
  */
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
-  const supabase = await createServerSupabaseClient()
+  return withSupabaseClient('getCategoryBySlug', null, async supabase => {
+    const { data, error } = await supabase.from('categories').select('*').eq('slug', slug).single()
 
-  const { data, error } = await supabase.from('categories').select('*').eq('slug', slug).single()
+    if (error) {
+      console.error('Error fetching category:', safeErrorLog(error))
+      return null
+    }
 
-  if (error) {
-    console.error('Error fetching category:', error)
-    return null
-  }
-
-  return data
+    return data
+  })
 }
 
 /**
  * Get all authors
  */
 export async function getAllAuthors(): Promise<Author[]> {
-  const supabase = await createServerSupabaseClient()
+  return withSupabaseClient('getAllAuthors', [], async supabase => {
+    const { data, error } = await supabase.from('authors').select('*').order('name')
 
-  const { data, error } = await supabase.from('authors').select('*').order('name')
+    if (error) {
+      console.error('Error fetching authors:', safeErrorLog(error))
+      return []
+    }
 
-  if (error) {
-    console.error('Error fetching authors:', error)
-    return []
-  }
-
-  return data || []
+    return data || []
+  })
 }
 
 /**
  * Get author by slug
  */
 export async function getAuthorBySlug(slug: string): Promise<Author | null> {
-  const supabase = await createServerSupabaseClient()
+  return withSupabaseClient('getAuthorBySlug', null, async supabase => {
+    const { data, error } = await supabase.from('authors').select('*').eq('slug', slug).single()
 
-  const { data, error } = await supabase.from('authors').select('*').eq('slug', slug).single()
+    if (error) {
+      console.error('Error fetching author:', safeErrorLog(error))
+      return null
+    }
 
-  if (error) {
-    console.error('Error fetching author:', error)
-    return null
-  }
+    return data
+  })
+}
 
-  return data
+/**
+ * Sanitize user search input for use in PostgREST .or() ilike filters.
+ * Escapes ilike wildcards (%, _) and strips characters that could inject filter logic.
+ */
+function sanitizeSearchQuery(q: string): string {
+  return q
+    .replace(/\\/g, '\\\\')
+    .replace(/%/g, '\\%')
+    .replace(/_/g, '\\_')
+    .replace(/[,"()]/g, '')
 }
 
 /**
@@ -370,27 +394,30 @@ export async function getAuthorBySlug(slug: string): Promise<Author | null> {
 export async function searchPosts(query: string): Promise<PostWithRelations[]> {
   if (!query.trim()) return []
 
-  const supabase = await createServerSupabaseClient()
+  const safeQuery = sanitizeSearchQuery(query.trim())
+  if (!safeQuery) return []
 
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      `
+  return withSupabaseClient('searchPosts', [], async supabase => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select(
+        `
       *,
       category:categories(*),
       author:authors(*)
     `
-    )
-    .eq('status', 'published')
-    .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
-    .order('published_at', { ascending: false })
+      )
+      .eq('status', 'published')
+      .or(`title.ilike.%${safeQuery}%,excerpt.ilike.%${safeQuery}%,content.ilike.%${safeQuery}%`)
+      .order('published_at', { ascending: false })
 
-  if (error) {
-    console.error('Error searching posts:', error)
-    return []
-  }
+    if (error) {
+      console.error('Error searching posts:', safeErrorLog(error))
+      return []
+    }
 
-  return transformPosts(data || [])
+    return transformPosts(data || [])
+  })
 }
 
 /**

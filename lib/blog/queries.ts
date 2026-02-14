@@ -20,6 +20,24 @@ function safeErrorLog(error: unknown): string {
 }
 
 /**
+ * Run a callback with the server Supabase client. If client creation fails,
+ * logs with safeErrorLog and returns the provided fallback.
+ */
+async function withSupabaseClient<T>(
+  context: string,
+  fallback: T,
+  fn: (supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>) => Promise<T>
+): Promise<T> {
+  try {
+    const supabase = await createServerSupabaseClient()
+    return await fn(supabase)
+  } catch (error) {
+    console.error(`Failed to connect to Supabase in ${context}:`, safeErrorLog(error))
+    return fallback
+  }
+}
+
+/**
  * Transform Supabase post data to handle joined relations.
  * Supabase returns joined relations as arrays, but we need single objects.
  * Note: PostWithRelations requires category and author, but we handle nulls
@@ -102,9 +120,8 @@ function convertStaticPostsToSupabaseFormat(staticPosts: BlogPost[]): PostWithRe
  * Falls back to static data if Supabase is unavailable or returns no results
  */
 export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  const fallback = convertStaticPostsToSupabaseFormat(blogPosts)
+  return withSupabaseClient('getAllPublishedPosts', fallback, async supabase => {
     const { data, error } = await supabase
       .from('posts')
       .select(
@@ -119,23 +136,16 @@ export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
 
     if (error) {
       console.error('Error fetching posts from Supabase, using fallback data:', safeErrorLog(error))
-      // Fall back to static data when Supabase fails
-      return convertStaticPostsToSupabaseFormat(blogPosts)
+      return fallback
     }
 
-    // If Supabase returns data, use it; otherwise fall back to static data
     if (data && data.length > 0) {
       return transformPosts(data)
     }
 
-    // No data in Supabase, use static fallback
     console.warn('No posts found in Supabase, using static fallback data')
-    return convertStaticPostsToSupabaseFormat(blogPosts)
-  } catch (error) {
-    // If Supabase client creation fails, use static data
-    console.error('Failed to connect to Supabase, using fallback data:', safeErrorLog(error))
-    return convertStaticPostsToSupabaseFormat(blogPosts)
-  }
+    return fallback
+  })
 }
 
 /**
@@ -143,9 +153,11 @@ export async function getAllPublishedPosts(): Promise<PostWithRelations[]> {
  * Falls back to static data if Supabase is unavailable or returns no results
  */
 export async function getPostBySlug(slug: string): Promise<PostWithRelations | null> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  const staticFallback = (() => {
+    const p = blogPosts.find(post => post.slug === slug)
+    return p ? (convertStaticPostsToSupabaseFormat([p])[0] ?? null) : null
+  })()
+  return withSupabaseClient('getPostBySlug', staticFallback, async supabase => {
     const { data, error } = await supabase
       .from('posts')
       .select(
@@ -163,7 +175,6 @@ export async function getPostBySlug(slug: string): Promise<PostWithRelations | n
       return transformPost(data)
     }
 
-    // If Supabase fails or returns no data, fall back to static data
     if (error) {
       console.error(
         'Error fetching post from Supabase, checking fallback data:',
@@ -171,33 +182,20 @@ export async function getPostBySlug(slug: string): Promise<PostWithRelations | n
       )
     }
 
-    // Check static fallback data
-    const staticPost = blogPosts.find(post => post.slug === slug)
-    if (staticPost) {
-      const converted = convertStaticPostsToSupabaseFormat([staticPost])
-      return converted[0] || null
-    }
-
-    return null
-  } catch (error) {
-    // If Supabase client creation fails, use static data
-    console.error('Failed to connect to Supabase, checking fallback data:', safeErrorLog(error))
     const staticPost = blogPosts.find(post => post.slug === slug)
     if (staticPost) {
       const converted = convertStaticPostsToSupabaseFormat([staticPost])
       return converted[0] || null
     }
     return null
-  }
+  })
 }
 
 /**
  * Get all published post slugs for static generation
  */
 export async function getAllPostSlugs(): Promise<string[]> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  return withSupabaseClient('getAllPostSlugs', [], async supabase => {
     const { data, error } = await supabase.from('posts').select('slug').eq('status', 'published')
 
     if (error) {
@@ -206,20 +204,14 @@ export async function getAllPostSlugs(): Promise<string[]> {
     }
 
     return data?.map(p => p.slug) || []
-  } catch (error) {
-    console.error('Failed to connect to Supabase in getAllPostSlugs:', safeErrorLog(error))
-    return []
-  }
+  })
 }
 
 /**
  * Get posts by category slug
  */
 export async function getPostsByCategory(categorySlug: string): Promise<PostWithRelations[]> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
-    // First get the category ID
+  return withSupabaseClient('getPostsByCategory', [], async supabase => {
     const { data: category } = await supabase
       .from('categories')
       .select('id')
@@ -247,20 +239,14 @@ export async function getPostsByCategory(categorySlug: string): Promise<PostWith
     }
 
     return transformPosts(data || [])
-  } catch (error) {
-    console.error('Failed to connect to Supabase in getPostsByCategory:', safeErrorLog(error))
-    return []
-  }
+  })
 }
 
 /**
  * Get posts by author slug
  */
 export async function getPostsByAuthor(authorSlug: string): Promise<PostWithRelations[]> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
-    // First get the author ID
+  return withSupabaseClient('getPostsByAuthor', [], async supabase => {
     const { data: author } = await supabase
       .from('authors')
       .select('id')
@@ -288,10 +274,7 @@ export async function getPostsByAuthor(authorSlug: string): Promise<PostWithRela
     }
 
     return transformPosts(data || [])
-  } catch (error) {
-    console.error('Failed to connect to Supabase in getPostsByAuthor:', safeErrorLog(error))
-    return []
-  }
+  })
 }
 
 /**
@@ -301,15 +284,10 @@ export async function getRelatedPosts(
   currentPost: PostWithRelations,
   limit: number = 3
 ): Promise<PostWithRelations[]> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
-    // If post has no category, return empty array (can't find related posts by category)
-    if (!currentPost.category_id) {
-      return []
-    }
-
-    // Get posts from same category, excluding current post
+  if (!currentPost.category_id) {
+    return []
+  }
+  return withSupabaseClient('getRelatedPosts', [], async supabase => {
     const { data, error } = await supabase
       .from('posts')
       .select(
@@ -331,19 +309,14 @@ export async function getRelatedPosts(
     }
 
     return transformPosts(data || [])
-  } catch (error) {
-    console.error('Failed to connect to Supabase in getRelatedPosts:', safeErrorLog(error))
-    return []
-  }
+  })
 }
 
 /**
  * Get all categories
  */
 export async function getAllCategories(): Promise<Category[]> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  return withSupabaseClient('getAllCategories', [], async supabase => {
     const { data, error } = await supabase.from('categories').select('*').order('name')
 
     if (error) {
@@ -352,19 +325,14 @@ export async function getAllCategories(): Promise<Category[]> {
     }
 
     return data || []
-  } catch (error) {
-    console.error('Failed to connect to Supabase in getAllCategories:', safeErrorLog(error))
-    return []
-  }
+  })
 }
 
 /**
  * Get category by slug
  */
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  return withSupabaseClient('getCategoryBySlug', null, async supabase => {
     const { data, error } = await supabase.from('categories').select('*').eq('slug', slug).single()
 
     if (error) {
@@ -373,19 +341,14 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
     }
 
     return data
-  } catch (error) {
-    console.error('Failed to connect to Supabase in getCategoryBySlug:', safeErrorLog(error))
-    return null
-  }
+  })
 }
 
 /**
  * Get all authors
  */
 export async function getAllAuthors(): Promise<Author[]> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  return withSupabaseClient('getAllAuthors', [], async supabase => {
     const { data, error } = await supabase.from('authors').select('*').order('name')
 
     if (error) {
@@ -394,19 +357,14 @@ export async function getAllAuthors(): Promise<Author[]> {
     }
 
     return data || []
-  } catch (error) {
-    console.error('Failed to connect to Supabase in getAllAuthors:', safeErrorLog(error))
-    return []
-  }
+  })
 }
 
 /**
  * Get author by slug
  */
 export async function getAuthorBySlug(slug: string): Promise<Author | null> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  return withSupabaseClient('getAuthorBySlug', null, async supabase => {
     const { data, error } = await supabase.from('authors').select('*').eq('slug', slug).single()
 
     if (error) {
@@ -415,10 +373,7 @@ export async function getAuthorBySlug(slug: string): Promise<Author | null> {
     }
 
     return data
-  } catch (error) {
-    console.error('Failed to connect to Supabase in getAuthorBySlug:', safeErrorLog(error))
-    return null
-  }
+  })
 }
 
 /**
@@ -427,9 +382,7 @@ export async function getAuthorBySlug(slug: string): Promise<Author | null> {
 export async function searchPosts(query: string): Promise<PostWithRelations[]> {
   if (!query.trim()) return []
 
-  try {
-    const supabase = await createServerSupabaseClient()
-
+  return withSupabaseClient('searchPosts', [], async supabase => {
     const { data, error } = await supabase
       .from('posts')
       .select(
@@ -449,10 +402,7 @@ export async function searchPosts(query: string): Promise<PostWithRelations[]> {
     }
 
     return transformPosts(data || [])
-  } catch (error) {
-    console.error('Failed to connect to Supabase in searchPosts:', safeErrorLog(error))
-    return []
-  }
+  })
 }
 
 /**

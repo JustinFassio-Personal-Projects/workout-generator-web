@@ -30,18 +30,19 @@
 
 ## Fixed
 
-| Item               | Location              | Action                                                                                                                                                  |
-| ------------------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Safe error logging | `lib/blog/queries.ts` | Introduced `safeErrorLog()` and used it for all Supabase/connection error logging to avoid leaking stack traces or nested error details in server logs. |
+| Item                    | Location              | Action                                                                                                                                                  |
+| ----------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Safe error logging      | `lib/blog/queries.ts` | Introduced `safeErrorLog()` and used it for all Supabase/connection error logging to avoid leaking stack traces or nested error details in server logs. |
+| Supabase client wrapper | `lib/blog/queries.ts` | Added file-scoped `withSupabaseClient()`; refactored 11 functions to use it; connection-failure logging and fallback centralized in one place.          |
 
 ---
 
 ## Ignored
 
-| Suggestion / Topic                                 | Reason                                                                                                 |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Table rows use `\|\|` in THREE-APP-ARCHITECTURE.md | False positive: repo has single `\|`; no change.                                                       |
-| New abstractions / utilities beyond `safeErrorLog` | Per rules: no new project-wide utilities. `safeErrorLog` is file-scoped in `lib/blog/queries.ts` only. |
+| Suggestion / Topic                                 | Reason                                                                                                                              |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Table rows use `\|\|` in THREE-APP-ARCHITECTURE.md | False positive: repo has single `\|`; no change.                                                                                    |
+| New abstractions / utilities beyond `safeErrorLog` | **Implemented.** One additional file-scoped helper, `withSupabaseClient`, added in `lib/blog/queries.ts` (no project-wide utility). |
 
 ---
 

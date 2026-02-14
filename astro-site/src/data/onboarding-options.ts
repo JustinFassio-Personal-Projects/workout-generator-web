@@ -44,18 +44,6 @@ export const equipmentAccessOptions: LabeledOption<EquipmentAccess>[] = [
   { value: 'full_gym', label: 'Full gym access' },
 ]
 
-/**
- * Get available equipment category options based on fitness level.
- * Used by OnboardingWizard (category-based UI).
- */
-export function getEquipmentCategoryOptions(fitnessLevel: FitnessLevel): LabeledOption<string>[] {
-  const categories = getAvailableCategoriesByFitnessLevel(fitnessLevel)
-  return categories.map(category => ({
-    value: category,
-    label: getCategoryLabel(category),
-  }))
-}
-
 export const genderOptions: LabeledOption<Gender>[] = [
   { value: 'prefer_not_to_say', label: 'Prefer not to say' },
   { value: 'male', label: 'Male' },
@@ -72,3 +60,11 @@ export const heightUnitOptions: LabeledOption<'in' | 'cm'>[] = [
   { value: 'in', label: 'in' },
   { value: 'cm', label: 'cm' },
 ]
+
+export function getEquipmentCategoryOptions(fitnessLevel: FitnessLevel): LabeledOption<string>[] {
+  const categories = getAvailableCategoriesByFitnessLevel(fitnessLevel)
+  return categories.map(category => ({
+    value: category,
+    label: getCategoryLabel(category),
+  }))
+}

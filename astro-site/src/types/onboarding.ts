@@ -1,4 +1,3 @@
-// Fitness goal options for multi-select
 export type FitnessGoal =
   | 'Build muscle'
   | 'Lose fat'
@@ -8,10 +7,8 @@ export type FitnessGoal =
   | 'Move better / reduce pain'
   | 'Improve overall fitness'
 
-// Fitness level options
 export type FitnessLevel = 'beginner' | 'intermediate' | 'advanced' | 'athlete'
 
-// Activity level options
 export type ActivityLevel =
   | 'sedentary'
   | 'lightly_active'
@@ -19,13 +16,10 @@ export type ActivityLevel =
   | 'very_active'
   | 'extremely_active'
 
-// Equipment access options (UI enum; mapped to category array for signup)
 export type EquipmentAccess = 'none' | 'minimal' | 'home' | 'full_gym'
 
-// Gender options (optional field)
 export type Gender = 'male' | 'female' | 'non_binary' | 'prefer_not_to_say'
 
-// Unit preferences
 export interface PreferredUnits {
   weight: 'lb' | 'kg'
   height: 'in' | 'cm'
@@ -33,7 +27,6 @@ export interface PreferredUnits {
   temperature: 'f' | 'c'
 }
 
-// Main onboarding data collected on the website (Phase A)
 export interface WebsiteOnboardingData {
   gender?: Gender
   age?: number
@@ -41,10 +34,9 @@ export interface WebsiteOnboardingData {
   fitness_level: FitnessLevel
   current_activity_level: ActivityLevel
   fitness_goals: FitnessGoal[]
-  equipment_access: string[] // Array of equipment category strings
+  equipment_access: string[]
 }
 
-// Default values for form initialization
 export const DEFAULT_ONBOARDING_DATA: WebsiteOnboardingData = {
   gender: undefined,
   age: undefined,

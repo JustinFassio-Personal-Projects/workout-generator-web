@@ -20,78 +20,58 @@ interface Stats {
 
 async function getStats(): Promise<Stats> {
   const supabase = await createServerSupabaseClient()
-
-  // Get post counts
-  const { count: totalPosts } = await supabase
-    .from('posts')
-    .select('*', { count: 'exact', head: true })
-
-  const { count: publishedPosts } = await supabase
-    .from('posts')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'published')
-
-  const { count: draftPosts } = await supabase
-    .from('posts')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'draft')
-
-  // Get posts published this week
   const weekAgo = new Date()
   weekAgo.setDate(weekAgo.getDate() - 7)
+  const weekAgoIso = weekAgo.toISOString()
 
-  const { count: postsThisWeek } = await supabase
-    .from('posts')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'published')
-    .gte('published_at', weekAgo.toISOString())
-
-  // Get category and author counts
-  const { count: totalCategories } = await supabase
-    .from('categories')
-    .select('*', { count: 'exact', head: true })
-
-  const { count: totalAuthors } = await supabase
-    .from('authors')
-    .select('*', { count: 'exact', head: true })
-
-  // Get lead counts
-  const { count: totalLeads } = await supabase
-    .from('leads')
-    .select('*', { count: 'exact', head: true })
-
-  const { count: leadsThisWeek } = await supabase
-    .from('leads')
-    .select('*', { count: 'exact', head: true })
-    .gte('created_at', weekAgo.toISOString())
-
-  const { count: visionLabLeads } = await supabase
-    .from('leads')
-    .select('*', { count: 'exact', head: true })
-    .eq('source', 'vision_lab')
-
-  const { count: exerciseChallengeLeads } = await supabase
-    .from('leads')
-    .select('*', { count: 'exact', head: true })
-    .eq('source', 'exercise_challenge')
-
-  const { count: verifiedLeads } = await supabase
-    .from('leads')
-    .select('*', { count: 'exact', head: true })
-    .eq('verified', true)
+  const [
+    totalPostsRes,
+    publishedPostsRes,
+    draftPostsRes,
+    postsThisWeekRes,
+    totalCategoriesRes,
+    totalAuthorsRes,
+    totalLeadsRes,
+    leadsThisWeekRes,
+    visionLabLeadsRes,
+    exerciseChallengeLeadsRes,
+    verifiedLeadsRes,
+  ] = await Promise.all([
+    supabase.from('posts').select('*', { count: 'exact', head: true }),
+    supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'published'),
+    supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
+    supabase
+      .from('posts')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'published')
+      .gte('published_at', weekAgoIso),
+    supabase.from('categories').select('*', { count: 'exact', head: true }),
+    supabase.from('authors').select('*', { count: 'exact', head: true }),
+    supabase.from('leads').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('leads')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', weekAgoIso),
+    supabase.from('leads').select('*', { count: 'exact', head: true }).eq('source', 'vision_lab'),
+    supabase
+      .from('leads')
+      .select('*', { count: 'exact', head: true })
+      .eq('source', 'exercise_challenge'),
+    supabase.from('leads').select('*', { count: 'exact', head: true }).eq('verified', true),
+  ])
 
   return {
-    totalPosts: totalPosts || 0,
-    publishedPosts: publishedPosts || 0,
-    draftPosts: draftPosts || 0,
-    postsThisWeek: postsThisWeek || 0,
-    totalCategories: totalCategories || 0,
-    totalAuthors: totalAuthors || 0,
-    totalLeads: totalLeads || 0,
-    leadsThisWeek: leadsThisWeek || 0,
-    visionLabLeads: visionLabLeads || 0,
-    exerciseChallengeLeads: exerciseChallengeLeads || 0,
-    verifiedLeads: verifiedLeads || 0,
+    totalPosts: totalPostsRes.count ?? 0,
+    publishedPosts: publishedPostsRes.count ?? 0,
+    draftPosts: draftPostsRes.count ?? 0,
+    postsThisWeek: postsThisWeekRes.count ?? 0,
+    totalCategories: totalCategoriesRes.count ?? 0,
+    totalAuthors: totalAuthorsRes.count ?? 0,
+    totalLeads: totalLeadsRes.count ?? 0,
+    leadsThisWeek: leadsThisWeekRes.count ?? 0,
+    visionLabLeads: visionLabLeadsRes.count ?? 0,
+    exerciseChallengeLeads: exerciseChallengeLeadsRes.count ?? 0,
+    verifiedLeads: verifiedLeadsRes.count ?? 0,
   }
 }
 
@@ -176,9 +156,11 @@ export default async function AdminDashboardPage() {
     redirect('/admin/login?error=unauthorized')
   }
 
-  const stats = await getStats()
-  const recentPosts = await getRecentPosts()
-  const recentLeads = await getRecentLeads()
+  const [stats, recentPosts, recentLeads] = await Promise.all([
+    getStats(),
+    getRecentPosts(),
+    getRecentLeads(),
+  ])
 
   return (
     <AdminLayout user={user} role={adminUser.role}>

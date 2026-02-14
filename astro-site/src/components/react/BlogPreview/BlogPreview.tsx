@@ -1,137 +1,122 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { ArrowRight } from 'lucide-react'
-import { BlogPreviewCard, type BlogPreviewPost } from './BlogPreviewCard'
+import React, { useEffect, useState } from 'react'
 import { fallbackPosts } from '@/data/blog/fallback-posts'
 import type { TransformedPost } from '@/types/blog'
 import styles from './BlogPreview.module.scss'
 
-function fallbackToPreview(p: TransformedPost): BlogPreviewPost {
-  return {
-    slug: p.slug,
-    title: p.title,
-    excerpt: p.excerpt,
-    date: p.date,
-    author: p.author,
-    category: p.category,
-    image: p.image,
-    tags: p.tags ?? [],
-  }
-}
-
-const FALLBACK_PREVIEW_POSTS: BlogPreviewPost[] = fallbackPosts.slice(0, 3).map(fallbackToPreview)
-
-/** Raw post shape returned by /api/blog (Supabase rows with joins) */
-interface ApiPostRow {
+interface ApiPost {
   id: string
   slug: string
   title: string
   excerpt: string
-  featured_image: string | null
-  published_at: string | null
-  category?:
-    | { id: string; slug: string; name: string }
-    | { id: string; slug: string; name: string }[]
-  author?:
-    | { id: string; name: string; avatar?: string }
-    | { id: string; name: string; avatar?: string }[]
+  featured_image?: string | null
+  published_at?: string | null
+  category?: { name: string } | null
+  author?: { name: string } | null
 }
 
-function transformRow(row: ApiPostRow): BlogPreviewPost {
-  const category = row.category
-  const author = row.author
-  const categoryName = Array.isArray(category) ? category[0]?.name : category?.name
-  const authorName = Array.isArray(author) ? author[0]?.name : author?.name
+function formatDate(value: string | undefined | null): string {
+  if (!value) return ''
+  const d = new Date(value)
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+}
 
+function toPreviewPost(p: ApiPost | TransformedPost): {
+  slug: string
+  title: string
+  excerpt: string
+  image: string
+  date: string
+  author: string
+} {
+  if ('date' in p) {
+    const t = p as TransformedPost
+    return {
+      slug: t.slug,
+      title: t.title,
+      excerpt: t.excerpt,
+      image: t.image || '',
+      date: t.date,
+      author: t.author || 'Team',
+    }
+  }
+  const a = p as ApiPost
   return {
-    slug: row.slug,
-    title: row.title,
-    excerpt: row.excerpt ?? '',
-    date: row.published_at ?? '',
-    author: authorName ?? 'Unknown',
-    category: categoryName ?? 'Uncategorized',
-    image: row.featured_image ?? undefined,
-    tags: [],
+    slug: a.slug,
+    title: a.title,
+    excerpt: a.excerpt,
+    image: a.featured_image || '',
+    date: a.published_at ? formatDate(a.published_at) : '',
+    author: a.author?.name || 'Team',
   }
 }
 
-export function BlogPreview() {
-  const [posts, setPosts] = useState<BlogPreviewPost[]>(() => FALLBACK_PREVIEW_POSTS)
+export const BlogPreview: React.FC = () => {
+  const [posts, setPosts] = useState<
+    { slug: string; title: string; excerpt: string; image: string; date: string; author: string }[]
+  >([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    let cancelled = false
-
-    async function fetchPosts() {
-      try {
-        const res = await fetch('/api/blog')
-        if (cancelled) return
-        if (!res.ok) {
-          setPosts(FALLBACK_PREVIEW_POSTS)
-          setLoading(false)
-          return
+    const base = typeof window !== 'undefined' ? window.location.origin : ''
+    fetch(`${base}/api/blog`)
+      .then(res => res.json())
+      .then((data: ApiPost[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPosts(data.slice(0, 3).map(toPreviewPost))
+        } else {
+          setPosts(fallbackPosts.slice(0, 3).map(toPreviewPost))
         }
-        let data: unknown
-        try {
-          data = await res.json()
-        } catch {
-          if (!cancelled) {
-            setPosts(FALLBACK_PREVIEW_POSTS)
-            setLoading(false)
-          }
-          return
-        }
-        if (cancelled) return
-        if (data && typeof data === 'object' && 'error' in data) {
-          setPosts(FALLBACK_PREVIEW_POSTS)
-          setLoading(false)
-          return
-        }
-        if (!Array.isArray(data)) {
-          setPosts(FALLBACK_PREVIEW_POSTS)
-          setLoading(false)
-          return
-        }
-        const transformed = (data as ApiPostRow[]).slice(0, 3).map(transformRow)
-        setPosts(transformed.length > 0 ? transformed : FALLBACK_PREVIEW_POSTS)
-      } catch {
-        if (!cancelled) setPosts(FALLBACK_PREVIEW_POSTS)
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-
-    fetchPosts()
-    return () => {
-      cancelled = true
-    }
+      })
+      .catch(() => {
+        setPosts(fallbackPosts.slice(0, 3).map(toPreviewPost))
+      })
+      .finally(() => setLoading(false))
   }, [])
 
-  return (
-    <section id="blog" className={styles.blog}>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>
-            Latest from Our
-            <span className={styles.gradientText}> Blog</span>
+  if (loading) {
+    return (
+      <section id="blog-preview" className={styles.section}>
+        <div className={styles.container}>
+          <h2 className={styles.heading}>
+            Latest from the <span className={styles.gradientText}>Blog</span>
           </h2>
-          <p className={styles.subtitle}>
-            Discover fitness tips, workout strategies, and expert advice to help you achieve your
-            goals.
-          </p>
+          <p className={styles.loading}>Loading posts…</p>
         </div>
+      </section>
+    )
+  }
+
+  return (
+    <section id="blog-preview" className={styles.section}>
+      <div className={styles.container}>
+        <h2 className={styles.heading}>
+          Latest from the <span className={styles.gradientText}>Blog</span>
+        </h2>
+        <p className={styles.subtitle}>Tips, science, and updates from our team.</p>
         <div className={styles.grid}>
           {posts.map(post => (
-            <BlogPreviewCard key={post.slug} post={post} className={styles.card} />
+            <a key={post.slug} href={`/blog/${post.slug}`} className={styles.card}>
+              {post.image && (
+                <div className={styles.imageWrap}>
+                  <img src={post.image} alt="" className={styles.image} />
+                </div>
+              )}
+              <div className={styles.body}>
+                <h3 className={styles.title}>{post.title}</h3>
+                <p className={styles.excerpt}>{post.excerpt}</p>
+                <span className={styles.meta}>
+                  {post.date && `${post.date} · `}
+                  {post.author}
+                </span>
+              </div>
+            </a>
           ))}
         </div>
-        <div className={styles.cta}>
-          <a href="/blog" className={styles.ctaLink}>
-            View All Posts
-            <ArrowRight className={styles.ctaIcon} aria-hidden />
-          </a>
-        </div>
+        <a href="/blog" className={styles.cta}>
+          View All Posts
+        </a>
       </div>
     </section>
   )

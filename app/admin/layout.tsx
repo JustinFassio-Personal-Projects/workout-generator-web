@@ -7,6 +7,6 @@ export const metadata: Metadata = {
 }
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
-  // Simple wrapper - actual auth is handled by middleware and individual pages
+  // Simple wrapper - auth is enforced in each admin page and in the login API route
   return <>{children}</>
 }

@@ -1,7 +1,3 @@
-/**
- * Report types and static data for Reports feature.
- * Mirrors types/reports.ts from Next.js for migration parity.
- */
 export interface Report {
   id: string
   slug: string
@@ -21,7 +17,7 @@ export const reports: Report[] = [
       'Experience the difference with our interactive analysis. Includes live demo to generate a "System" workout plan instantly using our algorithmic engine.',
     date: '2026-01-10',
     dateModified: '2026-01-10',
-    image: '/og-image.jpg', // fallback; add san-diego-core-fitness-hero-1920x1200.webp to public if desired
+    image: '/san-diego-core-fitness-hero-1920x1200.webp',
   },
   {
     id: '2',

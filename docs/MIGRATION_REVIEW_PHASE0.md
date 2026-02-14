@@ -87,10 +87,12 @@ Served by the Astro app (`astro-site/`). Audit these in Phases 1–8.
 
 Complete in order. Do not proceed to Phase 1 until all are checked.
 
-- [ ] **Build:** `cd astro-site && npm run build` succeeds (exit code 0; no errors).
-- [ ] **Dev server:** `cd astro-site && npm run dev` starts; no runtime errors in terminal; `http://localhost:4321` loads homepage.
-- [ ] **Env:** `astro-site/.env` exists with at least `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` (see `astro-site/.env.example`). Add optional vars as needed for production-like testing.
-- [ ] **Baseline:** Production URLs and key flows documented above (or in your own doc); optional Lighthouse reports saved.
-- [ ] **Scope:** Astro route list and Next.js/rewrite behavior confirmed above.
+- [x] **Build:** `cd astro-site && npm run build` succeeds (exit code 0; no errors).
+- [x] **Dev server:** `cd astro-site && npm run dev` starts; no runtime errors in terminal; `http://localhost:4321` loads homepage.
+- [x] **Env:** `astro-site/.env` exists with at least `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` (see `astro-site/.env.example`). Add optional vars as needed for production-like testing.
+- [x] **Baseline:** Production URLs and key flows documented above (or in your own doc); optional Lighthouse reports saved.
+- [x] **Scope:** Astro route list and Next.js/rewrite behavior confirmed above.
+
+**Phase 0 complete (2025-02-02):** Astro build succeeds; exit-criteria routes (homepage, about, faq, equipment, exercise-challenge, founder-story, onboard, onboarding, reports, reports/[slug], deep-research, deep-research/[slug], blog/category/[slug], blog/author/[name], blog index and post) build and render. Optional: tenant context on `/onboard` — `onboard.astro` reads `x-tenant-domain` header, calls `getTenantByDomain`, passes `tenantId` to `OnboardingWizard`; page is server-rendered (`prerender = false`) so headers are available at runtime.
 
 **Next step:** Proceed to Phase 1 (Core static and landing pages). Record pass/fail and fixes for each phase.

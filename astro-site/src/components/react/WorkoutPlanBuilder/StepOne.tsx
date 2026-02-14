@@ -1,3 +1,6 @@
+'use client'
+
+import React from 'react'
 import { Check } from 'lucide-react'
 import type { FitnessGoal, FitnessLevel, EquipmentAccess } from '@/types/onboarding'
 import {
@@ -5,6 +8,7 @@ import {
   fitnessLevelOptions,
   equipmentAccessOptions,
 } from '@/data/onboarding-options'
+import styles from './WorkoutPlanBuilder.module.scss'
 
 interface StepOneProps {
   fitnessGoals: FitnessGoal[]
@@ -17,16 +21,7 @@ interface StepOneProps {
   onContinue: () => void
 }
 
-const inputBase =
-  'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white min-h-[48px] focus:outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 appearance-none bg-no-repeat bg-[length:20px] bg-[right_1rem_center] pr-12'
-const chipBase =
-  'inline-flex items-center gap-1.5 px-4 py-2 rounded-full border min-h-[44px] text-sm font-medium transition-all'
-const chipDefault =
-  'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
-const chipSelected =
-  'bg-[var(--color-accent)]/15 border-[var(--color-accent)] text-[var(--color-accent-light)]'
-
-export function StepOne({
+export const StepOne: React.FC<StepOneProps> = ({
   fitnessGoals,
   fitnessLevel,
   equipmentAccess,
@@ -35,7 +30,7 @@ export function StepOne({
   onLevelChange,
   onEquipmentChange,
   onContinue,
-}: StepOneProps) {
+}) => {
   const toggleGoal = (goal: FitnessGoal) => {
     if (fitnessGoals.includes(goal)) {
       onGoalsChange(fitnessGoals.filter(g => g !== goal))
@@ -45,86 +40,72 @@ export function StepOne({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <label className="block text-base font-medium text-white mb-1">
-          What are your fitness goals? <span className="text-[var(--color-accent)]">*</span>
+    <div className={styles.stepContent}>
+      <div className={styles.fieldGroup}>
+        <label className={styles.fieldLabel}>
+          What are your fitness goals? <span className={styles.required}>*</span>
         </label>
-        <p className="text-sm text-white/60 mb-2">Select all that apply</p>
-        <div className="flex flex-wrap gap-2">
+        <p className={styles.fieldHint}>Select all that apply</p>
+        <div className={styles.chipGrid}>
           {fitnessGoalOptions.map(option => {
             const isSelected = fitnessGoals.includes(option.value)
             return (
               <button
                 key={option.value}
                 type="button"
-                className={`${chipBase} ${isSelected ? chipSelected : chipDefault}`}
+                className={`${styles.chip} ${isSelected ? styles.chipSelected : ''}`}
                 onClick={() => toggleGoal(option.value)}
                 aria-pressed={isSelected}
               >
-                {isSelected && <Check className="w-4 h-4 flex-shrink-0" />}
+                {isSelected && <Check size={16} className={styles.chipIcon} />}
                 <span>{option.label}</span>
               </button>
             )
           })}
         </div>
-        {errors.fitness_goals && (
-          <p className="mt-1 text-sm text-red-500">{errors.fitness_goals}</p>
-        )}
+        {errors.fitness_goals && <p className={styles.errorText}>{errors.fitness_goals}</p>}
       </div>
-
-      <div>
-        <label
-          htmlFor="builder-fitness-level"
-          className="block text-base font-medium text-white mb-1"
-        >
-          What&apos;s your current fitness level?{' '}
-          <span className="text-[var(--color-accent)]">*</span>
+      <div className={styles.fieldGroup}>
+        <label htmlFor="fitness-level" className={styles.fieldLabel}>
+          What&apos;s your current fitness level? <span className={styles.required}>*</span>
         </label>
         <select
-          id="builder-fitness-level"
-          className={inputBase}
+          id="fitness-level"
+          className={styles.select}
           value={fitnessLevel}
           onChange={e => onLevelChange(e.target.value as FitnessLevel)}
         >
-          {fitnessLevelOptions.map(opt => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
+          {fitnessLevelOptions.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
-        {errors.fitness_level && (
-          <p className="mt-1 text-sm text-red-500">{errors.fitness_level}</p>
-        )}
+        {errors.fitness_level && <p className={styles.errorText}>{errors.fitness_level}</p>}
       </div>
-
-      <div>
-        <label htmlFor="builder-equipment" className="block text-base font-medium text-white mb-1">
-          What equipment do you have access to?{' '}
-          <span className="text-[var(--color-accent)]">*</span>
+      <div className={styles.fieldGroup}>
+        <label htmlFor="equipment-access" className={styles.fieldLabel}>
+          What equipment do you have access to? <span className={styles.required}>*</span>
         </label>
         <select
-          id="builder-equipment"
-          className={inputBase}
+          id="equipment-access"
+          className={styles.select}
           value={equipmentAccess}
           onChange={e => onEquipmentChange(e.target.value as EquipmentAccess)}
         >
-          {equipmentAccessOptions.map(opt => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
+          {equipmentAccessOptions.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
-        {errors.equipment_access && (
-          <p className="mt-1 text-sm text-red-500">{errors.equipment_access}</p>
-        )}
+        {errors.equipment_access && <p className={styles.errorText}>{errors.equipment_access}</p>}
       </div>
-
-      <div className="flex justify-end pt-2">
+      <div className={styles.formActions}>
         <button
           type="button"
+          className={`${styles.formButton} ${styles.continueButton}`}
           onClick={onContinue}
-          className="px-6 py-3 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-colors min-w-[140px]"
         >
           Continue
         </button>

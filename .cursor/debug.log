@@ -1,0 +1,6 @@
+{"location":"admin/login:handleSubmit-start","message":"login submit start","data":{},"timestamp":1771021052136,"hypothesisId":"H1"}
+{"location":"admin/login:after-signIn","message":"after signIn","data":{"hasError":false},"timestamp":1771021052401,"hypothesisId":"H1"}
+{"location":"admin/login:before-navigate","message":"before router.push /admin","data":{},"timestamp":1771021052698,"hypothesisId":"H2"}
+{"location":"proxy.ts:admin-auth-start","message":"admin auth block start","data":{"pathname":"/admin"},"timestamp":1771021068075,"hypothesisId":"H2"}
+{"location":"proxy.ts:after-getUser","message":"after getUser","data":{"hasUser":true},"timestamp":1771021088025,"hypothesisId":"H2"}
+{"location":"proxy.ts:after-adminUsers","message":"after admin_users query","data":{"hasAdminUser":true},"timestamp":1771021092466,"hypothesisId":"H2"}

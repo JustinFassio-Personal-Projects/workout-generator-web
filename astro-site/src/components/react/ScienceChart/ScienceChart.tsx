@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+'use client'
+
+import React, { useState, useRef, useEffect } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,45 +14,71 @@ import {
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import { TrendingUp, Shield } from 'lucide-react'
-import { goalDataMap, type GoalType } from '@/data/science-chart'
 import styles from './ScienceChart.module.scss'
 
-if (typeof window !== 'undefined') {
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler
-  )
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
+
+type GoalType = 'hypertrophy' | 'strength' | 'fatloss' | 'power' | 'calisthenics'
+
+interface GoalData {
+  title: string
+  yAxisLabel: string
+  caption: string
+  aiData: number[]
+  randomData: number[]
 }
 
-const CHART_LABELS = [
-  'Week 1',
-  'Week 2',
-  'Week 3',
-  'Week 4',
-  'Week 5',
-  'Week 6',
-  'Week 7',
-  'Week 8',
-  'Week 9',
-  'Week 10',
-  'Week 11',
-  'Week 12',
-]
+const goalDataMap: Record<GoalType, GoalData> = {
+  hypertrophy: {
+    title: 'Projected Muscle Growth (Volume Load)',
+    yAxisLabel: '% Baseline Volume',
+    caption:
+      '*AI incorporates deloads at week 8 to resensitize muscle tissue, preventing plateaus.',
+    aiData: [100, 105, 115, 128, 142, 155, 165, 140, 160, 175, 185, 195],
+    randomData: [100, 108, 115, 118, 120, 122, 120, 118, 115, 115, 112, 110],
+  },
+  strength: {
+    title: 'Max Strength Gains (1 Rep Max)',
+    yAxisLabel: '% Baseline 1RM',
+    caption: '*AI uses Step-Loading periodization. Random plans stall due to CNS fatigue.',
+    aiData: [100, 102, 105, 105, 108, 112, 112, 115, 118, 120, 120, 125],
+    randomData: [100, 103, 106, 108, 108, 108, 109, 109, 108, 108, 107, 107],
+  },
+  fatloss: {
+    title: 'Metabolic Work Capacity',
+    yAxisLabel: '% Work Capacity',
+    caption: '*AI increases density (less rest) over time. Random leads to early burnout.',
+    aiData: [100, 110, 120, 130, 145, 160, 175, 185, 200, 215, 230, 250],
+    randomData: [100, 130, 135, 120, 110, 100, 95, 90, 85, 80, 75, 70],
+  },
+  power: {
+    title: 'Powerbuilding Composite Score',
+    yAxisLabel: 'Composite Score',
+    caption: '*AI balances heavy compounds with isolation volume for hybrid gains.',
+    aiData: [100, 104, 108, 115, 122, 130, 138, 145, 152, 160, 168, 180],
+    randomData: [100, 105, 102, 108, 103, 105, 102, 100, 98, 102, 100, 98],
+  },
+  calisthenics: {
+    title: 'Relative Strength (Bodyweight)',
+    yAxisLabel: 'Relative Strength',
+    caption: '*AI progresses through leverage (e.g., knee pushup -> archer pushup).',
+    aiData: [100, 110, 120, 120, 135, 150, 150, 165, 180, 180, 200, 220],
+    randomData: [100, 110, 115, 118, 120, 122, 123, 124, 125, 125, 125, 125],
+  },
+}
 
 export const ScienceChart: React.FC = () => {
-  const [mounted, setMounted] = useState(false)
   const [selectedGoal, setSelectedGoal] = useState<GoalType>('hypertrophy')
   const chartRef = useRef<ChartJS<'line'>>(null)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const getGradient = (
     ctx: CanvasRenderingContext2D,
@@ -65,61 +93,82 @@ export const ScienceChart: React.FC = () => {
 
   const currentGoalData = goalDataMap[selectedGoal]
 
-  const data = useMemo(
-    () => ({
-      labels: CHART_LABELS,
-      datasets: [
-        {
-          label: 'AI Optimized (Progressive Overload)',
-          data: currentGoalData.aiData,
-          borderColor: '#38bdf8',
-          backgroundColor: (context: { chart: ChartJS<'line'> }) => {
-            const chart = context.chart
-            const { ctx, chartArea } = chart
-            if (!chartArea) return 'rgba(56, 189, 248, 0.5)'
-            return getGradient(ctx, chartArea, 'rgba(56, 189, 248, 0.5)')
-          },
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-          pointBackgroundColor: '#0f172a',
-          pointBorderColor: '#38bdf8',
-          pointBorderWidth: 2,
-          pointRadius: 4,
+  const data = {
+    labels: [
+      'Week 1',
+      'Week 2',
+      'Week 3',
+      'Week 4',
+      'Week 5',
+      'Week 6',
+      'Week 7',
+      'Week 8',
+      'Week 9',
+      'Week 10',
+      'Week 11',
+      'Week 12',
+    ],
+    datasets: [
+      {
+        label: 'AI Optimized (Progressive Overload)',
+        data: currentGoalData.aiData,
+        borderColor: '#38bdf8',
+        backgroundColor: (context: {
+          chart: { ctx: CanvasRenderingContext2D; chartArea: { top: number; bottom: number } }
+        }) => {
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          if (!chartArea) return 'rgba(56, 189, 248, 0.5)'
+          return getGradient(ctx, chartArea, 'rgba(56, 189, 248, 0.5)')
         },
-        {
-          label: 'Random/Generic Plans',
-          data: currentGoalData.randomData,
-          borderColor: '#64748b',
-          backgroundColor: (context: { chart: ChartJS<'line'> }) => {
-            const chart = context.chart
-            const { ctx, chartArea } = chart
-            if (!chartArea) return 'rgba(148, 163, 184, 0.3)'
-            return getGradient(ctx, chartArea, 'rgba(148, 163, 184, 0.3)')
-          },
-          borderWidth: 2,
-          borderDash: [5, 5],
-          tension: 0.4,
-          fill: true,
-          pointRadius: 0,
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#0f172a',
+        pointBorderColor: '#38bdf8',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+      },
+      {
+        label: 'Random/Generic Plans',
+        data: currentGoalData.randomData,
+        borderColor: '#64748b',
+        backgroundColor: (context: {
+          chart: { ctx: CanvasRenderingContext2D; chartArea: { top: number; bottom: number } }
+        }) => {
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          if (!chartArea) return 'rgba(148, 163, 184, 0.3)'
+          return getGradient(ctx, chartArea, 'rgba(148, 163, 184, 0.3)')
         },
-      ],
-    }),
-    [currentGoalData]
-  )
+        borderWidth: 2,
+        borderDash: [5, 5],
+        tension: 0.4,
+        fill: true,
+        pointRadius: 0,
+      },
+    ],
+  }
 
   useEffect(() => {
     if (chartRef.current) {
       const chart = chartRef.current
       chart.data.datasets[0].data = currentGoalData.aiData
       chart.data.datasets[1].data = currentGoalData.randomData
-      const yScale = chart.options.scales?.y as { title?: { text?: string } } | undefined
-      if (yScale?.title) yScale.title.text = currentGoalData.yAxisLabel
+      if (
+        chart.options.scales?.y &&
+        'title' in chart.options.scales.y &&
+        chart.options.scales.y.title
+      ) {
+        ;(chart.options.scales.y.title as { text?: string }).text = currentGoalData.yAxisLabel
+      }
       chart.update()
     }
-  }, [selectedGoal, currentGoalData])
+  }, [selectedGoal])
 
-  const options = useMemo(
+  const handleGoalChange = (goal: GoalType) => setSelectedGoal(goal)
+
+  const options = React.useMemo(
     () => ({
       responsive: true,
       maintainAspectRatio: false,
@@ -165,7 +214,7 @@ export const ScienceChart: React.FC = () => {
   return (
     <section id="science" className={styles.scienceSection}>
       <div className={styles.container}>
-        <div className={styles.textContent}>
+        <div className={styles.textContent} data-aos="fade-up">
           <h2 className={styles.heading}>Why &quot;Random&quot; Doesn&apos;t Work</h2>
           <p className={styles.description}>
             Most workout generators pull random exercises from a database.{' '}
@@ -174,39 +223,36 @@ export const ScienceChart: React.FC = () => {
             unstructured training.
           </p>
         </div>
-
-        <div className={styles.chartWrapper}>
+        <div className={styles.chartWrapper} data-aos="fade-up" data-aos-delay="100">
           <div className={styles.chartContainer}>
             <div className={styles.chartHeader}>
               <h3 className={styles.chartTitle}>{currentGoalData.title}</h3>
               <span className={styles.chartBadge}>AI Optimized</span>
             </div>
             <div className={styles.goalSelectors}>
-              {(['hypertrophy', 'strength', 'fatloss', 'power', 'calisthenics'] as const).map(
+              {(['hypertrophy', 'strength', 'fatloss', 'power', 'calisthenics'] as GoalType[]).map(
                 goal => (
                   <button
                     key={goal}
-                    onClick={() => setSelectedGoal(goal)}
+                    onClick={() => handleGoalChange(goal)}
                     className={`${styles.goalSelector} ${selectedGoal === goal ? styles.goalSelectorActive : ''}`}
                     data-goal={goal}
                   >
-                    {goal === 'hypertrophy' && 'Hypertrophy'}
-                    {goal === 'strength' && 'Max Strength'}
-                    {goal === 'fatloss' && 'Fat Loss'}
-                    {goal === 'power' && 'Powerbuilding'}
-                    {goal === 'calisthenics' && 'Calisthenics'}
+                    {goal === 'fatloss'
+                      ? 'Fat Loss'
+                      : goal === 'calisthenics'
+                        ? 'Calisthenics'
+                        : goal === 'hypertrophy'
+                          ? 'Hypertrophy'
+                          : goal === 'strength'
+                            ? 'Max Strength'
+                            : 'Powerbuilding'}
                   </button>
                 )
               )}
             </div>
             <div className={styles.chartInner}>
-              {mounted ? (
-                <Line ref={chartRef} data={data} options={options} />
-              ) : (
-                <div className={styles.chartPlaceholder} aria-hidden="true">
-                  Chart loads when visible.
-                </div>
-              )}
+              <Line ref={chartRef} data={data} options={options} />
             </div>
             <p className={styles.chartNote}>{currentGoalData.caption}</p>
           </div>

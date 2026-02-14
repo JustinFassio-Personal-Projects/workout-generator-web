@@ -1,2 +1,1 @@
-/* Tailwind must be imported from a .css file; the Vite plugin does not process it inside .scss */
 @import 'tailwindcss';

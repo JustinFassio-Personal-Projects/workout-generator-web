@@ -1,7 +1,6 @@
 /**
- * Formats a date string to a human-readable format.
- * Mirrors features/blog/lib/formatDate.ts for parity with Next.js blog.
- * @param dateString - ISO date string (e.g., '2025-01-15') or timestamp (e.g., '2025-01-15T00:00:00.000Z')
+ * Formats a date string to a human-readable format
+ * @param dateString - ISO date string (e.g., '2025-01-15') or timestamp
  * @returns Formatted date string (e.g., 'January 15, 2025')
  */
 export function formatDate(dateString: string | null | undefined): string {

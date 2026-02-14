@@ -1,4 +1,6 @@
-import { useMemo, useEffect } from 'react'
+'use client'
+
+import React, { useMemo, useEffect } from 'react'
 import { GraduationCap, Dumbbell, Activity, ChevronDown } from 'lucide-react'
 import type { FitnessGoal, FitnessLevel } from '@/types/onboarding'
 import {
@@ -18,7 +20,7 @@ interface StepOneProps {
   onContinue: () => void
 }
 
-export function StepOne({
+export const StepOne: React.FC<StepOneProps> = ({
   fitnessGoals,
   fitnessLevel,
   equipmentAccess,
@@ -27,12 +29,14 @@ export function StepOne({
   onLevelChange,
   onEquipmentChange,
   onContinue,
-}: StepOneProps) {
+}) => {
+  // Get available equipment categories based on fitness level
   const availableCategories = useMemo(
     () => getEquipmentCategoryOptions(fitnessLevel),
     [fitnessLevel]
   )
 
+  // Filter selected categories to only include those available for current fitness level
   useEffect(() => {
     const availableCategoryValues = availableCategories.map(cat => cat.value)
     const validSelectedCategories = equipmentAccess.filter(cat =>
@@ -59,15 +63,14 @@ export function StepOne({
     }
   }
 
-  const chipSelected = 'bg-emerald-500/20 border-emerald-500/50 text-lime-400'
-  const chipDefault = 'bg-slate-800 border-white/5 text-slate-300 hover:border-emerald-500/50'
-
   return (
     <div className="relative flex flex-col">
+      {/* Fitness Goals - Always stacked vertically */}
       <div className="flex flex-col gap-2 px-4 md:px-12 pb-4 -mt-1 md:-mt-2 mb-4">
         <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest shrink-0">
           Fitness Goals:
         </span>
+        {/* Vertical flex-wrap container */}
         <div className="flex flex-wrap items-center gap-2 w-full pb-2">
           {fitnessGoalOptions.map(option => {
             const isSelected = fitnessGoals.includes(option.value)
@@ -76,25 +79,32 @@ export function StepOne({
                 key={option.value}
                 type="button"
                 onClick={() => toggleGoal(option.value)}
+                data-analytics={`onboard_goal_${option.value}`}
                 aria-pressed={isSelected}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 whitespace-nowrap ${
-                  isSelected ? chipSelected : chipDefault
+                  isSelected
+                    ? 'bg-brand-green/20 border-brand-green/50 text-brand-lime'
+                    : 'bg-slate-800 border-white/5 text-slate-300 hover:border-brand-green/50'
                 }`}
               >
-                <Activity className="w-3 h-3 text-emerald-500" />
+                <Activity className="w-3 h-3 text-brand-green" />
                 <span>{option.label}</span>
               </button>
             )
           })}
         </div>
       </div>
+      {/* Note: Prettier formats this as single-line (86 chars) while equipment_access stays multi-line (91 chars, closer to printWidth: 100).
+          PR review suggested multi-line for consistency and readability. Both formats are valid, deferring to Prettier's heuristic for maintainability. */}
       {errors.fitness_goals && (
         <p className="text-xs text-red-400 mt-1 px-4 md:px-12 mb-2">{errors.fitness_goals}</p>
       )}
 
+      {/* Dropdown Row Container - Always stacked vertically */}
       <div className="flex flex-col gap-2 p-2 mt-2">
-        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-emerald-500/30 transition-colors relative overflow-hidden group/item">
-          <div className="p-2 bg-slate-800 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+        {/* Fitness Level - Dark mode only */}
+        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-brand-green/30 transition-colors relative overflow-hidden group/item">
+          <div className="p-2 bg-slate-800 rounded-lg text-brand-green shrink-0 shadow-sm">
             <GraduationCap className="w-4 h-4" />
           </div>
           <div className="flex flex-col z-10 w-full overflow-hidden relative">
@@ -105,7 +115,8 @@ export function StepOne({
               <select
                 value={fitnessLevel}
                 onChange={e => onLevelChange(e.target.value as FitnessLevel)}
-                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-emerald-500 transition-colors truncate pr-8 appearance-none"
+                data-analytics="onboard_select_fitness_level"
+                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-brand-green transition-colors truncate pr-8 appearance-none"
               >
                 {fitnessLevelOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -123,9 +134,10 @@ export function StepOne({
           )}
         </div>
 
-        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 p-4 flex flex-col gap-2 hover:border-emerald-500/30 transition-colors relative overflow-hidden group/item">
+        {/* Equipment Access - Multi-select checkboxes */}
+        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 p-4 flex flex-col gap-2 hover:border-brand-green/30 transition-colors relative overflow-hidden group/item">
           <div className="flex items-center gap-2 mb-1">
-            <div className="p-2 bg-slate-800 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+            <div className="p-2 bg-slate-800 rounded-lg text-brand-green shrink-0 shadow-sm">
               <Dumbbell className="w-4 h-4" />
             </div>
             <div className="flex flex-col z-10 w-full overflow-hidden relative">
@@ -133,12 +145,13 @@ export function StepOne({
                 Equipment Categories
               </label>
               {equipmentAccess.length > 0 && (
-                <span className="text-[10px] text-emerald-500 font-semibold mt-0.5">
+                <span className="text-[10px] text-brand-green font-semibold mt-0.5">
                   {equipmentAccess.length} selected
                 </span>
               )}
             </div>
           </div>
+          {/* Vertical flex-wrap container for equipment categories */}
           <div className="relative">
             <div className="flex flex-wrap items-center gap-2 w-full pb-1">
               {availableCategories.map(option => {
@@ -148,12 +161,15 @@ export function StepOne({
                     key={option.value}
                     type="button"
                     onClick={() => toggleEquipmentCategory(option.value)}
+                    data-analytics={`onboard_equipment_${option.value}`}
                     aria-pressed={isSelected}
                     className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border transition-all shrink-0 whitespace-nowrap ${
-                      isSelected ? chipSelected : chipDefault
+                      isSelected
+                        ? 'bg-brand-green/20 border-brand-green/50 text-brand-lime'
+                        : 'bg-slate-800 border-white/5 text-slate-300 hover:border-brand-green/50'
                     }`}
                   >
-                    <Dumbbell className="w-3 h-3 text-emerald-500" />
+                    <Dumbbell className="w-3 h-3 text-brand-green" />
                     <span>{option.label}</span>
                   </button>
                 )
@@ -167,10 +183,12 @@ export function StepOne({
           )}
         </div>
 
+        {/* Continue Button - Always full width */}
         <button
           type="submit"
           onClick={onContinue}
-          className="w-full bg-gradient-to-r from-emerald-500 to-lime-400 text-slate-900 px-8 py-4 rounded-2xl font-bold tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+          data-analytics="onboard_step1_continue"
+          className="w-full bg-gradient-to-r from-brand-green to-brand-lime text-brand-dark px-8 py-4 rounded-2xl font-bold font-display tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <Activity className="w-5 h-5" />
           <span>CONTINUE</span>

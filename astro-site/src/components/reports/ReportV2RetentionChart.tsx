@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useRef } from 'react'
 import {
   Chart as ChartJS,
@@ -38,7 +40,7 @@ export const ReportV2RetentionChart: React.FC = () => {
       },
       tooltip: {
         callbacks: {
-          label: function (context: { raw: number }) {
+          label: function (context: any) {
             return context.raw + '% of users still active after 6 months'
           },
         },

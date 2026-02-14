@@ -128,7 +128,7 @@ const faqSchema = {
     <ScienceChart client:load />
 
     <!-- Equipment Adaptive Section (React Island: tab switcher Full Gym / Dumbbells / Bodyweight) -->
-    <EquipmentAdaptive client:visible />
+    <EquipmentAdaptive client:load />
 
     <!-- Onboarding Wizard Section (entry to /onboard — animated intro + full workflow) -->
     <OnboardingIntroSection />
@@ -137,10 +137,10 @@ const faqSchema = {
     <Features />
 
     <!-- Journey Section (Equipment Adaptive layout: 3 tabs, left explanation, right step cards) -->
-    <JourneySection client:visible />
+    <JourneySection client:load />
 
     <!-- Testimonials Section (React Island: carousel with auto-play, prev/next, dots) -->
-    <Testimonials client:visible />
+    <Testimonials client:load />
 
     <!-- Blog Preview Section (React Island: fetches /api/blog, shows up to 3 posts, View All Posts) -->
     <BlogPreview client:load />
@@ -160,7 +160,7 @@ const faqSchema = {
         <div class="max-w-2xl mx-auto glass-card-strong rounded-2xl p-6 md:p-8">
           {homepageFaqs.map((faq) => (
             <FaqItem 
-              client:visible
+              client:load
               question={faq.question} 
               answer={faq.answer} 
             />

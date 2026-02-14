@@ -1,0 +1,70 @@
+---
+import { getTenantByDomain } from '@/lib/multi-tenant/tenant-config'
+
+export const prerender = false
+
+// For tracer bullet: hardcoded tenant data (fallback when Supabase not available)
+const MOCK_TENANTS: Record<string, { id?: string; name: string; primary_color: string }> = {
+  'client-a.localhost': {
+    name: 'Iron Gym',
+    primary_color: '#ff0000',
+  },
+  'client-b.localhost': {
+    name: 'FitZone',
+    primary_color: '#0066cc',
+  },
+}
+
+const domainFromParams = Astro.params.domain
+const domainFromHeader = Astro.request.headers.get('x-tenant-domain')
+const tenantDomain = domainFromHeader || domainFromParams || ''
+
+if (!tenantDomain) {
+  return Astro.redirect('/404')
+}
+
+let tenant = await getTenantByDomain(tenantDomain)
+
+if (!tenant) {
+  const mockTenant = MOCK_TENANTS[tenantDomain]
+  if (mockTenant) {
+    tenant = {
+      id: mockTenant.id || tenantDomain,
+      domain: tenantDomain,
+      name: mockTenant.name,
+      primary_color: mockTenant.primary_color,
+      settings: {},
+    }
+  }
+}
+
+if (!tenant) {
+  return Astro.redirect('/404')
+}
+
+const tenantIdentifier = tenant.id || tenantDomain
+// Same env as Next.js when Astro is canonical; fallback for local tracer bullet
+const firebaseAppBaseUrl = import.meta.env.PUBLIC_FIREBASE_APP_URL || import.meta.env.NEXT_PUBLIC_FIREBASE_APP_URL || 'http://localhost:3000'
+const primaryColor = tenant.primary_color || '#84cc16'
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Welcome to {tenant.name}</title>
+  </head>
+  <body style={`padding: 40px; color: ${primaryColor}; font-family: system-ui, sans-serif;`}>
+    <h1>Welcome to {tenant.name}</h1>
+    <p>This is the SEO-optimized marketing site for {tenant.name}.</p>
+    <p>Domain: {tenantDomain}</p>
+
+    <a
+      href={`${firebaseAppBaseUrl}/login?tenant_id=${tenantIdentifier}`}
+      style={`background: ${primaryColor}; color: white; padding: 10px 20px; border-radius: 4px; display: inline-block; margin-top: 20px; text-decoration: none;`}
+    >
+      Launch Workout App
+    </a>
+  </body>
+</html>

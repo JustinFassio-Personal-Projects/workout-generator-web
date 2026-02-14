@@ -1,5 +1,5 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 
 // Platform routes that should be accessible on tenant domains too
 // These routes should NOT be rewritten to /sites/[domain]
@@ -33,6 +33,30 @@ export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   const normalizedPath = pathname.toLowerCase().replace(/\/$/, '') // Remove trailing slash and normalize case
   const hostname = request.headers.get('host') || ''
+
+  // Admin routes: refresh Supabase session so server always sees valid cookies, then pass through.
+  // Auth is enforced in each admin page; this only keeps the session cookie up to date.
+  if (pathname.startsWith('/admin')) {
+    const response = NextResponse.next()
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (supabaseUrl && supabaseAnonKey) {
+      const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            )
+          },
+        },
+      })
+      await supabase.auth.getUser()
+    }
+    return response
+  }
 
   // ============================================================================
   // MULTI-TENANT ROUTING (handled first, before redirects)
@@ -76,13 +100,13 @@ export async function proxy(request: NextRequest) {
       // Already on /admin route - continue to redirect logic, then admin auth check
     }
     // 2. Platform domains → Existing homepage (no rewrite, continue to redirect logic)
-    // Check if it's a non-platform domain (tenant) while treating localhost:3001 as platform.
+    // Check if it's a non-platform domain (tenant) while treating localhost:3004 as platform.
     // Note: We intentionally combine normalizedHost (without port) with the raw hostname port check
-    // to distinguish `client-a.localhost:3001` (tenant) from `localhost:3001` (platform).
+    // to distinguish `client-a.localhost:3004` (tenant) from `localhost:3004` (platform).
     // Simplifying this condition would misclassify localhost tenant vs platform traffic.
     else if (
       !PLATFORM_DOMAINS.includes(normalizedHost) &&
-      !(normalizedHost === 'localhost' && hostname.includes(':3001'))
+      !(normalizedHost === 'localhost' && hostname.includes(':3004'))
     ) {
       // If this is a platform route, don't rewrite - let it fall through to platform handling
       if (isPlatformRoute(pathname)) {
@@ -218,68 +242,7 @@ export async function proxy(request: NextRequest) {
     return createRedirect(blogPostRedirects[normalizedPath])
   }
 
-  // Only protect /admin routes (after redirect checks)
-  if (!pathname.startsWith('/admin')) {
-    return NextResponse.next()
-  }
-
-  // Allow login page without auth check to prevent redirect loops
-  if (pathname === '/admin/login') {
-    return NextResponse.next()
-  }
-
-  // For all other admin routes, require authentication
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // No user - redirect to login
-  if (!user) {
-    return NextResponse.redirect(new URL('/admin/login', request.url))
-  }
-
-  // Check if user is in admin_users table (RLS allows users to check their own status)
-  const { data: adminUser, error } = await supabase
-    .from('admin_users')
-    .select('id, role')
-    .eq('id', user.id)
-    .single()
-
-  if (error || !adminUser) {
-    // User is authenticated but not an admin - redirect to login with error
-    const loginUrl = new URL('/admin/login', request.url)
-    loginUrl.searchParams.set('error', 'unauthorized')
-    return NextResponse.redirect(loginUrl)
-  }
-
-  // Add admin role to headers for use in server components
-  response.headers.set('x-admin-role', adminUser.role)
-
-  return response
+  return NextResponse.next()
 }
 
 // Helper function to normalize hostname for multi-tenant routing
@@ -302,7 +265,7 @@ export const config = {
      * Performance note: This proxy runs on most requests to handle WordPress redirects
      * and multi-tenant routing. Redirect checks are O(1) string comparisons and return early
      * for non-matches. Multi-tenant routing executes first (lines 9-54), then WordPress redirects,
-     * then admin authentication only executes for /admin routes (see early return at line 175).
+     * /admin routes return immediately (early return); auth is enforced in admin pages.
      * Static assets are excluded by the matcher pattern above, so they never hit this proxy.
      */
     '/((?!api|_next|favicon.ico|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|json|woff|woff2|ttf|eot)$).*)',

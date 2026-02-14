@@ -58,9 +58,9 @@ export function DeepResearchList({ initialItems }: DeepResearchListProps) {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Deep Research</h1>
-        <Link href="/admin/deep-research/new" className={styles.newButton}>
+        <a href="/admin/deep-research/new" className={styles.newButton}>
           + New Deep Research
-        </Link>
+        </a>
       </div>
 
       <div className={styles.filters}>
@@ -90,9 +90,9 @@ export function DeepResearchList({ initialItems }: DeepResearchListProps) {
             ) : (
               <>
                 <p>No deep research yet</p>
-                <Link href="/admin/deep-research/new" className={styles.createLink}>
+                <a href="/admin/deep-research/new" className={styles.createLink}>
                   Create your first deep research
-                </Link>
+                </a>
               </>
             )}
           </div>

@@ -1,12 +1,10 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { useSearchParams } from 'next/navigation'
 import styles from './login.module.scss'
 
 function AdminLoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,45 +18,29 @@ function AdminLoginForm() {
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const res = await fetch('/api/admin/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include',
     })
 
-    if (authError) {
-      setError(authError.message)
+    const data = await res.json().catch(() => ({}))
+
+    if (!res.ok) {
+      setError(data.error ?? 'Sign in failed')
       setLoading(false)
       return
     }
 
-    // Check if user is an admin
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      setError('Authentication failed')
+    if (!data.success) {
+      setError(data.error ?? 'Sign in failed')
       setLoading(false)
       return
     }
 
-    const { data: adminUser, error: adminError } = await supabase
-      .from('admin_users')
-      .select('id, role')
-      .eq('id', user.id)
-      .single()
-
-    if (adminError || !adminUser) {
-      await supabase.auth.signOut()
-      setError('You do not have admin access')
-      setLoading(false)
-      return
-    }
-
-    router.push('/admin')
-    router.refresh()
+    // Session cookies are on the response; full page load so /admin sees them
+    window.location.href = '/admin'
   }
 
   return (

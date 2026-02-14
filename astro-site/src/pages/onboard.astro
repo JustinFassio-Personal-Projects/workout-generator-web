@@ -1,11 +1,17 @@
 ---
 // Onboarding wizard with animated intro: goals, equipment, profile, then loading sequence and redirect to signup.
 // Query param ?preselect=dumbbells (or kettlebells, barbell, etc.) pre-fills fitness level and equipment.
+// Multi-tenant: x-tenant-domain header (set by proxy) is used to resolve tenant and pass tenantId to the wizard.
+export const prerender = false;
+
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Footer from '@/components/landing/Footer.astro';
 import { OnboardingWizard } from '@/components/react/OnboardingWizard/OnboardingWizard';
+import { getTenantByDomain } from '@/lib/multi-tenant/tenant-config';
 
 const preselect = Astro.url.searchParams.get('preselect');
+const tenantDomain = Astro.request.headers.get('x-tenant-domain');
+const tenant = tenantDomain ? await getTenantByDomain(tenantDomain) : null;
 ---
 
 <BaseLayout
@@ -14,7 +20,7 @@ const preselect = Astro.url.searchParams.get('preselect');
 >
   <main class="min-h-screen flex flex-col">
     <div class="flex-1">
-      <OnboardingWizard client:load preselect={preselect} />
+      <OnboardingWizard client:load preselect={preselect} tenantId={tenant?.id} />
     </div>
     <Footer />
   </main>

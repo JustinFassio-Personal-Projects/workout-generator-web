@@ -1,53 +1,20 @@
-# Astro Starter Kit: Minimal
+# Astro site (legacy / optional)
 
-```sh
-npm create astro@latest -- --template minimal
-```
+This directory is a **legacy Astro app** and is **not** part of the main production stack.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- **Canonical app**: The root Next.js App Router application is the active front end (run `npm run dev` from the project root).
+- This Astro site is excluded from the main `tsconfig.json` and is not built or deployed with the Next.js app.
+- It may be kept for reference or occasional use; do not treat it as the primary or conflicting front end.
 
-## 🚀 Project Structure
+## Phase 1: Blog (complete)
 
-Inside of your Astro project, you'll see the following folders and files:
+- **Blog index** (`/blog`) and **blog post** (`/blog/[slug]`) work in Astro with correct data and layout. The index uses `src/lib/blog/queries.ts` (Supabase + fallback), BlogHero, and the BlogIndexClient React island for **search** and **pagination** (10 per page). URL params `?search=` and `?page=` are supported (e.g. tag links from post pages use `/blog?search=...`).
+- Meta, canonical, OG, and structured data (Blog + Breadcrumb on index; Article + Breadcrumb on post) are set. Sitemap and feed include blog posts; no regression.
+- **Deferred (Phase 1):** Post content placeholders `[GainsSimulator]` and `[HallucinationQuiz]` are not rendered as interactive widgets in Astro; they appear as markdown. Interactive post layout for specific slugs (e.g. `system-vs-random`, `random-workouts-kill-progress`) is not implemented; those posts render as standard articles. Implement in a follow-up if needed.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## When Astro is the canonical front end (Phase 4+)
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## API routes
-
-- **`/api/leads`** (POST): Lead capture. Endpoint is ready; no lead form UI in Footer or exercise-challenge today. A future footer or landing form can POST here.
-- **`/api/blog`** (GET): Blog listing for homepage BlogPreview.
-- **`/api/reports/gemini-workout`** (POST): AI workout generation for the reports live demo.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## Security / npm audit
-
-`@astrojs/vercel` is pinned to **8.0.4** to avoid the high-severity path-to-regexp advisory (GHSA-9wv6-86v2-598j) that affects newer 8.x and 9.x releases. Running `npm audit` (or `npm audit --audit-level=moderate`) may report **2 moderate** (esbuild, GHSA-67mh-4wv8-2f99); that advisory affects the **development server** only (CORS on localhost), not production builds or deployed output. **These 2 moderate are accepted for pre-push.** Do not run `npm audit fix --force` here—it would upgrade to a version that reintroduces the high-severity path-to-regexp issue. **TODO:** Periodically check newer `@astrojs/vercel` 8.x/9.x releases and the status of GHSA-9wv6-86v2-598j; once a fixed version is available, update this dependency and remove or relax the pin.
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- **Multi-tenant:** The proxy (or Vercel rewrite) must route tenant-host requests to the Astro app and set the `x-tenant-domain` request header so `src/pages/sites/[domain].astro` can resolve the tenant. Tenant lookup uses `src/lib/multi-tenant/tenant-config.ts` and the Supabase `tenants` table (with optional `PUBLIC_FIREBASE_APP_URL` for the Launch Workout App link).
+- **Blog:** Route `/blog` and `/blog/[slug]` to the Astro app so the Astro blog index and post pages are served.
+- **Feed, sitemap, robots:** `/feed.xml`, `/sitemap.xml`, `/sitemap-index.xml`, and `/robots.txt` are implemented in Astro and are the canonical URLs for the site. When Astro is the default deploy, these are the single source of truth. BaseLayout already links to `/feed.xml`; crawlers discover `/robots.txt` and the sitemap from it.
+- **Redirects:** Root `proxy.ts` contains WordPress and legacy redirects. When the deploy points to Astro, ensure those redirects still run (e.g. proxy in front of Astro or equivalent redirects in Vercel config).

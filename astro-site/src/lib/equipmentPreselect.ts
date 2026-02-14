@@ -1,47 +1,29 @@
 import type { FitnessLevel } from '@/types/onboarding'
 import { getAvailableCategoriesByFitnessLevel } from '@/data/equipment-categories'
 
-/**
- * Maps equipment preselect values (from URL) to category arrays.
- * Aligned with Next.js lib/equipmentPreselect + data/equipment category lists.
- */
 const preselectToCategories: Record<string, string[]> = {
-  dumbbells: ['general', 'strength'],
+  dumbbells: ['general', 'strength', 'functional'],
   kettlebells: ['general', 'strength', 'functional'],
-  barbell: ['general', 'strength'],
+  barbell: ['general', 'strength', 'functional', 'cardio'],
   bands: ['general', 'strength', 'functional'],
-  machines: ['general', 'strength', 'cardio'],
-  bodyweight: ['general', 'functional', 'calisthenics'],
+  bodyweight: ['general', 'calisthenics'],
+  machines: ['general', 'strength', 'functional', 'cardio'],
 }
 
-/**
- * Get equipment categories for a given preselect value from URL.
- */
-export function getCategoriesForEquipmentPreselect(preselectValue: string): string[] {
-  const normalized = preselectValue.toLowerCase().trim()
-  return preselectToCategories[normalized] ?? ['general', 'strength']
-}
-
-/**
- * Minimum fitness level that includes all given categories.
- */
-export function getMinimumFitnessLevelForCategories(categories: string[]): FitnessLevel {
-  const levels: FitnessLevel[] = ['beginner', 'intermediate', 'advanced', 'athlete']
-  for (const level of levels) {
-    const available = getAvailableCategoriesByFitnessLevel(level)
-    if (categories.every(c => available.includes(c))) return level
-  }
-  return 'athlete'
-}
-
-/**
- * Get preselect data from URL ?preselect= value.
- */
 export function getPreselectData(preselectValue: string): {
   fitnessLevel: FitnessLevel
   categories: string[]
 } {
-  const categories = getCategoriesForEquipmentPreselect(preselectValue)
-  const fitnessLevel = getMinimumFitnessLevelForCategories(categories)
+  const categories = preselectToCategories[preselectValue.toLowerCase()] || ['general', 'strength']
+  const levels: FitnessLevel[] = ['beginner', 'intermediate', 'advanced', 'athlete']
+  let fitnessLevel: FitnessLevel = 'beginner'
+  for (const level of levels) {
+    const available = getAvailableCategoriesByFitnessLevel(level)
+    if (categories.every(c => available.includes(c))) {
+      fitnessLevel = level
+      break
+    }
+    fitnessLevel = level
+  }
   return { fitnessLevel, categories }
 }

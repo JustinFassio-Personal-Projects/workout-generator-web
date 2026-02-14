@@ -1,12 +1,12 @@
-import { useEffect, useState, useRef } from 'react'
+'use client'
+
+import React, { useEffect, useState, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { testimonials } from '@/data/testimonials'
 import { TestimonialCard } from './TestimonialCard'
 import styles from './Testimonials.module.scss'
 
-const AUTO_PLAY_MS = 5000
-
-export function Testimonials() {
+export const Testimonials: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [itemsPerPage, setItemsPerPage] = useState(3)
@@ -18,27 +18,23 @@ export function Testimonials() {
         setItemsPerPage(window.innerWidth >= 1024 ? 3 : window.innerWidth >= 640 ? 2 : 1)
       }
     }
-
     updateItemsPerPage()
     window.addEventListener('resize', updateItemsPerPage)
     return () => window.removeEventListener('resize', updateItemsPerPage)
   }, [])
 
-  const totalPages = Math.max(1, Math.ceil(testimonials.length / itemsPerPage))
+  const totalPages = Math.ceil(testimonials.length / itemsPerPage)
 
   useEffect(() => {
-    if (isAutoPlaying && totalPages > 0) {
+    if (isAutoPlaying) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex(prev => (prev + 1) % totalPages)
-      }, AUTO_PLAY_MS)
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current)
+      }, 5000)
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current)
     }
-
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current)
     }
   }, [isAutoPlaying, totalPages])
 
@@ -55,7 +51,7 @@ export function Testimonials() {
   return (
     <section id="testimonials" className={styles.testimonials}>
       <div className={styles.container}>
-        <div className={styles.header}>
+        <div className={styles.header} data-aos="fade-up">
           <h2 className={styles.title}>
             Loved by
             <span className={styles.gradientText}> Thousands</span>
@@ -85,9 +81,8 @@ export function Testimonials() {
                 <div
                   key={testimonial.id}
                   className={styles.carouselItem}
-                  style={{
-                    width: `${100 / itemsPerPage}%`,
-                  }}
+                  style={{ width: `${100 / itemsPerPage}%` }}
+                  data-aos="fade-up"
                 >
                   <TestimonialCard testimonial={testimonial} />
                 </div>

@@ -12,6 +12,7 @@
     var(--bg-dark) 100%
   );
 
+  // Background Image Layer
   &::after {
     content: '';
     position: absolute;
@@ -28,6 +29,7 @@
     pointer-events: none;
   }
 
+  // Gradient Overlay Layer
   &::before {
     content: '';
     position: absolute;

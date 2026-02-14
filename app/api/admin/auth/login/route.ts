@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { getPostHogClient } from '@/lib/posthog-server'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
 
@@ -10,9 +10,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
-    const supabase = await createServerSupabaseClient()
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return NextResponse.json({ error: 'Missing Supabase environment variables' }, { status: 500 })
+    }
 
-    // Attempt to sign in
+    // Response we will return on success; Supabase will set session cookies on it via setAll
+    const response = new NextResponse()
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    })
+
+    // Attempt to sign in (this triggers setAll and writes cookies to response)
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -97,14 +116,25 @@ export async function POST(request: Request) {
       console.warn('PostHog tracking error:', posthogError)
     }
 
-    return NextResponse.json({
+    // Return JSON with session cookies on the same response so the browser stores them before redirect
+    const body = {
       success: true,
       user: {
         id: data.user.id,
         email: data.user.email,
         role: adminUser.role,
       },
-    })
+    }
+    const successResponse = NextResponse.json(body)
+    const setCookieHeaders = response.headers.getSetCookie?.() ?? []
+    if (setCookieHeaders.length > 0) {
+      setCookieHeaders.forEach(value => successResponse.headers.append('Set-Cookie', value))
+    } else {
+      response.cookies.getAll().forEach(cookie => {
+        successResponse.cookies.set(cookie.name, cookie.value, { path: '/' })
+      })
+    }
+    return successResponse
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json({ error: 'An error occurred during login' }, { status: 500 })

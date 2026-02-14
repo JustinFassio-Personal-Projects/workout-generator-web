@@ -1,60 +1,62 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import BlogCard from '@/components/blog/BlogCard.astro';
-import PostContent from '@/components/blog/PostContent.astro';
-import PostHero from '@/components/blog/PostHero.astro';
 import Footer from '@/components/landing/Footer.astro';
+import PostHero from '@/components/blog/PostHero.astro';
+import PostContent from '@/components/blog/PostContent.astro';
 import { getPostBySlug, getRelatedPosts, toTransformedPost } from '@/lib/blog/queries';
+import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
 
-// Enable SSR for dynamic data fetching
 export const prerender = false;
 
-const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
-
-// Get the slug from the URL
 const { slug } = Astro.params;
 
-// Fetch the post
-const post = await getPostBySlug(slug!, Astro.cookies);
+if (!slug) {
+  return Astro.redirect('/blog');
+}
 
-// If post not found, return 404
+const post = await getPostBySlug(slug, Astro.cookies);
+
 if (!post) {
   return Astro.redirect('/404');
 }
 
-// Get related posts
-const relatedPostsData = await getRelatedPosts(post, Astro.cookies, 3);
-const relatedPosts = relatedPostsData.map(toTransformedPost);
-
-// Transform the post for display
+const relatedPosts = await getRelatedPosts(post, Astro.cookies, 3);
 const transformedPost = toTransformedPost(post);
 
-// Calculate word count and reading time
-const wordCount = post.content.split(/\s+/).filter((word) => word.length > 0).length;
-const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+const url = `${baseUrl}/blog/${post.slug}`;
+const publishedTime = post.published_at || post.created_at;
+const modifiedTime = post.updated_at;
 
-// Format dates
-const publishedDate = post.published_at || post.created_at;
-const modifiedDate = post.updated_at || publishedDate;
-
-// Handle image URL
-const postImage = post.featured_image
+const heroImage = post.featured_image
   ? post.featured_image.startsWith('http')
     ? post.featured_image
     : `${baseUrl}${post.featured_image}`
   : `${baseUrl}/og-image.jpg`;
 
-// Article structured data (JSON-LD)
+const wordCount = post.content.split(/\s+/).filter((word: string) => word.length > 0).length;
+const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+const pageTitle = post.seo_title || `${post.title} | Blog`;
+const pageDescription =
+  post.seo_description ||
+  (post.excerpt.length > 160 ? post.excerpt.substring(0, 157).trim() + '...' : post.excerpt);
+
+const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [
+  { name: 'Home', url: baseUrl },
+  { name: 'Blog', url: `${baseUrl}/blog` },
+  { name: post.title, url },
+]);
+
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: post.title,
-  description: post.excerpt,
-  image: postImage,
-  datePublished: publishedDate,
-  dateModified: modifiedDate,
+  description: pageDescription,
+  image: heroImage,
+  datePublished: publishedTime,
+  dateModified: modifiedTime,
   wordCount,
-  timeRequired: `PT${readingTimeMinutes}M`,
   author: {
     '@type': 'Person',
     name: post.author?.name || 'Unknown',
@@ -69,281 +71,51 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': `${baseUrl}/blog/${post.slug}`,
+    '@id': url,
   },
   articleSection: post.category?.name || 'Uncategorized',
-  keywords: post.tags.join(', '),
+  keywords: (post.tags || []).join(', '),
 };
-
-// BreadcrumbList structured data (JSON-LD)
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Home',
-      item: baseUrl,
-    },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Blog',
-      item: `${baseUrl}/blog`,
-    },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: post.title,
-      item: `${baseUrl}/blog/${post.slug}`,
-    },
-  ],
-};
-
-// SEO metadata (aligned with Next.js: seo_title, seo_description, excerpt fallback)
-const seoTitle = post.seo_title || `${post.title} | Blog`;
-const seoDescription =
-  post.seo_description ||
-  (post.excerpt.length > 160 ? post.excerpt.substring(0, 157).trim() + '...' : post.excerpt);
 ---
 
 <BaseLayout
-  title={seoTitle}
-  description={seoDescription}
-  canonicalUrl={`${baseUrl}/blog/${post.slug}`}
-  ogImage={postImage}
-  structuredData={[articleSchema, breadcrumbSchema]}
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={url}
+  ogImage={heroImage}
+  ogType="article"
+  structuredData={[breadcrumbSchema, articleSchema]}
 >
   <main class="min-h-screen">
-    <!-- Post Hero (matches Next.js BlogPostHero) -->
     <PostHero
       post={transformedPost}
-      heroImage={postImage}
+      heroImage={heroImage}
       readingTimeMinutes={readingTimeMinutes}
     />
+    <PostContent content={post.content} />
 
-    <!-- Post Content (matches Next.js BlogPostContent layout) -->
-    <section class="pb-16">
-      <div class="container-custom">
-        <PostContent content={post.content} />
-
-        <div class="blog-post-aside-wrap">
-        <!-- Explore More Topics (matches Next.js Related Topics aside) -->
-        <aside class="blog-related-topics">
-          <h3 class="blog-related-topics__title">Explore More Topics</h3>
-          <div class="blog-related-topics__links">
-            {post.category?.slug && (
-              <a href={`/blog/category/${post.category.slug}`} class="blog-related-topics__category-link">
-                More in {post.category.name}
-              </a>
-            )}
-            {post.tags && post.tags.length > 0 && (
-              <div class="blog-related-topics__tag-links">
-                {post.tags.map((tag) => (
-                  <a href={`/blog?search=${encodeURIComponent(tag)}`} class="blog-related-topics__tag-link">
-                    #{tag}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        </aside>
-
-        <!-- Internal CTA to Equipment (matches Next.js BlogPostContent CTA) -->
-        <div class="blog-cta-equipment">
-          <div class="blog-cta-equipment__icon-wrap">
-            <svg class="blog-cta-equipment__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z" />
-              <path d="m2.5 21.5 1.4-1.4" />
-              <path d="m20.1 3.9 1.4-1.4" />
-              <path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z" />
-              <path d="m9.6 14.4 4.8-4.8" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="blog-cta-equipment__title">Build Muscle with the Gear You Own</h3>
-            <p class="blog-cta-equipment__text">
-              Don't let limited equipment hold you back. Our AI adjusts your workout plan based on
-              exactly what you have available—whether it's a full gym, just dumbbells, or
-              bodyweight only.
-            </p>
-            <a href="/equipment" class="blog-cta-equipment__link">
-              Browse Equipment-Specific Workouts
-              <svg class="w-4 h-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          </div>
-        </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Related Articles (matches Next.js RelatedPosts layout) -->
     {relatedPosts.length > 0 && (
-      <section class="blog-related-posts">
-        <div class="blog-related-posts__container">
-          <h2 class="blog-related-posts__title">Related Articles</h2>
-          <div class="blog-related-posts__grid">
-            {relatedPosts.map((relatedPost) => (
-              <BlogCard
-                slug={relatedPost.slug}
-                title={relatedPost.title}
-                excerpt={relatedPost.excerpt}
-                date={relatedPost.date}
-                author={relatedPost.author}
-                category={relatedPost.category}
-                image={relatedPost.image}
-                tags={relatedPost.tags}
-              />
-            ))}
-          </div>
-        </div>
+      <section class="container-custom py-16 border-t border-[var(--glass-border-base)]">
+        <h2 class="text-2xl font-bold mb-6">Related articles</h2>
+        <ul class="grid md:grid-cols-3 gap-6">
+          {relatedPosts.map((p) => {
+            const transformed = toTransformedPost(p);
+            return (
+              <li>
+                <a
+                  href={`/blog/${p.slug}`}
+                  class="block p-4 rounded-lg bg-[var(--glass-bg-base)] hover:bg-[var(--glass-bg-hover)] transition-colors"
+                >
+                  <span class="font-semibold text-primary">{transformed.title}</span>
+                  <span class="text-sm text-secondary block mt-1">{transformed.category}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     )}
 
     <Footer />
   </main>
 </BaseLayout>
-
-<style>
-  /* Wrapper to align Related Topics and CTA with article (max-width 900px) */
-  .blog-post-aside-wrap {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  /* Explore More Topics (aligned with BlogPostContent.module.scss .relatedTopics) */
-  .blog-related-topics {
-    margin-top: var(--spacing-4xl);
-    padding-top: var(--spacing-2xl);
-    border-top: 1px solid var(--glass-border-base);
-  }
-  .blog-related-topics__title {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-lg);
-  }
-  .blog-related-topics__links {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-  }
-  .blog-related-topics__category-link {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--spacing-md) var(--spacing-xl);
-    background: var(--glass-bg-base);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border-base);
-    border-radius: var(--radius-lg);
-    color: var(--color-accent);
-    font-weight: var(--font-weight-medium);
-    text-decoration: none;
-    transition: all var(--transition-fast);
-    width: fit-content;
-  }
-  .blog-related-topics__category-link:hover {
-    background: var(--glass-bg-hover);
-    border-color: var(--color-accent);
-    transform: translateX(4px);
-  }
-  .blog-related-topics__tag-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-  }
-  .blog-related-topics__tag-link {
-    display: inline-block;
-    padding: var(--spacing-xs) var(--spacing-md);
-    background: var(--glass-bg-base);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border-base);
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: all var(--transition-fast);
-  }
-  .blog-related-topics__tag-link:hover {
-    background: var(--glass-bg-hover);
-    border-color: var(--glass-border-hover);
-    color: var(--color-accent);
-  }
-
-  /* Equipment CTA (aligned with Next.js BlogPostContent CTA) */
-  .blog-cta-equipment {
-    margin-top: var(--spacing-2xl);
-    padding: var(--spacing-lg);
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid var(--glass-border-base);
-    border-radius: var(--radius-xl);
-    display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-md);
-  }
-  .blog-cta-equipment__icon-wrap {
-    padding: var(--spacing-md);
-    background: rgba(132, 204, 22, 0.1);
-    border-radius: var(--radius-lg);
-    color: var(--color-accent);
-    flex-shrink: 0;
-  }
-  .blog-cta-equipment__icon {
-    width: 24px;
-    height: 24px;
-  }
-  .blog-cta-equipment__title {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-sm);
-  }
-  .blog-cta-equipment__text {
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-md);
-    line-height: var(--line-height-relaxed);
-  }
-  .blog-cta-equipment__link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    color: var(--color-accent);
-    font-weight: var(--font-weight-bold);
-    text-decoration: none;
-    transition: color var(--transition-fast);
-  }
-  .blog-cta-equipment__link:hover {
-    color: var(--color-accent-light);
-  }
-
-  /* Related Articles (aligned with RelatedPosts.module.scss) */
-  .blog-related-posts {
-    padding: var(--spacing-4xl) var(--spacing-lg);
-    background: var(--bg-dark);
-  }
-  .blog-related-posts__container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .blog-related-posts__title {
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    text-align: center;
-    margin-bottom: var(--spacing-2xl);
-  }
-  .blog-related-posts__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--spacing-xl);
-  }
-  @media (max-width: 768px) {
-    .blog-related-posts__grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

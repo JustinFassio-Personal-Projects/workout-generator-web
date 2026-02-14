@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useRef, useState, useEffect } from 'react'
 import {
   Chart as ChartJS,
@@ -81,7 +83,7 @@ export const ReportV2ProgressChart: React.FC = () => {
         borderColor: '#e7e5e4', // Stone-200
         borderWidth: 1,
         callbacks: {
-          label: function (context: { dataset: { label: string }; raw: number }) {
+          label: function (context: any) {
             return context.dataset.label + ': ' + context.raw + '% Strength Base'
           },
         },

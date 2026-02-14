@@ -65,7 +65,7 @@ const schemaData = {
           <div>
             {masterFAQData.map((item) => (
               <FaqItem 
-                client:visible
+                client:load
                 question={item.question} 
                 answer={item.answer} 
               />
@@ -80,7 +80,7 @@ const schemaData = {
             <div>
               {category.items.map((item) => (
                 <FaqItem 
-                  client:visible
+                  client:load
                   question={item.question} 
                   answer={item.answer} 
                 />

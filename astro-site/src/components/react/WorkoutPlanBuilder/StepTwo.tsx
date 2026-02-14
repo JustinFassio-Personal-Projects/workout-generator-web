@@ -1,3 +1,6 @@
+'use client'
+
+import React from 'react'
 import { ArrowLeft } from 'lucide-react'
 import type { ActivityLevel, Gender, PreferredUnits } from '@/types/onboarding'
 import {
@@ -6,6 +9,7 @@ import {
   weightUnitOptions,
   heightUnitOptions,
 } from '@/data/onboarding-options'
+import styles from './WorkoutPlanBuilder.module.scss'
 
 interface StepTwoProps {
   activityLevel: ActivityLevel
@@ -21,10 +25,7 @@ interface StepTwoProps {
   onSubmit: () => void
 }
 
-const inputBase =
-  'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white min-h-[48px] focus:outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20'
-
-export function StepTwo({
+export const StepTwo: React.FC<StepTwoProps> = ({
   activityLevel,
   gender,
   age,
@@ -36,7 +37,7 @@ export function StepTwo({
   onUnitsChange,
   onBack,
   onSubmit,
-}: StepTwoProps) {
+}) => {
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     if (value === '') {
@@ -48,120 +49,106 @@ export function StepTwo({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <label htmlFor="builder-activity" className="block text-base font-medium text-white mb-1">
-          How active are you currently? <span className="text-[var(--color-accent)]">*</span>
+    <div className={styles.stepContent}>
+      <div className={styles.fieldGroup}>
+        <label htmlFor="activity-level" className={styles.fieldLabel}>
+          How active are you currently? <span className={styles.required}>*</span>
         </label>
         <select
-          id="builder-activity"
-          className={`${inputBase} appearance-none bg-no-repeat bg-[length:20px] bg-[right_1rem_center] pr-12`}
+          id="activity-level"
+          className={styles.select}
           value={activityLevel}
           onChange={e => onActivityChange(e.target.value as ActivityLevel)}
         >
-          {activityLevelOptions.map(opt => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
+          {activityLevelOptions.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
-        {errors.activity_level && (
-          <p className="mt-1 text-sm text-red-500">{errors.activity_level}</p>
-        )}
+        {errors.activity_level && <p className={styles.errorText}>{errors.activity_level}</p>}
       </div>
-
-      <div>
-        <label htmlFor="builder-gender" className="block text-base font-medium text-white mb-1">
-          Gender <span className="text-white/50 text-sm font-normal">(optional)</span>
+      <div className={styles.fieldGroup}>
+        <label htmlFor="gender" className={styles.fieldLabel}>
+          Gender <span className={styles.optional}>(optional)</span>
         </label>
         <select
-          id="builder-gender"
-          className={`${inputBase} appearance-none bg-no-repeat bg-[length:20px] bg-[right_1rem_center] pr-12`}
-          value={gender ?? 'prefer_not_to_say'}
+          id="gender"
+          className={styles.select}
+          value={gender || 'prefer_not_to_say'}
           onChange={e => onGenderChange(e.target.value as Gender)}
         >
-          {genderOptions.map(opt => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
+          {genderOptions.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
       </div>
-
-      <div>
-        <label htmlFor="builder-age" className="block text-base font-medium text-white mb-1">
-          Age <span className="text-white/50 text-sm font-normal">(optional)</span>
+      <div className={styles.fieldGroup}>
+        <label htmlFor="age" className={styles.fieldLabel}>
+          Age <span className={styles.optional}>(optional)</span>
         </label>
         <input
-          id="builder-age"
+          id="age"
           type="number"
-          className={inputBase}
+          className={styles.input}
           value={age ?? ''}
           onChange={handleAgeChange}
           min={13}
           max={120}
           placeholder="Enter your age"
         />
-        {errors.age && <p className="mt-1 text-sm text-red-500">{errors.age}</p>}
+        {errors.age && <p className={styles.errorText}>{errors.age}</p>}
       </div>
-
-      <div>
-        <label className="block text-base font-medium text-white mb-2">Preferred units</label>
-        <div className="flex flex-wrap gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-white/70 min-w-[52px]">Weight:</span>
-            <div className="flex rounded-lg overflow-hidden border border-white/10">
-              {weightUnitOptions.map(opt => (
+      <div className={styles.fieldGroup}>
+        <label className={styles.fieldLabel}>Preferred units</label>
+        <div className={styles.unitsRow}>
+          <div className={styles.unitToggle}>
+            <span className={styles.unitLabel}>Weight:</span>
+            <div className={styles.toggleGroup}>
+              {weightUnitOptions.map(option => (
                 <button
-                  key={opt.value}
+                  key={option.value}
                   type="button"
-                  className={`px-3 py-2 text-sm font-medium min-w-[44px] min-h-[36px] transition-colors ${
-                    preferredUnits.weight === opt.value
-                      ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent-light)]'
-                      : 'bg-white/5 text-white/70 hover:bg-white/10'
-                  }`}
-                  onClick={() => onUnitsChange({ weight: opt.value })}
+                  className={`${styles.toggleButton} ${preferredUnits.weight === option.value ? styles.toggleActive : ''}`}
+                  onClick={() => onUnitsChange({ weight: option.value })}
                 >
-                  {opt.label}
+                  {option.label}
                 </button>
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-white/70 min-w-[52px]">Height:</span>
-            <div className="flex rounded-lg overflow-hidden border border-white/10">
-              {heightUnitOptions.map(opt => (
+          <div className={styles.unitToggle}>
+            <span className={styles.unitLabel}>Height:</span>
+            <div className={styles.toggleGroup}>
+              {heightUnitOptions.map(option => (
                 <button
-                  key={opt.value}
+                  key={option.value}
                   type="button"
-                  className={`px-3 py-2 text-sm font-medium min-w-[44px] min-h-[36px] transition-colors ${
-                    preferredUnits.height === opt.value
-                      ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent-light)]'
-                      : 'bg-white/5 text-white/70 hover:bg-white/10'
-                  }`}
-                  onClick={() => onUnitsChange({ height: opt.value })}
+                  className={`${styles.toggleButton} ${preferredUnits.height === option.value ? styles.toggleActive : ''}`}
+                  onClick={() => onUnitsChange({ height: option.value })}
                 >
-                  {opt.label}
+                  {option.label}
                 </button>
               ))}
             </div>
           </div>
         </div>
       </div>
-
-      <div className="flex flex-wrap gap-3 justify-end pt-2">
+      <div className={styles.formActions}>
         <button
           type="button"
+          className={`${styles.formButtonSecondary} ${styles.backButton}`}
           onClick={onBack}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft size={18} />
           Back
         </button>
         <button
           type="button"
+          className={`${styles.formButton} ${styles.submitButton}`}
           onClick={onSubmit}
-          className="px-6 py-3 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-colors min-w-[140px]"
         >
           See My Plan
         </button>

@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useRef } from 'react'
 import styles from './ReportV2LogicSimulation.module.scss'
 

@@ -4,6 +4,12 @@ import React, { useState, useCallback } from 'react'
 import { Turnstile } from '@/components/landing/ExerciseChallenge/Turnstile'
 import styles from './ReportV2LiveDemo.module.scss'
 
+declare global {
+  interface Window {
+    posthog?: { capture: (event: string, props?: Record<string, unknown>) => void }
+  }
+}
+
 export const ReportV2LiveDemo: React.FC = () => {
   const [goal, setGoal] = useState<string>('Hypertrophy (Muscle Growth)')
   const [level, setLevel] = useState<string>('Beginner (0-1 years)')
@@ -15,9 +21,10 @@ export const ReportV2LiveDemo: React.FC = () => {
 
   const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_REPORTS_SITE_KEY as string | undefined
 
+  // Memoize callbacks to prevent Turnstile re-renders
   const handleTurnstileSuccess = useCallback((token: string) => {
     setTurnstileToken(token)
-    setError(null)
+    setError(null) // Clear any previous errors
   }, [])
 
   const handleTurnstileError = useCallback(() => {
@@ -30,6 +37,7 @@ export const ReportV2LiveDemo: React.FC = () => {
   }, [])
 
   const generateWorkout = async () => {
+    // Client-side validation
     if (!turnstileToken) {
       setError('Please complete the captcha verification')
       return
@@ -57,10 +65,11 @@ export const ReportV2LiveDemo: React.FC = () => {
         const errorData = await response.json()
         const errorMessage = errorData.error || 'Failed to generate workout'
 
+        // Handle specific error cases
         if (response.status === 400) {
           if (errorMessage.includes('Captcha')) {
             setError('Captcha verification failed. Please try again.')
-            setTurnstileToken(null)
+            setTurnstileToken(null) // Reset Turnstile on failure
           } else {
             setError(errorMessage)
           }
@@ -74,18 +83,17 @@ export const ReportV2LiveDemo: React.FC = () => {
 
       const data = await response.json()
 
+      // Format the workout text - replace **text** with <strong> tags
       let formattedText = data.workout
         .replace(/\*\*(.*?)\*\*/g, '<strong class="highlight">$1</strong>')
         .replace(/\n\*/g, '\n•')
 
       setWorkout(formattedText)
 
+      // PostHog: Track workout_viewed when workout is displayed/viewed (optional)
       try {
-        const posthog = (typeof window !== 'undefined' && (window as any).posthog) as
-          | { capture: (event: string, props: object) => void }
-          | undefined
-        if (posthog?.capture) {
-          posthog.capture('workout_viewed', {
+        if (typeof window !== 'undefined' && window.posthog) {
+          window.posthog.capture('workout_viewed', {
             goal,
             level,
             equipment,
@@ -165,8 +173,8 @@ export const ReportV2LiveDemo: React.FC = () => {
 
         {!turnstileSiteKey ? (
           <div className={styles.error}>
-            Turnstile site key is not configured. Add <code>PUBLIC_TURNSTILE_REPORTS_SITE_KEY</code>{' '}
-            to your environment variables.
+            Turnstile site key is not configured. Please add{' '}
+            <code>NEXT_PUBLIC_TURNSTILE_REPORTS_SITE_KEY</code> to your environment variables.
           </div>
         ) : (
           <div className={styles.turnstileContainer}>

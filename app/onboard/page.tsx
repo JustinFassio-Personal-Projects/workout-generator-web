@@ -22,7 +22,7 @@ export default async function OnboardPage() {
   // Suspense boundary required because OnboardingWizard uses useSearchParams()
   // which needs runtime context unavailable during static prerendering
 
-  // Extract tenant context from headers (set by proxy.ts middleware)
+  // Extract tenant context from headers (set by proxy)
   const headersList = await headers()
   const tenantDomain = headersList.get('x-tenant-domain')
 

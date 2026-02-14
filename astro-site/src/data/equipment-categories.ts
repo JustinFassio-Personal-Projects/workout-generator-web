@@ -1,8 +1,5 @@
 import type { FitnessLevel } from '@/types/onboarding'
 
-/**
- * Category labels for display
- */
 export const categoryLabels: Record<string, string> = {
   general: 'General / Universal',
   strength: 'Strength Training',
@@ -22,10 +19,6 @@ export const categoryLabels: Record<string, string> = {
   smart: 'Smart Equipment',
 }
 
-/**
- * Cumulative category mapping by fitness level.
- * Each level includes all categories from previous levels plus new ones.
- */
 const categoryMapping: Record<FitnessLevel, string[]> = {
   beginner: ['general', 'strength', 'functional', 'cardio'],
   intermediate: [
@@ -71,16 +64,10 @@ const categoryMapping: Record<FitnessLevel, string[]> = {
   ],
 }
 
-/**
- * Get available equipment categories for a given fitness level.
- */
 export function getAvailableCategoriesByFitnessLevel(fitnessLevel: FitnessLevel): string[] {
-  return categoryMapping[fitnessLevel] ?? categoryMapping.beginner
+  return categoryMapping[fitnessLevel] || categoryMapping.beginner
 }
 
-/**
- * Get display label for a category string
- */
 export function getCategoryLabel(category: string): string {
-  return categoryLabels[category] ?? category
+  return categoryLabels[category] || category
 }

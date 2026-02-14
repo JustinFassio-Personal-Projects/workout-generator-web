@@ -1,8 +1,3 @@
-/**
- * Testimonials data for the homepage carousel.
- * Single source of truth for the Astro site.
- */
-
 export interface Testimonial {
   id: string
   name: string

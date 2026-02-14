@@ -19,7 +19,6 @@ export interface Post {
   created_at: string
   updated_at: string
 
-  // Joined relations (populated when fetching with joins)
   category?: Category
   author?: Author
 }
@@ -47,7 +46,7 @@ export interface Author {
 }
 
 /**
- * Transformed post format for components
+ * Transformed post shape for UI components (date strings, author/category as strings)
  */
 export interface TransformedPost {
   id: string
@@ -61,4 +60,56 @@ export interface TransformedPost {
   category: string
   tags: string[]
   image?: string
+}
+
+export interface AdminUser {
+  id: string
+  role: 'admin' | 'editor'
+  created_at: string
+}
+
+export interface PostFormData {
+  title: string
+  slug: string
+  excerpt: string
+  content: string
+  category_id: string
+  tags: string[]
+  author_id: string
+  featured_image?: string
+  status: 'draft' | 'published'
+  seo_title?: string
+  seo_description?: string
+}
+
+export interface PostCreateData extends PostFormData {
+  published_at?: string
+}
+
+export interface PostUpdateData extends Partial<PostFormData> {
+  published_at?: string
+}
+
+export interface PostsListResponse {
+  posts: PostWithRelations[]
+  categories: Category[]
+  authors: Author[]
+}
+
+export interface PostResponse {
+  post: PostWithRelations
+}
+
+export interface UploadResponse {
+  url: string
+  filename: string
+}
+
+export interface BlogStats {
+  totalPosts: number
+  publishedPosts: number
+  draftPosts: number
+  postsThisWeek: number
+  totalCategories: number
+  totalAuthors: number
 }

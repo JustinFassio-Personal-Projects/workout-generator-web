@@ -1,16 +1,12 @@
-import type { ParsedHtml } from '@/types/deep-research'
+export interface ParsedHtml {
+  bodyHtml: string
+  title?: string
+  excerpt?: string
+}
 
 /**
- * Parse pasted HTML to extract title, excerpt, and body content.
- *
- * Uses different strategies depending on the environment:
- * - **Client-side (browser):** Uses DOMParser for accurate DOM-based parsing.
- * - **Server-side (Node/SSR):** Falls back to regex parsing since DOMParser is
- *   not available (no DOM in Node.js). Regex may miss edge cases but handles
- *   typical HTML from admin-pasted content.
- *
- * @param html - Raw HTML string (e.g., from clipboard or file)
- * @returns Parsed title, excerpt (from meta description), and body HTML
+ * Parses pasted HTML (e.g. from a browser) into bodyHtml and optional title/excerpt.
+ * Uses DOMParser when available (browser); falls back to regex when undefined (e.g. SSR).
  */
 export function parsePastedHtml(html: string): ParsedHtml {
   const trimmed = html.trim()
@@ -18,34 +14,33 @@ export function parsePastedHtml(html: string): ParsedHtml {
     return { bodyHtml: '' }
   }
 
-  let title: string | undefined
-  let excerpt: string | undefined
-  let bodyHtml: string
-
-  // Client vs server strategy: DOMParser in browser, regex fallback in Node (see JSDoc above).
   if (typeof DOMParser !== 'undefined') {
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(trimmed, 'text/html')
-    title = doc.querySelector('title')?.textContent?.trim()
-    const metaDesc = doc.querySelector('meta[name="description"]')
-    excerpt = metaDesc?.getAttribute('content')?.trim()
-    bodyHtml = doc.body?.innerHTML?.trim() ?? trimmed
-  } else {
-    const titleMatch = trimmed.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
-    title = titleMatch?.[1]?.replace(/<[^>]+>/g, '').trim()
-    const metaMatch = trimmed.match(/<meta\s+name=["']description["']\s+content=["']([^"']*)["']/i)
-    excerpt = metaMatch?.[1]?.trim()
-    const bodyMatch = trimmed.match(/<body[^>]*>([\s\S]*?)<\/body>/i)
-    bodyHtml = bodyMatch?.[1]?.trim() ?? trimmed
+    const doc = new DOMParser().parseFromString(trimmed, 'text/html')
+    const title =
+      doc.querySelector('title')?.textContent?.trim() ||
+      doc.querySelector('meta[property="og:title"]')?.getAttribute('content')?.trim()
+    const excerpt =
+      doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() ||
+      doc.querySelector('meta[property="og:description"]')?.getAttribute('content')?.trim()
+    const body = doc.body
+    const bodyHtml = body ? body.innerHTML.trim() : trimmed
+    return {
+      bodyHtml,
+      ...(title && { title }),
+      ...(excerpt && { excerpt }),
+    }
   }
 
-  if (!bodyHtml && trimmed) {
-    bodyHtml = trimmed
-  }
-
+  // Fallback when DOMParser is undefined (e.g. server-side)
+  const titleMatch = trimmed.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
+  const title = titleMatch?.[1]?.replace(/<[^>]+>/g, '').trim()
+  const descMatch = trimmed.match(/<meta\s+name=["']description["']\s+content=["']([^"']*)["']/i)
+  const excerpt = descMatch?.[1]?.trim()
+  const bodyMatch = trimmed.match(/<body[^>]*>([\s\S]*?)<\/body>/i)
+  const bodyHtml = bodyMatch?.[1]?.trim() ?? trimmed
   return {
-    title,
-    excerpt,
-    bodyHtml: bodyHtml || trimmed,
+    bodyHtml,
+    ...(title && { title }),
+    ...(excerpt && { excerpt }),
   }
 }

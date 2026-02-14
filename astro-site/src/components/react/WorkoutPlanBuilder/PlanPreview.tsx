@@ -1,11 +1,10 @@
+'use client'
+
+import React from 'react'
 import { ArrowRight, Edit3, Target, Dumbbell, Activity, Wrench } from 'lucide-react'
 import type { WebsiteOnboardingData } from '@/types/onboarding'
-import {
-  fitnessLevelOptions,
-  activityLevelOptions,
-  equipmentAccessOptions,
-} from '@/data/onboarding-options'
-import { equipmentArrayToAccess } from '@/lib/urlOnboarding'
+import { fitnessLevelOptions, activityLevelOptions } from '@/data/onboarding-options'
+import styles from './WorkoutPlanBuilder.module.scss'
 
 interface PlanPreviewProps {
   data: WebsiteOnboardingData
@@ -13,16 +12,15 @@ interface PlanPreviewProps {
   onCreateAccount: () => void
 }
 
-export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps) {
+export const PlanPreview: React.FC<PlanPreviewProps> = ({ data, onEdit, onCreateAccount }) => {
   const levelLabel =
-    fitnessLevelOptions.find(o => o.value === data.fitness_level)?.label ?? data.fitness_level
+    fitnessLevelOptions.find(o => o.value === data.fitness_level)?.label || data.fitness_level
   const activityLabel =
-    activityLevelOptions.find(o => o.value === data.current_activity_level)?.label ??
+    activityLevelOptions.find(o => o.value === data.current_activity_level)?.label ||
     data.current_activity_level
-  const equipmentAccess = equipmentArrayToAccess(data.equipment_access)
-  const equipmentLabel =
-    equipmentAccessOptions.find(o => o.value === equipmentAccess)?.label ??
-    data.equipment_access.join(', ')
+  const equipmentLabel = Array.isArray(data.equipment_access)
+    ? data.equipment_access.join(', ')
+    : String(data.equipment_access)
   const goalsDisplay =
     data.fitness_goals.length === 1
       ? data.fitness_goals[0]
@@ -31,60 +29,54 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
         data.fitness_goals[data.fitness_goals.length - 1]
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold text-white m-0 mb-1">Your plan is ready.</h3>
-        <p className="text-white/80 m-0 text-base">
+    <div className={styles.previewCard}>
+      <div className={styles.previewHeader}>
+        <h3 className={styles.previewTitle}>Your plan is ready.</h3>
+        <p className={styles.previewSubtitle}>
           Here&apos;s a summary of your personalized workout profile.
         </p>
       </div>
-
-      <div className="flex flex-col gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/10">
-        <div className="flex items-start gap-3">
-          <Target className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0 mt-0.5" />
-          <div>
-            <span className="block text-sm text-white/60 font-medium">Goals</span>
-            <span className="text-white">{goalsDisplay}</span>
+      <div className={styles.previewDetails}>
+        <div className={styles.previewItem}>
+          <Target size={20} className={styles.previewIcon} />
+          <div className={styles.previewItemContent}>
+            <span className={styles.previewLabel}>Goals</span>
+            <span className={styles.previewValue}>{goalsDisplay}</span>
           </div>
         </div>
-        <div className="flex items-start gap-3">
-          <Dumbbell className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0 mt-0.5" />
-          <div>
-            <span className="block text-sm text-white/60 font-medium">Level</span>
-            <span className="text-white">{levelLabel}</span>
+        <div className={styles.previewItem}>
+          <Dumbbell size={20} className={styles.previewIcon} />
+          <div className={styles.previewItemContent}>
+            <span className={styles.previewLabel}>Level</span>
+            <span className={styles.previewValue}>{levelLabel}</span>
           </div>
         </div>
-        <div className="flex items-start gap-3">
-          <Activity className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0 mt-0.5" />
-          <div>
-            <span className="block text-sm text-white/60 font-medium">Activity</span>
-            <span className="text-white">{activityLabel}</span>
+        <div className={styles.previewItem}>
+          <Activity size={20} className={styles.previewIcon} />
+          <div className={styles.previewItemContent}>
+            <span className={styles.previewLabel}>Activity</span>
+            <span className={styles.previewValue}>{activityLabel}</span>
           </div>
         </div>
-        <div className="flex items-start gap-3">
-          <Wrench className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0 mt-0.5" />
-          <div>
-            <span className="block text-sm text-white/60 font-medium">Equipment</span>
-            <span className="text-white">{equipmentLabel}</span>
+        <div className={styles.previewItem}>
+          <Wrench size={20} className={styles.previewIcon} />
+          <div className={styles.previewItemContent}>
+            <span className={styles.previewLabel}>Equipment</span>
+            <span className={styles.previewValue}>{equipmentLabel}</span>
           </div>
         </div>
       </div>
-
-      <div className="flex flex-col items-center gap-3">
+      <div className={styles.previewActions}>
         <button
           type="button"
+          className={`${styles.formButton} ${styles.createAccountButton}`}
           onClick={onCreateAccount}
-          className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-colors"
         >
           Create account to generate workout
-          <ArrowRight className="w-5 h-5" />
+          <ArrowRight size={18} />
         </button>
-        <button
-          type="button"
-          onClick={onEdit}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white font-medium hover:bg-white/10 transition-colors"
-        >
-          <Edit3 className="w-4 h-4" />
+        <button type="button" className={styles.formButtonSecondary} onClick={onEdit}>
+          <Edit3 size={18} />
           Edit answers
         </button>
       </div>

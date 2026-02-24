@@ -23,7 +23,7 @@ export default async function AdminLeadsPage() {
   const leads = await getLeads()
 
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <LeadList initialLeads={leads} />
     </AdminLayout>
   )

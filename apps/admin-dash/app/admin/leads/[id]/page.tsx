@@ -51,7 +51,7 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
   const lead = await getLead(id)
   if (!lead) notFound()
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <LeadDetail lead={lead} />
     </AdminLayout>
   )

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
+import { getAdminSession } from '@/lib/admin-auth'
 import { notifyMainSiteRevalidate } from '@/lib/notify-main-site'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createServerSupabaseClient, getServerUser } from '@/lib/supabase/server'
 
 interface RouteParams {
   params: Promise<{ slug: string }>
@@ -12,21 +12,9 @@ export async function GET(request: Request, { params }: RouteParams) {
   try {
     const { slug } = await params
 
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
     const adminClient = createAdminClient()
@@ -72,21 +60,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const { slug } = await params
 
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
     const rawData = await request.json()
@@ -207,22 +183,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     const { slug } = await params
 
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id, role')
-      .eq('id', user.id)
-      .single()
-
-    // Only full admins can delete
-    if (!adminUser || adminUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Only admins can delete posts' }, { status: 403 })
     }
 
     const adminClient = createAdminClient()

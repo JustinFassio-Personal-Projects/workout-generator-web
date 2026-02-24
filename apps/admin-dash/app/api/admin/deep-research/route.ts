@@ -1,26 +1,15 @@
 import { NextResponse } from 'next/server'
+import { getAdminSession } from '@/lib/admin-auth'
+import { validateDeepResearchPayload } from '@/lib/deep-research/validation'
 import { notifyMainSiteRevalidate } from '@/lib/notify-main-site'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createServerSupabaseClient, getServerUser } from '@/lib/supabase/server'
-import { validateDeepResearchPayload } from '@/lib/deep-research/validation'
 
 // GET: List all deep research (including drafts)
 export async function GET(request: Request) {
   try {
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id, role')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser || adminUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Only admins can list deep research' }, { status: 403 })
     }
 
     const adminClient = createAdminClient()
@@ -57,20 +46,9 @@ export async function GET(request: Request) {
 // POST: Create new deep research
 export async function POST(request: Request) {
   try {
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id, role')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser || adminUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Only admins can create deep research' }, { status: 403 })
     }
 
     const data = await request.json()

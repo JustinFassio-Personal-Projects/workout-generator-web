@@ -93,7 +93,7 @@ export default async function AdminAnalyticsPage() {
   ])
 
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <div className={styles.page}>
         <div className={styles.header}>
           <h1 className={styles.title}>Analytics</h1>

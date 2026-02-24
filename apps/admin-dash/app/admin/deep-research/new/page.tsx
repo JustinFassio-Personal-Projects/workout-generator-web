@@ -7,7 +7,7 @@ export default async function NewDeepResearchPage() {
   const session = await getAdminSession()
   if (!session) redirect('/admin/login')
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <DeepResearchEditor />
     </AdminLayout>
   )

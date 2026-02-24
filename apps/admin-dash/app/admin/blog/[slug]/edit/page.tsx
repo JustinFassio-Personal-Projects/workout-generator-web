@@ -54,7 +54,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   const [post, { categories, authors }] = await Promise.all([getPost(slug), getFormData()])
   if (!post) notFound()
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <BlogEditor post={post} categories={categories} authors={authors} />
     </AdminLayout>
   )

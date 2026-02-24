@@ -1,7 +1,17 @@
 import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 import { createHmac, timingSafeEqual } from 'crypto'
 
-const COOKIE_NAME = 'sb-admin-session'
+export type AdminCookieBag = { name: string; value: string; options: Record<string, unknown> }
+
+/** Applies admin cookie to a NextResponse so cookie-options typing lives in one place (used by login/logout routes). */
+export function applyAdminCookieToResponse(res: NextResponse, cookie: AdminCookieBag): void {
+  res.cookies.set(cookie.name, cookie.value, cookie.options as Parameters<NextResponse['cookies']['set']>[2])
+}
+
+// __Secure- prefix in production so browsers only send the cookie over HTTPS (cookie injection hardening).
+const COOKIE_NAME =
+  process.env.NODE_ENV === 'production' ? '__Secure-sb-admin-session' : 'sb-admin-session'
 const MAX_AGE_SEC = 60 * 60 * 24 * 7 // 7 days
 
 function getSecret(): string | null {
@@ -9,6 +19,7 @@ function getSecret(): string | null {
   return s && s.length >= 16 ? s : null
 }
 
+/** Signed payload (expiry.sig). Expiry in plaintext is intentional: stateless, and signature prevents tampering. Verification uses timingSafeEqual. */
 function sign(expiry: number): string {
   const secret = getSecret()
   if (!secret) return ''

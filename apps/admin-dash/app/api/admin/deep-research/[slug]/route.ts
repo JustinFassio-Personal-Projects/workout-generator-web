@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
+import { getAdminSession } from '@/lib/admin-auth'
+import { validateDeepResearchPayload } from '@/lib/deep-research/validation'
 import { notifyMainSiteRevalidate } from '@/lib/notify-main-site'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createServerSupabaseClient, getServerUser } from '@/lib/supabase/server'
-import { validateDeepResearchPayload } from '@/lib/deep-research/validation'
 
 interface RouteParams {
   params: Promise<{ slug: string }>
@@ -13,20 +13,9 @@ export async function GET(request: Request, { params }: RouteParams) {
   try {
     const { slug } = await params
 
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id, role')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser || adminUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Only admins can access deep research' }, { status: 403 })
     }
 
     const adminClient = createAdminClient()
@@ -53,20 +42,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const { slug } = await params
 
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id, role')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser || adminUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Only admins can update deep research' }, { status: 403 })
     }
 
     const rawData = await request.json()
@@ -154,20 +132,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     const { slug } = await params
 
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id, role')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser || adminUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Only admins can delete deep research' }, { status: 403 })
     }
 
     const adminClient = createAdminClient()

@@ -24,7 +24,9 @@ function AdminLoginForm() {
         body: JSON.stringify({ password }),
         credentials: 'include',
       })
-      const data = (await res.json().catch(() => ({}))) as { error?: string; success?: boolean }
+      const data = (await res.json().catch(() => ({
+        error: 'Invalid response from server',
+      }))) as { error?: string; success?: boolean }
 
       if (!res.ok) {
         setError(data.error ?? 'Login failed')

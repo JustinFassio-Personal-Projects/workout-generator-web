@@ -24,7 +24,7 @@ export default async function NewPostPage() {
   const { categories, authors } = await getFormData()
 
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <BlogEditor categories={categories} authors={authors} />
     </AdminLayout>
   )

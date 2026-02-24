@@ -1,26 +1,14 @@
 import { NextResponse } from 'next/server'
+import { getAdminSession } from '@/lib/admin-auth'
 import { notifyMainSiteRevalidate } from '@/lib/notify-main-site'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createServerSupabaseClient, getServerUser } from '@/lib/supabase/server'
 
 // GET: List all posts (including drafts)
 export async function GET(request: Request) {
   try {
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
     // Use admin client to bypass RLS and get all posts
@@ -75,21 +63,9 @@ export async function GET(request: Request) {
 // POST: Create new post
 export async function POST(request: Request) {
   try {
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
     const data = await request.json()

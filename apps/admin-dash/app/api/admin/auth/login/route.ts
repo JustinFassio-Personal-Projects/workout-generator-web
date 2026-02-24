@@ -3,6 +3,7 @@ import {
   isAdminPasswordConfigured,
   checkPassword,
   setAdminSessionCookie,
+  applyAdminCookieToResponse,
 } from '@/lib/admin-auth'
 
 /**
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     const res = NextResponse.json({ success: true })
-    res.cookies.set(cookie.name, cookie.value, cookie.options as Parameters<NextResponse['cookies']['set']>[2])
+    applyAdminCookieToResponse(res, cookie)
     return res
   } catch (error) {
     console.error('Login error:', error)

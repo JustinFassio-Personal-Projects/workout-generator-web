@@ -31,7 +31,7 @@ export default async function EditDeepResearchPage({ params }: EditDeepResearchP
   const item = await getDeepResearchItem(slug)
   if (!item) notFound()
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <DeepResearchEditor item={item} />
     </AdminLayout>
   )

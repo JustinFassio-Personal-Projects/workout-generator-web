@@ -168,7 +168,7 @@ export default async function AdminDashboardPage() {
   const recentLeads = await getRecentLeads()
 
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <div className={styles.dashboard}>
         <div className={styles.header}>
           <h1 className={styles.title}>Dashboard</h1>

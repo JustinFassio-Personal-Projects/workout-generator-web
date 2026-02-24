@@ -31,7 +31,7 @@ export default async function AdminDeepResearchPage() {
   if (!session) redirect('/admin/login')
   const items = await getDeepResearchItems()
   return (
-    <AdminLayout user={{ id: 'admin', email: 'admin' }} role="admin">
+    <AdminLayout>
       <DeepResearchList initialItems={items} />
     </AdminLayout>
   )

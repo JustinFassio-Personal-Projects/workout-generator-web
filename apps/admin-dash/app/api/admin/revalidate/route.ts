@@ -1,28 +1,26 @@
 import { NextResponse } from 'next/server'
+import { getAdminSession } from '@/lib/admin-auth'
 import { notifyMainSiteRevalidate } from '@/lib/notify-main-site'
-import { createServerSupabaseClient, getServerUser } from '@/lib/supabase/server'
 
 export async function POST(request: Request) {
   try {
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
-
     const { paths } = await request.json()
-    const pathList = paths && Array.isArray(paths) ? paths : ['all']
+    let pathList: string[]
+    if (paths === undefined || paths === null) {
+      pathList = ['all']
+    } else if (Array.isArray(paths) && paths.every((p) => typeof p === 'string')) {
+      pathList = paths
+    } else {
+      return NextResponse.json(
+        { error: 'Invalid paths. Expected an array of strings.' },
+        { status: 400 }
+      )
+    }
 
     const shouldNotify =
       pathList.includes('all') ||

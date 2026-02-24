@@ -18,11 +18,9 @@ import styles from './AdminLayout.module.scss'
 
 interface AdminLayoutProps {
   children: React.ReactNode
-  user: { id: string; email: string }
-  role: string
 }
 
-export function AdminLayout({ children, user, role }: AdminLayoutProps) {
+export function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
@@ -86,12 +84,7 @@ export function AdminLayout({ children, user, role }: AdminLayoutProps) {
         </nav>
 
         <div className={styles.sidebarFooter}>
-          {sidebarOpen && (
-            <div className={styles.userInfo}>
-              <span className={styles.userEmail}>{user.email}</span>
-              <span className={styles.userRole}>{role}</span>
-            </div>
-          )}
+          {sidebarOpen && <div className={styles.userInfo}>Admin</div>}
           <button onClick={handleLogout} className={styles.logoutButton}>
             {sidebarOpen ? 'Sign Out' : <LogOut size={18} />}
           </button>

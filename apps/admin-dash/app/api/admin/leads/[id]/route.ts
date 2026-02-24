@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
+import { getAdminSession } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createServerSupabaseClient, getServerUser } from '@/lib/supabase/server'
 
 interface RouteContext {
   params: Promise<{ id: string }>
@@ -9,21 +9,9 @@ interface RouteContext {
 // GET: Get single lead with relations
 export async function GET(request: Request, context: RouteContext) {
   try {
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
     const { id } = await context.params
@@ -70,21 +58,9 @@ export async function GET(request: Request, context: RouteContext) {
 // PUT: Update lead (primarily for verification status)
 export async function PUT(request: Request, context: RouteContext) {
   try {
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
     const { id } = await context.params
@@ -126,21 +102,9 @@ export async function PUT(request: Request, context: RouteContext) {
 // DELETE: Delete lead
 export async function DELETE(request: Request, context: RouteContext) {
   try {
-    // Verify admin access
-    const user = await getServerUser()
-    if (!user) {
+    const session = await getAdminSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = await createServerSupabaseClient()
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
     const { id } = await context.params

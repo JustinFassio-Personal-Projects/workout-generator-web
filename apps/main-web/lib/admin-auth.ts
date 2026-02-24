@@ -86,5 +86,11 @@ export function isAdminPasswordConfigured(): boolean {
 export function checkPassword(password: string): boolean {
   const secret = getSecret()
   if (!secret) return false
-  return password === secret
+  const a = Buffer.from(password, 'utf8')
+  const b = Buffer.from(secret, 'utf8')
+  if (a.length !== b.length) {
+    timingSafeEqual(a, Buffer.alloc(a.length, 0))
+    return false
+  }
+  return timingSafeEqual(a, b)
 }

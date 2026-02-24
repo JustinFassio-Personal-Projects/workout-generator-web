@@ -24,3 +24,10 @@ The `vercel.json` in each app configures `buildCommand` and `installCommand` to 
 3. Add **ADMIN_PASSWORD** (or **ADMIN_SECRET**) with a strong value (at least 16 characters).
 4. Enable it for **Production** (and **Preview** if you want login on preview deployments).
 5. Redeploy so the new variable is available.
+
+**If you get 307 redirect to /admin/login when visiting /admin (cookie not persisting):**
+
+1. Ensure **admin.aiworkoutgenerator.com** (or your admin domain) is assigned to the **admin-dash** Vercel project in **Settings** → **Domains**.
+2. Log in at `https://admin.aiworkoutgenerator.com/admin/login` (use the exact domain you'll access admin from).
+3. Clear cookies for the domain and try again; stale or wrong-domain cookies can block the new one.
+4. In DevTools → Application → Cookies, confirm `__Secure-sb-admin-session` is set for your admin domain after login.

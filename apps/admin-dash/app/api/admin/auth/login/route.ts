@@ -34,9 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
     }
 
-    const rawHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || null
-    const cookieDomain = rawHost ? rawHost.split(':')[0].trim() : null
-    const cookie = setAdminSessionCookie(cookieDomain)
+    const cookie = setAdminSessionCookie()
     if (!cookie) {
       return NextResponse.json({ error: 'Could not create session' }, { status: 500 })
     }

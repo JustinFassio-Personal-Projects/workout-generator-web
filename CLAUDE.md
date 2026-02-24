@@ -263,9 +263,47 @@ Setup script: `scripts/setup-admin-user.ts`
 
 ---
 
-## Testing
+## Prettier Configuration
 
-Tests live in `__tests__/` mirroring the source structure. Test files use the naming convention `*.test.ts` or `*.test.tsx`.
+Prettier runs automatically via the pre-commit hook and is enforced in CI. Settings (`.prettierrc`):
+
+```json
+{
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
+  "bracketSpacing": true,
+  "jsxSingleQuote": false
+}
+```
+
+Key implications: **no semicolons**, single quotes in JS/TS, double quotes in JSX attributes, no trailing arrow-function parens for single args.
+
+---
+
+## CI/CD Pipeline
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on push to `main` and manual dispatch, using Node 22:
+
+1. `npm run lint` — ESLint
+2. `npm run format:check` — Prettier check
+3. `npm run type-check` — TypeScript
+4. `npm run test:critical` — critical path tests
+5. `npm run test:coverage` — full test suite + coverage (must pass 67% threshold)
+6. `npm run build` — Next.js production build
+7. `npm audit --audit-level=moderate` — security audit (non-blocking)
+8. Secrets scan — grep for hardcoded keys in `app/`, `components/`, `features/`
+9. Codecov coverage upload
+
+**In CI, env vars default to test stubs** when secrets are not set (e.g. `OPENAI_API_KEY=test-key-for-ci`). Tests are designed to handle these stubs gracefully.
+
+---
+
+## Testing
 
 **Test setup** (`src/test/setup.ts`) provides global mocks for:
 - `next/navigation` (useRouter, usePathname, useSearchParams)

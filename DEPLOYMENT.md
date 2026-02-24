@@ -14,3 +14,13 @@ This monorepo has multiple deployable apps. Each needs its own Vercel project wi
 The `vercel.json` in each app configures `buildCommand` and `installCommand` to run from the monorepo root so Turborepo builds correctly.
 
 **If you see "No Output Directory named 'dist' found":** In **Settings** → **Build & Development Settings**, set **Framework Preset** to **Next.js** and clear **Output Directory** (leave empty). Next.js uses `.next`, not `dist`.
+
+## admin-dash: Production login
+
+**If you see "Admin login is not configured. Set ADMIN_PASSWORD in env." in production:**
+
+1. Open the **admin-dash** Vercel project (not main-web).
+2. Go to **Settings** → **Environment Variables**.
+3. Add **ADMIN_PASSWORD** (or **ADMIN_SECRET**) with a strong value (at least 16 characters).
+4. Enable it for **Production** (and **Preview** if you want login on preview deployments).
+5. Redeploy so the new variable is available.

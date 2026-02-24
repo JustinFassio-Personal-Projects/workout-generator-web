@@ -13,11 +13,11 @@ export async function POST(request: Request) {
     }
 
     const formData = await request.formData()
-    const file = formData.get('file') as File
-
-    if (!file) {
+    const entry = formData.get('file')
+    if (!entry || !(entry instanceof File)) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
+    const file = entry
 
     // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     // Generate unique filename
-    const ext = file.name.split('.').pop()
+    const ext = file.name.split('.').pop() || 'bin'
     const timestamp = Date.now()
     const randomId = Math.random().toString(36).substring(2, 8)
     const filename = `${timestamp}-${randomId}.${ext}`

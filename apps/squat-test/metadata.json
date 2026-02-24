@@ -1,8 +1,0 @@
-{
-  "name": "KineticAI",
-  "description": "Elite-level biomechanical analysis tool using real-time pose estimation and Gemini AI for form correction.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}

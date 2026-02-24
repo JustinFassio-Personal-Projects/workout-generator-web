@@ -6,13 +6,9 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "dev:main": "turbo run dev --filter=main-web",
-    "dev:admin": "turbo run dev --filter=admin-dash",
-    "dev:squat": "turbo run dev --filter=squat-test"
+    "dev:admin": "turbo run dev --filter=admin-dash"
   },
   "devDependencies": {
     "turbo": "^2.3.0"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.55.1"
   }
 }

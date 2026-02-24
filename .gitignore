@@ -1,21 +1,29 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# dependencies (root and monorepo apps/packages)
 /node_modules
+node_modules/
 /.pnp
 .pnp.js
 
 # testing
 /coverage
+coverage/
 *.lcov
 .vitest
 
-# next.js
+# next.js (root and monorepo apps)
 /.next/
+.next/
 /out/
+out/
 
-# production
+# production / build output
 /build
+dist/
+
+# Turborepo
+.turbo/
 
 # misc
 .DS_Store
@@ -30,8 +38,13 @@ yarn-error.log*
 .env
 .env*.local
 
-# Cursor MCP config (contains SUPABASE_ACCESS_TOKEN)
+# Cursor (mcp.json contains secrets; debug log is local)
 .cursor/mcp.json
+.cursor/debug.log
+.cursor/*.log
+
+# Playwright MCP screenshots (local/dev)
+.playwright-mcp/
 
 # vercel
 .vercel

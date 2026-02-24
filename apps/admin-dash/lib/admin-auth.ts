@@ -55,22 +55,24 @@ export async function getAdminSession(): Promise<{ ok: true } | null> {
   return verify(cookie.value) ? { ok: true } : null
 }
 
-export function setAdminSessionCookie(): { name: string; value: string; options: Record<string, unknown> } | null {
+export function setAdminSessionCookie(cookieDomain?: string | null): { name: string; value: string; options: Record<string, unknown> } | null {
   const secret = getSecret()
   if (!secret) return null
   const expiry = Date.now() + MAX_AGE_SEC * 1000
   const value = sign(expiry)
   if (!value) return null
+  const options: Record<string, unknown> = {
+    path: '/',
+    maxAge: MAX_AGE_SEC,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+  }
+  if (cookieDomain && cookieDomain.trim()) options.domain = cookieDomain.trim()
   return {
     name: COOKIE_NAME,
     value,
-    options: {
-      path: '/',
-      maxAge: MAX_AGE_SEC,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    },
+    options,
   }
 }
 

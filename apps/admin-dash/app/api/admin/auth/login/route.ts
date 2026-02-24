@@ -13,8 +13,12 @@ import {
 export async function POST(request: NextRequest) {
   try {
     if (!isAdminPasswordConfigured()) {
+      const hint =
+        process.env.VERCEL === '1'
+          ? 'Add ADMIN_PASSWORD (min 16 chars) in Vercel → admin-dash project → Settings → Environment Variables, enable for Production, then redeploy.'
+          : 'Set ADMIN_PASSWORD (min 16 chars) in .env.local.'
       return NextResponse.json(
-        { error: 'Admin login is not configured. Set ADMIN_PASSWORD in env.' },
+        { error: `Admin login is not configured. ${hint}` },
         { status: 503 }
       )
     }
@@ -30,7 +34,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
     }
 
-    const cookie = setAdminSessionCookie()
+    const rawHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || null
+    const cookieDomain = rawHost ? rawHost.split(':')[0].trim() : null
+    const cookie = setAdminSessionCookie(cookieDomain)
     if (!cookie) {
       return NextResponse.json({ error: 'Could not create session' }, { status: 500 })
     }

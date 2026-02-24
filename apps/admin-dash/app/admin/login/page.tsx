@@ -38,7 +38,8 @@ function AdminLoginForm() {
         setLoading(false)
         return
       }
-      window.location.href = '/admin'
+      // Full replace so the next request includes the Set-Cookie from this response
+      window.location.replace('/admin')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
       setLoading(false)

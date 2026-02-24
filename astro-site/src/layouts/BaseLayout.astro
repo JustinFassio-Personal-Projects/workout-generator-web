@@ -254,8 +254,8 @@ const allStructuredData = [
             once: true,
             offset: 100,
           });
-        } catch (e) {
-          if (import.meta.env.DEV) console.warn('AOS init:', e);
+        } catch (_e) {
+          // AOS init failed; non-critical, no log
         }
       }
       if (document.readyState === 'loading') {

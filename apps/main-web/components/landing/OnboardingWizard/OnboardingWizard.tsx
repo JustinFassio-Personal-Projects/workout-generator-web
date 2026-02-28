@@ -13,7 +13,7 @@ import type {
 } from '@/types/onboarding'
 import { DEFAULT_ONBOARDING_DATA } from '@/types/onboarding'
 import { buildSignupUrl } from '@/lib/buildSignupUrl'
-import { getPreselectData } from '@/lib/equipmentPreselect'
+import { getPreselectData, getPreselectDataForMultiple } from '@/lib/equipmentPreselect'
 import { trackGA4Event } from '@/lib/analytics'
 import { Dumbbell } from 'lucide-react'
 import { StepOne } from './StepOne'
@@ -37,15 +37,22 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ tenantId }) 
   // Initialize from URL params after mount to avoid hydration mismatch
   // Using useEffect ensures this only runs on client after hydration
   useEffect(() => {
-    const preselectValue = searchParams?.get('preselect')
-    if (preselectValue) {
-      const { fitnessLevel, categories } = getPreselectData(preselectValue)
-      setFormData(prev => ({
-        ...prev,
-        fitness_level: fitnessLevel,
-        equipment_access: categories,
-      }))
-    }
+    const preselectValues =
+      typeof searchParams?.getAll === 'function'
+        ? searchParams.getAll('preselect')
+        : searchParams?.get('preselect')
+          ? [searchParams.get('preselect')!]
+          : []
+    if (preselectValues.length === 0) return
+    const { fitnessLevel, categories } =
+      preselectValues.length === 1
+        ? getPreselectData(preselectValues[0])
+        : getPreselectDataForMultiple(preselectValues)
+    setFormData(prev => ({
+      ...prev,
+      fitness_level: fitnessLevel,
+      equipment_access: categories,
+    }))
   }, [searchParams])
   const [currentStep, setCurrentStep] = useState<1 | 2>(1)
   const [showPreview, setShowPreview] = useState(false)

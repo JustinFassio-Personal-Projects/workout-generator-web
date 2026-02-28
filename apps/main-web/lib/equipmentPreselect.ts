@@ -81,3 +81,26 @@ export function getPreselectData(preselectValue: string): {
     categories,
   }
 }
+
+/**
+ * Get preselect data from multiple equipment preselect values.
+ * Merges and dedupes categories, then computes minimum fitness level for the union.
+ *
+ * @param preselectValues - Array of preselect values from URL
+ * @returns Object with fitnessLevel and merged categories
+ */
+export function getPreselectDataForMultiple(preselectValues: string[]): {
+  fitnessLevel: FitnessLevel
+  categories: string[]
+} {
+  if (preselectValues.length === 0) {
+    return { fitnessLevel: 'beginner', categories: ['general'] }
+  }
+  const allCategories = preselectValues.flatMap(v => getCategoriesForEquipmentPreselect(v))
+  const categories = [...new Set(allCategories)]
+  const fitnessLevel = getMinimumFitnessLevelForCategories(categories)
+  return {
+    fitnessLevel,
+    categories,
+  }
+}

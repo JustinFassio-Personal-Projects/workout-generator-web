@@ -21,4 +21,13 @@ describe('buildEquipmentWizardUrl', () => {
     const url = buildEquipmentWizardUrl('resistance bands')
     expect(url).toBe('/onboard?preselect=resistance+bands')
   })
+
+  it('should build URL with multiple preselect parameters', () => {
+    const url = buildEquipmentWizardUrl(['dumbbells', 'kettlebells'])
+    expect(url).toBe('/onboard?preselect=dumbbells&preselect=kettlebells')
+  })
+
+  it('should handle single-item array the same as single string', () => {
+    expect(buildEquipmentWizardUrl(['dumbbells'])).toBe(buildEquipmentWizardUrl('dumbbells'))
+  })
 })

@@ -1,15 +1,15 @@
 import React from 'react'
 import Image from 'next/image'
-import styles from './BlogHero.module.scss'
+import styles from './ReportsHero.module.scss'
 
-const BLOG_HERO_IMAGE = '/og-image.jpg'
+const REPORTS_HERO_IMAGE = '/san-diego-core-fitness-hiit-workout-plan-builder-background.jpg'
 
-export const BlogHero: React.FC = () => {
+export const ReportsHero: React.FC = () => {
   return (
     <section className={styles.hero}>
       <div className={styles.heroImageWrapper}>
         <Image
-          src={BLOG_HERO_IMAGE}
+          src={REPORTS_HERO_IMAGE}
           alt=""
           fill
           priority
@@ -21,11 +21,11 @@ export const BlogHero: React.FC = () => {
       <div className={styles.heroContent}>
         <div className={styles.heroText} data-aos="fade-up">
           <h1 className={styles.heroTitle}>
-            <span className={styles.gradientText}>Blog</span>
+            <span className={styles.gradientText}>Reports</span>
           </h1>
           <p className={styles.heroSubtitle}>
-            Discover fitness tips, workout strategies, and expert advice to help you achieve your
-            goals.
+            In-depth analysis of AI workout generators, training systems, and fitness technology
+            trends.
           </p>
         </div>
       </div>

@@ -2,13 +2,14 @@
  * Builds a wizard URL with equipment preselect parameters.
  * Maps equipment types to URL structure for future wizard implementation.
  *
- * @param equipmentType - The equipment type to preselect (e.g., 'dumbbells', 'kettlebells', or any equipment ID)
- * @returns The wizard URL with preselect parameter
+ * @param equipmentTypes - Single equipment type or array of types to preselect (e.g., 'dumbbells' or ['dumbbells', 'kettlebells'])
+ * @returns The wizard URL with preselect parameter(s)
  */
-export function buildEquipmentWizardUrl(equipmentType: string): string {
+export function buildEquipmentWizardUrl(equipmentTypes: string | string[]): string {
   const baseUrl = '/onboard'
   const params = new URLSearchParams()
-  params.set('preselect', equipmentType)
+  const values = Array.isArray(equipmentTypes) ? equipmentTypes : [equipmentTypes]
+  values.forEach(value => params.append('preselect', value))
   return `${baseUrl}?${params.toString()}`
 }
 

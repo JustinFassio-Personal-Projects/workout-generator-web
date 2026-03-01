@@ -1,5 +1,7 @@
 const { withBotId } = require('botid/next/config')
 
+const APP_BASE = process.env.NEXT_PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // PostHog reverse proxy rewrites
@@ -238,60 +240,60 @@ const nextConfig = {
         destination: '/blog/ai-workout-female-38yrs-active-runner-high-intensity',
         permanent: true,
       },
-      // External redirects to app (https://aiworkoutgen.app)
+      // External redirects to app (NEXT_PUBLIC_APP_URL)
       {
         source: '/login',
-        destination: 'https://aiworkoutgen.app/login',
+        destination: `${APP_BASE}/login`,
         permanent: true,
       },
       {
         source: '/login/',
-        destination: 'https://aiworkoutgen.app/login',
+        destination: `${APP_BASE}/login`,
         permanent: true,
       },
       {
         source: '/react-login',
-        destination: 'https://aiworkoutgen.app/login',
+        destination: `${APP_BASE}/login`,
         permanent: true,
       },
       {
         source: '/react-login/',
-        destination: 'https://aiworkoutgen.app/login',
+        destination: `${APP_BASE}/login`,
         permanent: true,
       },
       {
         source: '/workout-generator-registration',
-        destination: 'https://aiworkoutgen.app/signup',
+        destination: `${APP_BASE}/signup`,
         permanent: true,
       },
       {
         source: '/workout-generator-registration/',
-        destination: 'https://aiworkoutgen.app/signup',
+        destination: `${APP_BASE}/signup`,
         permanent: true,
       },
       {
         source: '/build/login',
-        destination: 'https://aiworkoutgen.app/login',
+        destination: `${APP_BASE}/login`,
         permanent: true,
       },
       {
         source: '/features/login',
-        destination: 'https://aiworkoutgen.app/login',
+        destination: `${APP_BASE}/login`,
         permanent: true,
       },
       {
         source: '/features/login/',
-        destination: 'https://aiworkoutgen.app/login',
+        destination: `${APP_BASE}/login`,
         permanent: true,
       },
       {
         source: '/register',
-        destination: 'https://aiworkoutgen.app/signup',
+        destination: `${APP_BASE}/signup`,
         permanent: true,
       },
       {
         source: '/register/',
-        destination: 'https://aiworkoutgen.app/signup',
+        destination: `${APP_BASE}/signup`,
         permanent: true,
       },
       // Marketing page redirects

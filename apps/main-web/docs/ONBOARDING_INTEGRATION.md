@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes how the website (`aiworkoutgenerator.com`) passes onboarding data to the app (`aiworkoutgen.app`) via URL query parameters. The onboarding system uses a **cumulative fitness level model** where each fitness level unlocks additional equipment categories beyond those available at previous levels.
+This document describes how the website (`aiworkoutgenerator.com`) passes onboarding data to the app (`app.aiworkoutgenerator.com`) via URL query parameters. The app URL is configurable via `NEXT_PUBLIC_APP_URL` in main-web (default: `https://app.aiworkoutgenerator.com`). The onboarding system uses a **cumulative fitness level model** where each fitness level unlocks additional equipment categories beyond those available at previous levels.
 
 ## URL Parameters
 
@@ -33,7 +33,7 @@ Redirects from the website builder (e.g. after the user clicks "Create account t
 ### Example URL
 
 ```
-https://aiworkoutgen.app/signup?fitness_level=beginner&equipment_access=general,strength,functional&activity_level=moderately_active&fitness_goals=Build%20muscle,Lose%20fat&units_weight=lb&units_height=in&units_distance=mi&units_temperature=f&source=website_builder&theme=dark&tab=signup&mode=signup&view=signup
+https://app.aiworkoutgenerator.com/signup?fitness_level=beginner&equipment_access=general,strength,functional&activity_level=moderately_active&fitness_goals=Build%20muscle,Lose%20fat&units_weight=lb&units_height=in&units_distance=mi&units_temperature=f&source=website_builder&theme=dark&tab=signup&mode=signup&view=signup
 ```
 
 ## Fitness Levels

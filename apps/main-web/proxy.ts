@@ -1,5 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com').replace(
+  /\/$/,
+  ''
+)
+
 // Platform routes that should be accessible on tenant domains too
 // These routes should NOT be rewritten to /sites/[domain]
 const PLATFORM_ROUTES: readonly string[] = [
@@ -177,14 +182,14 @@ export async function proxy(request: NextRequest) {
     return createRedirect('/')
   }
 
-  // External redirects to app domain (https://aiworkoutgen.app)
+  // External redirects to app domain (NEXT_PUBLIC_APP_URL)
   const externalRedirects: Record<string, string> = {
-    '/login': 'https://aiworkoutgen.app/login',
-    '/react-login': 'https://aiworkoutgen.app/login',
-    '/workout-generator-registration': 'https://aiworkoutgen.app/signup',
-    '/build/login': 'https://aiworkoutgen.app/login',
-    '/features/login': 'https://aiworkoutgen.app/login',
-    '/register': 'https://aiworkoutgen.app/signup',
+    '/login': `${APP_BASE}/login`,
+    '/react-login': `${APP_BASE}/login`,
+    '/workout-generator-registration': `${APP_BASE}/signup`,
+    '/build/login': `${APP_BASE}/login`,
+    '/features/login': `${APP_BASE}/login`,
+    '/register': `${APP_BASE}/signup`,
   }
 
   if (externalRedirects[normalizedPath] !== undefined) {

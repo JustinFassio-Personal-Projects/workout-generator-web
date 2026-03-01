@@ -314,7 +314,7 @@ describe('WorkoutPlanBuilder', () => {
 
     await waitFor(
       () => {
-        expect(mockLocation.href).toContain('https://aiworkoutgen.app/signup?')
+        expect(mockLocation.href).toContain('https://app.aiworkoutgenerator.com/signup?')
         expect(mockLocation.href).toContain('fitness_level=beginner')
         // URLSearchParams encodes spaces as +
         expect(mockLocation.href).toContain('fitness_goals=Build+muscle')

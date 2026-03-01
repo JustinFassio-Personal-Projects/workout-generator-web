@@ -1,6 +1,9 @@
 import type { WebsiteOnboardingData } from '@/types/onboarding'
 
-const SIGNUP_BASE_URL = 'https://aiworkoutgen.app/signup'
+const APP_BASE = (
+  import.meta.env.PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com'
+).replace(/\/$/, '')
+const SIGNUP_BASE_URL = `${APP_BASE}/signup`
 
 /**
  * Builds the signup URL with query parameters from the onboarding data.

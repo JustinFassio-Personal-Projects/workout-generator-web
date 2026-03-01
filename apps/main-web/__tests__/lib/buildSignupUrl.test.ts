@@ -18,7 +18,7 @@ describe('buildSignupUrl', () => {
     }
 
     const url = buildSignupUrl(data)
-    expect(url).toContain('https://aiworkoutgen.app/signup?')
+    expect(url).toContain('https://app.aiworkoutgenerator.com/signup?')
     expect(url).toContain('fitness_level=beginner')
     expect(url).toContain('activity_level=moderately_active')
     // URLSearchParams encodes spaces as + and commas as %2C

@@ -17,7 +17,10 @@ export interface PricingPlan {
   ctaLink?: string
 }
 
-const FALLBACK_LOGIN_URL = 'https://aiworkoutgen.app/login'
+const APP_BASE = (
+  import.meta.env.PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com'
+).replace(/\/$/, '')
+const FALLBACK_LOGIN_URL = `${APP_BASE}/login`
 
 function getEnv(name: string): string {
   try {

@@ -1,6 +1,16 @@
 import type { WebsiteOnboardingData } from '@/types/onboarding'
 
-const SIGNUP_BASE_URL = 'https://aiworkoutgen.app/signup'
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com').replace(
+  /\/$/,
+  ''
+)
+const SIGNUP_BASE_URL = `${APP_BASE}/signup`
+
+/**
+ * Returns the app base URL (signup/login domain). Configurable via NEXT_PUBLIC_APP_URL.
+ */
+export const getAppBaseUrl = (): string =>
+  (process.env.NEXT_PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com').replace(/\/$/, '')
 
 /**
  * Builds the signup URL with query parameters from the onboarding data.

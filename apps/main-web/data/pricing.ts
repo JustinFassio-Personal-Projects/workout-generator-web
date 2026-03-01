@@ -1,3 +1,5 @@
+import { getAppBaseUrl } from '@/lib/buildSignupUrl'
+
 export interface PricingPlan {
   id: string
   name: string
@@ -13,7 +15,7 @@ export interface PricingPlan {
 }
 
 // Fallback URL for payment links if environment variables are not set
-const FALLBACK_LOGIN_URL = 'https://aiworkoutgen.app/login'
+const FALLBACK_LOGIN_URL = `${getAppBaseUrl()}/login`
 
 export const pricingPlans: PricingPlan[] = [
   {

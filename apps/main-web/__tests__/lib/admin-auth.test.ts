@@ -14,7 +14,7 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(() =>
     Promise.resolve({
       get: mockCookiesGet,
-    }),
+    })
   ),
 }))
 
@@ -82,7 +82,7 @@ describe('admin-auth', () => {
           maxAge: 60 * 60 * 24 * 7,
           httpOnly: true,
           sameSite: 'lax',
-        }),
+        })
       )
     })
   })
@@ -124,7 +124,7 @@ describe('admin-auth', () => {
       const cookie = setAdminSessionCookie()
       expect(cookie).not.toBe(null)
       mockCookiesGet.mockImplementation((name: string) =>
-        name === 'sb-admin-session' ? { value: cookie!.value } : undefined,
+        name === 'sb-admin-session' ? { value: cookie!.value } : undefined
       )
       const session = await getAdminSession()
       expect(session).toEqual({ ok: true })

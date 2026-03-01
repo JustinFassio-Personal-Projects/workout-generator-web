@@ -11,6 +11,7 @@ import {
   trackVercelEvent,
   analytics,
 } from '@/lib/analytics'
+import { getAppBaseUrl } from '@/lib/buildSignupUrl'
 import styles from './Navbar.module.scss'
 
 export const Navbar: React.FC = () => {
@@ -190,14 +191,15 @@ export const Navbar: React.FC = () => {
     </>
   )
 
+  const loginUrl = `${getAppBaseUrl()}/login`
   const signInButton = (
     <div className={styles.signInButton}>
       <a
-        href="https://aiworkoutgen.app/login"
+        href={loginUrl}
         onClick={() => {
           closeDrawer()
           // Track login intent with flag
-          analytics.trackLoginIntent('navbar', 'https://aiworkoutgen.app/login')
+          analytics.trackLoginIntent('navbar', loginUrl)
           trackButtonClick('Sign In', 'navbar', { type: 'external_link' })
         }}
       >

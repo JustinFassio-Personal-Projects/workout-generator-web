@@ -15,6 +15,7 @@ import type {
   PreferredUnits,
 } from '@/types/onboarding'
 import { DEFAULT_ONBOARDING_DATA } from '@/types/onboarding'
+import { getAppBaseUrl } from '@/lib/buildSignupUrl'
 import styles from './Journey.module.scss'
 import builderStyles from '@/components/landing/WorkoutPlanBuilder/WorkoutPlanBuilder.module.scss'
 
@@ -263,15 +264,15 @@ export const JourneyStepCard: React.FC<JourneyStepCardProps> = ({
                 </p>
                 <div className={styles.workoutIframeWrapper}>
                   <iframe
-                    src="https://aiworkoutgen.app/workouts?id=ItBV7oyoqVHmjLRN4USV"
+                    src={`${getAppBaseUrl()}/workouts?id=ItBV7oyoqVHmjLRN4USV`}
                     className={styles.workoutIframe}
                     title="Sample Workout Plan"
                     allow="fullscreen"
-                    // Sandbox removed: aiworkoutgen.app is a trusted source from the same organization
+                    // Sandbox removed: app domain is a trusted source from the same organization
                   />
                 </div>
                 <a
-                  href="https://aiworkoutgen.app/workouts?id=ItBV7oyoqVHmjLRN4USV"
+                  href={`${getAppBaseUrl()}/workouts?id=ItBV7oyoqVHmjLRN4USV`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.workoutLink}

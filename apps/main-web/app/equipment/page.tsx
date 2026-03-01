@@ -441,9 +441,7 @@ export default function EquipmentPage() {
               {selectedEquipmentIds.size} equipment selected
             </span>
             <Link
-              href={buildEquipmentWizardUrl(
-                Array.from(selectedEquipmentIds).sort(),
-              )}
+              href={buildEquipmentWizardUrl(Array.from(selectedEquipmentIds).sort())}
               className={styles.stickyBarButton}
             >
               Get Started

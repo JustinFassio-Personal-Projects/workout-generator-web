@@ -1,6 +1,9 @@
 const { withBotId } = require('botid/next/config')
 
-const APP_BASE = process.env.NEXT_PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com'
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com').replace(
+  /\/$/,
+  ''
+)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

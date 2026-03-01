@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react'
 import { buildEquipmentWizardUrl, EQUIPMENT_TYPES } from '@/lib/buildEquipmentWizardUrl'
+import { getPreselectValueForEquipmentId } from '@/lib/equipmentPreselect'
 import { equipmentData, allCategories } from '@/data/equipment'
 import styles from './page.module.scss'
 import { Button } from '@/components/ui/Button/Button'
@@ -35,13 +36,15 @@ const itemListSchema = {
 export default function EquipmentPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  // Store preselect values only (e.g. 'kettlebells', 'bands') so featured cards (wizardType) and
+  // catalog items (via getPreselectValueForEquipmentId) share the same keys and both show selected.
   const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<Set<string>>(new Set())
 
-  const toggleEquipment = (id: string) => {
+  const toggleEquipment = (preselectValue: string) => {
     setSelectedEquipmentIds(prev => {
       const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
+      if (next.has(preselectValue)) next.delete(preselectValue)
+      else next.add(preselectValue)
       return next
     })
   }
@@ -302,12 +305,13 @@ export default function EquipmentPage() {
                   <div className={styles.equipmentGrid}>
                     {items.map(item => {
                       const IconComponent = item.icon
-                      const isSelected = selectedEquipmentIds.has(item.id)
+                      const preselectValue = getPreselectValueForEquipmentId(item.id)
+                      const isSelected = selectedEquipmentIds.has(preselectValue)
                       return (
                         <button
                           key={item.id}
                           type="button"
-                          onClick={() => toggleEquipment(item.id)}
+                          onClick={() => toggleEquipment(preselectValue)}
                           className={`${styles.equipmentCard} ${styles.equipmentCardSelectable} ${isSelected ? styles.equipmentCardSelected : ''}`}
                           id={item.id}
                           aria-pressed={isSelected}

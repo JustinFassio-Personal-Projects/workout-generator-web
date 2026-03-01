@@ -36,8 +36,7 @@ const itemListSchema = {
 export default function EquipmentPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  // Store preselect values only (e.g. 'kettlebells', 'bands') so featured cards (wizardType) and
-  // catalog items (via getPreselectValueForEquipmentId) share the same keys and both show selected.
+  // Preselect values only so featured (wizardType) and catalog (getPreselectValueForEquipmentId) share keys.
   const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<Set<string>>(new Set())
 
   const toggleEquipment = (preselectValue: string) => {
@@ -442,7 +441,9 @@ export default function EquipmentPage() {
               {selectedEquipmentIds.size} equipment selected
             </span>
             <Link
-              href={buildEquipmentWizardUrl(Array.from(selectedEquipmentIds))}
+              href={buildEquipmentWizardUrl(
+                Array.from(selectedEquipmentIds).sort(),
+              )}
               className={styles.stickyBarButton}
             >
               Get Started

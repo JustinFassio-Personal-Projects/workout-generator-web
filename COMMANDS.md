@@ -2,24 +2,18 @@
 
 From the **repository root** unless otherwise noted. Requires Node.js 18+ and npm.
 
-**Important:** `npm run dev:main` and `npm run dev:admin` exist only on the **root** `package.json`. Run them from the repo root (e.g. `cd "/Users/.../Workout Generator"`), not from `astro-site` or inside an app.
+**Important:** `npm run dev:main` and `npm run dev:admin` exist only on the **root** `package.json`. Run them from the repo root, not from `astro-site` or inside an app.
 
 ---
 
 ## Opening the root and app directories
 
-**In the terminal:** go to the repo root so root-level commands work:
+**In the terminal:** navigate to the repo root (the directory that contains `apps/`, `astro-site/`, and the root `package.json`). From there, use relative paths to open a specific app directory:
 
 ```bash
-cd "/Users/justinfassio/Local Sites/Workout Generator"
-```
-
-To open a specific app directory (e.g. to run `npm run dev` from that app):
-
-```bash
-cd "/Users/justinfassio/Local Sites/Workout Generator/apps/admin-dash"
-cd "/Users/justinfassio/Local Sites/Workout Generator/apps/main-web"
-cd "/Users/justinfassio/Local Sites/Workout Generator/astro-site"
+cd apps/admin-dash
+cd apps/main-web
+cd astro-site
 ```
 
 **In VS Code / Cursor:** use **File → Open Folder** and choose the repo root (`Workout Generator`). To work in a single app, open the repo root first, then use the file tree to open `apps/admin-dash`, `apps/main-web`, or `astro-site`. For terminal commands that use the root `package.json` (e.g. `npm run dev:main`), open a terminal with the workspace root as the current directory.

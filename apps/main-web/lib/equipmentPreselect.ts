@@ -14,6 +14,30 @@ const equipmentPreselectMap: Record<string, string> = {
   bodyweight: 'none',
 }
 
+/** Reverse map: equipment ID (catalog) → preselect value for consistent URL/selection */
+const equipmentIdToPreselect: Record<string, string> = {
+  dumbbells: 'dumbbells',
+  kettlebell: 'kettlebells',
+  competition_kettlebell: 'kettlebells',
+  barbell: 'barbell',
+  resistance_bands: 'bands',
+  cable_machine: 'machines',
+  smith_machine: 'machines',
+  none: 'bodyweight',
+}
+
+/**
+ * Normalize a catalog equipment ID to the preselect value used in wizard URLs.
+ * Featured cards use preselect values (e.g. 'kettlebells'); catalog uses item.id (e.g. 'kettlebell').
+ * Use this so both store the same key and the wizard URL gets consistent preselect params.
+ *
+ * @param equipmentId - Catalog equipment id (e.g. 'kettlebell', 'resistance_bands')
+ * @returns Preselect value for URL/selection (e.g. 'kettlebells', 'bands'), or id if no mapping
+ */
+export function getPreselectValueForEquipmentId(equipmentId: string): string {
+  return equipmentIdToPreselect[equipmentId] ?? equipmentId
+}
+
 /**
  * Get equipment categories for a given equipment preselect value
  *
@@ -76,6 +100,29 @@ export function getPreselectData(preselectValue: string): {
   const categories = getCategoriesForEquipmentPreselect(preselectValue)
   const fitnessLevel = getMinimumFitnessLevelForCategories(categories)
 
+  return {
+    fitnessLevel,
+    categories,
+  }
+}
+
+/**
+ * Get preselect data from multiple equipment preselect values.
+ * Merges and dedupes categories, then computes minimum fitness level for the union.
+ *
+ * @param preselectValues - Array of preselect values from URL
+ * @returns Object with fitnessLevel and merged categories
+ */
+export function getPreselectDataForMultiple(preselectValues: string[]): {
+  fitnessLevel: FitnessLevel
+  categories: string[]
+} {
+  if (preselectValues.length === 0) {
+    return { fitnessLevel: 'beginner', categories: ['general'] }
+  }
+  const allCategories = preselectValues.flatMap(v => getCategoriesForEquipmentPreselect(v))
+  const categories = [...new Set(allCategories)]
+  const fitnessLevel = getMinimumFitnessLevelForCategories(categories)
   return {
     fitnessLevel,
     categories,

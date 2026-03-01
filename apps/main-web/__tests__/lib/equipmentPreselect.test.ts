@@ -3,6 +3,8 @@ import {
   getCategoriesForEquipmentPreselect,
   getMinimumFitnessLevelForCategories,
   getPreselectData,
+  getPreselectDataForMultiple,
+  getPreselectValueForEquipmentId,
 } from '@/lib/equipmentPreselect'
 
 describe('equipmentPreselect', () => {
@@ -60,6 +62,45 @@ describe('equipmentPreselect', () => {
       expect(result.categories).toEqual(['general'])
       // general is available at beginner level
       expect(['beginner', 'intermediate', 'advanced', 'athlete']).toContain(result.fitnessLevel)
+    })
+  })
+
+  describe('getPreselectDataForMultiple', () => {
+    it('should merge categories from multiple preselect values', () => {
+      const result = getPreselectDataForMultiple(['dumbbells', 'kettlebells'])
+      expect(result).toHaveProperty('fitnessLevel')
+      expect(result).toHaveProperty('categories')
+      expect(Array.isArray(result.categories)).toBe(true)
+      expect(result.categories.length).toBeGreaterThan(0)
+      expect(['beginner', 'intermediate', 'advanced', 'athlete']).toContain(result.fitnessLevel)
+    })
+
+    it('should dedupe categories when equipment share same category', () => {
+      const result = getPreselectDataForMultiple(['dumbbells', 'dumbbells'])
+      const uniqueCategories = [...new Set(result.categories)]
+      expect(result.categories).toEqual(uniqueCategories)
+    })
+
+    it('should return default when given empty array', () => {
+      const result = getPreselectDataForMultiple([])
+      expect(result.categories).toEqual(['general'])
+      expect(result.fitnessLevel).toBe('beginner')
+    })
+  })
+
+  describe('getPreselectValueForEquipmentId', () => {
+    it('should return preselect value for catalog ids that map to featured preselects', () => {
+      expect(getPreselectValueForEquipmentId('kettlebell')).toBe('kettlebells')
+      expect(getPreselectValueForEquipmentId('resistance_bands')).toBe('bands')
+      expect(getPreselectValueForEquipmentId('cable_machine')).toBe('machines')
+      expect(getPreselectValueForEquipmentId('dumbbells')).toBe('dumbbells')
+      expect(getPreselectValueForEquipmentId('barbell')).toBe('barbell')
+      expect(getPreselectValueForEquipmentId('none')).toBe('bodyweight')
+    })
+
+    it('should return id as-is for unmapped catalog equipment', () => {
+      expect(getPreselectValueForEquipmentId('leg_press')).toBe('leg_press')
+      expect(getPreselectValueForEquipmentId('treadmill')).toBe('treadmill')
     })
   })
 })

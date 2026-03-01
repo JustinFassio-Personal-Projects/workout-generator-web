@@ -15,7 +15,8 @@ import {
   X,
 } from 'lucide-react'
 import { buildEquipmentWizardUrl, EQUIPMENT_TYPES } from '@/lib/buildEquipmentWizardUrl'
-import { equipmentData, equipmentByCategory, allCategories } from '@/data/equipment'
+import { getPreselectValueForEquipmentId } from '@/lib/equipmentPreselect'
+import { equipmentData, allCategories } from '@/data/equipment'
 import styles from './page.module.scss'
 import { Button } from '@/components/ui/Button/Button'
 
@@ -35,6 +36,17 @@ const itemListSchema = {
 export default function EquipmentPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  // Preselect values only so featured (wizardType) and catalog (getPreselectValueForEquipmentId) share keys.
+  const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<Set<string>>(new Set())
+
+  const toggleEquipment = (preselectValue: string) => {
+    setSelectedEquipmentIds(prev => {
+      const next = new Set(prev)
+      if (next.has(preselectValue)) next.delete(preselectValue)
+      else next.add(preselectValue)
+      return next
+    })
+  }
 
   // Filter equipment based on search and category
   const filteredEquipment = useMemo(() => {
@@ -130,7 +142,9 @@ export default function EquipmentPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
 
-      <main className={styles.main}>
+      <main
+        className={`${styles.main} ${selectedEquipmentIds.size > 0 ? styles.mainWithStickyBar : ''}`}
+      >
         {/* Hero Section */}
         <section className={styles.hero}>
           <div className={styles.heroContainer}>
@@ -149,12 +163,15 @@ export default function EquipmentPage() {
             <div className={styles.featuredGrid}>
               {featuredEquipment.map(card => {
                 const IconComponent = card.icon
+                const isSelected = selectedEquipmentIds.has(card.wizardType)
                 return (
-                  <Link
+                  <button
                     key={card.id}
-                    href={buildEquipmentWizardUrl(card.wizardType)}
-                    className={styles.card}
+                    type="button"
+                    onClick={() => toggleEquipment(card.wizardType)}
+                    className={`${styles.card} ${styles.cardSelectable} ${isSelected ? styles.cardSelected : ''}`}
                     id={card.id}
+                    aria-pressed={isSelected}
                   >
                     <div className={styles.cardIcon}>
                       <IconComponent className={styles.icon} />
@@ -162,10 +179,19 @@ export default function EquipmentPage() {
                     <h3 className={styles.cardTitle}>{card.name}</h3>
                     <p className={styles.cardDescription}>{card.description}</p>
                     <div className={styles.cardAction}>
-                      <span className={styles.cardLinkText}>Get Started</span>
-                      <ArrowRight className={styles.cardArrow} />
+                      {isSelected ? (
+                        <>
+                          <Check className={styles.cardCheck} aria-hidden />
+                          <span className={styles.cardLinkText}>Selected</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className={styles.cardLinkText}>Select</span>
+                          <ArrowRight className={styles.cardArrow} />
+                        </>
+                      )}
                     </div>
-                  </Link>
+                  </button>
                 )
               })}
             </div>
@@ -278,12 +304,16 @@ export default function EquipmentPage() {
                   <div className={styles.equipmentGrid}>
                     {items.map(item => {
                       const IconComponent = item.icon
+                      const preselectValue = getPreselectValueForEquipmentId(item.id)
+                      const isSelected = selectedEquipmentIds.has(preselectValue)
                       return (
-                        <Link
+                        <button
                           key={item.id}
-                          href={buildEquipmentWizardUrl(item.id)}
-                          className={styles.equipmentCard}
+                          type="button"
+                          onClick={() => toggleEquipment(preselectValue)}
+                          className={`${styles.equipmentCard} ${styles.equipmentCardSelectable} ${isSelected ? styles.equipmentCardSelected : ''}`}
                           id={item.id}
+                          aria-pressed={isSelected}
                         >
                           <div className={styles.equipmentIcon}>
                             <IconComponent className={styles.equipmentIconSvg} />
@@ -304,7 +334,12 @@ export default function EquipmentPage() {
                               </span>
                             )}
                           </div>
-                        </Link>
+                          {isSelected && (
+                            <div className={styles.equipmentCardCheckWrap} aria-hidden>
+                              <Check className={styles.equipmentCardCheck} />
+                            </div>
+                          )}
+                        </button>
                       )
                     })}
                   </div>
@@ -397,6 +432,26 @@ export default function EquipmentPage() {
           </div>
         </section>
       </main>
+
+      {/* Sticky CTA when equipment selected */}
+      {selectedEquipmentIds.size > 0 && (
+        <div className={styles.stickyBar}>
+          <div className={styles.stickyBarContent}>
+            <span className={styles.stickyBarText}>
+              {selectedEquipmentIds.size} equipment selected
+            </span>
+            <Link
+              href={buildEquipmentWizardUrl(
+                Array.from(selectedEquipmentIds).sort(),
+              )}
+              className={styles.stickyBarButton}
+            >
+              Get Started
+              <ArrowRight className={styles.stickyBarArrow} aria-hidden />
+            </Link>
+          </div>
+        </div>
+      )}
     </>
   )
 }

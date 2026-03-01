@@ -17,7 +17,7 @@ export const reports: Report[] = [
       'Experience the difference with our interactive analysis. Includes live demo to generate a "System" workout plan instantly using our algorithmic engine.',
     date: '2026-01-10',
     dateModified: '2026-01-10',
-    image: '/san-diego-core-fitness-hero-1920x1200.webp',
+    image: '/san-diego-core-fitness-hiit-workout-plan-builder-background.jpg',
   },
   {
     id: '2',

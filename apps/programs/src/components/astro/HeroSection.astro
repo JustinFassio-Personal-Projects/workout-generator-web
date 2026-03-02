@@ -1,0 +1,172 @@
+---
+// Static Hero Section - Pure HTML for SEO
+// Use ?url to bypass /_image endpoint (causes 500 in production)
+import logoTransparentUrl from '../../assets/images/logo_transparent_256.png?url';
+---
+
+<header
+  class="relative flex h-[100svh] min-h-[600px] flex-col items-center justify-center overflow-hidden px-4 pt-24"
+>
+  <div class="z-10 flex w-full max-w-6xl flex-col items-center pb-24 text-center md:pb-20">
+    <!-- Category nav bar: marquee with gradient fade (visible below fixed site nav) -->
+    <div class="relative mb-4 w-full max-w-4xl overflow-hidden">
+      <div class="animate-marquee-slow flex w-fit">
+        <!-- Dot wrappers: w-6/md:w-8 = fixed cell for gap alignment; pl-[0.2em]/md:pl-[0.3em] match text tracking so dot sits centered between words -->
+        <div class="flex shrink-0 items-center gap-6 whitespace-nowrap">
+          <span
+            class="font-mono text-xs uppercase tracking-[0.2em] text-[#ffbf00] md:text-base md:tracking-[0.3em]"
+            >Boot Camp Fitness</span
+          >
+          <span
+            class="flex w-6 flex-shrink-0 items-center justify-center pl-[0.2em] md:w-8 md:pl-[0.3em]"
+            aria-hidden="true"
+          >
+            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff8000] md:h-2 md:w-2"></span>
+          </span>
+          <span
+            class="font-mono text-xs uppercase tracking-[0.2em] text-[#ffbf00] md:text-base md:tracking-[0.3em]"
+            >Bodyweight Complexes</span
+          >
+          <span
+            class="flex w-6 flex-shrink-0 items-center justify-center pl-[0.2em] md:w-8 md:pl-[0.3em]"
+            aria-hidden="true"
+          >
+            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff8000] md:h-2 md:w-2"></span>
+          </span>
+          <span
+            class="font-mono text-xs uppercase tracking-[0.2em] text-[#ffbf00] md:text-base md:tracking-[0.3em]"
+            >U.S. Air Force Spec Op Workouts</span
+          >
+          <span
+            class="flex w-6 flex-shrink-0 items-center justify-center pl-[0.2em] md:w-8 md:pl-[0.3em]"
+            aria-hidden="true"
+          >
+            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff8000] md:h-2 md:w-2"></span>
+          </span>
+        </div>
+        <div class="flex shrink-0 items-center gap-6 whitespace-nowrap">
+          <span
+            class="ml-6 font-mono text-xs uppercase tracking-[0.2em] text-[#ffbf00] md:text-base md:tracking-[0.3em]"
+            >Boot Camp Fitness</span
+          >
+          <span
+            class="flex w-6 flex-shrink-0 items-center justify-center pl-[0.2em] md:w-8 md:pl-[0.3em]"
+            aria-hidden="true"
+          >
+            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff8000] md:h-2 md:w-2"></span>
+          </span>
+          <span
+            class="font-mono text-xs uppercase tracking-[0.2em] text-[#ffbf00] md:text-base md:tracking-[0.3em]"
+            >Bodyweight Complexes</span
+          >
+          <span
+            class="flex w-6 flex-shrink-0 items-center justify-center pl-[0.2em] md:w-8 md:pl-[0.3em]"
+            aria-hidden="true"
+          >
+            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff8000] md:h-2 md:w-2"></span>
+          </span>
+          <span
+            class="font-mono text-xs uppercase tracking-[0.2em] text-[#ffbf00] md:text-base md:tracking-[0.3em]"
+            >U.S. Air Force Spec Op Workouts</span
+          >
+          <span
+            class="flex w-6 flex-shrink-0 items-center justify-center pl-[0.2em] md:w-8 md:pl-[0.3em]"
+            aria-hidden="true"
+          >
+            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff8000] md:h-2 md:w-2"></span>
+          </span>
+        </div>
+      </div>
+      <!-- Gradient fade on edges -->
+      <div
+        class="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#0d0500] to-transparent"
+      >
+      </div>
+      <div
+        class="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#0d0500] to-transparent"
+      >
+      </div>
+    </div>
+
+    <div class="relative flex w-full flex-col items-center justify-center gap-4 px-4 md:gap-6">
+      <h1
+        class="text-center font-heading text-[10vw] font-black leading-[0.9] tracking-tighter text-[#ffbf00] md:text-[8vw]"
+      >
+        AI FITCOPILOT
+      </h1>
+      <img
+        src={logoTransparentUrl}
+        alt="AI Fitcopilot logo"
+        width={192}
+        height={192}
+        class="h-auto w-24 shrink-0 md:w-32"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
+    </div>
+
+    <div
+      class="mb-4 mt-4 h-px w-full max-w-md bg-gradient-to-r from-transparent via-[#ff8000]/50 to-transparent md:mt-8"
+    >
+    </div>
+
+    <h2 class="mb-6 font-heading text-xl font-bold text-white md:mb-8 md:text-3xl">
+      The AI Copilot for Personal Trainers
+    </h2>
+  </div>
+
+  <!-- Marquee Banner -->
+  <div
+    class="absolute bottom-12 left-0 z-20 w-full overflow-hidden border-y-2 border-black bg-[#ff8000] py-2 text-black shadow-[0_0_40px_rgba(255,128,0,0.4)] md:bottom-16 md:py-3"
+  >
+    <div class="animate-marquee flex w-fit">
+      <div class="flex shrink-0 items-center gap-4 whitespace-nowrap">
+        <span class="marquee-banner-text flex items-center gap-4 px-8 font-heading font-black">
+          AI-generated programs <span class="h-2 w-2 rounded-full bg-black md:h-3 md:w-3"></span> Client-ready
+          <span class="h-2 w-2 rounded-full bg-black md:h-3 md:w-3"></span> Design hypertrophy or strength
+          programs in seconds—not hours
+        </span>
+        <span class="marquee-banner-text flex items-center gap-4 px-8 font-heading font-black">
+          AI-generated programs <span class="h-2 w-2 rounded-full bg-black md:h-3 md:w-3"></span> Client-ready
+          <span class="h-2 w-2 rounded-full bg-black md:h-3 md:w-3"></span> Design hypertrophy or strength
+          programs in seconds—not hours
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Reduced from previous Tailwind sizes (text-3xl 1.875rem / md:text-7xl 4.5rem); scoped so it always applies */
+  .marquee-banner-text {
+    font-size: 0.84375rem;
+  }
+  @media (min-width: 768px) {
+    .marquee-banner-text {
+      font-size: 2.025rem;
+    }
+  }
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes marquee-slow {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-marquee {
+    animation: marquee 75s linear infinite;
+  }
+  .animate-marquee-slow {
+    animation: marquee-slow 48s linear infinite;
+  }
+</style>

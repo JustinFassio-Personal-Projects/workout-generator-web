@@ -6,7 +6,8 @@
     "dev": "turbo run dev",
     "build": "turbo run build --concurrency=1",
     "dev:nextjs": "turbo run dev --filter=main-web",
-    "dev:admin": "turbo run dev --filter=admin-dash"
+    "dev:admin": "turbo run dev --filter=admin-dash",
+    "dev:programs": "turbo run dev --filter=programs"
   },
   "devDependencies": {
     "turbo": "^2.3.0"

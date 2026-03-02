@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build --concurrency=1",
-    "dev:main": "turbo run dev --filter=main-web",
+    "dev:nextjs": "turbo run dev --filter=main-web",
     "dev:admin": "turbo run dev --filter=admin-dash"
   },
   "devDependencies": {

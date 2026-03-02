@@ -6,12 +6,18 @@ This monorepo has multiple deployable apps. Each needs its own Vercel project wi
 
 | App        | Root Directory   | Notes                                      |
 |-----------|-------------------|---------------------------------------------|
-| main-web  | `apps/main-web`   | Main marketing/workout app                  |
+| nextjs-backend  | `apps/nextjs-backend`   | APIs, admin proxy target, legacy routes (not the primary marketing site)    |
 | admin-dash| `apps/admin-dash` | Admin dashboard (blog, leads, analytics)    |
 
 **Required:** In each Vercel project → **Settings** → **General** → set **Root Directory** to the app path above. Without this, Vercel looks for `.next` at the repo root and fails with `routes-manifest.json` not found.
 
+**After renaming nextjs-backend:** If this app was previously deployed with Root Directory `apps/main-web`, update the Vercel project → **Settings** → **General** → **Root Directory** to `apps/nextjs-backend` so builds continue to work.
+
+**If the build fails with "The specified Root Directory 'apps/main-web' does not exist":** Open the Vercel project that deploys the old main-web app → **Settings** → **General** → **Root Directory**. Change `apps/main-web` to `apps/nextjs-backend` and save. Trigger a new deploy.
+
 The `vercel.json` in each app configures `buildCommand` and `installCommand` to run from the monorepo root so Turborepo builds correctly.
+
+**Build command:** The app lives in `apps/nextjs-backend` but the **package name** is `main-web` so Turborepo and Vercel's default/cached build command (`--filter=main-web`) build this app without changing Framework settings.
 
 **If you see "No Output Directory named 'dist' found":** In **Settings** → **Build & Development Settings**, set **Framework Preset** to **Next.js** and clear **Output Directory** (leave empty). Next.js uses `.next`, not `dist`.
 
@@ -19,7 +25,7 @@ The `vercel.json` in each app configures `buildCommand` and `installCommand` to 
 
 **If you see "Admin login is not configured. Set ADMIN_PASSWORD in env." in production:**
 
-1. Open the **admin-dash** Vercel project (not main-web).
+1. Open the **admin-dash** Vercel project (not nextjs-backend).
 2. Go to **Settings** → **Environment Variables**.
 3. Add **ADMIN_PASSWORD** (or **ADMIN_SECRET**) with a strong value (at least 16 characters).
 4. Enable it for **Production** (and **Preview** if you want login on preview deployments).

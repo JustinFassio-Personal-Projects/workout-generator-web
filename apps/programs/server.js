@@ -56,7 +56,17 @@ app.use(
     },
   })
 );
-app.use((req, res) => handler(req, res));
+app.use((req, res, next) => {
+  Promise.resolve(handler(req, res)).catch(next);
+});
+// Centralized error handler to surface/log SSR errors
+app.use((err, req, res, next) => {
+  console.error('Unhandled error in SSR handler:', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(500).send('Internal Server Error');
+});
 
 const server = app.listen(PORT, HOST, () => {
   console.log(`Astro SSR server running on http://${HOST}:${PORT} (with Gzip compression)`);

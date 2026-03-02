@@ -1,9 +1,9 @@
 # Set Admin User - Quick Guide
 
-## Your User Details:
+## Your User Details (use placeholders)
 
-- **UID**: `RaJARHpHfpgzYW3Wr6EjfLj9pJc2`
-- **Email**: `jlfassio@gmail.com`
+- **UID**: `<UID>` — get this from [Firebase Console → Authentication → Users](https://console.firebase.google.com/project/_/authentication/users): open a user and copy the **User UID**.
+- **Email**: `<EMAIL>` — the user’s email (for your reference when editing the document).
 
 ## Method 1: Firebase Console (Fastest - ~2 minutes)
 
@@ -16,18 +16,18 @@
    - Click on "users" collection
 
 3. **Add/Edit Document**:
-   - Click "Add document" (or find existing document with ID `RaJARHpHfpgzYW3Wr6EjfLj9pJc2`)
-   - **Document ID**: `RaJARHpHfpgzYW3Wr6EjfLj9pJc2`
+   - Click "Add document" (or find existing document with ID `<UID>`)
+   - **Document ID**: `<UID>`
    - Add these fields:
 
      ```
      Field name: uid
      Type: string
-     Value: RaJARHpHfpgzYW3Wr6EjfLj9pJc2
+     Value: <UID>
 
      Field name: email
      Type: string
-     Value: jlfassio@gmail.com
+     Value: <EMAIL>
 
      Field name: isAdmin
      Type: boolean

@@ -6,9 +6,12 @@
  * Used for mobile filter panels (e.g. PrescriptionVitalsSidebar).
  */
 
-import React, { useEffect, useCallback, useId } from 'react';
+import React, { useEffect, useCallback, useId, useRef } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const FOCUSABLE =
+  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export interface DrawerProps {
   isOpen: boolean;
@@ -20,6 +23,9 @@ export interface DrawerProps {
 
 const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => {
   const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
@@ -28,13 +34,49 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => 
     [onClose]
   );
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key !== 'Tab' || !panelRef.current) return;
+      const focusable = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)
+      ).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const target = e.target as HTMLElement;
+      if (e.shiftKey) {
+        if (target === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (target === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     if (!isOpen) return;
+    previouslyFocusedRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     document.addEventListener('keydown', handleEscape);
     document.body.style.overflow = 'hidden';
+    const raf = requestAnimationFrame(() => {
+      closeButtonRef.current?.focus();
+    });
     return () => {
+      cancelAnimationFrame(raf);
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
+      setTimeout(() => {
+        previouslyFocusedRef.current?.focus?.();
+      }, 0);
     };
   }, [isOpen, handleEscape]);
 
@@ -54,6 +96,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => 
           />
           {/* Panel */}
           <motion.div
+            ref={panelRef}
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -62,7 +105,9 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => 
             role="dialog"
             aria-modal="true"
             aria-labelledby={title ? titleId : undefined}
+            aria-label={!title ? 'Drawer' : undefined}
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={handleKeyDown}
           >
             {/* Header */}
             <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-6 py-4">
@@ -75,6 +120,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => 
                 </h2>
               )}
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={onClose}
                 className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-white/80 transition hover:bg-white/10 hover:text-white"

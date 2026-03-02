@@ -66,8 +66,16 @@ const DeploymentGrid: React.FC<DeploymentGridProps> = ({
             return (
               <motion.div
                 key={workout.id}
+                role="button"
+                tabIndex={0}
                 whileHover={{ scale: 1.02 }}
                 onClick={() => onSelectWorkout?.(workout)}
+                onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onSelectWorkout?.(workout);
+                  }
+                }}
                 className={`group relative flex h-40 w-full cursor-pointer items-center overflow-hidden rounded-3xl border px-8 shadow-2xl transition-all ${isDone ? 'border-[#ffbf00] bg-[#ffbf00]/5 shadow-[#ffbf00]/5' : 'border-white/10 bg-black/40 hover:border-[#ffbf00]/30'}`}
               >
                 <div className="absolute inset-0 overflow-hidden">

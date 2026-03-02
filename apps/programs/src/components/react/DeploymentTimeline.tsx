@@ -5,7 +5,7 @@
  * Deployment Timeline: week selector (HUB and program views).
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { X, Target, Lock } from 'lucide-react';
 
 export interface DeploymentTimelineProps {
@@ -23,6 +23,7 @@ const DeploymentTimeline: React.FC<DeploymentTimelineProps> = ({
   onSelectWeek,
   weekLabels,
 }) => {
+  const unlocked = useMemo(() => new Set(unlockedWeeks), [unlockedWeeks]);
   return (
     <div className="space-y-6">
       <h4 className="mb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-white/30">
@@ -30,7 +31,7 @@ const DeploymentTimeline: React.FC<DeploymentTimelineProps> = ({
       </h4>
       <div className="space-y-4">
         {Array.from({ length: weeks }, (_, i) => i + 1).map((week) => {
-          const isUnlocked = unlockedWeeks.includes(week);
+          const isUnlocked = unlocked.has(week);
           const isActive = selectedWeek === week;
           const title = weekLabels?.[week];
 

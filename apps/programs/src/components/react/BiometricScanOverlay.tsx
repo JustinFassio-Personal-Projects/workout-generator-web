@@ -22,7 +22,7 @@ const BiometricScanOverlay: React.FC<BiometricScanOverlayProps> = ({ isOpen, onC
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[100] flex cursor-wait flex-col items-center justify-center bg-[#0d0500] p-10"
         >
-          <div className="pointer-events-none absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+          <div className="pointer-events-none absolute inset-0 bg-[url('/noise.svg')] opacity-20" />
 
           <motion.div
             className="absolute z-20 h-1 w-full bg-[#ffbf00] shadow-[0_0_20px_#ffbf00]"

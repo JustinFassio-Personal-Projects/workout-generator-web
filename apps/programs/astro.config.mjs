@@ -9,9 +9,9 @@ import { fileURLToPath } from 'url';
 import { resolve } from 'path';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
-// Load .env then .env.local; override:true ensures .env.local wins over .env and any existing process.env
+// Load .env then .env.local; existing process.env values (e.g. from shell/CI/prod) take precedence
 loadEnv({ path: resolve(root, '.env') });
-loadEnv({ path: resolve(root, '.env.local'), override: true });
+loadEnv({ path: resolve(root, '.env.local') });
 const src = resolve(root, './src');
 
 // Use Vercel adapter on Vercel (fixes 404 NOT_FOUND); Node adapter elsewhere (e.g. local preview, other hosts)

@@ -13,6 +13,7 @@ import type {
 } from '@/types/onboarding'
 import { DEFAULT_ONBOARDING_DATA } from '@/types/onboarding'
 import { buildSignupUrl } from '@/lib/buildSignupUrl'
+import { trackOnboardingComplete } from '@/lib/conversion-events'
 import { getPreselectData, getPreselectDataForMultiple } from '@/lib/equipmentPreselect'
 import { trackGA4Event } from '@/lib/analytics'
 import { Dumbbell } from 'lucide-react'
@@ -193,9 +194,23 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ tenantId }) 
         equipment_access: formData.equipment_access,
         fitness_level: formData.fitness_level,
       })
+      // Phase 1: Canonical Onboarding_Complete (MVC viewed)
+      trackOnboardingComplete({
+        fitness_goals: formData.fitness_goals,
+        fitness_level: formData.fitness_level,
+        equipment_access: formData.equipment_access,
+        activity_level: formData.current_activity_level,
+        source: 'onboarding_wizard',
+      })
       setShowPreview(true)
     }
-  }, [validateStepTwo, formData.fitness_goals, formData.equipment_access, formData.fitness_level])
+  }, [
+    validateStepTwo,
+    formData.fitness_goals,
+    formData.equipment_access,
+    formData.fitness_level,
+    formData.current_activity_level,
+  ])
 
   // Preview handlers
   const handleEdit = useCallback(() => {

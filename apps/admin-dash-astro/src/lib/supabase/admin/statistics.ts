@@ -7,7 +7,7 @@
  */
 
 import type { UserProfile } from '@/types/admin-users';
-import { getSupabaseServer } from '../server';
+import { getSupabaseServiceRole } from '../server';
 
 const AUTH_LIST_PAGE_SIZE = 1000;
 
@@ -16,7 +16,7 @@ const AUTH_LIST_PAGE_SIZE = 1000;
  * Does not require public.profiles table.
  */
 export async function getAllUsersServer(): Promise<UserProfile[]> {
-  const supabase = getSupabaseServer();
+  const supabase = getSupabaseServiceRole();
 
   const adminIdSet = new Set<string>();
   const { data: adminRows } = await supabase.from('admin_users').select('id');

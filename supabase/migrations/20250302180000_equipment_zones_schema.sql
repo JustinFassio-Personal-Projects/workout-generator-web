@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS public.equipment_zones (
   equipment_ids text[] DEFAULT '{}',
   created_at timestamptz DEFAULT now()
 );
--- RLS: enable and allow authenticated read/write (restrict to admin_users if desired)
+-- RLS: enable; initial permissive policy is replaced by admin-only policy in 20260303130000_equipment_zones_admin_only_rls.sql
 ALTER TABLE public.equipment_inventory ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.equipment_zones ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Authenticated users can manage equipment_inventory" ON public.equipment_inventory;

@@ -115,9 +115,12 @@ const ManageUsers: React.FC = () => {
         </div>
         <button
           type="button"
-          className="rounded-lg bg-[#ffbf00] px-4 py-2 font-medium text-black transition-colors hover:bg-[#ffbf00]/90"
+          disabled
+          aria-disabled="true"
+          title="Add User functionality coming soon"
+          className="cursor-not-allowed rounded-lg bg-[#ffbf00]/70 px-4 py-2 font-medium text-black opacity-60"
         >
-          Add User
+          Add User (coming soon)
         </button>
       </div>
 

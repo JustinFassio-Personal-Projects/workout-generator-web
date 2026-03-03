@@ -31,10 +31,26 @@ const anonKey =
 
 /**
  * Client with service role key when available (bypasses RLS). Otherwise anon (RLS applies).
+ * Use for server-side reads/writes where RLS is acceptable (e.g. user-scoped queries).
  */
 export function getSupabaseServer() {
   if (!supabaseUrl) throw new Error('PUBLIC_SUPABASE_URL is required');
   const key = serviceRoleKey || anonKey;
   if (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY or PUBLIC_SUPABASE_ANON_KEY required');
   return createClient(supabaseUrl, key);
+}
+
+/**
+ * Client with service role key only. Use for admin-only operations that require it
+ * (e.g. auth.admin.listUsers(), bypassing RLS). Throws if SUPABASE_SERVICE_ROLE_KEY is missing
+ * so misconfiguration is caught early instead of failing at runtime.
+ */
+export function getSupabaseServiceRole() {
+  if (!supabaseUrl) throw new Error('PUBLIC_SUPABASE_URL is required');
+  if (!serviceRoleKey) {
+    throw new Error(
+      'SUPABASE_SERVICE_ROLE_KEY is required for this operation (e.g. admin users list). Set it in .env from Dashboard → Settings → API.'
+    );
+  }
+  return createClient(supabaseUrl, serviceRoleKey);
 }

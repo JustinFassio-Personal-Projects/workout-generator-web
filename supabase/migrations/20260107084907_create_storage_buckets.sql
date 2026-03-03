@@ -20,6 +20,8 @@ DROP POLICY IF EXISTS "public_can_read_lead_images" ON storage.objects;
 DROP POLICY IF EXISTS "public_can_read_blog_images" ON storage.objects;
 DROP POLICY IF EXISTS "authenticated_can_write_lead_images" ON storage.objects;
 DROP POLICY IF EXISTS "authenticated_can_update_delete_lead_images" ON storage.objects;
+DROP POLICY IF EXISTS "authenticated_can_update_lead_images" ON storage.objects;
+DROP POLICY IF EXISTS "authenticated_can_delete_lead_images" ON storage.objects;
 DROP POLICY IF EXISTS "admin_write_blog_images" ON storage.objects;
 DROP POLICY IF EXISTS "admin_update_delete_blog_images" ON storage.objects;
 -- Public read for lead-images
@@ -41,10 +43,14 @@ WITH CHECK (
   bucket_id = 'lead-images'
   AND (char_length(name) > 36) -- Ensure path prefix exists (UUID is 36 chars)
 );
-CREATE POLICY "authenticated_can_update_delete_lead_images"
+-- Split so name matches capability: UPDATE and DELETE are separate operations in RLS.
+CREATE POLICY "authenticated_can_update_lead_images"
 ON storage.objects FOR UPDATE TO authenticated
 USING (bucket_id = 'lead-images')
 WITH CHECK (bucket_id = 'lead-images');
+CREATE POLICY "authenticated_can_delete_lead_images"
+ON storage.objects FOR DELETE TO authenticated
+USING (bucket_id = 'lead-images');
 -- Blog images: Admin-only write
 CREATE POLICY "admin_write_blog_images"
 ON storage.objects FOR INSERT TO authenticated

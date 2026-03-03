@@ -17,14 +17,25 @@ CREATE TABLE IF NOT EXISTS public.equipment_zones (
   equipment_ids text[] DEFAULT '{}',
   created_at timestamptz DEFAULT now()
 );
+-- RLS: authenticated can read; only admin_users can insert/update/delete (admin-dash).
 ALTER TABLE public.equipment_inventory ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.equipment_zones ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Authenticated users can manage equipment_inventory" ON public.equipment_inventory;
-CREATE POLICY "Authenticated users can manage equipment_inventory"
-  ON public.equipment_inventory FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admins can manage equipment_inventory" ON public.equipment_inventory;
+CREATE POLICY "Authenticated users can read equipment_inventory"
+  ON public.equipment_inventory FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admins can manage equipment_inventory"
+  ON public.equipment_inventory FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_users au WHERE au.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_users au WHERE au.id = auth.uid()));
 DROP POLICY IF EXISTS "Authenticated users can manage equipment_zones" ON public.equipment_zones;
-CREATE POLICY "Authenticated users can manage equipment_zones"
-  ON public.equipment_zones FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admins can manage equipment_zones" ON public.equipment_zones;
+CREATE POLICY "Authenticated users can read equipment_zones"
+  ON public.equipment_zones FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admins can manage equipment_zones"
+  ON public.equipment_zones FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_users au WHERE au.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_users au WHERE au.id = auth.uid()));
 
 -- ========== 2. Taxonomy (equipment_categories + backfill) ==========
 CREATE TABLE IF NOT EXISTS public.equipment_categories (

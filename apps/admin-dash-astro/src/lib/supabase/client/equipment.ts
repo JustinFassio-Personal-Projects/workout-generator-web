@@ -1,6 +1,8 @@
 /**
  * Client-side equipment and zones. Replaces firebase/admin/equipment.
- * RLS: authenticated read, admin write.
+ *
+ * RLS (see RUN_EQUIPMENT_MIGRATIONS.sql / 20260303130000): SELECT for any authenticated user;
+ * INSERT/UPDATE/DELETE only for users in public.admin_users. No FOR ALL for anon or plain authenticated.
  * When tables do not exist (404/42P01), functions return empty data so the UI can show setup instructions.
  */
 

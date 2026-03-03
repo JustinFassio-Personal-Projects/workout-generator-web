@@ -3,9 +3,15 @@
  */
 import { createClient } from '@supabase/supabase-js';
 
-const DEFAULT_SUPABASE_URL = 'https://qbklyimfazrkutwqictw.supabase.co';
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+// Require env explicitly so we never silently point at the wrong project (fail fast).
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY are required. Copy .env.example to .env and set them (same project as programs for shared admin).'
+  );
+}
 
 const COOKIE_NAME = 'sb-access-token';
 
@@ -42,7 +48,6 @@ export async function verifyAdminRequest(
 ): Promise<{ uid: string; email?: string }> {
   const token = extractAccessToken(request, cookies);
   if (!token) throw new Error('UNAUTHENTICATED');
-  if (!supabaseAnonKey) throw new Error('UNAUTHENTICATED');
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     global: { headers: { Authorization: `Bearer ${token}` } },

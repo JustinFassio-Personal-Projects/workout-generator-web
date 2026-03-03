@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { adminPaths } from '@/lib/admin/config';
+const loginUrl = adminPaths.login;
+---
+<BaseLayout title="Admin">
+  <meta http-equiv="refresh" content={`0;url=${loginUrl}`} />
+  <script is:inline define:vars={{ loginUrl }}>
+    window.location.replace(loginUrl);
+  </script>
+  <div class="flex min-h-screen items-center justify-center bg-[#0d0500] text-white">
+    <p>Redirecting to <a href={loginUrl} class="text-[#ffbf00] underline">admin login</a>...</p>
+  </div>
+</BaseLayout>

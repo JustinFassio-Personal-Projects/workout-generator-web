@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdminLoginGate from '../../components/react/AdminLoginGate';
+import AuthModalWrapper from '../../components/react/AuthModalWrapper';
+import { adminPaths } from '@/lib/admin/config';
+import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
+
+export const prerender = false;
+
+try {
+  await verifyAdminRequest(Astro.request, Astro.cookies);
+  return Astro.redirect(adminPaths.root);
+} catch {
+  // Not authenticated or not admin — show login
+}
+---
+<BaseLayout title="Admin Login">
+  <div class="min-h-screen bg-[#0d0500] text-white">
+    <main>
+      <AdminLoginGate client:load />
+    </main>
+    <AuthModalWrapper client:load />
+  </div>
+</BaseLayout>

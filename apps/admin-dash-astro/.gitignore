@@ -1,0 +1,15 @@
+# Dependencies and build
+node_modules
+dist
+*.local
+.env
+.env.local
+.env.*.local
+
+# Astro cache and generated files (avoid noisy diffs / merge conflicts)
+# Per Astro guidance: https://github.com/withastro/astro/blob/main/.gitignore
+.astro/
+
+# Editor / OS
+.DS_Store
+.vercel

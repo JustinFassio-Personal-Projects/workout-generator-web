@@ -1,72 +1,47 @@
-# Pre-PR Checklist Report — Staged Changes Only
+# Pre-Merge Report (Final PR Gatekeeper)
 
-**Scope:** Staged files only (main-web → nextjs-backend rename + root docs).  
-**Checklist reference:** `apps/programs/PRE_PR_CHECKLIST.md`  
-**Run date:** 2026-03-02
-
----
-
-## Automatic pre-commit checks (nextjs-backend)
-
-| Check | Status | Notes |
-|-------|--------|--------|
-| **ESLint** (`npm run lint`) | Pass | No errors. |
-| **TypeScript** (`npm run type-check`) | Pass | No errors. |
-| **Prettier** (`npm run format:check`) | Fixed then pass | 2 files were not formatted; Prettier was run with `--write` on them (see below). |
-| **Tests** (`npm run test:run`) | 1 failure | 925 passed, 1 failed (timeout), 1 skipped. See [Test failure](#test-failure). |
-| **Build** (`npm run build`) | Pass | Production build completed successfully. |
+**Branch:** current → main  
+**Scope:** admin-dash-astro, equipment/zones migrations, RLS, auth/config, docs, run-equipment-migration script.
 
 ---
 
-## Prettier fixes applied
+## Fixed
 
-These files were reformatted so `format:check` passes:
+| Item | Location | Change |
+|------|----------|--------|
+| **Hardcoded project ref** | `apps/admin-dash-astro/docs/EQUIPMENT_SCHEMA.md` | CLI example now uses `<PROJECT_REF>` with a one-line note to substitute (aligned with `ADMIN_USER_SETUP.md` and run-equipment-migration.sh). |
+| **Stale env comment** | `apps/admin-dash-astro/.env.example` | Replaced "URL is defaulted in code" with "All required; no defaults (fail fast)" and clarified `SUPABASE_SERVICE_ROLE_KEY` usage (auth.admin.listUsers). |
 
-- `apps/nextjs-backend/components/landing/OnboardingWizard/OnboardingWizard.tsx` (staged)
-- `apps/nextjs-backend/next-env.d.ts` (not staged)
-
-**Action:** If you want the formatting changes included in the PR, stage the Prettier changes:
-
-```bash
-git add apps/nextjs-backend/components/landing/OnboardingWizard/OnboardingWizard.tsx
-# optional: git add apps/nextjs-backend/next-env.d.ts
-```
+*(Earlier gatekeeper/session work already applied: equipment RLS, auth/config fail-fast, ADMIN_USER_SETUP placeholders, lead-related RLS migrations, server Supabase service-role usage, equipment.ts RLS header.)*
 
 ---
 
-## Test failure
+## Slop Scrubbed
 
-| Test | Result | Cause |
-|------|--------|--------|
-| `__tests__/components/landing/Bio/Bio.test.tsx` → “should handle \"Read the Founder Story\" button click” | Timeout (10000ms) | Test timed out; likely flaky or needs a higher timeout. Not caused by the rename. |
-
-**Suggestion:** Increase timeout for this test or fix the async/button behavior so it completes within 10s. The rest of the suite (925 tests) passed.
+- **Redundant comments:** None removed. Existing comments in `src/lib/supabase/*` are purposeful (fail-fast rationale, env loading, admin_users check, RLS summary). Section labels in `client/equipment.ts` (e.g. `// Cables & Bands (canonical 21)`) retained as useful scan markers for default equipment lists.
+- **Dead logic / placeholders:** No TODO/FIXME or placeholder logic in scope; only UI `placeholder` props in forms (intended).
+- **Hallucinated APIs:** None identified; imports and usages match project libraries.
 
 ---
 
-## Checklist sections not applicable to staged changes
+## Ignored
 
-- **Firebase / Astro / programs:** Staged changes are in `nextjs-backend` and root docs only; no `apps/programs` or Astro/Firebase code.
-- **Security scan / Firebase rules / App Check:** N/A for this PR.
-- **Islands / Astro-specific:** N/A.
-
----
-
-## Code quality (staged scope)
-
-- **console.log:** None found in codebase.
-- **.env / secrets:** Staged `.env.example` only; no secrets in staged files.
+- **Style/nitpick suggestions:** Any suggestion that would introduce new abstractions or patterns not already used in admin-dash-astro was not applied.
+- **Out-of-scope:** Changes in `apps/nextjs-backend`, `apps/admin-dash`, or other apps were not modified; report and fixes are limited to this PR’s scope (admin-dash-astro, supabase migrations, docs, script).
 
 ---
 
-## Summary
+## Verification Summary
 
-| Item | Status |
-|------|--------|
-| Lint | Pass |
-| Type-check | Pass |
-| Format | Pass (after Prettier fix) |
-| Tests | 1 timeout failure (Bio.test.tsx) |
-| Build | Pass |
+- **Security/RLS:** Equipment tables: SELECT authenticated; INSERT/UPDATE/DELETE only for `admin_users`. Lead-related tables: admin-only SELECT; public INSERT unchanged.
+- **Auth/config:** No default Supabase URL/anon key; missing env throws at startup.
+- **Astro/build:** `PUBLIC_*` used only for browser-intended values; Node/`process` limited to server-only code (`server.ts`, API routes).
+- **Docs:** No hardcoded project ref or admin email in admin-dash-astro docs; placeholders used consistently.
 
-**Recommendation:** Stage the Prettier change to `OnboardingWizard.tsx` (and optionally `next-env.d.ts`). Consider fixing or relaxing the Bio “Read the Founder Story” test timeout before or after this PR.
+---
+
+## Status
+
+**READY TO MERGE**
+
+All critical and doc fixes applied. No new debt, no hallucinated APIs, env/RLS/build safety verified. Remaining comments are intentional; no human intervention required for this scope.

@@ -84,14 +84,14 @@ This document describes how the Programs app (Astro) fits into the Workout Gener
 
 ## Summary Checklist
 
-| Item            | Action                                                                 |
-|-----------------|------------------------------------------------------------------------|
-| Workspace       | Already included via `apps/*`; run `npm install` at root.               |
-| Turbo           | No change; `dist/**` already in build outputs.                         |
-| Root script     | Add `dev:programs` (or `dev:astro`) with `turbo run dev --filter=programs` (or `ai-fit-copilot`). |
-| Package name    | Optionally set `"name": "programs"` in `apps/programs/package.json`.   |
-| Port            | 3006; no conflict.                                                     |
-| Env             | Use `apps/programs/.env` and `.env.local` as today.                    |
-| COMMANDS.md     | Document programs, port 3006, and how to run from root and from `apps/programs`. |
+| Item         | Action                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| Workspace    | Already included via `apps/*`; run `npm install` at root.                                         |
+| Turbo        | No change; `dist/**` already in build outputs.                                                    |
+| Root script  | Add `dev:programs` (or `dev:astro`) with `turbo run dev --filter=programs` (or `ai-fit-copilot`). |
+| Package name | Optionally set `"name": "programs"` in `apps/programs/package.json`.                              |
+| Port         | 3006; no conflict.                                                                                |
+| Env          | Use `apps/programs/.env` and `.env.local` as today.                                               |
+| COMMANDS.md  | Document programs, port 3006, and how to run from root and from `apps/programs`.                  |
 
 After that, the Astro app is wired in: root install and root-level `npm run dev` or `npm run dev:programs` will include it, and builds will be cached by Turbo with `dist/` as the build output.

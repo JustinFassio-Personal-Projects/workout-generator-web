@@ -10,8 +10,7 @@ import React, { useEffect, useCallback, useId, useRef } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FOCUSABLE =
-  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export interface DrawerProps {
   isOpen: boolean;
@@ -34,37 +33,32 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => 
     [onClose]
   );
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key !== 'Tab' || !panelRef.current) return;
-      const focusable = Array.from(
-        panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)
-      ).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null);
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const target = e.target as HTMLElement;
-      if (e.shiftKey) {
-        if (target === first) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (target === last) {
-          e.preventDefault();
-          first.focus();
-        }
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab' || !panelRef.current) return;
+    const focusable = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+      (el) => !el.hasAttribute('disabled') && el.offsetParent !== null
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const target = e.target as HTMLElement;
+    if (e.shiftKey) {
+      if (target === first) {
+        e.preventDefault();
+        last.focus();
       }
-    },
-    []
-  );
+    } else {
+      if (target === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
     previouslyFocusedRef.current =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     document.addEventListener('keydown', handleEscape);
     document.body.style.overflow = 'hidden';
     const raf = requestAnimationFrame(() => {

@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdminDashboard from '../../components/react/AdminDashboard';
+import { adminPaths } from '@/lib/admin/config';
+import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
+
+export const prerender = false;
+
+try {
+  await verifyAdminRequest(Astro.request, Astro.cookies);
+} catch {
+  const returnTo = Astro.url.pathname;
+  const loginUrl =
+    returnTo && returnTo.startsWith(adminPaths.root)
+      ? `${adminPaths.login}?redirect=${encodeURIComponent(returnTo)}`
+      : adminPaths.login;
+  return Astro.redirect(loginUrl);
+}
+---
+<BaseLayout title="Admin Dashboard">
+  <div class="min-h-screen bg-[#0d0500] text-white">
+    <AdminDashboard client:only="react" />
+  </div>
+</BaseLayout>

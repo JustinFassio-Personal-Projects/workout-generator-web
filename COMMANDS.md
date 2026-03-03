@@ -2,7 +2,7 @@
 
 From the **repository root** unless otherwise noted. Requires Node.js 18+ and npm.
 
-**Important:** `npm run dev:main`, `npm run dev:admin`, and `npm run dev:programs` exist only on the **root** `package.json`. Run them from the repo root, not from `astro-site` or inside an app.
+**Important:** `npm run dev:nextjs`, `npm run dev:admin`, `npm run dev:admin-astro`, and `npm run dev:programs` exist only on the **root** `package.json`. Run them from the repo root, not from `astro-site` or inside an app.
 
 ---
 
@@ -12,6 +12,7 @@ From the **repository root** unless otherwise noted. Requires Node.js 18+ and np
 
 ```bash
 cd apps/admin-dash
+cd apps/admin-dash-astro
 cd apps/main-web
 cd apps/programs
 cd astro-site
@@ -37,6 +38,7 @@ Installs dependencies for all workspaces (`apps/*`, `packages/*`).
 |--------|-------------|
 | `npm run build` | Build all apps and packages (Turborepo, concurrency 1). |
 | `npm run build --workspace=admin-dash` | Build only admin-dash. |
+| `npm run build --workspace=admin-dash-astro` | Build only admin-dash-astro (Astro). |
 | `npm run build --workspace=main-web` | Build only main-web. |
 | `npm run build --workspace=programs` | Build only programs (Astro). |
 
@@ -60,15 +62,17 @@ The shared UI package is built automatically when you build an app that depends 
 |--------|-------------|
 | `npm run dev` | Start **all** dev servers (admin-dash + main-web + any other workspace with a `dev` script). |
 | `npm run dev:admin` | Start only **admin-dash** (Next.js on port **3008**). |
-| `npm run dev:main` | Start only **main-web** (Next.js on port **3007**). |
+| `npm run dev:admin-astro` | Start only **admin-dash-astro** (Astro admin on port **3009**). |
+| `npm run dev:nextjs` | Start only **main-web** (Next.js on port **3007**). |
 | `npm run dev:programs` | Start only **programs** (Astro on port **3006**). |
 
 Or from the app directory:
 
 ```bash
-cd apps/admin-dash && npm run dev   # → http://localhost:3008
-cd apps/main-web  && npm run dev   # → http://localhost:3007
-cd apps/programs  && npm run dev   # → http://localhost:3006
+cd apps/admin-dash       && npm run dev   # → http://localhost:3008
+cd apps/admin-dash-astro && npm run dev   # → http://localhost:3009
+cd apps/main-web         && npm run dev   # → http://localhost:3007
+cd apps/programs         && npm run dev   # → http://localhost:3006
 ```
 
 ---
@@ -87,6 +91,7 @@ cd apps/programs  && npm run start   # port 3006 dev; 3002/8080 for server.js
 
 ## Astro sites
 
+- **`apps/admin-dash-astro`** is the Astro admin dashboard (scaffolded; copy features from programs). From root: `npm run dev:admin-astro`. Port **3009**.
 - **`apps/programs`** is the in-repo Astro app (part of workspaces). From root: `npm run dev:programs`. From app dir: `cd apps/programs && npm run dev` (port **3006**).
 - **`astro-site`** at the repo root is not part of the npm workspaces. To run it:
 
@@ -105,5 +110,6 @@ npm run preview # preview production build
 | App | Port | From root | From app dir |
 |-----|------|-----------|---------------|
 | **admin-dash** | 3008 | `npm run dev:admin` | `cd apps/admin-dash && npm run dev` |
-| **main-web** | 3007 | `npm run dev:main` | `cd apps/main-web && npm run dev` |
+| **admin-dash-astro** | 3009 | `npm run dev:admin-astro` | `cd apps/admin-dash-astro && npm run dev` |
+| **main-web** | 3007 | `npm run dev:nextjs` | `cd apps/main-web && npm run dev` |
 | **programs** | 3006 | `npm run dev:programs` | `cd apps/programs && npm run dev` |

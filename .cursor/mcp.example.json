@@ -1,5 +1,8 @@
 {
   "mcpServers": {
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF"
+    },
     "user-supabase": {
       "command": "node",
       "args": ["scripts/run-mcp-supabase.js", "--read-only", "--project-ref=YOUR_PROJECT_REF"],

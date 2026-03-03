@@ -9,6 +9,7 @@ import { Plus, Trash2, X, Edit2, RotateCcw, Shield } from 'lucide-react';
 import CreatableSelect from 'react-select/creatable';
 import {
   getAllEquipmentItems,
+  getEquipmentCategories,
   createEquipmentItem,
   deleteEquipmentItem,
   getAllZones,
@@ -16,9 +17,16 @@ import {
   updateZone,
   seedDefaultData,
 } from '@/lib/supabase/client/equipment';
-import type { EquipmentItem, EquipmentCategoryCode, Zone } from '@/lib/supabase/client/equipment';
+import type {
+  EquipmentItem,
+  EquipmentCategory,
+  EquipmentCategoryCode,
+  Zone,
+} from '@/lib/supabase/client/equipment';
 
 type TabType = 'inventory' | 'zones';
+
+const EMPTY_STATE_DISMISSED_KEY = 'admin-zones-empty-state-dismissed';
 
 const PREDEFINED_CONSTRAINTS = [
   'Load Limited',
@@ -37,6 +45,7 @@ const PREDEFINED_CONSTRAINTS = [
 const ManageZones: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('zones');
   const [equipmentItems, setEquipmentItems] = useState<EquipmentItem[]>([]);
+  const [equipmentCategories, setEquipmentCategories] = useState<EquipmentCategory[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +53,14 @@ const ManageZones: React.FC = () => {
   const [showZoneModal, setShowZoneModal] = useState(false);
   const [editingZone, setEditingZone] = useState<Zone | null>(null);
   const [seeding, setSeeding] = useState(false);
+  const [emptyStateDismissed, setEmptyStateDismissed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return window.localStorage.getItem(EMPTY_STATE_DISMISSED_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
 
   // Equipment form state
   const [equipmentFormData, setEquipmentFormData] = useState<{
@@ -72,8 +89,13 @@ const ManageZones: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const [equipment, zonesData] = await Promise.all([getAllEquipmentItems(), getAllZones()]);
+      const [equipment, categories, zonesData] = await Promise.all([
+        getAllEquipmentItems(),
+        getEquipmentCategories(),
+        getAllZones(),
+      ]);
       setEquipmentItems(equipment);
+      setEquipmentCategories(categories);
       setZones(zonesData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -212,19 +234,11 @@ const ManageZones: React.FC = () => {
     }
   };
 
-  const EQUIPMENT_CATEGORY_LABELS: Record<EquipmentCategoryCode, string> = {
-    free_weights: 'Free Weights',
-    machines: 'Machines',
-    cables_bands: 'Cables & Bands',
-    bodyweight: 'Bodyweight',
-    benches_racks: 'Benches & Racks',
-    conditioning: 'Conditioning',
-    functional_training: 'Functional Training',
-  };
+  const getEquipmentCategoryLabel = (code: string) =>
+    equipmentCategories.find((c) => c.code === code)?.commonTerm ?? code;
 
   const getCategoryLabel = (category: string, type: 'equipment' | 'zone' = 'zone') => {
-    if (type === 'equipment' && category in EQUIPMENT_CATEGORY_LABELS)
-      return EQUIPMENT_CATEGORY_LABELS[category as EquipmentCategoryCode];
+    if (type === 'equipment') return getEquipmentCategoryLabel(category);
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
 
@@ -282,6 +296,7 @@ const ManageZones: React.FC = () => {
         {activeTab === 'zones' && (
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={handleSeedDefaults}
               disabled={seeding}
               className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white transition-colors hover:bg-white/5 disabled:opacity-50"
@@ -290,6 +305,7 @@ const ManageZones: React.FC = () => {
               <span>Reset Defaults</span>
             </button>
             <button
+              type="button"
               onClick={() => handleOpenZoneModal()}
               className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-4 py-2 font-medium text-black transition-colors hover:bg-[#ffbf00]/90"
             >
@@ -300,6 +316,7 @@ const ManageZones: React.FC = () => {
         )}
         {activeTab === 'inventory' && (
           <button
+            type="button"
             onClick={() => setShowEquipmentForm(!showEquipmentForm)}
             className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-4 py-2 font-medium text-black transition-colors hover:bg-[#ffbf00]/90"
           >
@@ -316,9 +333,43 @@ const ManageZones: React.FC = () => {
         </div>
       )}
 
+      {/* Empty state: tables exist but no data, or tables not created yet (dismissible) */}
+      {!loading &&
+        !error &&
+        !emptyStateDismissed &&
+        equipmentItems.length === 0 &&
+        zones.length === 0 && (
+          <div className="relative rounded-lg border border-[#ffbf00]/30 bg-[#ffbf00]/5 px-4 py-3 pr-10 text-white/90">
+            <button
+              type="button"
+              onClick={() => {
+                setEmptyStateDismissed(true);
+                try {
+                  window.localStorage.setItem(EMPTY_STATE_DISMISSED_KEY, '1');
+                } catch {
+                  /* ignore */
+                }
+              }}
+              className="absolute right-2 top-2 rounded p-1 text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+              aria-label="Dismiss"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <p className="font-medium">No equipment or zones data yet.</p>
+            <p className="mt-1 text-sm text-white/70">
+              Switch to the <strong>Zones</strong> tab and click <strong>Reset Defaults</strong> to
+              load preset equipment and zones, or add items manually in the tabs. If you see errors
+              when saving, the Supabase tables may not exist—run the SQL in{' '}
+              <code className="rounded bg-black/20 px-1">docs/EQUIPMENT_SCHEMA.md</code> in
+              Supabase Dashboard → SQL Editor, then refresh.
+            </p>
+          </div>
+        )}
+
       {/* Tabs */}
       <div className="flex gap-2 border-b border-white/10">
         <button
+          type="button"
           onClick={() => setActiveTab('inventory')}
           className={`border-b-2 px-4 py-2 font-medium transition-colors ${
             activeTab === 'inventory'
@@ -329,6 +380,7 @@ const ManageZones: React.FC = () => {
           Inventory
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('zones')}
           className={`border-b-2 px-4 py-2 font-medium transition-colors ${
             activeTab === 'zones'
@@ -349,6 +401,7 @@ const ManageZones: React.FC = () => {
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="font-heading text-xl font-bold">Add Equipment Item</h2>
                 <button
+                  type="button"
                   onClick={() => setShowEquipmentForm(false)}
                   className="rounded-lg p-2 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
                 >
@@ -386,13 +439,11 @@ const ManageZones: React.FC = () => {
                     className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
                     required
                   >
-                    {(Object.keys(EQUIPMENT_CATEGORY_LABELS) as EquipmentCategoryCode[]).map(
-                      (code) => (
-                        <option key={code} value={code}>
-                          {EQUIPMENT_CATEGORY_LABELS[code]}
-                        </option>
-                      )
-                    )}
+                    {equipmentCategories.map((cat) => (
+                      <option key={cat.code} value={cat.code} title={`${cat.technicalTerm}: ${cat.examples}`}>
+                        {cat.commonTerm}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -422,65 +473,66 @@ const ManageZones: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-6">
-              {(Object.keys(EQUIPMENT_CATEGORY_LABELS) as EquipmentCategoryCode[]).map(
-                (category) => {
-                  const items = equipmentByCategory[category] || [];
-                  if (items.length === 0) return null;
+              {equipmentCategories.map((cat) => {
+                const items = equipmentByCategory[cat.code] || [];
+                if (items.length === 0) return null;
 
-                  return (
-                    <div
-                      key={category}
-                      className="rounded-lg border border-white/10 bg-black/20 p-6 backdrop-blur-sm"
-                    >
-                      <h3 className="mb-4 font-heading text-lg font-bold">
-                        {EQUIPMENT_CATEGORY_LABELS[category]}
-                      </h3>
-                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-                        {items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between rounded-lg border border-white/5 bg-black/10 p-3"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span
-                                className={`rounded-full px-2 py-1 text-xs font-medium ${getCategoryColor(
-                                  item.category
-                                )}`}
-                              >
-                                {getCategoryLabel(item.category, 'equipment')}
-                              </span>
-                              <span className="font-medium text-white">{item.name}</span>
-                              {item.tags?.includes('safety_features') && (
-                                <span
-                                  className="ml-1.5 inline-flex items-center gap-1 rounded bg-emerald-500/20 px-1.5 py-0.5 text-xs text-emerald-300"
-                                  title="Safety pins/straps available"
-                                >
-                                  <Shield className="h-3 w-3" aria-hidden />
-                                  Safety features
-                                </span>
-                              )}
-                              {item.tags?.includes('cable_machine') && item.pulley_ratio && (
-                                <span
-                                  className="ml-1.5 inline-flex rounded bg-amber-500/20 px-1.5 py-0.5 text-xs text-amber-300"
-                                  title="Pulley ratio (e.g. 2:1 = 100 lb stack feels like 50 lb)"
-                                >
-                                  Pulley {item.pulley_ratio}
-                                </span>
-                              )}
-                            </div>
-                            <button
-                              onClick={() => handleDeleteEquipment(item.id)}
-                              className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-500/10"
+                return (
+                  <div
+                    key={cat.code}
+                    className="rounded-lg border border-white/10 bg-black/20 p-6 backdrop-blur-sm"
+                  >
+                    <h3 className="mb-4 font-heading text-lg font-bold">{cat.commonTerm}</h3>
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between rounded-lg border border-white/5 bg-black/10 p-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`rounded-full px-2 py-1 text-xs font-medium ${getCategoryColor(
+                                item.category
+                              )}`}
+                              title={(() => {
+                                const itemCat = equipmentCategories.find((c) => c.code === item.category);
+                                return itemCat ? `${itemCat.technicalTerm}: ${itemCat.examples}` : undefined;
+                              })()}
                             >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+                              {getCategoryLabel(item.category, 'equipment')}
+                            </span>
+                            <span className="font-medium text-white">{item.name}</span>
+                            {item.tags?.includes('safety_features') && (
+                              <span
+                                className="ml-1.5 inline-flex items-center gap-1 rounded bg-emerald-500/20 px-1.5 py-0.5 text-xs text-emerald-300"
+                                title="Safety pins/straps available"
+                              >
+                                <Shield className="h-3 w-3" aria-hidden />
+                                Safety features
+                              </span>
+                            )}
+                            {item.tags?.includes('cable_machine') && item.pulley_ratio && (
+                              <span
+                                className="ml-1.5 inline-flex rounded bg-amber-500/20 px-1.5 py-0.5 text-xs text-amber-300"
+                                title="Pulley ratio (e.g. 2:1 = 100 lb stack feels like 50 lb)"
+                              >
+                                Pulley {item.pulley_ratio}
+                              </span>
+                            )}
                           </div>
-                        ))}
-                      </div>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteEquipment(item.id)}
+                            className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-500/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  );
-                }
-              )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -525,6 +577,7 @@ const ManageZones: React.FC = () => {
                               </span>
                             </div>
                             <button
+                              type="button"
                               onClick={() => handleOpenZoneModal(zone)}
                               className="rounded-lg p-1.5 text-white/60 opacity-0 transition-all hover:bg-white/10 hover:text-white group-hover:opacity-100"
                             >
@@ -595,6 +648,7 @@ const ManageZones: React.FC = () => {
                   {editingZone ? 'Edit Zone' : 'Create Zone'}
                 </h2>
                 <button
+                  type="button"
                   onClick={() => setShowZoneModal(false)}
                   className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
                 >

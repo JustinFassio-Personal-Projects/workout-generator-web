@@ -10,15 +10,15 @@ Shared design tokens, base styles, and animations for the Workout Generator mono
 
 ## Usage
 
-Import the full bundle (recommended):
+Import the full bundle (recommended) from your app’s entry or root layout (e.g. Astro layout frontmatter, Next.js `app/layout.tsx`, or main JS entry):
 
-```css
+```js
 import '@workout-generator/design-system';
 ```
 
 Or import subpaths:
 
-```css
+```js
 import '@workout-generator/design-system/tokens';
 import '@workout-generator/design-system/base';
 import '@workout-generator/design-system/animations';

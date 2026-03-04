@@ -25,7 +25,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultSignUp = 
   const [fullName, setFullName] = useState('');
 
   React.useEffect(() => {
-    if (isOpen && defaultSignUp) setIsRegistering(true);
+    if (isOpen) {
+      setIsRegistering(defaultSignUp);
+    } else {
+      setIsRegistering(false);
+    }
   }, [isOpen, defaultSignUp]);
 
   const handleAuth = async () => {

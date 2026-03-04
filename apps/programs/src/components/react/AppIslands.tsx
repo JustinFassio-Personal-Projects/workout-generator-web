@@ -234,10 +234,10 @@ const AppIslands: React.FC<AppIslandsProps> = ({ pathname: initialPathname }) =>
     return () => {
       if (typeof window !== 'undefined') {
         try {
-window.removeEventListener('selectWorkout', handleSelectWorkout);
-        window.removeEventListener('showAuthModal', handleShowAuth);
-        window.removeEventListener('showAuthModalWithSignup', handleShowAuthWithSignup);
-        window.removeEventListener('showPrograms', handleShowPrograms);
+          window.removeEventListener('selectWorkout', handleSelectWorkout);
+          window.removeEventListener('showAuthModal', handleShowAuth);
+          window.removeEventListener('showAuthModalWithSignup', handleShowAuthWithSignup);
+          window.removeEventListener('showPrograms', handleShowPrograms);
         } catch (error) {
           console.error('[AppIslands] Error removing event listeners:', error);
         }

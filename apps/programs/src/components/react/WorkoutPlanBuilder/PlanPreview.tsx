@@ -24,11 +24,13 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
     equipmentAccessOptions.find((o) => o.value === equipmentAccess)?.label ??
     data.equipment_access.join(', ');
   const goalsDisplay =
-    data.fitness_goals.length === 1
-      ? data.fitness_goals[0]
-      : data.fitness_goals.slice(0, -1).join(', ') +
-        ' & ' +
-        data.fitness_goals[data.fitness_goals.length - 1];
+    data.fitness_goals.length === 0
+      ? '—'
+      : data.fitness_goals.length === 1
+        ? data.fitness_goals[0]
+        : data.fitness_goals.slice(0, -1).join(', ') +
+          ' & ' +
+          data.fitness_goals[data.fitness_goals.length - 1];
 
   return (
     <div className="flex flex-col gap-6">

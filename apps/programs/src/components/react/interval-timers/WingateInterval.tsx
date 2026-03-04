@@ -533,7 +533,7 @@ const WingateInterval: React.FC<WingateIntervalProps> = ({ onNavigate }) => {
             onClick={() => setIsReportOpen(false)}
             aria-hidden
           />
-          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0500] shadow-2xl">
+          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-bg-dark shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 p-6">
               <h3 className="font-display text-xl font-bold text-white">The Wingate Protocol</h3>
               <button

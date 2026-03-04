@@ -198,7 +198,7 @@ const ScheduleZone: React.FC<ScheduleZoneProps> = ({ refreshKey = 0, onViewLog }
       />
       {!loading && stripDays.length > 0 && (
         <div className="mt-6">
-          <h4 className="mb-3 font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+          <h4 className="mb-3 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
             Next 7 days
           </h4>
           <UpcomingStrip days={stripDays} todayISO={today} onDayClick={handleDayClick} />

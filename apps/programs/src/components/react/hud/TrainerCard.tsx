@@ -31,7 +31,7 @@ const TrainerCard: React.FC = () => {
               className="h-10 w-10 shrink-0 rounded-full object-cover"
             />
           ) : (
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ffbf00]/20 font-mono text-sm font-bold uppercase text-[#ffbf00]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-light/20 font-mono text-sm font-bold uppercase text-orange-light">
               {getInitials(trainerProfile.displayName)}
             </div>
           )}

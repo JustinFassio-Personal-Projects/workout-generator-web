@@ -63,7 +63,7 @@ const PRFeed: React.FC<PRFeedProps> = ({ isPaid }) => {
             <p className="font-mono text-[10px] text-white/50">{pr.date}</p>
           </div>
           <div className="text-right">
-            <p className="font-mono font-semibold text-[#ffbf00]">{pr.weight} lbs</p>
+            <p className="font-mono font-semibold text-orange-light">{pr.weight} lbs</p>
             {pr.previousWeight != null ? (
               <p className="font-mono text-[10px] text-emerald-400/80">
                 +{pr.weight - pr.previousWeight} lbs

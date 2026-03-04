@@ -68,7 +68,7 @@ const WarmUpInterval: React.FC<WarmUpIntervalProps> = ({ onNavigate }) => {
         {/* Hero */}
         <section className="mx-auto max-w-4xl pt-8 text-center">
           <h1 className="font-display mb-6 text-4xl font-bold leading-tight text-white md:text-6xl">
-            Daily <span className="text-[#ffbf00]">Warm-Up</span>
+            Daily <span className="text-orange-light">Warm-Up</span>
           </h1>
           <p className="mb-10 text-xl leading-relaxed text-white/80">
             Joint mobility and activation. A simple 5-minute routine to prepare your body for
@@ -77,7 +77,7 @@ const WarmUpInterval: React.FC<WarmUpIntervalProps> = ({ onNavigate }) => {
           <button
             type="button"
             onClick={handleStart}
-            className="rounded-xl bg-[#ffbf00] px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-0.5"
+            className="rounded-xl bg-orange-light px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-0.5"
           >
             Start Daily Warm-Up
           </button>

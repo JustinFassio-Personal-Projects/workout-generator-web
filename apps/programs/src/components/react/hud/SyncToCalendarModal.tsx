@@ -66,7 +66,7 @@ const SyncToCalendarModal: React.FC<SyncToCalendarModalProps> = ({
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
           transition={reduceMotion ? { duration: 0 } : undefined}
-          className="relative w-full max-w-md overflow-hidden rounded-[3rem] border border-white/10 bg-[#0d0500] p-8 shadow-[0_50px_100px_rgba(0,0,0,0.8)]"
+          className="relative w-full max-w-md overflow-hidden rounded-[3rem] border border-white/10 bg-bg-dark p-8 shadow-[0_50px_100px_rgba(0,0,0,0.8)]"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -78,7 +78,7 @@ const SyncToCalendarModal: React.FC<SyncToCalendarModalProps> = ({
             <X className="h-5 w-5" />
           </button>
 
-          <div className="mb-6 flex items-center gap-3 text-[#ffbf00]">
+          <div className="mb-6 flex items-center gap-3 text-orange-light">
             <Calendar className="h-8 w-8" />
             <h3 className="font-heading text-xl font-black uppercase tracking-tighter text-white">
               Sync to Calendar
@@ -102,7 +102,7 @@ const SyncToCalendarModal: React.FC<SyncToCalendarModalProps> = ({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors focus:border-[#ffbf00]/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors focus:border-orange-light/50"
                 required
               />
             </div>
@@ -112,7 +112,7 @@ const SyncToCalendarModal: React.FC<SyncToCalendarModalProps> = ({
                 disabled={saving}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full rounded-2xl bg-[#ffbf00] py-4 font-heading font-black uppercase tracking-[0.3em] text-black shadow-[0_20px_40px_rgba(255,191,0,0.15)] transition-colors hover:bg-[#ff8000] disabled:opacity-50"
+                className="w-full rounded-2xl bg-orange-light py-4 font-heading font-black uppercase tracking-[0.3em] text-black shadow-[0_20px_40px_rgba(255,191,0,0.15)] transition-colors hover:bg-orange-medium disabled:opacity-50"
               >
                 {saving ? 'Saving…' : currentStartDate ? 'Update date' : 'Add to calendar'}
               </motion.button>

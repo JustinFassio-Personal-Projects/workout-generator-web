@@ -374,13 +374,13 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
             onClick={(e) => e.stopPropagation()}
-            className={`relative w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0d0500] shadow-[0_0_100px_rgba(255,191,0,0.1)] ${
+            className={`relative w-full overflow-hidden rounded-2xl border border-white/10 bg-bg-dark shadow-[0_0_100px_rgba(255,191,0,0.1)] ${
               step === 'preview' ? 'max-w-4xl' : 'max-w-3xl'
             }`}
           >
             <div className="flex items-center justify-between border-b border-white/10 p-6">
               <div className="flex items-center gap-3">
-                <Sparkles className="h-6 w-6 text-[#ffbf00]" />
+                <Sparkles className="h-6 w-6 text-orange-light" />
                 <div>
                   <h2 className="font-heading text-2xl font-bold">
                     {isEditMode
@@ -408,14 +408,14 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
             <div className="max-h-[70vh] overflow-y-auto p-6">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[#ffbf00]/20 border-t-[#ffbf00]" />
+                  <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-orange-light/20 border-t-orange-light" />
                   <p className="text-lg font-medium text-white">{loadingMessage}</p>
                   <div className="mt-4 flex gap-2">
                     {[1, 2, 3, 4].map((s) => (
                       <div
                         key={s}
                         className={`h-2 w-8 rounded-full ${
-                          s <= chainStep + 1 ? 'bg-[#ffbf00]' : 'bg-white/20'
+                          s <= chainStep + 1 ? 'bg-orange-light' : 'bg-white/20'
                         }`}
                       />
                     ))}
@@ -588,7 +588,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                       type="button"
                       onClick={handleSave}
                       disabled={loading}
-                      className="rounded-lg bg-[#ffbf00] px-4 py-2 font-medium text-black hover:bg-[#ffbf00]/90 disabled:opacity-50"
+                      className="rounded-lg bg-orange-light px-4 py-2 font-medium text-black hover:bg-orange-light/90 disabled:opacity-50"
                     >
                       {editingWorkoutId ? 'Update Workout' : 'Save to Library'}
                     </button>
@@ -620,7 +620,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                             workoutInfo: { ...prev.workoutInfo, title: e.target.value },
                           }))
                         }
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         placeholder="e.g. Upper/Lower Split"
                         required
                       />
@@ -638,7 +638,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                           }))
                         }
                         rows={2}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         placeholder="Brief description of the workout set"
                         required
                       />
@@ -673,7 +673,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                             return next;
                           });
                         }}
-                        className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                        className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                       />
                       <span className="text-sm font-medium text-white/80">
                         Enable Metabolic Conditioning (HIIT) Mode
@@ -689,7 +689,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                         onClick={() => setWorkoutSetType('single')}
                         className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
                           workoutSetType === 'single'
-                            ? 'bg-[#ffbf00] text-black'
+                            ? 'bg-orange-light text-black'
                             : 'text-white/80 hover:bg-white/5 hover:text-white'
                         }`}
                       >
@@ -700,7 +700,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                         onClick={() => setWorkoutSetType('split')}
                         className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
                           workoutSetType === 'split'
-                            ? 'bg-[#ffbf00] text-black'
+                            ? 'bg-orange-light text-black'
                             : 'text-white/80 hover:bg-white/5 hover:text-white'
                         }`}
                       >
@@ -728,7 +728,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }))
                             }
-                            className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                            className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                           />
                           <span className="text-sm font-medium text-white/80">
                             Include warmup block
@@ -751,7 +751,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }))
                             }
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           >
                             {([1, 2, 3, 4, 5] as const).map((n) => (
                               <option key={n} value={n}>
@@ -775,7 +775,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }))
                             }
-                            className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                            className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                           />
                           <span className="text-sm font-medium text-white/80">
                             Include finisher block
@@ -796,7 +796,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }))
                             }
-                            className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                            className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                           />
                           <span className="text-sm font-medium text-white/80">
                             Include cool down block
@@ -827,7 +827,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }))
                             }
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           >
                             {HIIT_PROTOCOL_OPTIONS.map((o) => (
                               <option key={o.value} value={o.value}>
@@ -856,7 +856,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                   },
                                 }))
                               }
-                              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                             >
                               {HIIT_WORK_REST_OPTIONS.map((o) => (
                                 <option key={o.value} value={o.value}>
@@ -923,7 +923,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                     };
                                   })
                                 }
-                                className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                                className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                               />
                               <span className="text-sm text-white/70">{label}</span>
                             </label>
@@ -956,7 +956,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                               },
                             }))
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         />
                       </div>
                       {workoutSetType === 'split' && (
@@ -982,7 +982,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }))
                             }
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           >
                             {[1, 2, 3, 4, 5, 6, 7].map((n) => (
                               <option key={n} value={n}>
@@ -1017,7 +1017,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }));
                             }}
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           >
                             {HIIT_SESSION_TIER_OPTIONS.map((o) => (
                               <option key={o.value} value={o.value}>
@@ -1040,7 +1040,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }))
                             }
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           />
                         )}
                       </div>
@@ -1062,7 +1062,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                 },
                               }))
                             }
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           >
                             {SPLIT_OPTIONS.map((o) => (
                               <option key={o.value} value={o.value}>
@@ -1087,7 +1087,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                               },
                             }))
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         >
                           {LIFESTYLE_OPTIONS.map((o) => (
                             <option key={o.value} value={o.value}>
@@ -1111,7 +1111,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                               },
                             }))
                           }
-                          className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                          className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                         />
                         <span className="text-sm font-medium text-white/80">Two-a-day allowed</span>
                       </label>
@@ -1129,7 +1129,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                             preferredFocus: e.target.value || undefined,
                           }))
                         }
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         placeholder="e.g. upper push only"
                       />
                     </div>
@@ -1153,7 +1153,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                               },
                             }))
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         >
                           {['18-25', '26-35', '36-45', '46-55', '56-65', '65+'].map((a) => (
                             <option key={a} value={a}>
@@ -1177,7 +1177,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                               },
                             }))
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         >
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
@@ -1202,7 +1202,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                               },
                             }))
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         />
                       </div>
                       <div>
@@ -1223,7 +1223,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                               },
                             }))
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         >
                           <option value="beginner">Beginner</option>
                           <option value="intermediate">Intermediate</option>
@@ -1260,7 +1260,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                                   goals: { ...prev.goals, primary: e.target.value },
                                 }))
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         >
                           {workoutConfig.hiitMode
                             ? HIIT_PRIMARY_GOAL_OPTIONS.map((o) => (
@@ -1287,7 +1287,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                               goals: { ...prev.goals, secondary: e.target.value },
                             }))
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         >
                           {[
                             'Fat Loss',
@@ -1332,7 +1332,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                           }));
                         }
                       }}
-                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                     >
                       <option value="">None</option>
                       {zones.map((z) => (
@@ -1373,7 +1373,7 @@ const WorkoutGeneratorModal: React.FC<WorkoutGeneratorModalProps> = ({
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-6 py-2 font-medium text-black hover:bg-[#ffbf00]/90 disabled:opacity-50"
+                      className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black hover:bg-orange-light/90 disabled:opacity-50"
                     >
                       <Sparkles className="h-5 w-5" />
                       {loading ? 'Generating...' : 'Generate Workout'}

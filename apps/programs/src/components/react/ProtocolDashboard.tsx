@@ -51,13 +51,13 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
           initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
-          className="fixed inset-0 z-[90] cursor-auto overflow-y-auto bg-[#0d0500] px-6 pb-12 pt-24"
+          className="fixed inset-0 z-[90] cursor-auto overflow-y-auto bg-bg-dark px-6 pb-12 pt-24"
         >
           <div className="mx-auto flex max-w-7xl flex-col gap-12">
             {/* Dashboard Header */}
             <div className="flex flex-col items-start justify-between gap-6 border-b border-white/10 pb-10 md:flex-row md:items-end">
               <div>
-                <div className="mb-2 flex items-center gap-3 text-[#ffbf00]">
+                <div className="mb-2 flex items-center gap-3 text-orange-light">
                   <Activity className="h-5 w-5 animate-pulse" />
                   <span className="font-mono text-xs uppercase tracking-[0.4em]">
                     Operational Status: {user ? 'Active' : 'Offline'}
@@ -85,11 +85,11 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                   <div>
                     <div className="mb-2 flex items-center justify-between">
                       <span className="font-mono text-xs uppercase text-white/50">Heart Rate</span>
-                      <span className="font-bold text-[#ffbf00]">142 BPM</span>
+                      <span className="font-bold text-orange-light">142 BPM</span>
                     </div>
                     <div className="h-1 overflow-hidden rounded-full bg-white/10">
                       <motion.div
-                        className="h-full bg-[#ffbf00]"
+                        className="h-full bg-orange-light"
                         animate={{ width: ['70%', '85%', '70%'] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
                       />
@@ -125,9 +125,9 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[#ffbf00]/20 bg-[#ffbf00]/5 p-6">
+                <div className="rounded-2xl border border-orange-light/20 bg-orange-light/5 p-6">
                   <div className="mb-4 flex items-center gap-3">
-                    <User className="h-5 w-5 text-[#ffbf00]" />
+                    <User className="h-5 w-5 text-orange-light" />
                     <h5 className="font-heading text-xs font-bold uppercase">Cadet Stats</h5>
                   </div>
                   <div className="space-y-3">
@@ -164,7 +164,7 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                         className="flex flex-col gap-2 rounded-xl border border-white/5 bg-white/5 p-4"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-[10px] font-bold uppercase text-[#ffbf00]">
+                          <span className="font-mono text-[10px] font-bold uppercase text-orange-light">
                             {log.workoutName}
                           </span>
                           <span className="font-mono text-[10px] uppercase text-white/30">
@@ -175,7 +175,7 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-2.5 w-2.5 ${i < log.rating ? 'fill-current text-[#ffbf00]' : 'text-white/10'}`}
+                              className={`h-2.5 w-2.5 ${i < log.rating ? 'fill-current text-orange-light' : 'text-white/10'}`}
                             />
                           ))}
                         </div>
@@ -196,11 +196,11 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                       exit={{ opacity: 0, x: 20 }}
                       className="group relative"
                     >
-                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#ffbf00] to-[#ff4000] opacity-20 blur-2xl transition-opacity group-hover:opacity-30" />
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-light to-orange-dark opacity-20 blur-2xl transition-opacity group-hover:opacity-30" />
                       <div className="relative rounded-3xl border border-white/10 bg-black/40 p-10 backdrop-blur-md">
                         <div className="mb-8 flex items-start justify-between">
                           <div>
-                            <span className="mb-2 block font-mono text-xs uppercase tracking-[0.4em] text-[#ffbf00]">
+                            <span className="mb-2 block font-mono text-xs uppercase tracking-[0.4em] text-orange-light">
                               Current Mission
                             </span>
                             <h3 className="font-heading text-3xl font-black uppercase text-white">
@@ -210,13 +210,13 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                               Week 1 ● Day 1 ● Structural Alignment
                             </p>
                           </div>
-                          <Award className="h-10 w-10 text-[#ffbf00]" />
+                          <Award className="h-10 w-10 text-orange-light" />
                         </div>
 
                         <div className="mb-12 space-y-6">
                           <div className="flex items-start gap-4">
                             <div
-                              className={`rounded-lg border p-3 transition-colors ${checkedIn ? 'border-[#ffbf00] bg-[#ffbf00] text-black' : 'border-white/10 bg-white/5 text-white/40'}`}
+                              className={`rounded-lg border p-3 transition-colors ${checkedIn ? 'border-orange-light bg-orange-light text-black' : 'border-white/10 bg-white/5 text-white/40'}`}
                             >
                               <CheckCircle2 className="h-5 w-5" />
                             </div>
@@ -245,8 +245,8 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                           onClick={() => setCheckedIn(!checkedIn)}
                           className={`flex w-full items-center justify-center gap-3 rounded-xl py-5 text-sm font-black uppercase tracking-widest transition-all ${
                             checkedIn
-                              ? 'cursor-default border border-[#ffbf00]/30 bg-white/10 text-[#ffbf00]'
-                              : 'bg-white text-black hover:bg-[#ffbf00]'
+                              ? 'cursor-default border border-orange-light/30 bg-white/10 text-orange-light'
+                              : 'bg-white text-black hover:bg-orange-light'
                           }`}
                         >
                           {checkedIn ? (
@@ -296,14 +296,14 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
-                    <TrendingUp className="mx-auto mb-2 h-6 w-6 text-[#ffbf00]" />
+                    <TrendingUp className="mx-auto mb-2 h-6 w-6 text-orange-light" />
                     <div className="font-mono text-[10px] uppercase text-white/40">
                       Efficiency Prime
                     </div>
                     <div className="text-xl font-bold">94.8%</div>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
-                    <BarChart3 className="mx-auto mb-2 h-6 w-6 text-[#ffbf00]" />
+                    <BarChart3 className="mx-auto mb-2 h-6 w-6 text-orange-light" />
                     <div className="font-mono text-[10px] uppercase text-white/40">
                       Total Sessions
                     </div>

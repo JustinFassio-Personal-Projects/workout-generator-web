@@ -71,7 +71,7 @@ const ConversionModal: React.FC<ConversionModalProps> = ({
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
             transition={reduceMotion ? { duration: 0 } : undefined}
-            className="relative w-full max-w-xl overflow-hidden rounded-[3rem] border border-white/10 bg-[#0d0500] p-8 shadow-[0_50px_100px_rgba(0,0,0,0.8)] md:p-10"
+            className="relative w-full max-w-xl overflow-hidden rounded-[3rem] border border-white/10 bg-bg-dark p-8 shadow-[0_50px_100px_rgba(0,0,0,0.8)] md:p-10"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -84,11 +84,11 @@ const ConversionModal: React.FC<ConversionModalProps> = ({
             </button>
 
             <div className="mb-8 text-center">
-              <Zap className="mx-auto mb-4 h-12 w-12 text-[#ffbf00]" />
+              <Zap className="mx-auto mb-4 h-12 w-12 text-orange-light" />
               <h3 className="mb-2 font-heading text-2xl font-black uppercase tracking-tighter text-white md:text-3xl">
                 Unlock AI Optimization
               </h3>
-              <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+              <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
                 Save client data and get smarter program recommendations.
               </p>
             </div>
@@ -96,8 +96,8 @@ const ConversionModal: React.FC<ConversionModalProps> = ({
             <ul className="mb-10 space-y-6">
               {FEATURES.map(({ icon: Icon, title, description }) => (
                 <li key={title} className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#ffbf00]/20 bg-[#ffbf00]/10">
-                    <Icon className="h-5 w-5 text-[#ffbf00]" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-orange-light/20 bg-orange-light/10">
+                    <Icon className="h-5 w-5 text-orange-light" />
                   </div>
                   <div>
                     <h4 className="font-heading text-sm font-black uppercase tracking-tighter text-white">
@@ -118,7 +118,7 @@ const ConversionModal: React.FC<ConversionModalProps> = ({
                   onUpgrade?.();
                   onClose();
                 }}
-                className="w-full rounded-2xl bg-[#ffbf00] py-6 font-heading font-black uppercase tracking-[0.3em] text-black shadow-[0_20px_40px_rgba(255,191,0,0.15)] transition-colors hover:bg-[#ff8000]"
+                className="w-full rounded-2xl bg-orange-light py-6 font-heading font-black uppercase tracking-[0.3em] text-black shadow-[0_20px_40px_rgba(255,191,0,0.15)] transition-colors hover:bg-orange-medium"
               >
                 Upgrade — $6/mo
               </motion.button>

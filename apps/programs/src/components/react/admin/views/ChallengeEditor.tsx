@@ -223,7 +223,7 @@ const ChallengeEditor: React.FC = () => {
           <button
             onClick={() => setShowGeneratorModal(true)}
             disabled={!challengeConfig}
-            className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-4 py-2 font-medium text-black transition-colors hover:bg-[#ffbf00]/90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Sparkles className="h-5 w-5" />
             <span>Edit schedule with AI</span>
@@ -267,7 +267,7 @@ const ChallengeEditor: React.FC = () => {
             type="text"
             value={formData.theme}
             onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
-            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
             placeholder="e.g. Strength Builder, Fat Loss"
             disabled={saving}
           />
@@ -293,7 +293,7 @@ const ChallengeEditor: React.FC = () => {
           <ul className="space-y-2">
             {challenge.milestones.map((m, i) => (
               <li key={i} className="flex items-center gap-3 text-white/80">
-                <span className="rounded-full bg-[#ffbf00]/20 px-2 py-1 text-xs text-[#ffbf00]">
+                <span className="rounded-full bg-orange-light/20 px-2 py-1 text-xs text-orange-light">
                   Week {m.week}
                 </span>
                 <span>{m.label}</span>

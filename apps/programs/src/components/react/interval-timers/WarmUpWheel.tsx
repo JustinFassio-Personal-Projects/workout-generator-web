@@ -103,14 +103,14 @@ const WarmUpWheel: React.FC<WarmUpWheelProps> = ({
             transform: activeIndex === exercises.length ? 'scale(1.1)' : 'scale(0.9)',
           }}
         >
-          <h3 className="font-display m-0 text-lg font-bold text-[#ffbf00]">Warm-up Complete!</h3>
+          <h3 className="font-display m-0 text-lg font-bold text-orange-light">Warm-up Complete!</h3>
         </div>
       </div>
 
       {elapsedSeconds > 0 && !isFinished && (
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
           <div
-            className="h-full bg-[#ffbf00] transition-all duration-1000 ease-linear"
+            className="h-full bg-orange-light transition-all duration-1000 ease-linear"
             style={{ width: `${segmentProgress}%` }}
           />
         </div>

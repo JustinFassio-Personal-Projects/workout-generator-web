@@ -121,7 +121,7 @@ const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onEdit }) => 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#ffbf00]" />
+        <Loader2 className="h-8 w-8 animate-spin text-orange-light" />
         <span className="ml-3 text-white/60">Loading workouts...</span>
       </div>
     );
@@ -146,7 +146,7 @@ const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onEdit }) => 
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as 'all' | 'draft' | 'published')}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
           >
             <option value="all">All</option>
             <option value="draft">Draft</option>
@@ -249,7 +249,7 @@ const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onEdit }) => 
                         {onEdit ? (
                           <button
                             onClick={() => onEdit(item.id)}
-                            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-[#ffbf00]"
+                            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-orange-light"
                             title="Edit workout"
                           >
                             <Edit className="h-4 w-4" />
@@ -257,7 +257,7 @@ const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onEdit }) => 
                         ) : (
                           <Link
                             to={item.id}
-                            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-[#ffbf00]"
+                            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-orange-light"
                             title="Edit workout"
                           >
                             <Edit className="h-4 w-4" />

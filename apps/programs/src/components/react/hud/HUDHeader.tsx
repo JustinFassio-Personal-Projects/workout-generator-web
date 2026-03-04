@@ -70,7 +70,7 @@ const HUDHeader: React.FC<HUDHeaderProps> = ({ onClose, notificationCount = 0, o
               />
             ) : (
               <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/10 font-mono text-xs font-bold text-[#ffbf00]"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/10 font-mono text-xs font-bold text-orange-light"
                 aria-hidden
               >
                 {getInitials(trainerProfile.displayName, null)}
@@ -89,7 +89,7 @@ const HUDHeader: React.FC<HUDHeaderProps> = ({ onClose, notificationCount = 0, o
 
       {/* Center: App wordmark (hidden on mobile) */}
       <div className="hidden flex-shrink-0 md:block">
-        <span className="font-heading text-lg font-black uppercase tracking-tighter text-[#ffbf00]">
+        <span className="font-heading text-lg font-black uppercase tracking-tighter text-orange-light">
           AI FITCOPILOT
         </span>
       </div>
@@ -107,7 +107,7 @@ const HUDHeader: React.FC<HUDHeaderProps> = ({ onClose, notificationCount = 0, o
           >
             <Bell className="h-5 w-5" />
             {notificationCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ffbf00] px-1 font-mono text-[10px] font-bold text-black">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-light px-1 font-mono text-[10px] font-bold text-black">
                 {notificationCount > 99 ? '99+' : notificationCount}
               </span>
             )}
@@ -130,7 +130,7 @@ const HUDHeader: React.FC<HUDHeaderProps> = ({ onClose, notificationCount = 0, o
                     className="h-full w-full rounded-full object-cover"
                   />
                 ) : (
-                  <span className="font-mono text-sm font-bold text-[#ffbf00]">
+                  <span className="font-mono text-sm font-bold text-orange-light">
                     {getInitials(user.displayName, user.email)}
                   </span>
                 )}
@@ -139,7 +139,7 @@ const HUDHeader: React.FC<HUDHeaderProps> = ({ onClose, notificationCount = 0, o
               {dropdownOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-lg border border-white/10 bg-[#0d0500] py-1 shadow-xl"
+                  className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-lg border border-white/10 bg-bg-dark py-1 shadow-xl"
                 >
                   <a
                     href="/profile"

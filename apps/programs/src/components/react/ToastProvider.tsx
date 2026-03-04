@@ -26,7 +26,7 @@ const ToastProvider: React.FC = () => {
           toast: 'font-sans',
           title: 'font-medium',
           description: 'text-white/70',
-          actionButton: 'bg-[#ffbf00] text-black font-bold',
+          actionButton: 'bg-orange-light text-black font-bold',
           cancelButton: 'bg-white/10 text-white',
           closeButton: 'bg-white/10 border-white/20 text-white hover:bg-white/20',
         },

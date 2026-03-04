@@ -40,7 +40,7 @@ const WeekView: React.FC<WeekViewProps> = ({
         className="flex cursor-pointer items-center justify-between bg-white/5 px-6 py-4 transition-colors hover:bg-white/10"
       >
         <div className="flex items-center gap-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-[#ffbf00] font-black text-black">
+          <div className="flex h-8 w-8 items-center justify-center rounded bg-orange-light font-black text-black">
             {weekNumber}
           </div>
           <h3 className="font-heading text-lg font-bold uppercase tracking-wider text-white">
@@ -84,7 +84,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                           e.stopPropagation();
                           onAddWorkout(weekNumber, dayIndex);
                         }}
-                        className="rounded p-1 text-white/20 opacity-0 transition-all hover:bg-[#ffbf00] hover:text-black group-hover:opacity-100"
+                        className="rounded p-1 text-white/20 opacity-0 transition-all hover:bg-orange-light hover:text-black group-hover:opacity-100"
                         title="Add Workout"
                       >
                         <Plus className="h-3 w-3" />
@@ -97,10 +97,10 @@ const WeekView: React.FC<WeekViewProps> = ({
                         <div
                           key={workout.id}
                           onClick={() => onEditWorkout(workout)}
-                          className="group/card relative cursor-pointer rounded-lg border border-white/5 bg-[#1a1a1a] p-3 shadow-sm transition-all hover:border-[#ffbf00]/50 hover:bg-[#2a2a2a] hover:shadow-md"
+                          className="group/card relative cursor-pointer rounded-lg border border-white/5 bg-[#1a1a1a] p-3 shadow-sm transition-all hover:border-orange-light/50 hover:bg-[#2a2a2a] hover:shadow-md"
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <h4 className="line-clamp-2 text-xs font-bold text-white group-hover/card:text-[#ffbf00]">
+                            <h4 className="line-clamp-2 text-xs font-bold text-white group-hover/card:text-orange-light">
                               {workout.title}
                             </h4>
                             <button

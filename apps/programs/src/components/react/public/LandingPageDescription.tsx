@@ -132,7 +132,7 @@ const LandingPageDescription: React.FC<LandingPageDescriptionProps> = ({
             {metadata.difficulty}
           </span>
           {metadata.theme && (
-            <span className="rounded bg-[#ffbf00]/20 px-3 py-1 text-sm text-[#ffbf00]">
+            <span className="rounded bg-orange-light/20 px-3 py-1 text-sm text-orange-light">
               {metadata.theme}
             </span>
           )}
@@ -142,7 +142,7 @@ const LandingPageDescription: React.FC<LandingPageDescriptionProps> = ({
           <ul className="space-y-1.5 text-sm text-white/80">
             {glanceBullets.map((bullet, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#ffbf00]" />
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-orange-light" />
                 <span>{bullet}</span>
               </li>
             ))}
@@ -182,7 +182,7 @@ const LandingPageDescription: React.FC<LandingPageDescriptionProps> = ({
                 onKeyDown={(e) => handleTabKeyDown(e, index)}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-[#ffbf00]/20 text-[#ffbf00]'
+                    ? 'bg-orange-light/20 text-orange-light'
                     : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
                 }`}
               >

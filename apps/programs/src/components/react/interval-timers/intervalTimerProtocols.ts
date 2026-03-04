@@ -63,9 +63,9 @@ export interface ProtocolAccentTheme {
 }
 
 export const GOLD_ACCENT: ProtocolAccentTheme = {
-  badge: 'bg-[#ffbf00]/20',
-  badgeText: 'text-[#ffbf00]',
-  workBg: 'bg-[#ffbf00]',
+  badge: 'bg-orange-light/20',
+  badgeText: 'text-orange-light',
+  workBg: 'bg-orange-light',
 };
 
 /** Per-protocol accent themes. Tabata red, Mindful green; others default to gold. */

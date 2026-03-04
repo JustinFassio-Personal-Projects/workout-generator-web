@@ -1,9 +1,5 @@
 // Global Styles for Astro
-// Note: Using @use without 'as *' because these files define CSS custom properties (:root)
-// which are automatically global. CSS custom properties don't require namespacing.
-@use './design-system/colors.scss';
-@use './design-system/tokens.scss';
-@use './design-system/animations.scss';
+// Tokens and base styles (fonts, html/body/headings, scrollbar) come from @workout-generator/design-system.
 
 /* Tailwind is loaded from global.css so the @tailwindcss/vite plugin can process it */
 
@@ -22,17 +18,7 @@
   }
 
   body {
-    font-family: var(
-      --font-sans,
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      Roboto,
-      'Helvetica Neue',
-      Arial,
-      sans-serif
-    );
+    font-family: 'Space Grotesk', sans-serif;
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
     color: var(--text-primary);
@@ -48,13 +34,14 @@
   }
 }
 
-// Typography
+// Typography (font-family from global.css; sizes/weights here)
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
+  font-family: 'Syncopate', sans-serif;
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   color: var(--text-primary);
@@ -174,24 +161,6 @@ a {
   }
 }
 
-// Scrollbar Styling
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-dark);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-gray-700);
-  border-radius: var(--radius-full);
-
-  &:hover {
-    background: var(--color-gray-600);
-  }
-}
-
 // Selection Styling
 ::selection {
   background: var(--color-accent);
@@ -273,6 +242,10 @@ a {
 // Font utility classes
 .font-display {
   font-family: var(--font-display, var(--font-sans));
+}
+
+.font-heading {
+  font-family: 'Syncopate', sans-serif;
 }
 
 .font-serif-display {

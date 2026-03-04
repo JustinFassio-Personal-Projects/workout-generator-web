@@ -97,9 +97,9 @@ function PrescriptionCard({
     <article
       className={`flex flex-col rounded-3xl border p-[2px] shadow-2xl backdrop-blur-sm transition ${
         isTopMatch
-          ? 'border-[#ffbf00]/60 bg-[#ffbf00]/10'
+          ? 'border-orange-light/60 bg-orange-light/10'
           : program.matchScore >= 50
-            ? 'border-white/10 bg-black/20 hover:border-[#ffbf00]/30 hover:bg-black/30'
+            ? 'border-white/10 bg-black/20 hover:border-orange-light/30 hover:bg-black/30'
             : 'border-white/5 bg-black/10 opacity-75'
       } ${program.matchScore < 30 ? 'grayscale' : ''}`}
     >
@@ -107,7 +107,7 @@ function PrescriptionCard({
       <GridCard
         headerImage={program.image ?? DEFAULT_PROGRAM_IMAGE}
         headerImageAlt={program.title ?? 'Program'}
-        className="border-[#ffbf00]/40"
+        className="border-orange-light/40"
         headerContent={
           <>
             <div className="min-w-0 flex-1">
@@ -115,7 +115,7 @@ function PrescriptionCard({
                 {program.title || 'Untitled Program'}
               </h2>
               {isTopMatch && (
-                <p className="mt-1 font-mono text-xs uppercase tracking-wider text-[#ffbf00]">
+                <p className="mt-1 font-mono text-xs uppercase tracking-wider text-orange-light">
                   Dr. Kinetics Prescribes…
                 </p>
               )}
@@ -157,13 +157,13 @@ function PrescriptionCard({
               <div>
                 <div className="mb-1 flex items-center justify-between">
                   <span className="font-mono text-[10px] uppercase text-white/50">Equipment</span>
-                  <span className="font-bold text-[#ffbf00]">
+                  <span className="font-bold text-orange-light">
                     {program.componentScores.equipment}%
                   </span>
                 </div>
                 <div className="h-1 overflow-hidden rounded-full bg-white/10">
                   <motion.div
-                    className="h-full bg-[#ffbf00]"
+                    className="h-full bg-orange-light"
                     initial={false}
                     animate={{ width: `${program.componentScores.equipment}%` }}
                     transition={{ duration: 0.5 }}
@@ -173,13 +173,13 @@ function PrescriptionCard({
               <div>
                 <div className="mb-1 flex items-center justify-between">
                   <span className="font-mono text-[10px] uppercase text-white/50">Experience</span>
-                  <span className="font-bold text-[#ffbf00]">
+                  <span className="font-bold text-orange-light">
                     {program.componentScores.experience}%
                   </span>
                 </div>
                 <div className="h-1 overflow-hidden rounded-full bg-white/10">
                   <motion.div
-                    className="h-full bg-[#ffbf00]"
+                    className="h-full bg-orange-light"
                     initial={false}
                     animate={{ width: `${program.componentScores.experience}%` }}
                     transition={{ duration: 0.5 }}
@@ -237,7 +237,7 @@ function PrescriptionCard({
         <div className="mt-auto">
           <a
             href={`/programs/${program.id}`}
-            className="inline-flex items-center gap-1 rounded-lg bg-[#ffbf00] px-4 py-2 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-white"
+            className="inline-flex items-center gap-1 rounded-lg bg-orange-light px-4 py-2 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-white"
           >
             View Program
             <ChevronRight className="h-4 w-4" />
@@ -320,7 +320,7 @@ const ProgramPrescriptionEngine: React.FC<ProgramPrescriptionEngineProps> = ({
           <h1 className="mb-2 font-heading text-3xl font-bold text-white md:text-4xl">
             Kinetic Prescription Engine
           </h1>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#ffbf00]">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-orange-light">
             Tune your inputs — we rank protocols in real time
           </p>
         </div>
@@ -329,7 +329,7 @@ const ProgramPrescriptionEngine: React.FC<ProgramPrescriptionEngineProps> = ({
             <button
               type="button"
               onClick={() => setFiltersOpen(true)}
-              className="inline-flex items-center gap-2 rounded-full border border-[#ffbf00]/50 bg-[#ffbf00]/20 px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-[#ffbf00] transition-all hover:bg-[#ffbf00]/30"
+              className="inline-flex items-center gap-2 rounded-full border border-orange-light/50 bg-orange-light/20 px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-all hover:bg-orange-light/30"
             >
               <SlidersHorizontal className="h-4 w-4" />
               Filters
@@ -407,7 +407,7 @@ const ProgramPrescriptionEngine: React.FC<ProgramPrescriptionEngineProps> = ({
           ) : (
             <>
               {topMatch && (
-                <div className="rounded-xl border border-[#ffbf00]/30 bg-black/20 p-4">
+                <div className="rounded-xl border border-orange-light/30 bg-black/20 p-4">
                   <PrescriptionCard program={topMatch} zonesMap={zonesMap} isTopMatch />
                 </div>
               )}

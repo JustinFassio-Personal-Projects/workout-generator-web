@@ -47,7 +47,7 @@ const LevelFilter: React.FC<LevelFilterProps> = ({
             onClick={() => onLevelChange(opt.value)}
             className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
               selectedLevel === opt.value
-                ? 'border-[#ffbf00]/50 bg-[#ffbf00]/20 text-[#ffbf00]'
+                ? 'border-orange-light/50 bg-orange-light/20 text-orange-light'
                 : 'border-white/10 bg-white/5 text-white/70 hover:border-white/20'
             }`}
           >

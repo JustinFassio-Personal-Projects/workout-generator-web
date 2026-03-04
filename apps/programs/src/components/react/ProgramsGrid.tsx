@@ -40,7 +40,7 @@ const ProgramsGrid: React.FC<ProgramsGridProps> = ({
                 <h2 className="mb-2 font-heading text-4xl font-bold uppercase tracking-tighter text-white md:text-7xl">
                   Bodyweight Fusion
                 </h2>
-                <p className="font-mono text-xs uppercase tracking-[0.3em] text-[#ffbf00]">
+                <p className="font-mono text-xs uppercase tracking-[0.3em] text-orange-light">
                   Tactical Progression Architect
                 </p>
               </div>
@@ -54,7 +54,7 @@ const ProgramsGrid: React.FC<ProgramsGridProps> = ({
 
             {loading ? (
               <div className="flex items-center justify-center py-24">
-                <Loader2 className="h-10 w-10 animate-spin text-[#ffbf00]" />
+                <Loader2 className="h-10 w-10 animate-spin text-orange-light" />
                 <span className="ml-3 text-white/60">Loading programs...</span>
               </div>
             ) : (
@@ -78,14 +78,14 @@ const ProgramsGrid: React.FC<ProgramsGridProps> = ({
 
                     <div className="absolute inset-0 flex flex-col justify-between p-8">
                       <div className="flex items-start justify-between">
-                        <div className="rounded bg-[#ffbf00] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-black">
+                        <div className="rounded bg-orange-light px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-black">
                           {program.weeks} Weeks
                         </div>
                         <IntensityBars level={program.intensity} />
                       </div>
 
                       <div>
-                        <h3 className="mb-4 font-heading text-2xl font-bold uppercase leading-none tracking-tighter text-white transition-colors group-hover:text-[#ffbf00] md:text-4xl">
+                        <h3 className="mb-4 font-heading text-2xl font-bold uppercase leading-none tracking-tighter text-white transition-colors group-hover:text-orange-light md:text-4xl">
                           {program.name}
                         </h3>
                         <div className="mb-6 line-clamp-3 text-sm font-light leading-relaxed text-gray-400">
@@ -95,7 +95,7 @@ const ProgramsGrid: React.FC<ProgramsGridProps> = ({
                           <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
                             {program.focus}
                           </span>
-                          <div className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase text-white transition-colors group-hover:text-[#ffbf00]">
+                          <div className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase text-white transition-colors group-hover:text-orange-light">
                             {program.programDetail ? 'Review Program' : 'View Program'}{' '}
                             <ArrowUpRight className="h-4 w-4" />
                           </div>

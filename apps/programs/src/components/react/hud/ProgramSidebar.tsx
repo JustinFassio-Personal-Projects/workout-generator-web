@@ -138,7 +138,7 @@ const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
       id="program-sidebar"
       className="space-y-6 rounded-xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm"
     >
-      <h4 className="border-b border-[#ffbf00]/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+      <h4 className="border-b border-orange-light/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
         Program
       </h4>
 
@@ -148,16 +148,16 @@ const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
           Active program
         </p>
         {activeProgram && weekInfo ? (
-          <div className="rounded-xl border border-[#ffbf00]/20 bg-white/5 p-4">
+          <div className="rounded-xl border border-orange-light/20 bg-white/5 p-4">
             <p className="mb-1 font-heading text-sm font-black uppercase tracking-tighter text-white">
               {activeProgram.title ?? 'Program'}
             </p>
-            <p className="mb-2 font-mono text-[10px] uppercase text-[#ffbf00]/80">
+            <p className="mb-2 font-mono text-[10px] uppercase text-orange-light/80">
               Week {weekInfo.current} of {weekInfo.total}
             </p>
             <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-white/10">
               <div
-                className="h-full rounded-full bg-[#ffbf00]"
+                className="h-full rounded-full bg-orange-light"
                 style={{
                   width: `${Math.min(100, (weekInfo.current / weekInfo.total) * 100)}%`,
                 }}
@@ -170,7 +170,7 @@ const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                     ? 'bg-green-500/20 text-green-400'
                     : weekInfo.status === 'not_started'
                       ? 'bg-white/10 text-white/60'
-                      : 'bg-[#ffbf00]/20 text-[#ffbf00]'
+                      : 'bg-orange-light/20 text-orange-light'
                 }`}
               >
                 {weekInfo.status === 'complete'
@@ -189,7 +189,7 @@ const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
               type="button"
               onClick={handleContinue}
               disabled={continueLoading || weekInfo.status === 'not_started'}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#ffbf00] py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-orange-light py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               <Play className="h-3.5 w-3.5" />
               {continueLoading ? 'Loading…' : 'Continue'}
@@ -224,7 +224,7 @@ const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                 <li
                   key={program.programId}
                   className={`rounded-xl border p-4 transition-colors ${
-                    isActive ? 'border-[#ffbf00]/40 bg-white/10' : 'border-white/5 bg-white/5'
+                    isActive ? 'border-orange-light/40 bg-white/10' : 'border-white/5 bg-white/5'
                   }`}
                 >
                   <button
@@ -235,7 +235,7 @@ const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                     {program.title ?? 'Program'}
                   </button>
                   {program.startDate && (
-                    <p className="mb-2 font-mono text-[10px] uppercase text-[#ffbf00]/80">
+                    <p className="mb-2 font-mono text-[10px] uppercase text-orange-light/80">
                       Calendar: starts {program.startDate}
                     </p>
                   )}
@@ -245,7 +245,7 @@ const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                         <button
                           type="button"
                           onClick={onOpenConversionModal}
-                          className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 py-2.5 font-mono text-[10px] uppercase tracking-widest text-white/60 transition-colors hover:border-[#ffbf00]/30 hover:text-[#ffbf00]"
+                          className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 py-2.5 font-mono text-[10px] uppercase tracking-widest text-white/60 transition-colors hover:border-orange-light/30 hover:text-orange-light"
                           title="Upgrade to unlock"
                         >
                           <Lock className="h-3.5 w-3.5" />
@@ -254,7 +254,7 @@ const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                         <button
                           type="button"
                           onClick={onOpenConversionModal}
-                          className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 py-2.5 font-mono text-[10px] uppercase tracking-widest text-white/60 transition-colors hover:border-[#ffbf00]/30 hover:text-[#ffbf00]"
+                          className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 py-2.5 font-mono text-[10px] uppercase tracking-widest text-white/60 transition-colors hover:border-orange-light/30 hover:text-orange-light"
                           title="Upgrade to unlock"
                         >
                           <Lock className="h-3.5 w-3.5" />

@@ -77,7 +77,7 @@ const zonesForClient = zones.map((z) => ({ id: z.id, name: z.name }));
 
 <BaseLayout title={pageTitle} description={pageDescription} canonicalUrl={canonicalPageUrl}>
   <div
-    class="relative min-h-screen overflow-x-hidden text-white selection:bg-[#ffbf00] selection:text-black"
+    class="relative min-h-screen overflow-x-hidden text-white selection:bg-orange-light selection:text-black"
   >
     <StandaloneNav client:load pathname={Astro.url.pathname} />
     <main class="pt-24">
@@ -103,7 +103,7 @@ const zonesForClient = zones.map((z) => ({ id: z.id, name: z.name }));
             </p>
             <a
               href="/challenges"
-              class="inline-flex items-center gap-2 rounded-lg bg-[#ffbf00] px-5 py-3 font-bold uppercase tracking-wider text-black transition hover:bg-white"
+              class="inline-flex items-center gap-2 rounded-lg bg-orange-light px-5 py-3 font-bold uppercase tracking-wider text-black transition hover:bg-white"
             >
               Browse challenges
             </a>

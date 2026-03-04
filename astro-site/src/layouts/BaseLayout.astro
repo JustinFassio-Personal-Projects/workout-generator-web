@@ -1,18 +1,12 @@
 ---
-// Import styles
+// Import styles (design-system before Tailwind so tokens are available)
+import '@workout-generator/design-system';
 import '@/styles/global.css';
 import '@/styles/globals.scss';
 import 'aos/dist/aos.css';
 import Navbar from '@/components/landing/Navbar.astro';
 
-// Import fonts
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/inter/700.css';
-import '@fontsource/space-grotesk/300.css';
-import '@fontsource/space-grotesk/500.css';
-import '@fontsource/space-grotesk/700.css';
+// Import fonts (Space Grotesk + Syncopate are self-hosted via global.css; Cinzel for about page)
 import '@fontsource/cinzel/400.css';
 import '@fontsource/cinzel/500.css';
 import '@fontsource/cinzel/600.css';
@@ -202,16 +196,12 @@ const allStructuredData = [
       </>
     )}
     
-    <!-- Font Variables for CSS -->
+    <!-- Font Variables for CSS (body/headings set in global.css) -->
     <style is:global>
       :root {
-        --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        --font-display: 'Space Grotesk', var(--font-sans);
+        --font-sans: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-display: 'Syncopate', var(--font-sans);
         --font-serif-display: 'Cinzel', Georgia, 'Times New Roman', serif;
-      }
-      
-      body {
-        font-family: var(--font-sans);
       }
     </style>
   </head>

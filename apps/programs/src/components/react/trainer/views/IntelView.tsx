@@ -107,7 +107,7 @@ const IntelView: React.FC = () => {
       label: 'Roster Activity',
       value: stats.recentActivity.length > 0 ? 'Recent' : 'None yet',
       icon: TrendingUp,
-      color: 'text-[#ffbf00]',
+      color: 'text-orange-light',
     },
   ];
 

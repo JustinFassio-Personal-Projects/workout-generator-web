@@ -62,9 +62,9 @@ const AIChat: React.FC = () => {
             className="mb-4 w-[90vw] overflow-hidden rounded-2xl border border-white/10 bg-black/80 shadow-2xl shadow-[#ff4000]/20 backdrop-blur-xl md:w-96"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#ff4000]/50 to-[#ff1500]/50 p-4">
+            <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#ff4000]/50 to-orange-darkest/50 p-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 animate-pulse text-[#ffbf00]" />
+                <Sparkles className="h-5 w-5 animate-pulse text-orange-light" />
                 <h3 className="font-heading text-xs font-bold tracking-wider text-white">
                   AI FITCOPILOT
                 </h3>
@@ -103,15 +103,15 @@ const AIChat: React.FC = () => {
                 <div className="flex justify-start">
                   <div className="flex gap-1 rounded-lg rounded-tl-none bg-white/10 p-3">
                     <span
-                      className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#ffbf00]"
+                      className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-light"
                       style={{ animationDelay: '0ms' }}
                     />
                     <span
-                      className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#ffbf00]"
+                      className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-light"
                       style={{ animationDelay: '150ms' }}
                     />
                     <span
-                      className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#ffbf00]"
+                      className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-light"
                       style={{ animationDelay: '300ms' }}
                     />
                   </div>
@@ -154,7 +154,7 @@ const AIChat: React.FC = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="group z-50 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-gradient-to-tr from-[#ffbf00] to-[#ff1500] shadow-lg shadow-[#ff4000]/40 md:h-14 md:w-14"
+        className="group z-50 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-gradient-to-tr from-orange-light to-orange-darkest shadow-lg shadow-[#ff4000]/40 md:h-14 md:w-14"
         data-hover="true"
       >
         {isOpen ? (

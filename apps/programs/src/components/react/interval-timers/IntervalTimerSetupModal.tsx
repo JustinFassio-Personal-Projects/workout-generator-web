@@ -55,7 +55,7 @@ const IntervalTimerSetupModal: React.FC<IntervalTimerSetupModalProps> = ({
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="animate-zoom-in relative flex max-h-[calc(100vh-2rem)] w-full max-w-2xl shrink-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0500] shadow-2xl duration-200">
+      <div className="animate-zoom-in relative flex max-h-[calc(100vh-2rem)] w-full max-w-2xl shrink-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-bg-dark shadow-2xl duration-200">
         <div className="relative shrink-0 border-b border-white/10 p-6 text-center">
           <h3 className="font-display text-xl font-bold text-white">{title}</h3>
           <p className="mt-1 text-sm text-white/70">{subtitle}</p>
@@ -63,7 +63,7 @@ const IntervalTimerSetupModal: React.FC<IntervalTimerSetupModalProps> = ({
             <button
               type="button"
               onClick={onBack}
-              className="absolute left-6 top-1/2 -translate-y-1/2 text-sm text-white/70 hover:text-[#ffbf00]"
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-sm text-white/70 hover:text-orange-light"
             >
               ← Back
             </button>
@@ -76,7 +76,7 @@ const IntervalTimerSetupModal: React.FC<IntervalTimerSetupModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-sm font-bold text-white/60 hover:text-[#ffbf00]"
+            className="text-sm font-bold text-white/60 hover:text-orange-light"
           >
             Cancel
           </button>

@@ -760,7 +760,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
             onClick={(e) => e.stopPropagation()}
-            className={`relative w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0d0500] shadow-[0_0_100px_rgba(255,191,0,0.1)] ${
+            className={`relative w-full overflow-hidden rounded-2xl border border-white/10 bg-bg-dark shadow-[0_0_100px_rgba(255,191,0,0.1)] ${
               step === 'preview'
                 ? 'max-w-6xl'
                 : step === 'blueprint' || step === 'architect'
@@ -771,7 +771,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 p-6">
               <div className="flex items-center gap-3">
-                <Sparkles className="h-6 w-6 text-[#ffbf00]" />
+                <Sparkles className="h-6 w-6 text-orange-light" />
                 <div>
                   <h2 className="font-heading text-2xl font-bold">
                     {isEditMode
@@ -810,7 +810,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
             <div className="max-h-[70vh] overflow-y-auto p-6">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[#ffbf00]/20 border-t-[#ffbf00]"></div>
+                  <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-orange-light/20 border-t-orange-light"></div>
                   <p className="text-lg font-medium text-white">{loadingMessage}</p>
                   {/* Chain step progress indicator */}
                   <div className="mt-4 flex gap-2">
@@ -818,7 +818,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                       <div
                         key={step}
                         className={`h-2 w-8 rounded-full transition-colors ${
-                          step <= chainStep + 1 ? 'bg-[#ffbf00]' : 'bg-white/20'
+                          step <= chainStep + 1 ? 'bg-orange-light' : 'bg-white/20'
                         }`}
                       />
                     ))}
@@ -936,7 +936,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                             },
                           }))
                         }
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         placeholder="Program title"
                         required
                       />
@@ -959,7 +959,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                           }))
                         }
                         rows={3}
-                        className="w-full resize-none rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                        className="w-full resize-none rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                         placeholder="Program description"
                         required
                       />
@@ -993,7 +993,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                             }
                             className={`flex-1 rounded-lg border px-4 py-3 font-medium transition-colors ${
                               programConfig.requirements.durationWeeks === weeks
-                                ? 'border-[#ffbf00] bg-[#ffbf00]/20 text-[#ffbf00]'
+                                ? 'border-orange-light bg-orange-light/20 text-orange-light'
                                 : 'border-white/10 bg-black/20 text-white/70 hover:border-white/20 hover:text-white'
                             }`}
                           >
@@ -1042,7 +1042,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                             }));
                           }
                         }}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                       >
                         <option value="">None - Generate without zone context</option>
                         {zones.map((zone) => (
@@ -1056,7 +1056,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
 
                     {/* Zone Info Display with Equipment Selection */}
                     {selectedZone && (
-                      <div className="rounded-lg border border-[#ffbf00]/20 bg-[#ffbf00]/10 p-4">
+                      <div className="rounded-lg border border-orange-light/20 bg-orange-light/10 p-4">
                         <div className="mb-2 font-medium text-white">{selectedZone.name}</div>
                         {selectedZone.biomechanicalConstraints.length > 0 && (
                           <div className="mb-3 flex flex-wrap gap-1">
@@ -1122,7 +1122,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                                           }));
                                         }
                                       }}
-                                      className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                                      className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                                     />
                                     <span
                                       className={`text-sm ${isSelected ? 'text-white' : 'text-white/50'}`}
@@ -1147,7 +1147,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                               selectedEquipmentIds: undefined,
                             }));
                           }}
-                          className="mt-3 text-sm text-[#ffbf00] underline hover:text-[#ffbf00]/80"
+                          className="mt-3 text-sm text-orange-light underline hover:text-orange-light/80"
                         >
                           Clear Zone
                         </button>
@@ -1166,7 +1166,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                         <select
                           value={programConfig.targetAudience.ageRange}
                           onChange={(e) => handleTargetAudienceChange('ageRange', e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           required
                         >
                           <option value="18-25">18-25</option>
@@ -1185,7 +1185,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                         <select
                           value={programConfig.targetAudience.sex}
                           onChange={(e) => handleTargetAudienceChange('sex', e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           required
                         >
                           <option value="Male">Male</option>
@@ -1206,7 +1206,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                           onChange={(e) =>
                             handleTargetAudienceChange('weight', parseInt(e.target.value) || 0)
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           required
                         />
                       </div>
@@ -1223,7 +1223,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                               e.target.value as 'beginner' | 'intermediate' | 'advanced'
                             )
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           required
                         >
                           <option value="beginner">Beginner</option>
@@ -1248,7 +1248,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                           onChange={(e) =>
                             handleMedicalContextChange('includeInjuries', e.target.checked)
                           }
-                          className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                          className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                         />
                         <span className="text-sm font-medium text-white/80">
                           Include Injury Constraints?
@@ -1264,7 +1264,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                             value={programConfig.medicalContext?.injuries || ''}
                             onChange={(e) => handleMedicalContextChange('injuries', e.target.value)}
                             rows={3}
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                             placeholder="e.g., Right shoulder impingement"
                           />
                         </div>
@@ -1277,7 +1277,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                           onChange={(e) =>
                             handleMedicalContextChange('includeConditions', e.target.checked)
                           }
-                          className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-2 focus:ring-[#ffbf00]/50"
+                          className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
                         />
                         <span className="text-sm font-medium text-white/80">
                           Include Medical Conditions?
@@ -1295,7 +1295,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                               handleMedicalContextChange('conditions', e.target.value)
                             }
                             rows={3}
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                             placeholder="e.g., Non-Alcoholic Fatty Liver Disease (mild)"
                           />
                         </div>
@@ -1316,7 +1316,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                         <select
                           value={programConfig.goals.primary}
                           onChange={(e) => handleGoalChange('primary', e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           required
                         >
                           <option value="Fat Loss">Fat Loss</option>
@@ -1335,7 +1335,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                         <select
                           value={programConfig.goals.secondary}
                           onChange={(e) => handleGoalChange('secondary', e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                           required
                         >
                           <option value="Fat Loss">Fat Loss</option>
@@ -1384,7 +1384,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                           handleGenerateChain(e);
                         }}
                         disabled={loading}
-                        className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-6 py-2 font-medium text-black transition-colors hover:bg-[#ffbf00]/90 disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
                       >
                         <Sparkles className="h-5 w-5" />
                         <span>{loading ? 'Generating...' : 'Generate Program'}</span>
@@ -1398,15 +1398,15 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
             {/* Unsaved changes confirmation overlay */}
             {pendingCloseAction != null && (
               <div
-                className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl border border-[#ffbf00]/30 bg-black/90 p-6 backdrop-blur-sm"
+                className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl border border-orange-light/30 bg-black/90 p-6 backdrop-blur-sm"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="unsaved-changes-title"
               >
-                <div className="w-full max-w-sm rounded-xl border border-white/10 bg-[#0d0500] p-6 shadow-xl">
+                <div className="w-full max-w-sm rounded-xl border border-white/10 bg-bg-dark p-6 shadow-xl">
                   <div className="mb-4 flex justify-center">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ffbf00]/20">
-                      <AlertTriangle className="h-6 w-6 text-[#ffbf00]" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-light/20">
+                      <AlertTriangle className="h-6 w-6 text-orange-light" />
                     </div>
                   </div>
                   <h3
@@ -1429,7 +1429,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
                     <button
                       type="button"
                       onClick={handleConfirmLeave}
-                      className="flex-1 rounded-lg bg-[#ffbf00] py-2.5 font-medium text-black transition-colors hover:bg-[#ffbf00]/90"
+                      className="flex-1 rounded-lg bg-orange-light py-2.5 font-medium text-black transition-colors hover:bg-orange-light/90"
                     >
                       Leave anyway
                     </button>

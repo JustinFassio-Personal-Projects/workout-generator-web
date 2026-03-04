@@ -26,7 +26,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-          className="fixed inset-0 z-[80] cursor-auto overflow-y-auto bg-[#0d0500]"
+          className="fixed inset-0 z-[80] cursor-auto overflow-y-auto bg-bg-dark"
         >
           <div className="relative h-[40vh] w-full md:h-[60vh]">
             <img
@@ -38,7 +38,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
               decoding="async"
               className="h-full w-full object-cover opacity-50 grayscale"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0d0500] to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg-dark to-transparent" />
 
             <div className="absolute left-10 right-10 top-10 flex items-center justify-between">
               <button
@@ -48,7 +48,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
                 <ChevronLeft className="h-4 w-4" /> Back to Lineup
               </button>
               <div className="hidden items-center gap-4 rounded-full border border-white/10 bg-black/40 px-6 py-3 backdrop-blur-md md:flex">
-                <span className="font-mono text-xs uppercase tracking-tighter text-[#ffbf00]">
+                <span className="font-mono text-xs uppercase tracking-tighter text-orange-light">
                   Intensity Level
                 </span>
                 <IntensityBars level={program.intensity} />
@@ -65,7 +65,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
                   {program.name}
                 </h2>
                 <div className="flex items-center gap-6">
-                  <span className="rounded bg-[#ffbf00] px-4 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-black">
+                  <span className="rounded bg-orange-light px-4 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-black">
                     {program.weeks} WEEK OPERATIONAL WINDOW
                   </span>
                   <span className="font-mono text-xs uppercase tracking-[0.2em] text-white/60">
@@ -79,7 +79,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 px-6 py-16 lg:grid-cols-12">
             <div className="space-y-12 lg:col-span-5">
               <section>
-                <h4 className="mb-6 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+                <h4 className="mb-6 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
                   <Layers className="h-4 w-4" /> Operational Overview
                 </h4>
                 <p className="text-xl font-light italic leading-tight text-gray-200 md:text-3xl">
@@ -89,14 +89,14 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-                  <Cpu className="mb-4 h-8 w-8 text-[#ffbf00]" />
+                  <Cpu className="mb-4 h-8 w-8 text-orange-light" />
                   <h5 className="mb-2 font-heading text-sm font-bold uppercase">Neural Rec</h5>
                   <p className="text-[10px] uppercase leading-relaxed tracking-widest text-white/40">
                     Optimization of CNS motor recruitment.
                   </p>
                 </div>
                 <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-                  <Activity className="mb-4 h-8 w-8 text-[#ffbf00]" />
+                  <Activity className="mb-4 h-8 w-8 text-orange-light" />
                   <h5 className="mb-2 font-heading text-sm font-bold uppercase">Bio-Feedback</h5>
                   <p className="text-[10px] uppercase leading-relaxed tracking-widest text-white/40">
                     Real-time HRV and efficiency tracking.
@@ -106,7 +106,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
 
               <button
                 onClick={onActivate}
-                className="w-full rounded-3xl bg-gradient-to-r from-[#ffbf00] to-[#ff4000] py-8 font-black uppercase tracking-[0.3em] text-black shadow-[0_20px_50px_rgba(255,191,0,0.2)] transition-transform hover:scale-[1.02]"
+                className="w-full rounded-3xl bg-gradient-to-r from-orange-light to-orange-dark py-8 font-black uppercase tracking-[0.3em] text-black shadow-[0_20px_50px_rgba(255,191,0,0.2)] transition-transform hover:scale-[1.02]"
               >
                 Activate Protocol Now
               </button>
@@ -124,13 +124,13 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
                   transition={{ delay: idx * 0.1 }}
                   className="group relative border-l border-white/10 pb-16 pl-12 last:pb-0"
                 >
-                  <div className="absolute left-[-7px] top-0 h-[14px] w-[14px] rounded-full bg-[#ffbf00] shadow-[0_0_20px_#ffbf00]" />
+                  <div className="absolute left-[-7px] top-0 h-[14px] w-[14px] rounded-full bg-orange-light shadow-[0_0_20px_#ffbf00]" />
                   <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
                     <div>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#ffbf00]">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-orange-light">
                         {phase.weeks}
                       </span>
-                      <h5 className="font-heading text-4xl font-bold uppercase leading-none tracking-tighter text-white transition-colors group-hover:text-[#ffbf00]">
+                      <h5 className="font-heading text-4xl font-bold uppercase leading-none tracking-tighter text-white transition-colors group-hover:text-orange-light">
                         {phase.title}
                       </h5>
                     </div>
@@ -142,9 +142,9 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
                     {phase.deliverables.map((item, dIdx) => (
                       <div
                         key={dIdx}
-                        className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:border-[#ffbf00]/30"
+                        className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:border-orange-light/30"
                       >
-                        <div className="h-2 w-2 rounded-full bg-[#ffbf00] shadow-[0_0_10px_#ffbf00]" />
+                        <div className="h-2 w-2 rounded-full bg-orange-light shadow-[0_0_10px_#ffbf00]" />
                         <span className="text-xs font-bold uppercase leading-relaxed tracking-widest text-gray-400">
                           {item}
                         </span>

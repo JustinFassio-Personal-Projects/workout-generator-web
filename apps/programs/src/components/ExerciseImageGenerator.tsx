@@ -480,7 +480,7 @@ export default function ExerciseImageGenerator() {
   return (
     <div className="mx-auto max-w-4xl rounded-lg border border-white/10 bg-black/20 p-6 text-white backdrop-blur-sm">
       <h2 className="mb-6 flex items-center gap-2 text-2xl font-bold text-white">
-        <Info className="h-6 w-6 text-[#ffbf00]" />
+        <Info className="h-6 w-6 text-orange-light" />
         Exercise Biomechanics & Image Generator
       </h2>
 
@@ -494,7 +494,7 @@ export default function ExerciseImageGenerator() {
                   key={topic}
                   type="button"
                   onClick={() => setExerciseTopic(topic)}
-                  className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium text-white transition-colors hover:border-[#ffbf00]/50 hover:bg-[#ffbf00]/20"
+                  className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium text-white transition-colors hover:border-orange-light/50 hover:bg-orange-light/20"
                 >
                   {topic}
                 </button>
@@ -507,7 +507,7 @@ export default function ExerciseImageGenerator() {
             onChange={(e) => setExerciseTopic(e.target.value)}
             placeholder="e.g. Barbell Squat, Push Up"
             required
-            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
           />
         </div>
 
@@ -517,7 +517,7 @@ export default function ExerciseImageGenerator() {
             <select
               value={complexityLevel}
               onChange={(e) => setComplexityLevel(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
             >
               <option value="beginner">Beginner</option>
               <option value="intermediate">Intermediate</option>
@@ -530,7 +530,7 @@ export default function ExerciseImageGenerator() {
             <select
               value={visualStyle}
               onChange={(e) => setVisualStyle(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
             >
               <option value="photorealistic">Photorealistic</option>
               <option value="illustration">Illustration</option>
@@ -545,7 +545,7 @@ export default function ExerciseImageGenerator() {
             <select
               value={outputMode}
               onChange={(e) => setOutputMode(e.target.value as 'single' | 'sequence')}
-              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
             >
               <option value="single">Single image</option>
               <option value="sequence">3 image sequence</option>
@@ -557,7 +557,7 @@ export default function ExerciseImageGenerator() {
               id="review-prompts"
               checked={reviewPromptsBeforeGenerate}
               onChange={(e) => setReviewPromptsBeforeGenerate(e.target.checked)}
-              className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-[#ffbf00]/50"
+              className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-orange-light/50"
             />
             <label htmlFor="review-prompts" className="text-sm font-medium text-white/80">
               Review prompts before generating
@@ -573,7 +573,7 @@ export default function ExerciseImageGenerator() {
             <select
               value={movementPhase}
               onChange={(e) => setMovementPhase(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
             >
               <option value="">Not specified</option>
               <option value="bottom">Bottom</option>
@@ -591,7 +591,7 @@ export default function ExerciseImageGenerator() {
                 <select
                   value={bodySideStart}
                   onChange={(e) => setBodySideStart(e.target.value)}
-                  className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                  className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                 >
                   <option value="">Not specified</option>
                   <option value="left">Left</option>
@@ -605,7 +605,7 @@ export default function ExerciseImageGenerator() {
                 <select
                   value={bodySideEnd}
                   onChange={(e) => setBodySideEnd(e.target.value)}
-                  className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                  className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                 >
                   <option value="">Not specified</option>
                   <option value="left">Left</option>
@@ -621,7 +621,7 @@ export default function ExerciseImageGenerator() {
               <select
                 value={bodySide}
                 onChange={(e) => setBodySide(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
               >
                 <option value="">Not specified</option>
                 <option value="right">Right</option>
@@ -641,7 +641,7 @@ export default function ExerciseImageGenerator() {
               const text = getPresetTextById(e.target.value);
               if (text != null) setDemographics(text);
             }}
-            className="mb-2 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="mb-2 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
           >
             <option value="">Select a preset...</option>
             {DEMOGRAPHICS_PRESETS.map((grp) => (
@@ -659,7 +659,7 @@ export default function ExerciseImageGenerator() {
             onChange={(e) => setDemographics(e.target.value)}
             placeholder="e.g. Female athlete, 30s"
             rows={3}
-            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
           />
         </div>
 
@@ -677,7 +677,7 @@ export default function ExerciseImageGenerator() {
                 onChange={(e) => setFormCuesToEmphasize(e.target.value)}
                 placeholder="e.g. Arms pumping by hips, low curl, legs at 45°"
                 rows={3}
-                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
               />
             </div>
             <div>
@@ -689,7 +689,7 @@ export default function ExerciseImageGenerator() {
                 onChange={(e) => setMisrenderingsToAvoid(e.target.value)}
                 placeholder="e.g. Do NOT show V-up or jackknife"
                 rows={3}
-                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
               />
             </div>
             <div>
@@ -701,7 +701,7 @@ export default function ExerciseImageGenerator() {
                 onChange={(e) => setDomainContext(e.target.value)}
                 placeholder="e.g. Pilates: control, precision. Avoid maximal effort aesthetic."
                 rows={3}
-                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
               />
             </div>
           </div>
@@ -718,7 +718,7 @@ export default function ExerciseImageGenerator() {
                   value={templateNameInput}
                   onChange={(e) => setTemplateNameInput(e.target.value)}
                   placeholder="Template name"
-                  className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none"
+                  className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveTemplate();
                     if (e.key === 'Escape') {
@@ -731,7 +731,7 @@ export default function ExerciseImageGenerator() {
                   type="button"
                   onClick={handleSaveTemplate}
                   disabled={!templateNameInput.trim() || !exerciseTopic.trim()}
-                  className="rounded-lg border border-white/10 bg-[#ffbf00]/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#ffbf00]/30 disabled:opacity-50"
+                  className="rounded-lg border border-white/10 bg-orange-light/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-light/30 disabled:opacity-50"
                 >
                   Save
                 </button>
@@ -752,7 +752,7 @@ export default function ExerciseImageGenerator() {
                 type="button"
                 onClick={() => setShowTemplateNameInput(true)}
                 disabled={!exerciseTopic.trim()}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:border-[#ffbf00]/30 hover:bg-[#ffbf00]/20 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20 disabled:opacity-50"
               >
                 <FileDown className="h-4 w-4" />
                 Save as template
@@ -773,7 +773,7 @@ export default function ExerciseImageGenerator() {
                       const t = templates.find((x) => x.id === id);
                       if (t) applyTemplate(t);
                     }}
-                    className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white focus:border-[#ffbf00]/50 focus:outline-none"
+                    className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white focus:border-orange-light/50 focus:outline-none"
                   >
                     <option value="">Load template...</option>
                     {templates.map((t) => (
@@ -822,7 +822,7 @@ export default function ExerciseImageGenerator() {
         <button
           type="submit"
           disabled={loading || promptStep === 'review'}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#ffbf00] px-4 py-3 font-bold text-black transition-colors hover:bg-[#ffbf00]/90 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-light px-4 py-3 font-bold text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
         >
           {loading ? (
             <>
@@ -843,7 +843,7 @@ export default function ExerciseImageGenerator() {
       </form>
 
       {promptStep === 'review' && researchResult && (
-        <div className="mb-8 rounded-lg border border-[#ffbf00]/30 bg-black/30 p-6">
+        <div className="mb-8 rounded-lg border border-orange-light/30 bg-black/30 p-6">
           <h3 className="mb-2 text-lg font-semibold text-white">Review image prompts</h3>
           <p className="mb-4 text-sm text-white/70">
             Edit the prompts below before generating. Changes will be used for image generation.
@@ -861,7 +861,7 @@ export default function ExerciseImageGenerator() {
                       setEditedPrompts(next);
                     }}
                     rows={4}
-                    className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                    className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
                   />
                 </div>
               ))}
@@ -873,7 +873,7 @@ export default function ExerciseImageGenerator() {
                 value={editedPrompt}
                 onChange={(e) => setEditedPrompt(e.target.value)}
                 rows={6}
-                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
               />
             </div>
           )}
@@ -887,7 +887,7 @@ export default function ExerciseImageGenerator() {
                   key={idx}
                   className="flex items-start gap-2 rounded-lg border border-white/10 bg-black/20 p-2 text-sm text-white/90"
                 >
-                  <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#ffbf00]" />
+                  <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-light" />
                   {point}
                 </li>
               ))}
@@ -911,7 +911,7 @@ export default function ExerciseImageGenerator() {
                 )
               }
               disabled={loading}
-              className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-4 py-2 font-bold text-black transition-colors hover:bg-[#ffbf00]/90 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-bold text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -938,9 +938,9 @@ export default function ExerciseImageGenerator() {
       {result && (
         <div className="animate-fade-in space-y-6">
           {previewMode === 'save-exercise' && previewPayload && (
-            <div className="rounded-lg border border-[#ffbf00]/30 bg-black/30 p-6">
+            <div className="rounded-lg border border-orange-light/30 bg-black/30 p-6">
               <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
-                <BookOpen className="h-5 w-5 text-[#ffbf00]" />
+                <BookOpen className="h-5 w-5 text-orange-light" />
                 Preview before save
               </h3>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -958,7 +958,7 @@ export default function ExerciseImageGenerator() {
                     <code className="rounded bg-white/10 px-1">{previewPayload.slug}</code>
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <span className="rounded-full border border-[#ffbf00]/50 bg-[#ffbf00]/10 px-2 py-0.5 text-xs text-[#ffbf00]">
+                    <span className="rounded-full border border-orange-light/50 bg-orange-light/10 px-2 py-0.5 text-xs text-orange-light">
                       {previewPayload.kineticChainType}
                     </span>
                     <span className="rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-xs text-white/80">
@@ -1023,7 +1023,7 @@ export default function ExerciseImageGenerator() {
                       <h4 className="mb-1 text-xs font-semibold uppercase tracking-wider text-white/60">
                         Sources
                       </h4>
-                      <ul className="space-y-0.5 text-xs text-[#ffbf00]">
+                      <ul className="space-y-0.5 text-xs text-orange-light">
                         {previewPayload.sources.map((s, i) => (
                           <li key={i}>
                             {s.title} ({s.domain}) — {s.searchQuery}
@@ -1039,7 +1039,7 @@ export default function ExerciseImageGenerator() {
                   type="button"
                   onClick={() => handleSaveExercise(previewPayload.slug)}
                   disabled={savingExercise}
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#ffbf00] px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-[#ffbf00]/90 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
                 >
                   {savingExercise ? (
                     <>
@@ -1096,14 +1096,14 @@ export default function ExerciseImageGenerator() {
               )}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {!user ? (
-                  <p className="text-sm text-[#ffbf00]">Sign in to save images.</p>
+                  <p className="text-sm text-orange-light">Sign in to save images.</p>
                 ) : (
                   <>
                     <button
                       type="button"
                       onClick={handleSaveToStorage}
                       disabled={saving}
-                      className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-[#ffbf00]/30 hover:bg-[#ffbf00]/20 disabled:opacity-50"
+                      className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20 disabled:opacity-50"
                     >
                       {saving ? (
                         <>
@@ -1121,7 +1121,7 @@ export default function ExerciseImageGenerator() {
                       type="button"
                       onClick={handleOpenPreview}
                       disabled={savingExercise || !!savedExerciseSlug || previewLoading}
-                      className="inline-flex items-center gap-2 rounded-lg bg-[#ffbf00] px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-[#ffbf00]/90 disabled:opacity-50"
+                      className="inline-flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
                     >
                       {previewLoading ? (
                         <>
@@ -1153,7 +1153,7 @@ export default function ExerciseImageGenerator() {
                 <button
                   type="button"
                   onClick={handleDownloadImage}
-                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-[#ffbf00]/30 hover:bg-[#ffbf00]/20"
+                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20"
                 >
                   <Download className="h-3.5 w-3.5" />
                   Download Image
@@ -1161,7 +1161,7 @@ export default function ExerciseImageGenerator() {
                 <button
                   type="button"
                   onClick={handleDownloadMetadata}
-                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-[#ffbf00]/30 hover:bg-[#ffbf00]/20"
+                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20"
                 >
                   <FileText className="h-3.5 w-3.5" />
                   Download Metadata
@@ -1169,7 +1169,7 @@ export default function ExerciseImageGenerator() {
                 <button
                   type="button"
                   onClick={clearResult}
-                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-[#ffbf00]/30 hover:bg-[#ffbf00]/20"
+                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
                   Generate another
@@ -1179,7 +1179,7 @@ export default function ExerciseImageGenerator() {
                     href={savedImageUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-[#ffbf00] hover:underline"
+                    className="inline-flex items-center gap-1 text-sm text-orange-light hover:underline"
                   >
                     Image saved <ArrowUpRight className="h-3 w-3" />
                   </a>
@@ -1187,7 +1187,7 @@ export default function ExerciseImageGenerator() {
                 {savedExerciseSlug && (
                   <Link
                     to={`/exercises/${savedExerciseSlug}`}
-                    className="inline-flex items-center gap-1 text-sm text-[#ffbf00] hover:underline"
+                    className="inline-flex items-center gap-1 text-sm text-orange-light hover:underline"
                   >
                     View Exercise (Admin) <ArrowUpRight className="h-3 w-3" />
                   </Link>
@@ -1227,7 +1227,7 @@ export default function ExerciseImageGenerator() {
                     key={idx}
                     className="flex items-start gap-3 rounded-lg border border-white/10 bg-black/20 p-3"
                   >
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#ffbf00]" />
+                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-orange-light" />
                     <span className="text-white/90">{point}</span>
                   </li>
                 ))}
@@ -1238,7 +1238,7 @@ export default function ExerciseImageGenerator() {
                   <h4 className="mb-2 text-sm font-semibold uppercase tracking-wider text-white/60">
                     Sources (Google Search)
                   </h4>
-                  <ul className="space-y-1 text-xs text-[#ffbf00]">
+                  <ul className="space-y-1 text-xs text-orange-light">
                     {result.searchResults.map(
                       (chunk: SearchChunk, i: number) =>
                         chunk.web && (

@@ -167,7 +167,7 @@ const protocols: {
 
 const IntervalTimerLandingPage: React.FC<IntervalTimerLandingPageProps> = ({ onNavigate }) => {
   return (
-    <div className="min-h-screen bg-[#0d0500] font-sans text-white">
+    <div className="min-h-screen bg-bg-dark font-sans text-white">
       {/* Hero */}
       <header className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 opacity-10">
@@ -193,7 +193,7 @@ const IntervalTimerLandingPage: React.FC<IntervalTimerLandingPageProps> = ({ onN
             <button
               type="button"
               onClick={() => onNavigate('warmup')}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#ffbf00] px-8 py-4 font-bold text-black transition-colors hover:bg-[#e6ac00]"
+              className="flex items-center justify-center gap-2 rounded-xl bg-orange-light px-8 py-4 font-bold text-black transition-colors hover:bg-[#e6ac00]"
             >
               <Play size={20} fill="currentColor" />
               Daily Warm-Up Protocol
@@ -254,7 +254,7 @@ const IntervalTimerLandingPage: React.FC<IntervalTimerLandingPageProps> = ({ onN
       <section id="protocols" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
         {protocols.map((category, idx) => (
           <div key={idx} className="mb-16 last:mb-0">
-            <h3 className="font-display mb-6 border-l-4 border-[#ffbf00] pl-4 text-xl font-bold text-white">
+            <h3 className="font-display mb-6 border-l-4 border-orange-light pl-4 text-xl font-bold text-white">
               {category.category}
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -277,7 +277,7 @@ const IntervalTimerLandingPage: React.FC<IntervalTimerLandingPageProps> = ({ onN
                   <p className="mb-4 flex-grow text-sm leading-relaxed text-white/60">
                     {item.desc}
                   </p>
-                  <div className="flex items-center text-xs font-bold uppercase tracking-wider text-white/50 transition-colors group-hover:text-[#ffbf00]">
+                  <div className="flex items-center text-xs font-bold uppercase tracking-wider text-white/50 transition-colors group-hover:text-orange-light">
                     Launch Timer <span className="ml-1">→</span>
                   </div>
                 </button>

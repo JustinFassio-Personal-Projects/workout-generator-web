@@ -264,7 +264,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
         {/* HERO */}
         <section className="mx-auto max-w-4xl pt-8 text-center">
           <h1 className="font-display mb-6 text-4xl font-bold leading-tight text-white md:text-6xl">
-            The Synthesis of <span className="text-[#ffbf00]">Power</span> &{' '}
+            The Synthesis of <span className="text-orange-light">Power</span> &{' '}
             <span className="text-green-400">Peace</span>
           </h1>
           <p className="mb-10 text-xl leading-relaxed text-white/80">
@@ -279,7 +279,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
               onClick={() =>
                 document.getElementById('simulator')?.scrollIntoView({ behavior: 'smooth' })
               }
-              className="rounded-xl bg-[#ffbf00] px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-1"
+              className="rounded-xl bg-orange-light px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-1"
             >
               Experience Protocol
             </button>
@@ -304,7 +304,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
                 Protocol&quot;—alternating 3 minutes fast and 3 minutes slow—creates the metabolic
                 stress required for adaptation.
               </p>
-              <div className="space-y-2 rounded-xl border-l-4 border-[#ffbf00] bg-black/20 p-6">
+              <div className="space-y-2 rounded-xl border-l-4 border-orange-light bg-black/20 p-6">
                 <div className="flex items-center gap-3">
                   <span className="text-xl">📈</span>
                   <span className="text-sm font-bold text-white/90">
@@ -468,7 +468,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => setIsTimerOpen(true)}
-              className="mx-auto flex items-center gap-3 rounded-full bg-[#ffbf00] px-8 py-4 font-bold text-black shadow-2xl transition-all hover:scale-105"
+              className="mx-auto flex items-center gap-3 rounded-full bg-orange-light px-8 py-4 font-bold text-black shadow-2xl transition-all hover:scale-105"
             >
               <span>⏱️</span>
               <span>Launch Japanese Walking Timer</span>
@@ -488,7 +488,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => setIsReportOpen(true)}
-              className="flex items-center gap-2 border-b border-[#ffbf00]/40 pb-0.5 text-sm font-bold text-[#ffbf00] transition-colors hover:text-[#ffbf00]/90"
+              className="flex items-center gap-2 border-b border-orange-light/40 pb-0.5 text-sm font-bold text-orange-light transition-colors hover:text-orange-light/90"
             >
               <span>Protocol Details</span>
               <span>→</span>
@@ -526,7 +526,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
             onClick={() => setIsReportOpen(false)}
             aria-hidden
           />
-          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0500] shadow-2xl">
+          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-bg-dark shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 p-6">
               <h3 className="font-display text-xl font-bold text-white">
                 The Japanese Walking Protocol
@@ -534,7 +534,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => setIsReportOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white hover:bg-[#ffbf00]/20 hover:text-[#ffbf00]"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white hover:bg-orange-light/20 hover:text-orange-light"
               >
                 &times;
               </button>

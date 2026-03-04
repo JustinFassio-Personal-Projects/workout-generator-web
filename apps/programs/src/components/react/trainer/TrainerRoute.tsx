@@ -44,7 +44,7 @@ const TrainerLayout: React.FC = () => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
                       isActive || active
-                        ? 'bg-[#ffbf00]/20 text-[#ffbf00]'
+                        ? 'bg-orange-light/20 text-orange-light'
                         : 'text-white/70 hover:bg-white/5 hover:text-white'
                     }`
                   }
@@ -105,7 +105,7 @@ const TrainerGuard = () => {
   if (!authChecked && !user) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-black text-white">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#ffbf00] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-light border-t-transparent" />
       </div>
     );
   }
@@ -118,7 +118,7 @@ const TrainerGuard = () => {
         <p className="mb-8 text-white/60">Trainer credentials required.</p>
         <button
           onClick={() => setShowAuth(true)}
-          className="rounded-xl bg-[#ffbf00] px-8 py-3 font-bold uppercase text-black hover:bg-white"
+          className="rounded-xl bg-orange-light px-8 py-3 font-bold uppercase text-black hover:bg-white"
         >
           Authenticate
         </button>
@@ -147,7 +147,7 @@ const TrainerGuard = () => {
             onClick={() =>
               window.alert('Contact support to upgrade your account to Trainer status.')
             }
-            className="block w-full rounded-xl text-xs uppercase tracking-widest text-white/30 hover:text-[#ffbf00]"
+            className="block w-full rounded-xl text-xs uppercase tracking-widest text-white/30 hover:text-orange-light"
           >
             Request Promotion
           </button>

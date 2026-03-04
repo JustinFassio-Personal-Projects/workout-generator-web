@@ -129,7 +129,7 @@ const ArchitectBlueprintPreview: React.FC<ArchitectBlueprintPreviewProps> = ({
               if (e.key === 'Enter') saveEdit();
               if (e.key === 'Escape') cancelEdit();
             }}
-            className="flex-1 rounded border border-white/20 bg-black/40 px-2 py-1 text-sm text-white focus:border-[#ffbf00] focus:outline-none"
+            className="flex-1 rounded border border-white/20 bg-black/40 px-2 py-1 text-sm text-white focus:border-orange-light focus:outline-none"
             autoFocus
           />
           <button onClick={saveEdit} className="rounded p-1 text-green-400 hover:bg-green-400/20">
@@ -158,7 +158,7 @@ const ArchitectBlueprintPreview: React.FC<ArchitectBlueprintPreviewProps> = ({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">Program Structure</h3>
-        <span className="rounded-full bg-[#ffbf00]/20 px-3 py-1 text-xs text-[#ffbf00]">
+        <span className="rounded-full bg-orange-light/20 px-3 py-1 text-xs text-orange-light">
           Review & Edit (2-Phase Flow)
         </span>
       </div>
@@ -188,7 +188,7 @@ const ArchitectBlueprintPreview: React.FC<ArchitectBlueprintPreviewProps> = ({
             <EditableField
               field="days_per_week"
               value={String(architect.split.days_per_week)}
-              className="text-2xl font-bold text-[#ffbf00]"
+              className="text-2xl font-bold text-orange-light"
             />
           </div>
           <div className="rounded-lg bg-white/5 p-3">
@@ -259,7 +259,7 @@ const ArchitectBlueprintPreview: React.FC<ArchitectBlueprintPreviewProps> = ({
               <EditableField
                 field={`landmark_muscle_${idx}`}
                 value={v.muscle_group}
-                className="flex-1 text-sm font-medium text-[#ffbf00]"
+                className="flex-1 text-sm font-medium text-orange-light"
               />
               <EditableField
                 field={`landmark_mev_${idx}`}
@@ -293,7 +293,7 @@ const ArchitectBlueprintPreview: React.FC<ArchitectBlueprintPreviewProps> = ({
           type="button"
           onClick={onGenerateWorkouts}
           disabled={loading}
-          className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-6 py-2 font-medium text-black transition-colors hover:bg-[#ffbf00]/90 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
         >
           <Sparkles className={`h-5 w-5 ${loading ? 'animate-pulse' : ''}`} />
           <span>{loading ? 'Generating Workouts...' : 'Generate Detailed Workouts'}</span>

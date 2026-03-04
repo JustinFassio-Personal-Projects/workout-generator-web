@@ -75,7 +75,7 @@ const ClientDetailView: React.FC = () => {
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#ffbf00] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-light border-t-transparent" />
         <span className="ml-3 text-white/60">Loading client stats...</span>
       </div>
     );
@@ -122,7 +122,7 @@ const ClientDetailView: React.FC = () => {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="rounded-lg border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <Activity className="h-6 w-6 text-[#ffbf00]" />
+            <Activity className="h-6 w-6 text-orange-light" />
             <div>
               <p className="text-sm text-white/60">Total Workouts</p>
               <p className="text-2xl font-bold">{stats.totalWorkouts}</p>
@@ -131,7 +131,7 @@ const ClientDetailView: React.FC = () => {
         </div>
         <div className="rounded-lg border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <Target className="h-6 w-6 text-[#ffbf00]" />
+            <Target className="h-6 w-6 text-orange-light" />
             <div>
               <p className="text-sm text-white/60">Avg Effort</p>
               <p className="text-2xl font-bold">
@@ -142,7 +142,7 @@ const ClientDetailView: React.FC = () => {
         </div>
         <div className="rounded-lg border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <Star className="h-6 w-6 text-[#ffbf00]" />
+            <Star className="h-6 w-6 text-orange-light" />
             <div>
               <p className="text-sm text-white/60">Avg Rating</p>
               <p className="text-2xl font-bold">

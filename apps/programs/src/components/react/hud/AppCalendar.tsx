@@ -49,7 +49,7 @@ function dateToISO(d: Date): string {
 
 const STATUS_STYLES: Record<CalendarEvent['status'], { border: string; bg: string; text: string }> =
   {
-    scheduled: { border: 'border-[#ffbf00]', bg: 'bg-[#ffbf00]/10', text: 'text-[#ffbf00]' },
+    scheduled: { border: 'border-orange-light', bg: 'bg-orange-light/10', text: 'text-orange-light' },
     completed: { border: 'border-emerald-500', bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
     missed: { border: 'border-white/30', bg: 'bg-white/5', text: 'text-white/50' },
   };
@@ -162,8 +162,8 @@ const AppCalendar: React.FC<AppCalendarProps> = ({
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm md:p-8">
-      <div className="mb-4 flex items-center justify-between border-b border-[#ffbf00]/20 pb-4">
-        <h4 className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+      <div className="mb-4 flex items-center justify-between border-b border-orange-light/20 pb-4">
+        <h4 className="font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
           Calendar
         </h4>
         <div className="flex items-center gap-2">
@@ -197,7 +197,7 @@ const AppCalendar: React.FC<AppCalendarProps> = ({
             {WEEKDAYS.map((wd) => (
               <div
                 key={wd}
-                className="bg-[#0d0500] py-2 text-center font-mono text-[10px] uppercase text-white/50"
+                className="bg-bg-dark py-2 text-center font-mono text-[10px] uppercase text-white/50"
               >
                 {wd}
               </div>
@@ -208,7 +208,7 @@ const AppCalendar: React.FC<AppCalendarProps> = ({
               return (
                 <div
                   key={i}
-                  className="min-h-[80px] border border-white/5 bg-[#0d0500] p-1 md:min-h-[100px]"
+                  className="min-h-[80px] border border-white/5 bg-bg-dark p-1 md:min-h-[100px]"
                 >
                   {d ? (
                     <>

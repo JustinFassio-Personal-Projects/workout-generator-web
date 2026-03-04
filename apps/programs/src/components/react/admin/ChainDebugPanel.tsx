@@ -37,7 +37,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ffbf00]/20 text-xs font-bold text-[#ffbf00]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-light/20 text-xs font-bold text-orange-light">
           {stepNumber}
         </span>
         {icon}
@@ -64,7 +64,7 @@ const ChainDebugPanel: React.FC<ChainDebugPanelProps> = ({ metadata }) => {
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-white/5"
       >
-        <Layers className="h-5 w-5 text-[#ffbf00]" />
+        <Layers className="h-5 w-5 text-orange-light" />
         <span className="flex-1 font-medium text-white">Chain Debug Details</span>
         <span className="text-xs text-white/50">
           {model_used} • {new Date(generated_at).toLocaleString()}
@@ -95,14 +95,14 @@ const ChainDebugPanel: React.FC<ChainDebugPanelProps> = ({ metadata }) => {
               <div className="grid grid-cols-3 gap-3">
                 <div className="rounded bg-white/5 p-3">
                   <div className="text-xs uppercase text-white/50">Split</div>
-                  <div className="font-medium text-[#ffbf00]">{step1_architect.split.type}</div>
+                  <div className="font-medium text-orange-light">{step1_architect.split.type}</div>
                   <div className="text-white/70">
                     {step1_architect.split.days_per_week} days/week
                   </div>
                 </div>
                 <div className="rounded bg-white/5 p-3">
                   <div className="text-xs uppercase text-white/50">Protocol</div>
-                  <div className="font-medium text-[#ffbf00]">
+                  <div className="font-medium text-orange-light">
                     {step1_architect.progression_protocol.replace(/_/g, ' ')}
                   </div>
                 </div>
@@ -157,7 +157,7 @@ const ChainDebugPanel: React.FC<ChainDebugPanelProps> = ({ metadata }) => {
             <div className="space-y-3 text-sm">
               {step2_biomechanist.days.map((day) => (
                 <div key={day.day_number} className="rounded bg-white/5 p-3">
-                  <div className="mb-2 font-medium text-[#ffbf00]">
+                  <div className="mb-2 font-medium text-orange-light">
                     Day {day.day_number}: {day.day_name}
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -166,7 +166,7 @@ const ChainDebugPanel: React.FC<ChainDebugPanelProps> = ({ metadata }) => {
                         key={i}
                         className={`rounded px-2 py-1 text-xs ${
                           p.priority === 'primary'
-                            ? 'bg-[#ffbf00]/20 text-[#ffbf00]'
+                            ? 'bg-orange-light/20 text-orange-light'
                             : 'bg-white/10 text-white/70'
                         }`}
                       >
@@ -188,7 +188,7 @@ const ChainDebugPanel: React.FC<ChainDebugPanelProps> = ({ metadata }) => {
             <div className="space-y-3 text-sm">
               {step3_coach.map((day) => (
                 <div key={day.day_number} className="rounded bg-white/5 p-3">
-                  <div className="mb-2 font-medium text-[#ffbf00]">
+                  <div className="mb-2 font-medium text-orange-light">
                     Day {day.day_number}: {day.day_name}
                   </div>
                   <table className="w-full text-xs">
@@ -223,7 +223,7 @@ const ChainDebugPanel: React.FC<ChainDebugPanelProps> = ({ metadata }) => {
             <div className="rounded bg-white/5 p-3 text-sm">
               <p className="text-white/80">
                 Week-by-week numbers have been calculated using the{' '}
-                <span className="font-medium text-[#ffbf00]">
+                <span className="font-medium text-orange-light">
                   {step1_architect.progression_protocol.replace(/_/g, ' ')}
                 </span>{' '}
                 protocol. Review the full schedule above to see the progression applied.

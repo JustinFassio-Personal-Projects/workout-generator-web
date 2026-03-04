@@ -190,14 +190,14 @@ const Navigation: React.FC<NavigationProps> = ({
       {isTrainer && (
         <a
           href="/trainer"
-          className="hidden cursor-pointer items-center gap-2 rounded-full bg-[#ffbf00]/20 px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#ffbf00] transition-colors hover:bg-[#ffbf00] hover:text-black md:flex"
+          className="hidden cursor-pointer items-center gap-2 rounded-full bg-orange-light/20 px-4 py-2 text-xs font-bold uppercase tracking-wider text-orange-light transition-colors hover:bg-orange-light hover:text-black md:flex"
         >
           Mission Control
         </a>
       )}
       <button
         onClick={onShowHUD}
-        className="flex cursor-pointer items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/15 hover:text-[#ffbf00]"
+        className="flex cursor-pointer items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/15 hover:text-orange-light"
         data-hover="true"
       >
         <Activity className="h-4 w-4" /> HUD
@@ -213,7 +213,7 @@ const Navigation: React.FC<NavigationProps> = ({
   ) : (
     <button
       onClick={onShowAuthModal}
-      className="flex cursor-pointer items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/15 hover:text-[#ffbf00]"
+      className="flex cursor-pointer items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/15 hover:text-orange-light"
       data-hover="true"
     >
       <LogIn className="h-4 w-4" /> SIGN IN
@@ -249,7 +249,7 @@ const Navigation: React.FC<NavigationProps> = ({
       <nav className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-6 py-6 mix-blend-difference md:px-8">
         <a
           href="/"
-          className="z-50 cursor-pointer font-heading text-lg font-bold tracking-tighter text-white transition-colors hover:text-[#ffbf00] md:text-xl"
+          className="z-50 cursor-pointer font-heading text-lg font-bold tracking-tighter text-white transition-colors hover:text-orange-light md:text-xl"
         >
           AI FITCOPILOT
         </a>
@@ -266,8 +266,8 @@ const Navigation: React.FC<NavigationProps> = ({
                 aria-current={active ? 'page' : undefined}
                 className={`cursor-pointer rounded-full px-4 py-2 transition-colors ${
                   active
-                    ? 'bg-white/20 text-[#ffbf00] ring-2 ring-[#ffbf00]'
-                    : 'bg-white/10 text-white hover:bg-white/15 hover:text-[#ffbf00]'
+                    ? 'bg-white/20 text-orange-light ring-2 ring-orange-light'
+                    : 'bg-white/10 text-white hover:bg-white/15 hover:text-orange-light'
                 }`}
                 data-hover="true"
               >
@@ -338,7 +338,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   ref={closeButtonRef}
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex h-11 w-11 items-center justify-center text-white transition-colors hover:text-[#ffbf00]"
+                  className="flex h-11 w-11 items-center justify-center text-white transition-colors hover:text-orange-light"
                   aria-label="Close menu"
                 >
                   <X className="h-6 w-6" />
@@ -353,7 +353,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   <a
                     href="/trainer"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="mb-2 block w-full rounded-xl border border-[#ffbf00] bg-[#ffbf00]/10 px-4 py-3 font-heading text-lg font-black uppercase tracking-wide text-[#ffbf00] transition-colors hover:bg-[#ffbf00] hover:text-black"
+                    className="mb-2 block w-full rounded-xl border border-orange-light bg-orange-light/10 px-4 py-3 font-heading text-lg font-black uppercase tracking-wide text-orange-light transition-colors hover:bg-orange-light hover:text-black"
                   >
                     Mission Control
                   </a>
@@ -369,8 +369,8 @@ const Navigation: React.FC<NavigationProps> = ({
                       onClick={() => setMobileMenuOpen(false)}
                       className={`rounded-full px-4 py-2.5 font-heading text-base font-semibold transition-colors ${
                         active
-                          ? 'bg-white/20 text-[#ffbf00] ring-2 ring-[#ffbf00]'
-                          : 'bg-white/10 text-white hover:bg-white/15 hover:text-[#ffbf00]'
+                          ? 'bg-white/20 text-orange-light ring-2 ring-orange-light'
+                          : 'bg-white/10 text-white hover:bg-white/15 hover:text-orange-light'
                       }`}
                     >
                       {item}
@@ -384,7 +384,7 @@ const Navigation: React.FC<NavigationProps> = ({
                         onShowHUD();
                         setMobileMenuOpen(false);
                       }}
-                      className="rounded-full bg-white/10 px-4 py-2.5 text-base font-semibold uppercase text-[#ffbf00] transition-colors hover:bg-white/15"
+                      className="rounded-full bg-white/10 px-4 py-2.5 text-base font-semibold uppercase text-orange-light transition-colors hover:bg-white/15"
                     >
                       HUD
                     </button>
@@ -404,7 +404,7 @@ const Navigation: React.FC<NavigationProps> = ({
                       onShowAuthModal();
                       setMobileMenuOpen(false);
                     }}
-                    className="rounded-full bg-white/10 px-4 py-2.5 text-base font-semibold uppercase text-[#ffbf00] transition-colors hover:bg-white/15"
+                    className="rounded-full bg-white/10 px-4 py-2.5 text-base font-semibold uppercase text-orange-light transition-colors hover:bg-white/15"
                   >
                     Login
                   </button>

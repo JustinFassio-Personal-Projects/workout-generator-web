@@ -313,7 +313,7 @@ const AerobicInterval: React.FC<AerobicIntervalProps> = ({ onNavigate }) => {
               onClick={() =>
                 document.getElementById('simulator')?.scrollIntoView({ behavior: 'smooth' })
               }
-              className="rounded-xl bg-[#ffbf00] px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-1"
+              className="rounded-xl bg-orange-light px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-1"
             >
               Experience 30/30
             </button>
@@ -483,7 +483,7 @@ const AerobicInterval: React.FC<AerobicIntervalProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => setIsSetupOpen(true)}
-              className="mx-auto flex items-center gap-3 rounded-full bg-[#ffbf00] px-8 py-4 font-bold text-black shadow-2xl transition-all hover:scale-105"
+              className="mx-auto flex items-center gap-3 rounded-full bg-orange-light px-8 py-4 font-bold text-black shadow-2xl transition-all hover:scale-105"
             >
               <span>⏱️</span>
               <span>Launch 1:1 Timer</span>
@@ -556,7 +556,7 @@ const AerobicInterval: React.FC<AerobicIntervalProps> = ({ onNavigate }) => {
             onClick={() => setIsReportOpen(false)}
             aria-hidden
           />
-          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0500] shadow-2xl">
+          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-bg-dark shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 p-6">
               <h3 className="font-display text-xl font-bold text-white">1:1 Ratio Protocol</h3>
               <button

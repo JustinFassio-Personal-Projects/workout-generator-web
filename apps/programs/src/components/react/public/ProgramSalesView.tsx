@@ -150,7 +150,7 @@ const ProgramSalesView: React.FC<ProgramSalesViewProps> = ({ program }) => {
           <button
             type="button"
             onClick={() => setSelectedWeek(1)}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#ffbf00] px-5 py-3 font-bold uppercase tracking-wider text-black transition hover:bg-white"
+            className="inline-flex items-center gap-2 rounded-lg bg-orange-light px-5 py-3 font-bold uppercase tracking-wider text-black transition hover:bg-white"
           >
             <Play className="h-5 w-5" />
             Start Week 1 (Free)
@@ -174,11 +174,11 @@ const ProgramSalesView: React.FC<ProgramSalesViewProps> = ({ program }) => {
                   exit={{ opacity: 0, x: 20 }}
                   className="group relative"
                 >
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#ffbf00] to-[#ff4000] opacity-20 blur-2xl transition-opacity group-hover:opacity-30" />
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-light to-orange-dark opacity-20 blur-2xl transition-opacity group-hover:opacity-30" />
                   <div className="relative rounded-3xl border border-white/10 bg-black/40 p-10 backdrop-blur-md">
                     <div className="mb-8 flex items-start justify-between">
                       <div>
-                        <span className="mb-2 block font-mono text-xs uppercase tracking-[0.4em] text-[#ffbf00]">
+                        <span className="mb-2 block font-mono text-xs uppercase tracking-[0.4em] text-orange-light">
                           Current Mission
                         </span>
                         <h3 className="font-heading text-3xl font-black uppercase text-white">
@@ -188,12 +188,12 @@ const ProgramSalesView: React.FC<ProgramSalesViewProps> = ({ program }) => {
                           Week 1 • Start with the workouts below
                         </p>
                       </div>
-                      <Award className="h-10 w-10 text-[#ffbf00]" />
+                      <Award className="h-10 w-10 text-orange-light" />
                     </div>
                     <button
                       type="button"
                       onClick={() => setSelectedWeek(1)}
-                      className="flex w-full items-center justify-center gap-3 rounded-xl bg-white py-5 text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-[#ffbf00]"
+                      className="flex w-full items-center justify-center gap-3 rounded-xl bg-white py-5 text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-orange-light"
                     >
                       <Play className="h-5 w-5" /> View Week 1
                     </button>
@@ -313,7 +313,7 @@ const ProgramSalesView: React.FC<ProgramSalesViewProps> = ({ program }) => {
 
       {/* Unlock CTA */}
       {lockedWeeksCount > 0 && (
-        <div className="rounded-xl border border-[#ffbf00]/30 bg-[#ffbf00]/10 p-6 text-center">
+        <div className="rounded-xl border border-orange-light/30 bg-orange-light/10 p-6 text-center">
           <p className="mb-4 font-medium text-white">
             Get access to all {totalWeeks} weeks and full workout details.
           </p>
@@ -322,7 +322,7 @@ const ProgramSalesView: React.FC<ProgramSalesViewProps> = ({ program }) => {
             type="button"
             onClick={handleUnlock}
             disabled={unlockLoading}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#ffbf00] px-6 py-3 font-bold uppercase tracking-wider text-black transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-orange-light px-6 py-3 font-bold uppercase tracking-wider text-black transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Lock className="h-5 w-5" />
             {unlockLoading ? 'Unlocking…' : `Unlock Full ${totalWeeks}-Week Program`}

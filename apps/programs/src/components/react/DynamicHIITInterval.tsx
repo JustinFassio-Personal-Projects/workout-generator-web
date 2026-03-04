@@ -47,9 +47,9 @@ function getThemeClasses(targetGoal: HIITTargetGoal): {
       };
     default:
       return {
-        text: 'text-[#ffbf00]',
-        bg: 'bg-[#ffbf00]',
-        border: 'border-[#ffbf00]/50',
+        text: 'text-orange-light',
+        bg: 'bg-orange-light',
+        border: 'border-orange-light/50',
       };
   }
 }
@@ -76,8 +76,8 @@ const DynamicHIITInterval: React.FC<DynamicHIITIntervalProps> = ({ workout, onCl
   const theme = getThemeClasses(workout.meta.targetGoal);
 
   return (
-    <div className="min-h-screen bg-[#0d0500] pb-20 font-sans text-slate-100">
-      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0d0500]/95 backdrop-blur-md">
+    <div className="min-h-screen bg-bg-dark pb-20 font-sans text-slate-100">
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-bg-dark/95 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <span className="font-display text-lg font-bold text-white">
             Pillar 4 · <span className="font-normal text-white/60">{workout.meta.protocol}</span>
@@ -143,7 +143,7 @@ const DynamicHIITInterval: React.FC<DynamicHIITIntervalProps> = ({ workout, onCl
             </div>
             <div className="flex h-[200px] flex-col items-center justify-center rounded-xl bg-white/5">
               <p className="mb-2 font-bold text-white/50">Work : Rest Ratio</p>
-              <p className="font-mono text-4xl font-bold text-[#ffbf00]">
+              <p className="font-mono text-4xl font-bold text-orange-light">
                 {avgWork}s : {avgRest}s
               </p>
             </div>

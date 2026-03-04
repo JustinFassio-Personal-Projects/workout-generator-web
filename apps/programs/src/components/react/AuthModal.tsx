@@ -12,15 +12,21 @@ import { supabase } from '../../lib/supabase/client';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** When true, show sign-up tab first (e.g. when opened from WorkoutPlanBuilder "Create account"). */
+  defaultSignUp?: boolean;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultSignUp = false }) => {
   const reduceMotion = useReducedMotion();
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [fullName, setFullName] = useState('');
+
+  React.useEffect(() => {
+    if (isOpen && defaultSignUp) setIsRegistering(true);
+  }, [isOpen, defaultSignUp]);
 
   const handleAuth = async () => {
     setAuthLoading(true);
@@ -95,12 +101,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
             transition={reduceMotion ? { duration: 0 } : undefined}
-            className="relative w-full max-w-md overflow-hidden rounded-[2.5rem] border border-[#ffbf00]/30 bg-[#0d0500] p-8 shadow-[0_0_50px_rgba(255,191,0,0.1)] md:p-10"
+            className="relative w-full max-w-md overflow-hidden rounded-[2.5rem] border border-orange-light/30 bg-bg-dark p-8 shadow-[0_0_50px_rgba(255,191,0,0.1)] md:p-10"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-transparent via-[#ffbf00] to-transparent" />
+            <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-transparent via-orange-light to-transparent" />
             <div className="mb-8 text-center">
-              <Fingerprint className="mx-auto mb-4 h-12 w-12 animate-pulse text-[#ffbf00]" />
+              <Fingerprint className="mx-auto mb-4 h-12 w-12 animate-pulse text-orange-light" />
               <h3 className="mb-2 font-heading text-2xl font-black uppercase text-white">
                 Command Access
               </h3>
@@ -129,7 +135,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-[#ffbf00]/50"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-orange-light/50"
                     placeholder="Sgt. Rock"
                     required
                   />
@@ -147,7 +153,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   type="email"
                   value={authEmail}
                   onChange={(e) => setAuthEmail(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-[#ffbf00]/50"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-orange-light/50"
                   placeholder="cadet@pt.army"
                   required
                 />
@@ -164,7 +170,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   type="password"
                   value={authPassword}
                   onChange={(e) => setAuthPassword(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-[#ffbf00]/50"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-orange-light/50"
                   placeholder="••••••••"
                   required
                 />
@@ -173,7 +179,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <button
                 type="submit"
                 disabled={authLoading}
-                className="w-full rounded-xl bg-[#ffbf00] py-4 font-black uppercase tracking-widest text-black transition-all hover:bg-white disabled:opacity-50"
+                className="w-full rounded-xl bg-orange-light py-4 font-black uppercase tracking-widest text-black transition-all hover:bg-white disabled:opacity-50"
               >
                 {authLoading ? 'Verifying...' : isRegistering ? 'Register' : 'Log In'}
               </button>
@@ -182,7 +188,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setIsRegistering(!isRegistering)}
-                  className="font-mono text-[10px] uppercase text-white/30 transition-colors hover:text-[#ffbf00]"
+                  className="font-mono text-[10px] uppercase text-white/30 transition-colors hover:text-orange-light"
                 >
                   {isRegistering ? 'Have an account? Log In' : 'New recruit? Register'}
                 </button>

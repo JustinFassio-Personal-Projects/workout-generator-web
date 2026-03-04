@@ -127,7 +127,7 @@ const HistoryZone: React.FC = () => {
           }}
           className={`rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase transition-colors ${
             filter === 'all'
-              ? 'border-[#ffbf00]/60 bg-[#ffbf00]/20 text-[#ffbf00]'
+              ? 'border-orange-light/60 bg-orange-light/20 text-orange-light'
               : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
           }`}
         >
@@ -141,7 +141,7 @@ const HistoryZone: React.FC = () => {
           }}
           className={`rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase transition-colors ${
             filter === 'this_week'
-              ? 'border-[#ffbf00]/60 bg-[#ffbf00]/20 text-[#ffbf00]'
+              ? 'border-orange-light/60 bg-orange-light/20 text-orange-light'
               : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
           }`}
         >
@@ -155,7 +155,7 @@ const HistoryZone: React.FC = () => {
           }}
           className={`rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase transition-colors ${
             filter === 'this_month'
-              ? 'border-[#ffbf00]/60 bg-[#ffbf00]/20 text-[#ffbf00]'
+              ? 'border-orange-light/60 bg-orange-light/20 text-orange-light'
               : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
           }`}
         >
@@ -174,7 +174,7 @@ const HistoryZone: React.FC = () => {
                 setProgramFilterId(null);
               }
             }}
-            className="appearance-none rounded-full border border-white/20 bg-white/5 px-3 py-1.5 pr-8 font-mono text-[10px] uppercase text-white/70 focus:outline-none focus:ring-1 focus:ring-[#ffbf00]/40"
+            className="appearance-none rounded-full border border-white/20 bg-white/5 px-3 py-1.5 pr-8 font-mono text-[10px] uppercase text-white/70 focus:outline-none focus:ring-1 focus:ring-orange-light/40"
             aria-label="Filter by program"
           >
             <option value="">By Program</option>

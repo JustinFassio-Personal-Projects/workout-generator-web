@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
-  @apply bg-[#0d0500] text-white antialiased;
+  @apply antialiased;
 }

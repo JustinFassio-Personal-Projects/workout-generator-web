@@ -1,0 +1,13 @@
+{
+  "name": "@workout-generator/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.css",
+    "./tokens": "./src/tokens.css",
+    "./base": "./src/base.css",
+    "./animations": "./src/animations.css",
+    "./cta": "./src/cta.css"
+  },
+  "files": ["src"]
+}

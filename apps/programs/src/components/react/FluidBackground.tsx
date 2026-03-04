@@ -42,7 +42,7 @@ const StarField = () => {
       {stars.map((star) => (
         <motion.div
           key={star.id}
-          className="absolute rounded-full bg-[#ffbf00]"
+          className="absolute rounded-full bg-orange-light"
           style={{
             left: `${star.x}%`,
             top: `${star.y}%`,
@@ -79,14 +79,14 @@ const FluidBackground: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden bg-gradient-to-br from-[#1a0a00] via-[#0d0500] to-black">
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-gradient-to-br from-[#1a0a00] via-bg-dark to-black">
       {!reduceMotion && <StarField />}
 
       {reduceMotion ? (
         <>
           {/* Static blobs when reduced motion preferred */}
           <div
-            className="absolute left-[-10%] top-[-10%] h-[90vw] w-[90vw] rounded-full bg-[#ffbf00] opacity-[0.015] blur-[24px]"
+            className="absolute left-[-10%] top-[-10%] h-[90vw] w-[90vw] rounded-full bg-orange-light opacity-[0.015] blur-[24px]"
             style={{ transform: 'translate(25px,-12px)' }}
           />
           <div
@@ -102,7 +102,7 @@ const FluidBackground: React.FC = () => {
         <>
           {/* Blob 1: Amber - reduced blur for INP */}
           <motion.div
-            className="absolute left-[-10%] top-[-10%] h-[90vw] w-[90vw] rounded-full bg-[#ffbf00] opacity-[0.015] mix-blend-screen blur-[24px] filter"
+            className="absolute left-[-10%] top-[-10%] h-[90vw] w-[90vw] rounded-full bg-orange-light opacity-[0.015] mix-blend-screen blur-[24px] filter"
             animate={{ x: [0, 50, -25, 0], y: [0, -25, 25, 0] }}
             transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
             style={{ transform: 'translateZ(0)' }}

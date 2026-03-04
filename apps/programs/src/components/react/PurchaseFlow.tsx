@@ -45,7 +45,7 @@ const PurchaseFlow: React.FC = () => {
       subtitle: '(3 Classes)',
       price: '$19',
       color: 'amber',
-      accent: 'bg-[#ffbf00]/10 border-[#ffbf00]/50',
+      accent: 'bg-orange-light/10 border-orange-light/50',
       features: ['Weekly Progression', 'Human Oversight', 'Prompt Support'],
     },
     {
@@ -68,7 +68,7 @@ const PurchaseFlow: React.FC = () => {
           <h2 className="font-heading text-5xl font-bold text-white opacity-20 md:text-9xl">
             PASSES
           </h2>
-          <p className="relative z-10 -mt-3 font-mono text-sm uppercase tracking-widest text-[#ffbf00] md:-mt-8 md:text-base">
+          <p className="relative z-10 -mt-3 font-mono text-sm uppercase tracking-widest text-orange-light md:-mt-8 md:text-base">
             PERSISTENT PROGRESSION
           </p>
         </div>
@@ -92,7 +92,7 @@ const PurchaseFlow: React.FC = () => {
                     {ticket.subtitle}
                   </p>
                   <div
-                    className={`mb-8 text-5xl font-bold ${ticket.color === 'white' ? 'text-white' : ticket.color === 'amber' ? 'text-[#ffbf00]' : 'text-[#ff1500]'}`}
+                    className={`mb-8 text-5xl font-bold ${ticket.color === 'white' ? 'text-white' : ticket.color === 'amber' ? 'text-orange-light' : 'text-[#ff1500]'}`}
                   >
                     {ticket.price}
                   </div>
@@ -108,7 +108,7 @@ const PurchaseFlow: React.FC = () => {
                 <button
                   onClick={() => handlePurchase(i)}
                   disabled={isDisabled || isPurchased}
-                  className={`group relative mt-8 w-full overflow-hidden border border-white/20 py-4 text-sm font-bold uppercase tracking-widest transition-all duration-300 ${isPurchased ? 'cursor-default border-[#ffbf00] bg-[#ffbf00] text-black' : 'cursor-pointer text-white hover:bg-white hover:text-black'}`}
+                  className={`group relative mt-8 w-full overflow-hidden border border-white/20 py-4 text-sm font-bold uppercase tracking-widest transition-all duration-300 ${isPurchased ? 'cursor-default border-orange-light bg-orange-light text-black' : 'cursor-pointer text-white hover:bg-white hover:text-black'}`}
                 >
                   <span className="relative z-10">
                     {isPurchasing ? 'Syncing...' : isPurchased ? 'Activated' : 'Activate Pass'}

@@ -68,7 +68,7 @@ const ChallengeCatalog: React.FC<ChallengeCatalogProps> = ({ availableChallenges
           <h1 className="mb-2 font-heading text-3xl font-bold text-white md:text-4xl">
             Challenge Catalog
           </h1>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#ffbf00]">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-orange-light">
             Filter by equipment and level
           </p>
         </div>
@@ -88,7 +88,7 @@ const ChallengeCatalog: React.FC<ChallengeCatalogProps> = ({ availableChallenges
           <select
             value={selectedZone}
             onChange={(e) => setSelectedZone(e.target.value)}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
           >
             {zoneOptions.map((opt) => (
               <option key={opt.value || 'all'} value={opt.value}>
@@ -102,7 +102,7 @@ const ChallengeCatalog: React.FC<ChallengeCatalogProps> = ({ availableChallenges
           <select
             value={selectedGoal}
             onChange={(e) => setSelectedGoal(e.target.value)}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
           >
             {GOAL_OPTIONS.map((opt) => (
               <option key={opt.value || 'all'} value={opt.value}>
@@ -124,18 +124,18 @@ const ChallengeCatalog: React.FC<ChallengeCatalogProps> = ({ availableChallenges
           {filteredChallenges.map((challenge) => (
             <article
               key={challenge.id}
-              className="flex flex-col rounded-xl border border-white/10 bg-black/20 p-5 backdrop-blur-sm transition hover:border-[#ffbf00]/30 hover:bg-black/30"
+              className="flex flex-col rounded-xl border border-white/10 bg-black/20 p-5 backdrop-blur-sm transition hover:border-orange-light/30 hover:bg-black/30"
             >
               <div className="mb-3 flex items-start justify-between gap-2">
                 <h2 className="line-clamp-2 font-heading text-lg font-bold text-white">
                   {challenge.title || 'Untitled Challenge'}
                 </h2>
-                <span className="shrink-0 rounded bg-[#ffbf00]/20 px-2 py-0.5 text-xs font-medium text-[#ffbf00]">
+                <span className="shrink-0 rounded bg-orange-light/20 px-2 py-0.5 text-xs font-medium text-orange-light">
                   {challenge.durationWeeks} Weeks
                 </span>
               </div>
               {challenge.theme && (
-                <span className="mb-2 inline-block rounded bg-white/10 px-2 py-0.5 text-xs text-[#ffbf00]">
+                <span className="mb-2 inline-block rounded bg-white/10 px-2 py-0.5 text-xs text-orange-light">
                   {challenge.theme}
                 </span>
               )}
@@ -153,7 +153,7 @@ const ChallengeCatalog: React.FC<ChallengeCatalogProps> = ({ availableChallenges
               <div className="mt-auto">
                 <a
                   href={`/challenges/${challenge.id}`}
-                  className="inline-flex items-center gap-1 rounded-lg bg-[#ffbf00] px-4 py-2 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-white"
+                  className="inline-flex items-center gap-1 rounded-lg bg-orange-light px-4 py-2 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-white"
                 >
                   View Challenge
                   <ChevronRight className="h-4 w-4" />

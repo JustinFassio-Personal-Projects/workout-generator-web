@@ -72,7 +72,7 @@ const ProgressZone: React.FC<ProgressZoneProps> = ({
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
-      <h4 className="mb-4 border-b border-[#ffbf00]/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+      <h4 className="mb-4 border-b border-orange-light/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
         Progress
       </h4>
       {!isPaid ? (
@@ -86,7 +86,7 @@ const ProgressZone: React.FC<ProgressZoneProps> = ({
             <button
               type="button"
               onClick={onOpenConversionModal}
-              className="self-start rounded-2xl border border-[#ffbf00]/30 bg-[#ffbf00]/10 px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-[#ffbf00] transition-colors hover:bg-[#ffbf00] hover:text-black"
+              className="self-start rounded-2xl border border-orange-light/30 bg-orange-light/10 px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-colors hover:bg-orange-light hover:text-black"
             >
               Upgrade to save & track client progress
             </button>
@@ -101,7 +101,7 @@ const ProgressZone: React.FC<ProgressZoneProps> = ({
                 type="button"
                 onClick={() => setActiveTab(tab)}
                 className={`border-b-2 pb-2 transition-colors hover:text-white/90 ${
-                  activeTab === tab ? 'border-[#ffbf00] text-[#ffbf00]' : 'border-transparent'
+                  activeTab === tab ? 'border-orange-light text-orange-light' : 'border-transparent'
                 }`}
               >
                 {tab === 'volume' ? 'Volume' : tab === 'consistency' ? 'Consistency' : 'PRs'}

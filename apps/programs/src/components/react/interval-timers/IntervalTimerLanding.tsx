@@ -50,13 +50,13 @@ const IntervalTimerLanding: React.FC<IntervalTimerLandingProps> = ({
 
   return (
     <IntervalTimerAccentContext.Provider value={accentTheme ?? null}>
-      <div className="min-h-screen bg-[#0d0500] pb-20 font-sans text-white">
-        <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0d0500]/95 backdrop-blur-md">
+      <div className="min-h-screen bg-bg-dark pb-20 font-sans text-white">
+        <nav className="sticky top-0 z-50 border-b border-white/10 bg-bg-dark/95 backdrop-blur-md">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-2">
               <span className="font-heading text-lg font-bold tracking-wide text-white/80">
                 Pillar 4{' '}
-                <span className="text-[#ffbf00]">| {getProtocolLabel(currentProtocol)}</span>
+                <span className="text-orange-light">| {getProtocolLabel(currentProtocol)}</span>
               </span>
             </div>
             <div className="hidden flex-wrap items-center justify-end gap-1 text-xs font-bold md:flex md:gap-3">
@@ -67,8 +67,8 @@ const IntervalTimerLanding: React.FC<IntervalTimerLandingProps> = ({
                     onClick={() => onNavigate(id)}
                     className={
                       id === currentProtocol
-                        ? 'text-[#ffbf00]'
-                        : 'text-white/70 transition-colors hover:text-[#ffbf00]'
+                        ? 'text-orange-light'
+                        : 'text-white/70 transition-colors hover:text-orange-light'
                     }
                   >
                     {getProtocolLabel(id)}
@@ -84,7 +84,7 @@ const IntervalTimerLanding: React.FC<IntervalTimerLandingProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigate(prev)}
-                  className="text-xs text-white/70 hover:text-[#ffbf00]"
+                  className="text-xs text-white/70 hover:text-orange-light"
                 >
                   ← {getProtocolLabel(prev)}
                 </button>
@@ -93,7 +93,7 @@ const IntervalTimerLanding: React.FC<IntervalTimerLandingProps> = ({
                 <button
                   type="button"
                   onClick={() => onNavigate(next)}
-                  className="text-xs text-white/70 hover:text-[#ffbf00]"
+                  className="text-xs text-white/70 hover:text-orange-light"
                 >
                   {getProtocolLabel(next)} →
                 </button>

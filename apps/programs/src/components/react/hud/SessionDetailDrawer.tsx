@@ -133,11 +133,11 @@ const SessionDetailDrawer: React.FC<SessionDetailDrawerProps> = ({
         onClick={onClose}
       />
       <div
-        className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-[#0d0500] shadow-2xl"
+        className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-bg-dark shadow-2xl"
         role="dialog"
         aria-labelledby="session-drawer-title"
       >
-        <div className="sticky top-0 flex items-center justify-between border-b border-white/10 bg-[#0d0500] px-6 py-4">
+        <div className="sticky top-0 flex items-center justify-between border-b border-white/10 bg-bg-dark px-6 py-4">
           <h2
             id="session-drawer-title"
             className="font-heading text-lg font-black uppercase text-white"
@@ -182,7 +182,7 @@ const SessionDetailDrawer: React.FC<SessionDetailDrawerProps> = ({
             type="button"
             onClick={handleDoAgain}
             disabled={doAgainLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#ffbf00]/50 bg-[#ffbf00]/20 py-3 font-heading text-sm font-black uppercase text-[#ffbf00] transition-colors hover:bg-[#ffbf00]/30 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-orange-light/50 bg-orange-light/20 py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors hover:bg-orange-light/30 disabled:opacity-50"
           >
             <Play className="h-4 w-4" />
             {doAgainLoading ? 'Loading…' : 'Do Again'}

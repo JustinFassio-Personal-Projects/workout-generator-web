@@ -135,7 +135,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
     <div className="fixed inset-0 z-50 flex flex-col bg-black/95 text-white">
       {/* Header */}
       <header className="flex min-h-[52px] shrink-0 items-center justify-between border-b border-white/10 px-4 py-3">
-        <span className="font-mono text-lg font-medium tabular-nums text-[#ffbf00]">
+        <span className="font-mono text-lg font-medium tabular-nums text-orange-light">
           {formatTime(elapsedTime)}
         </span>
         <div className="flex items-center gap-2">
@@ -151,7 +151,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
             type="button"
             onClick={handleFinish}
             disabled={saving}
-            className="min-h-[44px] rounded-lg bg-[#ffbf00] px-4 font-bold uppercase tracking-wider text-black transition hover:bg-white disabled:opacity-50"
+            className="min-h-[44px] rounded-lg bg-orange-light px-4 font-bold uppercase tracking-wider text-black transition hover:bg-white disabled:opacity-50"
           >
             {saving ? 'Saving…' : 'Finish'}
           </button>
@@ -201,7 +201,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                               actualWeight: parseFloat(e.target.value) || 0,
                             })
                           }
-                          className="min-h-[44px] w-full max-w-[80px] rounded border border-white/20 bg-black/40 px-2 text-white focus:border-[#ffbf00] focus:outline-none"
+                          className="min-h-[44px] w-full max-w-[80px] rounded border border-white/20 bg-black/40 px-2 text-white focus:border-orange-light focus:outline-none"
                         />
                       </td>
                       <td className="p-2">
@@ -215,7 +215,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                               actualReps: parseInt(e.target.value, 10) || 0,
                             })
                           }
-                          className="min-h-[44px] w-full max-w-[64px] rounded border border-white/20 bg-black/40 px-2 text-white focus:border-[#ffbf00] focus:outline-none"
+                          className="min-h-[44px] w-full max-w-[64px] rounded border border-white/20 bg-black/40 px-2 text-white focus:border-orange-light focus:outline-none"
                         />
                       </td>
                       <td className="p-2">
@@ -228,7 +228,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                           }
                           className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border-2 transition ${
                             set.completed
-                              ? 'border-[#ffbf00] bg-[#ffbf00]/20 text-[#ffbf00]'
+                              ? 'border-orange-light bg-orange-light/20 text-orange-light'
                               : 'border-white/20 text-white/50 hover:border-white/40'
                           }`}
                           aria-label={set.completed ? 'Mark set incomplete' : 'Mark set complete'}

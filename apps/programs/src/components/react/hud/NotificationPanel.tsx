@@ -21,9 +21,9 @@ export interface NotificationPanelProps {
 function iconForType(type: NotificationType): React.ReactNode {
   switch (type) {
     case 'program_complete':
-      return <Trophy className="h-4 w-4 shrink-0 text-[#ffbf00]" />;
+      return <Trophy className="h-4 w-4 shrink-0 text-orange-light" />;
     case 'new_workout_available':
-      return <Calendar className="h-4 w-4 shrink-0 text-[#ffbf00]" />;
+      return <Calendar className="h-4 w-4 shrink-0 text-orange-light" />;
     case 'rest_day_reminder':
       return <Moon className="h-4 w-4 shrink-0 text-white/70" />;
     case 'streak_at_risk':
@@ -58,7 +58,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
         onClick={onClose}
       />
       <div
-        className="fixed right-0 top-0 z-50 flex h-full w-full max-w-sm flex-col border-l border-white/10 bg-[#0d0500] shadow-2xl"
+        className="fixed right-0 top-0 z-50 flex h-full w-full max-w-sm flex-col border-l border-white/10 bg-bg-dark shadow-2xl"
         role="dialog"
         aria-labelledby="notification-panel-title"
       >
@@ -90,7 +90,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
                 >
                   {iconForType(n.type)}
                   <div className="min-w-0 flex-1">
-                    <p className="font-mono text-xs font-semibold uppercase text-[#ffbf00]">
+                    <p className="font-mono text-xs font-semibold uppercase text-orange-light">
                       {n.title}
                     </p>
                     <p className="mt-0.5 text-sm text-white/80">{n.message}</p>

@@ -98,7 +98,7 @@ const BlueprintPreview: React.FC<BlueprintPreviewProps> = ({
               if (e.key === 'Enter') saveEdit();
               if (e.key === 'Escape') cancelEdit();
             }}
-            className="flex-1 rounded border border-white/20 bg-black/40 px-2 py-1 text-sm text-white focus:border-[#ffbf00] focus:outline-none"
+            className="flex-1 rounded border border-white/20 bg-black/40 px-2 py-1 text-sm text-white focus:border-orange-light focus:outline-none"
             autoFocus
           />
           <button onClick={saveEdit} className="rounded p-1 text-green-400 hover:bg-green-400/20">
@@ -128,7 +128,7 @@ const BlueprintPreview: React.FC<BlueprintPreviewProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">Program Blueprint</h3>
-        <span className="rounded-full bg-[#ffbf00]/20 px-3 py-1 text-xs text-[#ffbf00]">
+        <span className="rounded-full bg-orange-light/20 px-3 py-1 text-xs text-orange-light">
           Phase 1 - Review &amp; Edit
         </span>
       </div>
@@ -158,7 +158,7 @@ const BlueprintPreview: React.FC<BlueprintPreviewProps> = ({
             <EditableField
               field="days_per_week"
               value={String(blueprint.structure.days_per_week)}
-              className="text-2xl font-bold text-[#ffbf00]"
+              className="text-2xl font-bold text-orange-light"
             />
           </div>
           <div className="rounded-lg bg-white/5 p-3">
@@ -189,7 +189,7 @@ const BlueprintPreview: React.FC<BlueprintPreviewProps> = ({
         <div className="space-y-2">
           {Object.entries(blueprint.periodization_strategy).map(([phase, focus]) => (
             <div key={phase} className="flex items-center gap-4 rounded-lg bg-white/5 p-3">
-              <span className="w-24 shrink-0 text-sm font-medium text-[#ffbf00]">
+              <span className="w-24 shrink-0 text-sm font-medium text-orange-light">
                 {phase.replace(/_/g, ' ')}
               </span>
               <EditableField
@@ -214,12 +214,12 @@ const BlueprintPreview: React.FC<BlueprintPreviewProps> = ({
               <div
                 key={day}
                 className={`flex items-center gap-4 rounded-lg p-3 ${
-                  isRest ? 'bg-white/5' : 'bg-[#ffbf00]/10'
+                  isRest ? 'bg-white/5' : 'bg-orange-light/10'
                 }`}
               >
                 <span
                   className={`w-16 shrink-0 text-sm font-medium ${
-                    isRest ? 'text-white/50' : 'text-[#ffbf00]'
+                    isRest ? 'text-white/50' : 'text-orange-light'
                   }`}
                 >
                   {day.replace(/_/g, ' ')}
@@ -250,7 +250,7 @@ const BlueprintPreview: React.FC<BlueprintPreviewProps> = ({
           type="button"
           onClick={onGenerateWorkouts}
           disabled={loading}
-          className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-6 py-2 font-medium text-black transition-colors hover:bg-[#ffbf00]/90 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
         >
           <Sparkles className={`h-5 w-5 ${loading ? 'animate-pulse' : ''}`} />
           <span>{loading ? 'Generating Workouts...' : 'Generate Detailed Workouts'}</span>

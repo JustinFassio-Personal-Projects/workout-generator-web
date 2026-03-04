@@ -121,7 +121,7 @@ const ExerciseSwapModal: React.FC<ExerciseSwapModalProps> = ({
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="relative flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0d0500] shadow-[0_0_100px_rgba(255,191,0,0.1)]"
+          className="relative flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-bg-dark shadow-[0_0_100px_rgba(255,191,0,0.1)]"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/10 p-6">

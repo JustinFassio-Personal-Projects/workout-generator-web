@@ -81,7 +81,7 @@ const ScheduleViewer: React.FC<ScheduleViewerProps> = ({
                           promoting.weekIndex === weekIndex &&
                           promoting.workoutIndex === workoutIndex
                         }
-                        className="rounded border border-[#ffbf00]/40 bg-[#ffbf00]/10 px-2 py-1 text-xs text-[#ffbf00] transition-colors hover:bg-[#ffbf00]/20 disabled:opacity-50"
+                        className="rounded border border-orange-light/40 bg-orange-light/10 px-2 py-1 text-xs text-orange-light transition-colors hover:bg-orange-light/20 disabled:opacity-50"
                       >
                         {promoting?.weekIndex === weekIndex &&
                         promoting?.workoutIndex === workoutIndex

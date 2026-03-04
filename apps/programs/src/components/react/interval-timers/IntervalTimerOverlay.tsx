@@ -175,7 +175,7 @@ const IntervalTimerOverlay: React.FC<IntervalTimerOverlayProps> = ({
           : 'COOLDOWN';
 
   return (
-    <div className="fixed inset-0 z-[200] flex h-full w-full flex-col overflow-hidden bg-[#0d0500]">
+    <div className="fixed inset-0 z-[200] flex h-full w-full flex-col overflow-hidden bg-bg-dark">
       <div
         className={`flex items-center justify-between gap-4 p-4 text-white transition-colors duration-300 sm:p-6 ${headerBg}`}
       >
@@ -307,7 +307,7 @@ const IntervalTimerOverlay: React.FC<IntervalTimerOverlayProps> = ({
           <button
             type="button"
             onClick={() => setHasStarted(true)}
-            className="max-w-[200px] flex-1 rounded-xl bg-[#ffbf00] px-8 py-4 font-bold text-black"
+            className="max-w-[200px] flex-1 rounded-xl bg-orange-light px-8 py-4 font-bold text-black"
           >
             START
           </button>

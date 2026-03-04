@@ -71,7 +71,7 @@ const AdminFooterButton: React.FC = () => {
     <button
       onClick={handleAdminClick}
       type="button"
-      className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 transition-colors hover:text-[#ffbf00]"
+      className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 transition-colors hover:text-orange-light"
       title={user ? 'Admin Dashboard' : 'Sign in to access Admin Dashboard'}
     >
       <Settings className="h-5 w-5" />

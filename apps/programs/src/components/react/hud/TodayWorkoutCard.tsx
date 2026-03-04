@@ -141,7 +141,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
         </p>
         <a
           href="#program-sidebar"
-          className="inline-block rounded-full border border-[#ffbf00]/30 bg-[#ffbf00]/10 px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-[#ffbf00] transition-colors hover:bg-[#ffbf00] hover:text-black"
+          className="inline-block rounded-full border border-orange-light/30 bg-orange-light/10 px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-colors hover:bg-orange-light hover:text-black"
         >
           Go to Program
         </a>
@@ -171,7 +171,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
     <>
       <div className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
         <div className="mb-2 flex items-center gap-2">
-          <span className="rounded bg-[#ffbf00]/20 px-2 py-0.5 font-mono text-[10px] uppercase text-[#ffbf00]">
+          <span className="rounded bg-orange-light/20 px-2 py-0.5 font-mono text-[10px] uppercase text-orange-light">
             Today
           </span>
           {isCompleted && (
@@ -202,7 +202,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
           <button
             type="button"
             onClick={handleStartWorkout}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#ffbf00] py-3 font-mono text-xs font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-90"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-orange-light py-3 font-mono text-xs font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-90"
           >
             <Play className="h-4 w-4" />
             Start Workout
@@ -211,7 +211,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
           <button
             type="button"
             onClick={onOpenConversionModal}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-[#ffbf00]/30 bg-[#ffbf00]/10 py-3 font-mono text-xs font-bold uppercase tracking-widest text-[#ffbf00] transition-colors hover:bg-[#ffbf00] hover:text-black"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-light/30 bg-orange-light/10 py-3 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-colors hover:bg-orange-light hover:text-black"
           >
             Upgrade to start workout
           </button>

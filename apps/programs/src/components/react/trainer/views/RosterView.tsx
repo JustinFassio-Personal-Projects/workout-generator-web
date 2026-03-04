@@ -82,7 +82,7 @@ const RosterView: React.FC = () => {
           placeholder="Search clients..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full max-w-md rounded-lg border border-white/10 bg-black/20 px-10 py-2 text-white placeholder:text-white/40 focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+          className="w-full max-w-md rounded-lg border border-white/10 bg-black/20 px-10 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
         />
       </div>
 

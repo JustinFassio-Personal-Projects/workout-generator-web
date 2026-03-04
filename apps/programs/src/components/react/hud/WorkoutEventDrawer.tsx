@@ -98,7 +98,7 @@ const WorkoutEventDrawer: React.FC<WorkoutEventDrawerProps> = ({
       ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
       : event.status === 'missed'
         ? 'bg-white/10 text-white/50 border-white/20'
-        : 'bg-[#ffbf00]/20 text-[#ffbf00] border-[#ffbf00]/40';
+        : 'bg-orange-light/20 text-orange-light border-orange-light/40';
 
   return (
     <>
@@ -108,11 +108,11 @@ const WorkoutEventDrawer: React.FC<WorkoutEventDrawerProps> = ({
         onClick={onClose}
       />
       <div
-        className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-[#0d0500] shadow-2xl"
+        className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-bg-dark shadow-2xl"
         role="dialog"
         aria-labelledby="drawer-title"
       >
-        <div className="sticky top-0 flex items-center justify-between border-b border-white/10 bg-[#0d0500] px-6 py-4">
+        <div className="sticky top-0 flex items-center justify-between border-b border-white/10 bg-bg-dark px-6 py-4">
           <h2 id="drawer-title" className="font-heading text-lg font-black uppercase text-white">
             Workout
           </h2>
@@ -166,7 +166,7 @@ const WorkoutEventDrawer: React.FC<WorkoutEventDrawerProps> = ({
                     onClick={() =>
                       onStartWorkout(workout, event.programId, event.weekId, event.workoutId)
                     }
-                    className="flex items-center justify-center gap-2 rounded-2xl border border-[#ffbf00]/50 bg-[#ffbf00]/20 py-3 font-heading text-sm font-black uppercase text-[#ffbf00] transition-colors hover:bg-[#ffbf00]/30"
+                    className="flex items-center justify-center gap-2 rounded-2xl border border-orange-light/50 bg-orange-light/20 py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors hover:bg-orange-light/30"
                   >
                     <Play className="h-4 w-4" />
                     Start Workout

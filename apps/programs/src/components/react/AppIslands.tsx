@@ -49,6 +49,7 @@ const AppIslands: React.FC<AppIslandsProps> = ({ pathname: initialPathname }) =>
     isPaid,
   } = useAppContext();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalSignupFirst, setAuthModalSignupFirst] = useState(false);
   const [showHUD, setShowHUD] = useState(false);
   const [showConversionModal, setShowConversionModal] = useState(false);
   const [calendarRefreshKey, setCalendarRefreshKey] = useState(0);
@@ -197,10 +198,18 @@ const AppIslands: React.FC<AppIslandsProps> = ({ pathname: initialPathname }) =>
     };
     const handleShowAuth = () => {
       try {
+        setAuthModalSignupFirst(false);
         setShowAuthModal(true);
       } catch (error) {
-        // Log only; no user-facing error state—matches other event handlers in this file. setState rarely throws.
         console.error('[AppIslands] Error showing auth modal:', error);
+      }
+    };
+    const handleShowAuthWithSignup = () => {
+      try {
+        setAuthModalSignupFirst(true);
+        setShowAuthModal(true);
+      } catch (error) {
+        console.error('[AppIslands] Error showing auth modal (signup):', error);
       }
     };
     const handleShowPrograms = () => {
@@ -215,6 +224,7 @@ const AppIslands: React.FC<AppIslandsProps> = ({ pathname: initialPathname }) =>
       try {
         window.addEventListener('selectWorkout', handleSelectWorkout);
         window.addEventListener('showAuthModal', handleShowAuth);
+        window.addEventListener('showAuthModalWithSignup', handleShowAuthWithSignup);
         window.addEventListener('showPrograms', handleShowPrograms);
       } catch (error) {
         console.error('[AppIslands] Error registering event listeners:', error);
@@ -226,6 +236,7 @@ const AppIslands: React.FC<AppIslandsProps> = ({ pathname: initialPathname }) =>
         try {
           window.removeEventListener('selectWorkout', handleSelectWorkout);
           window.removeEventListener('showAuthModal', handleShowAuth);
+          window.removeEventListener('showAuthModalWithSignup', handleShowAuthWithSignup);
           window.removeEventListener('showPrograms', handleShowPrograms);
         } catch (error) {
           console.error('[AppIslands] Error removing event listeners:', error);
@@ -391,7 +402,14 @@ const AppIslands: React.FC<AppIslandsProps> = ({ pathname: initialPathname }) =>
         initialPathname={initialPathname}
       />
 
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => {
+          setShowAuthModal(false);
+          setAuthModalSignupFirst(false);
+        }}
+        defaultSignUp={authModalSignupFirst}
+      />
 
       <Suspense fallback={null}>
         <HUDShell

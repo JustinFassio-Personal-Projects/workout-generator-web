@@ -37,7 +37,7 @@ const DeploymentGrid: React.FC<DeploymentGridProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-heading text-2xl font-black uppercase text-white">{title}</h3>
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#ffbf00]">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-orange-light">
             {subtitle}
           </span>
         </div>
@@ -76,7 +76,7 @@ const DeploymentGrid: React.FC<DeploymentGridProps> = ({
                     onSelectWorkout?.(workout);
                   }
                 }}
-                className={`group relative flex h-40 w-full cursor-pointer items-center overflow-hidden rounded-3xl border px-8 shadow-2xl transition-all ${isDone ? 'border-[#ffbf00] bg-[#ffbf00]/5 shadow-[#ffbf00]/5' : 'border-white/10 bg-black/40 hover:border-[#ffbf00]/30'}`}
+                className={`group relative flex h-40 w-full cursor-pointer items-center overflow-hidden rounded-3xl border px-8 shadow-2xl transition-all ${isDone ? 'border-orange-light bg-orange-light/5 shadow-[#ffbf00]/5' : 'border-white/10 bg-black/40 hover:border-orange-light/30'}`}
               >
                 <div className="absolute inset-0 overflow-hidden">
                   <img
@@ -91,13 +91,13 @@ const DeploymentGrid: React.FC<DeploymentGridProps> = ({
                   <div className="mb-3 flex items-center gap-4">
                     <div className="rounded-lg bg-white/10 p-2 backdrop-blur-md">
                       {isDone ? (
-                        <CheckCircle2 className="h-4 w-4 text-[#ffbf00]" />
+                        <CheckCircle2 className="h-4 w-4 text-orange-light" />
                       ) : (
                         <Target className="h-4 w-4 text-white/40" />
                       )}
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#ffbf00]">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-orange-light">
                         Session {sessionLabel}
                       </span>
                       {workout.genre ? (
@@ -107,11 +107,11 @@ const DeploymentGrid: React.FC<DeploymentGridProps> = ({
                       ) : null}
                     </div>
                   </div>
-                  <h4 className="font-heading text-2xl font-black uppercase text-white transition-colors group-hover:text-[#ffbf00]">
+                  <h4 className="font-heading text-2xl font-black uppercase text-white transition-colors group-hover:text-orange-light">
                     {workout.name}
                   </h4>
                   {isDone && (
-                    <span className="absolute right-4 top-4 rotate-12 rounded border border-[#ffbf00]/50 bg-black/50 px-2 py-1 font-mono text-[10px] font-black text-[#ffbf00]">
+                    <span className="absolute right-4 top-4 rotate-12 rounded border border-orange-light/50 bg-black/50 px-2 py-1 font-mono text-[10px] font-black text-orange-light">
                       COMPLETED
                     </span>
                   )}
@@ -120,7 +120,7 @@ const DeploymentGrid: React.FC<DeploymentGridProps> = ({
                 <div className="relative z-10 flex flex-col items-end gap-3">
                   <IntensityBars level={workout.intensity} />
                   <div
-                    className={`rounded-full p-4 transition-all ${isDone ? 'bg-[#ffbf00] text-black' : 'bg-white/5 text-white/40 group-hover:bg-white group-hover:text-black'}`}
+                    className={`rounded-full p-4 transition-all ${isDone ? 'bg-orange-light text-black' : 'bg-white/5 text-white/40 group-hover:bg-white group-hover:text-black'}`}
                   >
                     <Play className="h-5 w-5 fill-current" />
                   </div>

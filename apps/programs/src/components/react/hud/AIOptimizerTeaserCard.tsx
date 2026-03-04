@@ -37,8 +37,8 @@ const AIOptimizerTeaserCard: React.FC<AIOptimizerTeaserCardProps> = ({
   workoutName,
 }) => {
   return (
-    <div className="rounded-3xl border border-white/10 bg-[#ffbf00]/10 p-6 backdrop-blur-sm">
-      <h4 className="mb-4 border-b border-[#ffbf00]/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+    <div className="rounded-3xl border border-white/10 bg-orange-light/10 p-6 backdrop-blur-sm">
+      <h4 className="mb-4 border-b border-orange-light/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
         AI Optimizer
       </h4>
 
@@ -51,7 +51,7 @@ const AIOptimizerTeaserCard: React.FC<AIOptimizerTeaserCardProps> = ({
         <div className="relative">
           {/* Blurred preview content */}
           <div className="pointer-events-none select-none blur-md" aria-hidden>
-            <div className="mb-2 flex items-center gap-2 text-[#ffbf00]/80">
+            <div className="mb-2 flex items-center gap-2 text-orange-light/80">
               <Sparkles className="h-4 w-4" />
               <span className="font-mono text-[10px] uppercase">Load · Volume · Form</span>
             </div>
@@ -62,7 +62,7 @@ const AIOptimizerTeaserCard: React.FC<AIOptimizerTeaserCardProps> = ({
           </div>
           {/* Gradient overlay for depth */}
           <div
-            className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-t from-[#0d0500]/90 via-[#0d0500]/40 to-transparent"
+            className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-t from-bg-dark/90 via-bg-dark/40 to-transparent"
             aria-hidden
           />
           {/* CTA overlay */}
@@ -72,7 +72,7 @@ const AIOptimizerTeaserCard: React.FC<AIOptimizerTeaserCardProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={onOpenConversionModal}
-              className="w-full rounded-2xl border border-[#ffbf00]/30 bg-[#ffbf00] py-4 font-heading text-sm font-black uppercase tracking-[0.3em] text-black shadow-[0_20px_40px_rgba(255,191,0,0.15)] transition-colors hover:border-[#ff8000] hover:bg-[#ff8000]"
+              className="w-full rounded-2xl border border-orange-light/30 bg-orange-light py-4 font-heading text-sm font-black uppercase tracking-[0.3em] text-black shadow-[0_20px_40px_rgba(255,191,0,0.15)] transition-colors hover:border-orange-medium hover:bg-orange-medium"
             >
               Unlock AI Optimizer
             </motion.button>

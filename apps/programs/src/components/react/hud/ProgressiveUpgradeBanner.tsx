@@ -63,7 +63,7 @@ const ProgressiveUpgradeBanner: React.FC<ProgressiveUpgradeBannerProps> = ({
         <button
           type="button"
           onClick={onUpgrade}
-          className="rounded-full border border-[#ffbf00]/50 bg-[#ffbf00]/10 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[#ffbf00] transition-colors hover:bg-[#ffbf00] hover:text-black"
+          className="rounded-full border border-orange-light/50 bg-orange-light/10 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-orange-light transition-colors hover:bg-orange-light hover:text-black"
         >
           Upgrade
         </button>

@@ -244,7 +244,7 @@ const TenTwentyThirtyInterval: React.FC<TenTwentyThirtyIntervalProps> = ({ onNav
               onClick={() =>
                 document.getElementById('simulator')?.scrollIntoView({ behavior: 'smooth' })
               }
-              className="rounded-xl bg-[#ffbf00] px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-1"
+              className="rounded-xl bg-orange-light px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-1"
             >
               Start Protocol
             </button>
@@ -452,7 +452,7 @@ const TenTwentyThirtyInterval: React.FC<TenTwentyThirtyIntervalProps> = ({ onNav
               onClick={() => setIsDurationSelectOpen(false)}
               aria-hidden
             />
-            <div className="animate-zoom-in relative flex max-h-[calc(100vh-2rem)] w-full max-w-md shrink-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0500] shadow-2xl">
+            <div className="animate-zoom-in relative flex max-h-[calc(100vh-2rem)] w-full max-w-md shrink-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-bg-dark shadow-2xl">
               <div className="shrink-0 border-b border-white/10 p-6 text-center">
                 <h3 className="font-display text-xl font-bold text-white">Select Volume</h3>
               </div>
@@ -517,7 +517,7 @@ const TenTwentyThirtyInterval: React.FC<TenTwentyThirtyIntervalProps> = ({ onNav
             onClick={() => setIsReportOpen(false)}
             aria-hidden
           />
-          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0500] shadow-2xl">
+          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-bg-dark shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 p-6">
               <h3 className="font-display text-xl font-bold text-white">The 10-20-30 Method</h3>
               <button

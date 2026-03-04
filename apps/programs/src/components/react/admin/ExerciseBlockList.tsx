@@ -189,7 +189,7 @@ const ExerciseBlockList: React.FC<ExerciseBlockListProps> = ({
       <button
         type="button"
         onClick={onAdd}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-white/20 bg-black/10 py-4 text-white/60 transition-colors hover:border-[#ffbf00]/40 hover:bg-[#ffbf00]/5 hover:text-[#ffbf00]"
+        className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-white/20 bg-black/10 py-4 text-white/60 transition-colors hover:border-orange-light/40 hover:bg-orange-light/5 hover:text-orange-light"
       >
         <Plus className="h-5 w-5" />
         <span>Add Exercise</span>

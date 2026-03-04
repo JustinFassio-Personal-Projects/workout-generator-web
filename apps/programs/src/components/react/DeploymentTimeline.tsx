@@ -43,16 +43,16 @@ const DeploymentTimeline: React.FC<DeploymentTimelineProps> = ({
               onClick={() => onSelectWeek(isActive ? null : week)}
               className={`group/week flex w-full items-center justify-between rounded-xl border p-4 transition-all ${
                 isActive
-                  ? 'border-[#ffbf00] bg-[#ffbf00] text-black shadow-[0_0_20px_rgba(255,191,0,0.4)]'
+                  ? 'border-orange-light bg-orange-light text-black shadow-[0_0_20px_rgba(255,191,0,0.4)]'
                   : isUnlocked
-                    ? 'border-[#ffbf00]/30 bg-[#ffbf00]/10 text-white hover:bg-[#ffbf00]/20'
+                    ? 'border-orange-light/30 bg-orange-light/10 text-white hover:bg-orange-light/20'
                     : 'cursor-not-allowed border-white/10 bg-white/5 text-white/10'
               }`}
             >
               <div className="flex flex-col items-start gap-0.5">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold transition-colors ${isActive ? 'bg-black text-[#ffbf00]' : isUnlocked ? 'bg-[#ffbf00] text-black' : 'bg-white/5'}`}
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold transition-colors ${isActive ? 'bg-black text-orange-light' : isUnlocked ? 'bg-orange-light text-black' : 'bg-white/5'}`}
                   >
                     {week}
                   </span>
@@ -74,7 +74,7 @@ const DeploymentTimeline: React.FC<DeploymentTimelineProps> = ({
                 isActive ? (
                   <X className="h-4 w-4" />
                 ) : (
-                  <Target className="h-4 w-4 text-[#ffbf00]" />
+                  <Target className="h-4 w-4 text-orange-light" />
                 )
               ) : (
                 <Lock className="h-4 w-4" />

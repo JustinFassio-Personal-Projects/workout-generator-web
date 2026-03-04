@@ -148,7 +148,7 @@ const ActiveProgramView: React.FC<ActiveProgramViewProps> = ({ program, programI
 
       {toastMessage && (
         <div
-          className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-lg bg-[#ffbf00] px-6 py-3 font-bold text-black shadow-lg"
+          className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-lg bg-orange-light px-6 py-3 font-bold text-black shadow-lg"
           role="status"
         >
           {toastMessage}
@@ -255,7 +255,7 @@ const ActiveProgramView: React.FC<ActiveProgramViewProps> = ({ program, programI
 
       <header className="mb-12">
         <div className="mb-3 flex items-center gap-2">
-          <span className="rounded bg-[#ffbf00]/20 px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-[#ffbf00]">
+          <span className="rounded bg-orange-light/20 px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-orange-light">
             Active Program
           </span>
         </div>
@@ -286,11 +286,11 @@ const ActiveProgramView: React.FC<ActiveProgramViewProps> = ({ program, programI
                   exit={{ opacity: 0, x: 20 }}
                   className="group relative"
                 >
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#ffbf00] to-[#ff4000] opacity-20 blur-2xl transition-opacity group-hover:opacity-30" />
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-light to-orange-dark opacity-20 blur-2xl transition-opacity group-hover:opacity-30" />
                   <div className="relative rounded-3xl border border-white/10 bg-black/40 p-10 backdrop-blur-md">
                     <div className="mb-8 flex items-start justify-between">
                       <div>
-                        <span className="mb-2 block font-mono text-xs uppercase tracking-[0.4em] text-[#ffbf00]">
+                        <span className="mb-2 block font-mono text-xs uppercase tracking-[0.4em] text-orange-light">
                           Current Mission
                         </span>
                         <h3 className="font-heading text-3xl font-black uppercase text-white">
@@ -300,7 +300,7 @@ const ActiveProgramView: React.FC<ActiveProgramViewProps> = ({ program, programI
                           Select a week from the timeline
                         </p>
                       </div>
-                      <Award className="h-10 w-10 text-[#ffbf00]" />
+                      <Award className="h-10 w-10 text-orange-light" />
                     </div>
                     <p className="text-sm text-white/60">
                       All {durationWeeks} weeks are unlocked. Choose a week to view its workouts and

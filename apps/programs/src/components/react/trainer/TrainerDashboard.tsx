@@ -24,19 +24,19 @@ const TrainerDashboard: React.FC<TrainerDashboardProps> = ({ profile: profilePro
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-[#ffbf00]/50">
+        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-orange-light/50">
           <h2 className="mb-2 text-2xl font-bold">Roster</h2>
           <p className="mb-6 text-white/60">Manage active cadets and assignments.</p>
           <button
             type="button"
             onClick={() => navigate('/roster')}
-            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold uppercase transition-colors hover:bg-[#ffbf00] hover:text-black"
+            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold uppercase transition-colors hover:bg-orange-light hover:text-black"
           >
             View Clients
           </button>
         </div>
 
-        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-[#ffbf00]/50">
+        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-orange-light/50">
           <h2 className="mb-2 text-2xl font-bold">Programming</h2>
           <p className="mb-6 text-white/60">Design workouts and training blocks.</p>
           <button
@@ -44,19 +44,19 @@ const TrainerDashboard: React.FC<TrainerDashboardProps> = ({ profile: profilePro
             onClick={() => {
               window.location.href = adminPaths.root;
             }}
-            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold uppercase transition-colors hover:bg-[#ffbf00] hover:text-black"
+            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold uppercase transition-colors hover:bg-orange-light hover:text-black"
           >
             Open Builder
           </button>
         </div>
 
-        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-[#ffbf00]/50">
+        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-orange-light/50">
           <h2 className="mb-2 text-2xl font-bold">Intel</h2>
           <p className="mb-6 text-white/60">Review performance metrics and compliance.</p>
           <button
             type="button"
             onClick={() => navigate('/intel')}
-            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold uppercase transition-colors hover:bg-[#ffbf00] hover:text-black"
+            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold uppercase transition-colors hover:bg-orange-light hover:text-black"
           >
             View Analytics
           </button>

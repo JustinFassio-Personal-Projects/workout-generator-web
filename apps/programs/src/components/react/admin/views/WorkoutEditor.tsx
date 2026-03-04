@@ -140,7 +140,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
   if (loading) {
     return (
       <div className="flex justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#ffbf00]" />
+        <Loader2 className="h-8 w-8 animate-spin text-orange-light" />
       </div>
     );
   }
@@ -162,7 +162,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-white/5 bg-[#0d0500]/95 py-4 backdrop-blur-md">
+      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-white/5 bg-bg-dark/95 py-4 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -179,7 +179,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 rounded-lg bg-[#ffbf00] px-6 py-2 text-sm font-bold text-black transition-all hover:bg-[#ffbf00]/90 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 text-sm font-bold text-black transition-all hover:bg-orange-light/90 disabled:opacity-50"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {saving ? 'Saving...' : 'Save'}
@@ -205,7 +205,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-[#ffbf00]/50"
+              className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-orange-light/50"
               placeholder="e.g. Chest & Triceps"
             />
           </div>
@@ -217,7 +217,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-[#ffbf00]/50"
+              className="w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-orange-light/50"
               placeholder="Instructions for the client..."
             />
           </div>
@@ -232,7 +232,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
               type="number"
               value={duration}
               onChange={(e) => setDuration(parseInt(e.target.value) || 0)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-[#ffbf00]/50"
+              className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-orange-light/50"
             />
           </div>
           <div>
@@ -242,7 +242,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
             <select
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-[#ffbf00]/50"
+              className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-orange-light/50"
             >
               <option value="beginner">Beginner</option>
               <option value="intermediate">Intermediate</option>
@@ -272,7 +272,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
                   newBlocks[blockIndex].name = e.target.value;
                   setBlocks(newBlocks);
                 }}
-                className="border-b border-transparent bg-transparent font-bold text-white focus:border-[#ffbf00]/50 focus:outline-none"
+                className="border-b border-transparent bg-transparent font-bold text-white focus:border-orange-light/50 focus:outline-none"
               />
               <span className="rounded bg-white/10 px-2 py-1 text-xs uppercase text-white/50">
                 {block.type}
@@ -290,7 +290,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
                         onChange={(e) =>
                           handleUpdateExercise(blockIndex, exIndex, 'name', e.target.value)
                         }
-                        className="flex-1 rounded border border-white/10 bg-black/20 px-2 py-1.5 text-sm font-medium text-white outline-none focus:border-[#ffbf00]/50"
+                        className="flex-1 rounded border border-white/10 bg-black/20 px-2 py-1.5 text-sm font-medium text-white outline-none focus:border-orange-light/50"
                         placeholder="Exercise Name"
                       />
                       <button
@@ -351,7 +351,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({ workoutId }) => {
 
               <button
                 onClick={() => handleAddExercise(blockIndex)}
-                className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-white/10 py-2 text-xs font-bold uppercase tracking-wide text-white/30 transition-colors hover:bg-white/5 hover:text-[#ffbf00]"
+                className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-white/10 py-2 text-xs font-bold uppercase tracking-wide text-white/30 transition-colors hover:bg-white/5 hover:text-orange-light"
               >
                 <Plus className="h-3 w-3" />
                 Add Exercise

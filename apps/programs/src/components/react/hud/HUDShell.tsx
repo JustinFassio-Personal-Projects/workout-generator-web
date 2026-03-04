@@ -77,7 +77,7 @@ const HUDShell: React.FC<HUDShellProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={reduceMotion ? { duration: 0 } : undefined}
-            className="fixed inset-0 z-[90] cursor-auto overflow-y-auto bg-[#0d0500] px-6 pb-12 pt-24"
+            className="fixed inset-0 z-[90] cursor-auto overflow-y-auto bg-bg-dark px-6 pb-12 pt-24"
           >
             {content}
           </motion.div>
@@ -86,7 +86,7 @@ const HUDShell: React.FC<HUDShellProps> = ({
     );
   }
 
-  return <div className="min-h-screen bg-[#0d0500] px-6 pb-12 pt-24">{content}</div>;
+  return <div className="min-h-screen bg-bg-dark px-6 pb-12 pt-24">{content}</div>;
 };
 
 export default HUDShell;

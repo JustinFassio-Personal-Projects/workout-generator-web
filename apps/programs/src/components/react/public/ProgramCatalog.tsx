@@ -75,7 +75,7 @@ const ProgramCatalog: React.FC<ProgramCatalogProps> = ({ availablePrograms, zone
           <select
             value={selectedZone}
             onChange={(e) => setSelectedZone(e.target.value)}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
           >
             {zoneOptions.map((opt) => (
               <option key={opt.value || 'all'} value={opt.value}>
@@ -89,7 +89,7 @@ const ProgramCatalog: React.FC<ProgramCatalogProps> = ({ availablePrograms, zone
           <select
             value={selectedGoal}
             onChange={(e) => setSelectedGoal(e.target.value)}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-[#ffbf00]/50 focus:outline-none focus:ring-2 focus:ring-[#ffbf00]/20"
+            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
           >
             {GOAL_OPTIONS.map((opt) => (
               <option key={opt.value || 'all'} value={opt.value}>
@@ -112,13 +112,13 @@ const ProgramCatalog: React.FC<ProgramCatalogProps> = ({ availablePrograms, zone
           {filteredPrograms.map((program) => (
             <article
               key={program.id}
-              className="flex flex-col rounded-xl border border-white/10 bg-black/20 p-5 backdrop-blur-sm transition hover:border-[#ffbf00]/30 hover:bg-black/30"
+              className="flex flex-col rounded-xl border border-white/10 bg-black/20 p-5 backdrop-blur-sm transition hover:border-orange-light/30 hover:bg-black/30"
             >
               <div className="mb-3 flex items-start justify-between gap-2">
                 <h2 className="line-clamp-2 font-heading text-lg font-bold text-white">
                   {program.title || 'Untitled Program'}
                 </h2>
-                <span className="shrink-0 rounded bg-[#ffbf00]/20 px-2 py-0.5 text-xs font-medium text-[#ffbf00]">
+                <span className="shrink-0 rounded bg-orange-light/20 px-2 py-0.5 text-xs font-medium text-orange-light">
                   {program.durationWeeks} Weeks
                 </span>
               </div>
@@ -136,7 +136,7 @@ const ProgramCatalog: React.FC<ProgramCatalogProps> = ({ availablePrograms, zone
               <div className="mt-auto">
                 <a
                   href={`/programs/${program.id}`}
-                  className="inline-flex items-center gap-1 rounded-lg bg-[#ffbf00] px-4 py-2 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-white"
+                  className="inline-flex items-center gap-1 rounded-lg bg-orange-light px-4 py-2 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-white"
                 >
                   View Program
                   <ChevronRight className="h-4 w-4" />

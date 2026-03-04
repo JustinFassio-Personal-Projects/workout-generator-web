@@ -115,7 +115,7 @@ const ExerciseBlockEditor: React.FC<ExerciseBlockEditorProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md rounded-xl border border-white/10 bg-[#0d0500] p-6 shadow-xl"
+          className="w-full max-w-md rounded-xl border border-white/10 bg-bg-dark p-6 shadow-xl"
         >
           <div className="mb-4 flex items-center justify-between">
             <h3 className="font-heading text-lg font-bold">Edit: {exerciseName || 'Exercise'}</h3>
@@ -267,7 +267,7 @@ const ExerciseBlockEditor: React.FC<ExerciseBlockEditorProps> = ({
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-[#ffbf00] px-4 py-2 font-medium text-black hover:bg-[#ffbf00]/90"
+                className="rounded-lg bg-orange-light px-4 py-2 font-medium text-black hover:bg-orange-light/90"
               >
                 Save
               </button>

@@ -22,7 +22,7 @@ function renderTitle(title: string, highlightWord?: string) {
   return (
     <>
       {parts[0]}
-      <span className="text-[#ffbf00]">{highlightWord}</span>
+      <span className="text-orange-light">{highlightWord}</span>
       {parts.slice(1).join(highlightWord)}
     </>
   );
@@ -41,7 +41,7 @@ const IntervalTimerLandingContent: React.FC<IntervalTimerLandingContentProps> = 
       <>
         <section className="mx-auto max-w-4xl pt-8 text-center">
           <h1 className="mb-6 font-heading text-4xl font-bold leading-tight text-white md:text-6xl">
-            <span className="text-[#ffbf00]">{label}</span> Timer
+            <span className="text-orange-light">{label}</span> Timer
           </h1>
           <p className="mb-10 text-xl leading-relaxed text-white/80">
             This timer is coming soon. Try Tabata or Japanese Walking in the meantime.
@@ -50,14 +50,14 @@ const IntervalTimerLandingContent: React.FC<IntervalTimerLandingContentProps> = 
             <button
               type="button"
               onClick={() => onNavigate('tabata')}
-              className="rounded-xl bg-[#ffbf00] px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-0.5"
+              className="rounded-xl bg-orange-light px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-0.5"
             >
               Try Tabata
             </button>
             <button
               type="button"
               onClick={() => onNavigate('mindful')}
-              className="rounded-xl border border-[#ffbf00]/50 bg-[#ffbf00]/10 px-8 py-3 font-bold text-[#ffbf00] transition-colors hover:bg-[#ffbf00]/20"
+              className="rounded-xl border border-orange-light/50 bg-orange-light/10 px-8 py-3 font-bold text-orange-light transition-colors hover:bg-orange-light/20"
             >
               Try Japanese Walking
             </button>
@@ -91,7 +91,7 @@ const IntervalTimerLandingContent: React.FC<IntervalTimerLandingContentProps> = 
           <button
             type="button"
             onClick={handlePrimaryCta}
-            className="rounded-xl bg-[#ffbf00] px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-0.5"
+            className="rounded-xl bg-orange-light px-8 py-3 font-bold text-black shadow-lg transition-transform hover:-translate-y-0.5"
           >
             {hero.primaryCtaLabel}
           </button>
@@ -99,7 +99,7 @@ const IntervalTimerLandingContent: React.FC<IntervalTimerLandingContentProps> = 
             <button
               type="button"
               onClick={() => onNavigate(hero.secondaryCtaNavigateTo!)}
-              className="rounded-xl border border-[#ffbf00]/50 bg-[#ffbf00]/10 px-8 py-3 font-bold text-[#ffbf00] transition-colors hover:bg-[#ffbf00]/20"
+              className="rounded-xl border border-orange-light/50 bg-orange-light/10 px-8 py-3 font-bold text-orange-light transition-colors hover:bg-orange-light/20"
             >
               {hero.secondaryCtaLabel}
             </button>

@@ -607,7 +607,7 @@ const EmomInterval: React.FC<EmomIntervalProps> = ({ onNavigate }) => {
               onClick={() => setIsDurationSelectOpen(false)}
               aria-hidden
             />
-            <div className="animate-zoom-in relative flex max-h-[calc(100vh-2rem)] w-full max-w-md shrink-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0500] shadow-2xl">
+            <div className="animate-zoom-in relative flex max-h-[calc(100vh-2rem)] w-full max-w-md shrink-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-bg-dark shadow-2xl">
               <div className="shrink-0 border-b border-white/10 p-6 text-center">
                 <h3 className="font-display text-xl font-bold text-white">Select Duration</h3>
               </div>
@@ -659,7 +659,7 @@ const EmomInterval: React.FC<EmomIntervalProps> = ({ onNavigate }) => {
 
       {/* CUSTOM EMOM TIMER MODAL */}
       {isTimerOpen && (
-        <div className="animate-zoom-in fixed inset-0 z-[200] flex h-full w-full flex-col bg-[#0d0500] duration-200">
+        <div className="animate-zoom-in fixed inset-0 z-[200] flex h-full w-full flex-col bg-bg-dark duration-200">
           <div
             className={`flex shrink-0 items-center justify-between border-b border-white/10 p-4 text-white transition-colors duration-200 md:p-6 ${timerStyle.bg}`}
           >
@@ -760,7 +760,7 @@ const EmomInterval: React.FC<EmomIntervalProps> = ({ onNavigate }) => {
             onClick={() => setIsReportOpen(false)}
             aria-hidden
           />
-          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0d0500] shadow-2xl">
+          <div className="animate-zoom-in relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-bg-dark shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 p-6">
               <h3 className="font-display text-xl font-bold text-white">
                 Every Minute on the Minute (EMOM)

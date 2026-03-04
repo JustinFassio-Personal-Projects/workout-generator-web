@@ -42,13 +42,13 @@ const UpcomingStrip: React.FC<UpcomingStripProps> = ({ days, todayISO, onDayClic
             onClick={() => onDayClick(date, event)}
             className={`min-w-[80px] shrink-0 rounded-2xl border px-3 py-3 text-left transition-colors ${
               isToday
-                ? 'border-[#ffbf00]/60 bg-[#ffbf00]/20'
+                ? 'border-orange-light/60 bg-orange-light/20'
                 : 'border-white/10 bg-white/5 hover:bg-white/10'
             }`}
           >
             <p className="font-mono text-[10px] uppercase text-white/50">{formatDayName(date)}</p>
             <p
-              className={`mt-0.5 font-heading text-sm font-black ${isToday ? 'text-[#ffbf00]' : 'text-white'}`}
+              className={`mt-0.5 font-heading text-sm font-black ${isToday ? 'text-orange-light' : 'text-white'}`}
             >
               {formatDateNum(date)}
             </p>

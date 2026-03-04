@@ -95,7 +95,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title }) => 
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed right-0 top-0 z-50 flex h-full w-[min(320px,85vw)] max-w-full flex-col border-l border-white/10 bg-[#0d0500] shadow-2xl"
+            className="fixed right-0 top-0 z-50 flex h-full w-[min(320px,85vw)] max-w-full flex-col border-l border-white/10 bg-bg-dark shadow-2xl"
             role="dialog"
             aria-modal="true"
             aria-labelledby={title ? titleId : undefined}

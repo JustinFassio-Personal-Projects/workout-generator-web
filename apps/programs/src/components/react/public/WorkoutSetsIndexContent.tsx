@@ -202,7 +202,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                     <button
                       type="button"
                       onClick={() => setSelectedSet(set)}
-                      className="inline-flex w-full items-center justify-center gap-1 rounded-lg bg-[#ffbf00] px-4 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-[#ffbf00]/90"
+                      className="inline-flex w-full items-center justify-center gap-1 rounded-lg bg-orange-light px-4 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-orange-light/90"
                     >
                       View sessions
                       <ChevronRight className="h-4 w-4" />
@@ -234,7 +234,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 40 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative mx-4 flex w-full max-w-5xl flex-col overflow-hidden rounded-[3rem] border border-white/10 bg-[#0d0500] shadow-[0_50px_100px_rgba(0,0,0,0.8)] md:my-0"
+                className="relative mx-4 flex w-full max-w-5xl flex-col overflow-hidden rounded-[3rem] border border-white/10 bg-bg-dark shadow-[0_50px_100px_rgba(0,0,0,0.8)] md:my-0"
               >
                 {/* Hero strip */}
                 <div className="relative h-64 w-full shrink-0 md:h-80">
@@ -244,7 +244,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                     aria-hidden="true"
                     className="h-full w-full object-cover opacity-40 grayscale"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0500] via-[#0d0500]/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-bg-dark/40 to-transparent" />
                   <button
                     type="button"
                     onClick={() => {
@@ -273,7 +273,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                   <div className="space-y-8 lg:col-span-5">
                     {selectedSet.description ? (
                       <section className="max-w-prose">
-                        <h4 className="mb-6 border-b border-[#ffbf00]/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+                        <h4 className="mb-6 border-b border-orange-light/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
                           Overview
                         </h4>
                         {isOverviewLong ? (
@@ -288,7 +288,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                             <button
                               type="button"
                               onClick={() => setShowFullOverviewModal(true)}
-                              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#ffbf00]/50 bg-[#ffbf00]/10 px-4 py-2 text-sm font-medium text-[#ffbf00] transition-colors hover:bg-[#ffbf00]/20"
+                              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-orange-light/50 bg-orange-light/10 px-4 py-2 text-sm font-medium text-orange-light transition-colors hover:bg-orange-light/20"
                             >
                               Full Overview
                             </button>
@@ -304,7 +304,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                             ))}
                             {parsedDescription.sections.map((sec, i) => (
                               <div key={`sec-${i}`} className="space-y-3">
-                                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#ffbf00]/90">
+                                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-orange-light/90">
                                   {sec.label}
                                 </p>
                                 {sec.paragraphs.map((para, j) => (
@@ -323,7 +323,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                   </div>
                   {/* Right: Sessions */}
                   <div className="space-y-6 lg:col-span-7">
-                    <h4 className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#ffbf00]">
+                    <h4 className="font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
                       Sessions
                     </h4>
                     <ul className="space-y-2">
@@ -343,7 +343,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                           <button
                             type="button"
                             onClick={() => handleOpenSession(selectedSet, idx)}
-                            className="flex shrink-0 items-center gap-2 rounded-lg bg-[#ffbf00] px-3 py-2 text-sm font-medium text-black transition-colors hover:bg-[#ffbf00]/90"
+                            className="flex shrink-0 items-center gap-2 rounded-lg bg-orange-light px-3 py-2 text-sm font-medium text-black transition-colors hover:bg-orange-light/90"
                           >
                             View <Play className="h-4 w-4" />
                           </button>
@@ -376,7 +376,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-[3rem] border border-white/10 bg-[#0d0500] shadow-2xl"
+              className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-[3rem] border border-white/10 bg-bg-dark shadow-2xl"
             >
               <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-6 py-4 md:px-8">
                 <h2
@@ -404,7 +404,7 @@ const WorkoutSetsIndexContent: React.FC<WorkoutSetsIndexContentProps> = ({ publi
                 ))}
                 {parsedDescription.sections.map((sec, i) => (
                   <div key={`modal-sec-${i}`} className="space-y-3">
-                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#ffbf00]/90">
+                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-orange-light/90">
                       {sec.label}
                     </p>
                     {sec.paragraphs.map((para, j) => (

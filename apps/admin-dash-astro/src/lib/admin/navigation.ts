@@ -46,7 +46,8 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
  */
 export function isAdminNavActive(path: string, pathname: string): boolean {
   if (path === '/') {
-    return pathname === '/' || pathname === '' || pathname === '/admin' || pathname === '/admin/';
+    // React Router strips basename from location.pathname; admin root is '' or '/'.
+    return pathname === '/' || pathname === '';
   }
   return pathname === path || pathname.startsWith(path + '/');
 }

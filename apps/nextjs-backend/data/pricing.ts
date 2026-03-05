@@ -22,7 +22,9 @@ const DEFAULT_PREMIUM_PAYMENT_LINK = 'https://buy.stripe.com/dRm6oHcW3gW19RZ6qlg
 function getPremiumCtaLink(): string {
   const v = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM
   if (v) return v
-  return process.env.NODE_ENV === 'production' ? DEFAULT_PREMIUM_PAYMENT_LINK : FALLBACK_LOGIN_URL
+  // Use login URL only when explicitly in development. When NODE_ENV is unset (e.g. some serverless), use default Stripe link so production checkout works.
+  if (process.env.NODE_ENV === 'development') return FALLBACK_LOGIN_URL
+  return DEFAULT_PREMIUM_PAYMENT_LINK
 }
 
 export const pricingPlans: PricingPlan[] = [

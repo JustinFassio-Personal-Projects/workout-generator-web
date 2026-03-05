@@ -22,7 +22,7 @@ const GradientText: React.FC<GradientTextProps> = ({
     <Component className={`relative isolate inline-block font-black tracking-tighter ${className}`}>
       {/* Main Gradient Text: Amber to Red-Orange */}
       <motion.span
-        className="absolute inset-0 z-10 block bg-gradient-to-r from-white via-orange-dark via-orange via-orange-light to-white bg-[length:200%_auto] bg-clip-text text-transparent will-change-[background-position]"
+        className="absolute inset-0 z-10 block bg-gradient-to-r from-white via-orange via-orange-dark via-orange-light to-white bg-[length:200%_auto] bg-clip-text text-transparent will-change-[background-position]"
         animate={{
           backgroundPosition: ['0% center', '200% center'],
         }}
@@ -55,7 +55,7 @@ const GradientText: React.FC<GradientTextProps> = ({
 
       {/* Blur Glow Effect - Solar colors */}
       <span
-        className="absolute inset-0 -z-10 block bg-gradient-to-r from-orange-light via-orange-dark via-orange to-[#ffbf00] bg-[length:200%_auto] bg-clip-text text-transparent opacity-40 blur-xl md:blur-2xl"
+        className="absolute inset-0 -z-10 block bg-gradient-to-r from-orange-light via-orange via-orange-dark to-[#ffbf00] bg-[length:200%_auto] bg-clip-text text-transparent opacity-40 blur-xl md:blur-2xl"
         style={{
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',

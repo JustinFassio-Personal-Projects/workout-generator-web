@@ -113,7 +113,7 @@ const ManageUsers: React.FC = () => {
           <h1 className="font-heading text-3xl font-bold">Manage Users</h1>
           <p className="mt-2 text-white/60">View and manage user accounts</p>
         </div>
-        <button className="rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors hover:bg-orange-light/90">
+        <button className="hover:bg-orange-light/90 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors">
           Add User
         </button>
       </div>
@@ -127,7 +127,7 @@ const ManageUsers: React.FC = () => {
             placeholder="Search users..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-black/20 px-10 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+            className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-10 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
           />
         </div>
         <button className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white transition-colors hover:bg-white/5">

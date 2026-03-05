@@ -228,7 +228,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({
                           }
                           className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border-2 transition ${
                             set.completed
-                              ? 'border-orange-light bg-orange-light/20 text-orange-light'
+                              ? 'bg-orange-light/20 border-orange-light text-orange-light'
                               : 'border-white/20 text-white/50 hover:border-white/40'
                           }`}
                           aria-label={set.completed ? 'Mark set incomplete' : 'Mark set complete'}

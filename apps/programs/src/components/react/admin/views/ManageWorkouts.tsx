@@ -49,7 +49,7 @@ const ManageWorkouts: React.FC = () => {
         </div>
         <button
           onClick={handleNewWorkout}
-          className="flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors hover:bg-orange-light/90"
+          className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors"
         >
           <Sparkles className="h-5 w-5" />
           <span>Generate Workout</span>

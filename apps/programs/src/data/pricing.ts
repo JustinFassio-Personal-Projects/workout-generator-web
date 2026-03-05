@@ -1,41 +1,44 @@
 /**
- * Pricing plans for the Astro landing site.
- * Stripe payment links come from PUBLIC_STRIPE_PAYMENT_LINK_* env; fallback is login URL.
+ * Pricing plans for the Programs landing page.
+ * Matches astro-site landing. Stripe payment links from PUBLIC_STRIPE_PAYMENT_LINK_* env; fallback is app login URL.
  * Premium ($11.99) default link: https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00
  */
 
 export interface PricingPlan {
-  id: string
-  name: string
-  price: number
-  originalPrice?: number
-  period: 'month' | 'year'
-  description: string
-  features: string[]
-  popular?: boolean
-  ctaText: string
-  ctaVariant: 'primary' | 'secondary'
-  ctaLink?: string
+  id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  period: 'month' | 'year';
+  description: string;
+  features: string[];
+  popular?: boolean;
+  ctaText: string;
+  ctaVariant: 'primary' | 'secondary';
+  ctaLink?: string;
 }
 
 const APP_BASE = (
-  import.meta.env.PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com'
-).replace(/\/$/, '')
-const FALLBACK_LOGIN_URL = `${APP_BASE}/login`
-const DEFAULT_PREMIUM_PAYMENT_LINK = 'https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00'
+  (typeof import.meta !== 'undefined' &&
+    (import.meta as unknown as { env?: Record<string, string> }).env?.PUBLIC_APP_URL) ||
+  'https://app.aiworkoutgenerator.com'
+).replace(/\/$/, '');
+const FALLBACK_LOGIN_URL = `${APP_BASE}/login`;
+const DEFAULT_PREMIUM_PAYMENT_LINK = 'https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00';
 
 function getEnv(name: string): string {
   try {
-    const v = import.meta.env[name]
-    return typeof v === 'string' && v ? v : FALLBACK_LOGIN_URL
+    const v = (import.meta as unknown as { env?: Record<string, string> }).env?.[name];
+    return typeof v === 'string' && v ? v : FALLBACK_LOGIN_URL;
   } catch {
-    return FALLBACK_LOGIN_URL
+    return FALLBACK_LOGIN_URL;
   }
 }
 
 function getPremiumLink(): string {
-  const v = import.meta.env.PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM
-  return typeof v === 'string' && v ? v : DEFAULT_PREMIUM_PAYMENT_LINK
+  const env = (import.meta as unknown as { env?: Record<string, string> }).env;
+  const v = env?.PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM;
+  return typeof v === 'string' && v ? v : DEFAULT_PREMIUM_PAYMENT_LINK;
 }
 
 export const pricingPlans: PricingPlan[] = [
@@ -149,4 +152,4 @@ export const pricingPlans: PricingPlan[] = [
     ctaVariant: 'primary',
     ctaLink: getEnv('PUBLIC_STRIPE_PAYMENT_LINK_COACH_PRO'),
   },
-]
+];

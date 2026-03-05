@@ -49,7 +49,11 @@ function dateToISO(d: Date): string {
 
 const STATUS_STYLES: Record<CalendarEvent['status'], { border: string; bg: string; text: string }> =
   {
-    scheduled: { border: 'border-orange-light', bg: 'bg-orange-light/10', text: 'text-orange-light' },
+    scheduled: {
+      border: 'border-orange-light',
+      bg: 'bg-orange-light/10',
+      text: 'text-orange-light',
+    },
     completed: { border: 'border-emerald-500', bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
     missed: { border: 'border-white/30', bg: 'bg-white/5', text: 'text-white/50' },
   };
@@ -162,7 +166,7 @@ const AppCalendar: React.FC<AppCalendarProps> = ({
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm md:p-8">
-      <div className="mb-4 flex items-center justify-between border-b border-orange-light/20 pb-4">
+      <div className="border-orange-light/20 mb-4 flex items-center justify-between border-b pb-4">
         <h4 className="font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
           Calendar
         </h4>

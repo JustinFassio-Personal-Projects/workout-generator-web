@@ -18,7 +18,9 @@ export function equipmentArrayToAccess(arr: string[]): EquipmentAccess {
 export function parseOnboardingFromSearchParams(
   search: URLSearchParams
 ): Partial<WebsiteOnboardingData> {
-  const fitness_level = search.get('fitness_level') as WebsiteOnboardingData['fitness_level'] | null;
+  const fitness_level = search.get('fitness_level') as
+    | WebsiteOnboardingData['fitness_level']
+    | null;
   const activity_level = search.get('activity_level') as
     | WebsiteOnboardingData['current_activity_level']
     | null;

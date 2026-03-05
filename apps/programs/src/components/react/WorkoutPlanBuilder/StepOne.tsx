@@ -21,7 +21,8 @@ const inputBase =
   'min-h-[48px] w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-12 text-white focus:border-orange-light focus:outline-none focus:ring-2 focus:ring-orange-light/20';
 const chipBase =
   'inline-flex min-h-[44px] items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-all';
-const chipDefault = 'border-white/10 bg-white/5 text-white/80 hover:border-white/20 hover:bg-white/10';
+const chipDefault =
+  'border-white/10 bg-white/5 text-white/80 hover:border-white/20 hover:bg-white/10';
 const chipSelected = 'border-orange-light bg-orange-light/15 text-orange-light';
 
 export function StepOne({
@@ -66,11 +67,16 @@ export function StepOne({
             );
           })}
         </div>
-        {errors.fitness_goals && <p className="mt-1 text-sm text-red-500">{errors.fitness_goals}</p>}
+        {errors.fitness_goals && (
+          <p className="mt-1 text-sm text-red-500">{errors.fitness_goals}</p>
+        )}
       </div>
 
       <div>
-        <label htmlFor="builder-fitness-level" className="mb-1 block text-base font-medium text-white">
+        <label
+          htmlFor="builder-fitness-level"
+          className="mb-1 block text-base font-medium text-white"
+        >
           What&apos;s your current fitness level? <span className="text-orange-light">*</span>
         </label>
         <select
@@ -115,7 +121,7 @@ export function StepOne({
         <button
           type="button"
           onClick={onContinue}
-          className="min-w-[140px] rounded-xl bg-orange-light px-6 py-3 font-semibold text-bg-dark transition-colors hover:bg-orange-light/90"
+          className="hover:bg-orange-light/90 min-w-[140px] rounded-xl bg-orange-light px-6 py-3 font-semibold text-bg-dark transition-colors"
         >
           Continue
         </button>

@@ -63,7 +63,7 @@ const ReadinessCheckIn: React.FC<ReadinessCheckInProps> = ({ userId }) => {
               title={LABELS[i]}
               className={`rounded-full border px-3 py-2 text-lg transition-colors ${
                 isSelected
-                  ? 'border-orange-light bg-orange-light/20'
+                  ? 'bg-orange-light/20 border-orange-light'
                   : 'border-white/10 bg-white/5 hover:border-white/20'
               }`}
             >

@@ -157,7 +157,7 @@ const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
                   ) : (
                     <div className="h-full w-full bg-bg-dark" aria-hidden />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-bg-dark/40 to-transparent" />
+                  <div className="via-bg-dark/40 absolute inset-0 bg-gradient-to-t from-bg-dark to-transparent" />
 
                   <button
                     onClick={onClose}
@@ -170,7 +170,7 @@ const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
                     <div className="flex flex-col justify-between gap-10 md:flex-row md:items-end">
                       <div className="min-w-0 flex-1">
                         <div className="mb-4 flex items-center gap-4 text-orange-light">
-                          <span className="rounded bg-orange-light/10 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.4em]">
+                          <span className="bg-orange-light/10 rounded px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.4em]">
                             Protocol {workout.day}
                           </span>
                           <IntensityBars level={workout.intensity} />
@@ -194,7 +194,7 @@ const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
                 <div className="grid grid-cols-1 gap-20 overflow-y-auto p-12 md:p-20 lg:grid-cols-12">
                   <div className="space-y-12 lg:col-span-4">
                     <section>
-                      <h4 className="mb-6 border-b border-orange-light/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
+                      <h4 className="border-orange-light/20 mb-6 border-b pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
                         Mission Parameters
                       </h4>
                       <p className="text-xl font-light italic leading-relaxed text-gray-300">
@@ -204,7 +204,7 @@ const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setShowHIITTimer(true)}
-                          className="mt-6 flex min-h-[48px] w-full items-center justify-center gap-3 rounded-2xl border-2 border-orange-light bg-orange-light/10 py-4 font-mono text-sm font-bold uppercase tracking-wider text-orange-light transition-all active:scale-[0.98] md:min-h-[52px] md:py-5 md:text-base"
+                          className="bg-orange-light/10 mt-6 flex min-h-[48px] w-full items-center justify-center gap-3 rounded-2xl border-2 border-orange-light py-4 font-mono text-sm font-bold uppercase tracking-wider text-orange-light transition-all active:scale-[0.98] md:min-h-[52px] md:py-5 md:text-base"
                           aria-label="Launch interval timer"
                         >
                           <Timer className="h-5 w-5 shrink-0 md:h-6 md:w-6" />
@@ -215,7 +215,7 @@ const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
                         <button
                           type="button"
                           onClick={onOpenPlayer}
-                          className="mt-6 flex min-h-[48px] w-full items-center justify-center gap-3 rounded-2xl border-2 border-orange-light bg-orange-light/10 py-4 font-mono text-sm font-bold uppercase tracking-wider text-orange-light transition-all active:scale-[0.98] md:min-h-[52px] md:py-5 md:text-base"
+                          className="bg-orange-light/10 mt-6 flex min-h-[48px] w-full items-center justify-center gap-3 rounded-2xl border-2 border-orange-light py-4 font-mono text-sm font-bold uppercase tracking-wider text-orange-light transition-all active:scale-[0.98] md:min-h-[52px] md:py-5 md:text-base"
                           aria-label="Open workout player"
                         >
                           <Play className="h-5 w-5 shrink-0 md:h-6 md:w-6" />
@@ -226,7 +226,7 @@ const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
 
                     <div className="space-y-10 rounded-3xl border border-white/5 bg-white/5 p-8">
                       <div className="flex items-center gap-6">
-                        <div className="rounded-2xl bg-orange-light/10 p-4">
+                        <div className="bg-orange-light/10 rounded-2xl p-4">
                           <Timer className="h-6 w-6 text-orange-light" />
                         </div>
                         <div>
@@ -237,7 +237,7 @@ const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
                         </div>
                       </div>
                       <div className="flex items-center gap-6">
-                        <div className="rounded-2xl bg-orange-light/10 p-4">
+                        <div className="bg-orange-light/10 rounded-2xl p-4">
                           <ZapOff className="h-6 w-6 text-orange-light" />
                         </div>
                         <div>

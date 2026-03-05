@@ -141,7 +141,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
         </p>
         <a
           href="#program-sidebar"
-          className="inline-block rounded-full border border-orange-light/30 bg-orange-light/10 px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-colors hover:bg-orange-light hover:text-black"
+          className="border-orange-light/30 bg-orange-light/10 inline-block rounded-full border px-6 py-3 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-colors hover:bg-orange-light hover:text-black"
         >
           Go to Program
         </a>
@@ -171,7 +171,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
     <>
       <div className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
         <div className="mb-2 flex items-center gap-2">
-          <span className="rounded bg-orange-light/20 px-2 py-0.5 font-mono text-[10px] uppercase text-orange-light">
+          <span className="bg-orange-light/20 rounded px-2 py-0.5 font-mono text-[10px] uppercase text-orange-light">
             Today
           </span>
           {isCompleted && (
@@ -211,7 +211,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
           <button
             type="button"
             onClick={onOpenConversionModal}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-light/30 bg-orange-light/10 py-3 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-colors hover:bg-orange-light hover:text-black"
+            className="border-orange-light/30 bg-orange-light/10 flex w-full items-center justify-center gap-2 rounded-full border py-3 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-colors hover:bg-orange-light hover:text-black"
           >
             Upgrade to start workout
           </button>

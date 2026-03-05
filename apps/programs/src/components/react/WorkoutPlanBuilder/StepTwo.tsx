@@ -1,3 +1,4 @@
+import type { ChangeEvent } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import type { ActivityLevel, Gender, PreferredUnits } from '@/types/onboarding';
 import {
@@ -37,7 +38,7 @@ export function StepTwo({
   onBack,
   onSubmit,
 }: StepTwoProps) {
-  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAgeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value === '') {
       onAgeChange(undefined);
@@ -161,7 +162,7 @@ export function StepTwo({
         <button
           type="button"
           onClick={onSubmit}
-          className="min-w-[140px] rounded-xl bg-orange-light px-6 py-3 font-semibold text-bg-dark transition-colors hover:bg-orange-light/90"
+          className="hover:bg-orange-light/90 min-w-[140px] rounded-xl bg-orange-light px-6 py-3 font-semibold text-bg-dark transition-colors"
         >
           Next
         </button>

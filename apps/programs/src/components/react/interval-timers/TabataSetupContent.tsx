@@ -17,7 +17,7 @@ export function TabataProtocolStep({
     <div className="space-y-4">
       <button
         onClick={onStartWithStandard}
-        className="group flex w-full items-center justify-between rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light hover:bg-orange-light/10"
+        className="hover:bg-orange-light/10 group flex w-full items-center justify-between rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light"
       >
         <div>
           <div className="text-lg font-bold text-white group-hover:text-orange-light">
@@ -34,7 +34,7 @@ export function TabataProtocolStep({
       <div className="grid grid-cols-2 gap-4">
         <button
           onClick={() => onSelectCategory('single')}
-          className="rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light hover:bg-orange-light/10"
+          className="hover:bg-orange-light/10 rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light"
         >
           <div className="mb-1 font-bold text-white">{TABATA_PROTOCOL_LABELS.singleExercise}</div>
           <div className="text-[10px] text-white/70">
@@ -43,21 +43,21 @@ export function TabataProtocolStep({
         </button>
         <button
           onClick={() => onSelectCategory('alternating')}
-          className="rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light hover:bg-orange-light/10"
+          className="hover:bg-orange-light/10 rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light"
         >
           <div className="mb-1 font-bold text-white">{TABATA_PROTOCOL_LABELS.alternating}</div>
           <div className="text-[10px] text-white/70">{TABATA_PROTOCOL_LABELS.alternatingDesc}</div>
         </button>
         <button
           onClick={() => onSelectCategory('circuit4')}
-          className="rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light hover:bg-orange-light/10"
+          className="hover:bg-orange-light/10 rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light"
         >
           <div className="mb-1 font-bold text-white">{TABATA_PROTOCOL_LABELS.circuit4}</div>
           <div className="text-[10px] text-white/70">{TABATA_PROTOCOL_LABELS.circuit4Desc}</div>
         </button>
         <button
           onClick={() => onSelectCategory('circuit8')}
-          className="rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light hover:bg-orange-light/10"
+          className="hover:bg-orange-light/10 rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light"
         >
           <div className="mb-1 font-bold text-white">{TABATA_PROTOCOL_LABELS.circuit8}</div>
           <div className="text-[10px] text-white/70">{TABATA_PROTOCOL_LABELS.circuit8Desc}</div>
@@ -84,7 +84,7 @@ export function TabataWorkoutStep({
           <button
             key={idx}
             onClick={() => onStartWithWorkout(TABATA_DEFAULT_CYCLES, [...option.list])}
-            className="rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light hover:bg-orange-light/10"
+            className="hover:bg-orange-light/10 rounded-xl border border-white/10 bg-black/20 p-4 text-left transition-all hover:border-orange-light"
           >
             <div className="font-bold text-white">{option.name}</div>
             <div className="mt-1 line-clamp-1 text-[10px] text-white/70">

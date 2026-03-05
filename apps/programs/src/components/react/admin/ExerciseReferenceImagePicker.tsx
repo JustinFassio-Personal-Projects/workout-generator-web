@@ -113,7 +113,7 @@ const ExerciseReferenceImagePicker: React.FC<ExerciseReferenceImagePickerProps> 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search exercises by name or level..."
-          className="w-full rounded-lg border border-white/10 bg-black/20 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
         />
       </div>
 
@@ -192,7 +192,7 @@ const ExerciseReferenceImagePicker: React.FC<ExerciseReferenceImagePickerProps> 
                     type="button"
                     onClick={() => loadReferenceFromUrl(item.imageUrl)}
                     disabled={loadingReference}
-                    className="rounded border border-white/10 bg-black/20 px-2 py-0.5 text-xs font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20 disabled:opacity-50"
+                    className="hover:border-orange-light/30 hover:bg-orange-light/20 rounded border border-white/10 bg-black/20 px-2 py-0.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
                   >
                     Use as reference
                   </button>

@@ -255,7 +255,7 @@ const ActiveProgramView: React.FC<ActiveProgramViewProps> = ({ program, programI
 
       <header className="mb-12">
         <div className="mb-3 flex items-center gap-2">
-          <span className="rounded bg-orange-light/20 px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-orange-light">
+          <span className="bg-orange-light/20 rounded px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-orange-light">
             Active Program
           </span>
         </div>

@@ -543,7 +543,7 @@ const EmomInterval: React.FC<EmomIntervalProps> = ({ onNavigate }) => {
                   <button
                     type="button"
                     onClick={() => setSimMode('slow')}
-                    className={`w-1/2 rounded-xl font-bold transition-all ${simMode === 'slow' ? 'scale-105 bg-orange-600 text-white shadow-lg' : 'border border-white/20 bg-transparent text-white/70 hover:text-white'}`}
+                    className={`w-1/2 rounded-xl font-bold transition-all ${simMode === 'slow' ? 'bg-orange-600 scale-105 text-white shadow-lg' : 'border border-white/20 bg-transparent text-white/70 hover:text-white'}`}
                   >
                     SLOW PACE
                   </button>

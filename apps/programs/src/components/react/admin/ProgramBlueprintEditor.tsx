@@ -767,7 +767,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
             type="text"
             value={program.title}
             onChange={(e) => updateTitle(e.target.value)}
-            className="w-full rounded border-b border-transparent border-white/20 bg-transparent px-2 py-2 text-white transition-colors placeholder:text-white/40 focus:border-orange-light/50 focus:bg-black/20"
+            className="focus:border-orange-light/50 w-full rounded border-b border-transparent border-white/20 bg-transparent px-2 py-2 text-white transition-colors placeholder:text-white/40 focus:bg-black/20"
             placeholder="Enter program title"
           />
         </div>
@@ -778,7 +778,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
             value={program.description}
             onChange={(e) => updateDescription(e.target.value)}
             rows={3}
-            className="w-full resize-none rounded border-b border-transparent border-white/20 bg-transparent px-2 py-2 text-white transition-colors placeholder:text-white/40 focus:border-orange-light/50 focus:bg-black/20"
+            className="focus:border-orange-light/50 w-full resize-none rounded border-b border-transparent border-white/20 bg-transparent px-2 py-2 text-white transition-colors placeholder:text-white/40 focus:bg-black/20"
             placeholder="Enter program description"
           />
         </div>
@@ -820,7 +820,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                         onChange={(e) =>
                           updateWeekWorkout(weekIndex, workoutIndex, 'title', e.target.value)
                         }
-                        className="w-full rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 font-medium text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                        className="focus:border-orange-light/50 w-full rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 font-medium text-white transition-colors focus:bg-black/20"
                       />
                     </div>
                     <div className="flex shrink-0 gap-1">
@@ -838,7 +838,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                       <button
                         type="button"
                         onClick={() => addWorkout(weekIndex)}
-                        className="flex items-center gap-1 rounded border border-orange-light/40 bg-orange-light/10 px-2 py-1 text-xs text-orange-light transition-colors hover:bg-orange-light/20"
+                        className="border-orange-light/40 bg-orange-light/10 hover:bg-orange-light/20 flex items-center gap-1 rounded border px-2 py-1 text-xs text-orange-light transition-colors"
                         title="Add another workout to this week"
                         aria-label="Add workout"
                       >
@@ -859,7 +859,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                         updateWeekWorkout(weekIndex, workoutIndex, 'description', e.target.value)
                       }
                       rows={2}
-                      className="w-full resize-none rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                      className="focus:border-orange-light/50 w-full resize-none rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm text-white transition-colors focus:bg-black/20"
                       placeholder="e.g., Warm-up and main focus for this session"
                     />
                   </div>
@@ -914,7 +914,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                   e.target.value
                                 )
                               }
-                              className="mb-2 w-full rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm text-white focus:border-orange-light/50 focus:bg-black/20"
+                              className="focus:border-orange-light/50 mb-2 w-full rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm text-white focus:bg-black/20"
                               placeholder="Exercise name (e.g., Neck Rolls)"
                             />
                             <textarea
@@ -932,7 +932,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                 )
                               }
                               rows={2}
-                              className="w-full resize-none rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 focus:border-orange-light/50 focus:bg-black/20"
+                              className="focus:border-orange-light/50 w-full resize-none rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 focus:bg-black/20"
                               placeholder="One instruction per line (e.g., Assume proper starting position)"
                             />
                           </div>
@@ -983,7 +983,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                         <button
                           type="button"
                           onClick={() => addExerciseBlock(weekIndex, workoutIndex)}
-                          className="mt-3 inline-flex items-center gap-2 rounded-lg border border-orange-light/50 bg-orange-light/20 px-4 py-2 text-sm font-medium text-orange-light transition-colors hover:bg-orange-light/30"
+                          className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 mt-3 inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium text-orange-light transition-colors"
                         >
                           <Plus className="h-4 w-4" />
                           Add Exercise Block
@@ -1035,7 +1035,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                             e.target.value
                                           )
                                         }
-                                        className="flex-1 rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm font-medium text-white placeholder:text-white/40 focus:border-orange-light/50 focus:bg-black/20"
+                                        className="focus:border-orange-light/50 flex-1 rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm font-medium text-white placeholder:text-white/40 focus:bg-black/20"
                                         placeholder="Block name (e.g. Strength, Cardio)"
                                       />
                                       <div className="flex gap-1">
@@ -1168,7 +1168,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                                               parseInt(e.target.value) || 1
                                                             )
                                                           }
-                                                          className="w-12 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-center text-sm text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                                                          className="focus:border-orange-light/50 w-12 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-center text-sm text-white transition-colors focus:bg-black/20"
                                                           min="1"
                                                         />
                                                       </td>
@@ -1186,7 +1186,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                                               e.target.value
                                                             )
                                                           }
-                                                          className="w-full min-w-[150px] rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-sm text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                                                          className="focus:border-orange-light/50 w-full min-w-[150px] rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-sm text-white transition-colors focus:bg-black/20"
                                                         />
                                                       </td>
                                                       <td className="px-2 py-2">
@@ -1254,7 +1254,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                                               )
                                                             }
                                                             placeholder="e.g. bench press"
-                                                            className="min-w-0 flex-1 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-sm text-white/80 transition-colors placeholder:text-white/40 focus:border-orange-light/50 focus:bg-black/20"
+                                                            className="focus:border-orange-light/50 min-w-0 flex-1 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-sm text-white/80 transition-colors placeholder:text-white/40 focus:bg-black/20"
                                                             title="Link to approved exercise (or use Map button)"
                                                           />
                                                         </div>
@@ -1273,7 +1273,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                                               parseInt(e.target.value) || 0
                                                             )
                                                           }
-                                                          className="w-16 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-center text-sm text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                                                          className="focus:border-orange-light/50 w-16 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-center text-sm text-white transition-colors focus:bg-black/20"
                                                           min="0"
                                                         />
                                                       </td>
@@ -1291,7 +1291,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                                               e.target.value
                                                             )
                                                           }
-                                                          className="w-20 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-sm text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                                                          className="focus:border-orange-light/50 w-20 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-sm text-white transition-colors focus:bg-black/20"
                                                           placeholder="e.g., 8-10"
                                                         />
                                                       </td>
@@ -1311,7 +1311,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                                                 : undefined
                                                             )
                                                           }
-                                                          className="w-16 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-center text-sm text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                                                          className="focus:border-orange-light/50 w-16 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-center text-sm text-white transition-colors focus:bg-black/20"
                                                           min="1"
                                                           max="10"
                                                           placeholder="1-10"
@@ -1333,7 +1333,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                                                 : undefined
                                                             )
                                                           }
-                                                          className="w-20 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-center text-sm text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                                                          className="focus:border-orange-light/50 w-20 rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-center text-sm text-white transition-colors focus:bg-black/20"
                                                           min="0"
                                                           placeholder="seconds"
                                                         />
@@ -1352,7 +1352,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                                                               e.target.value
                                                             )
                                                           }
-                                                          className="w-full min-w-[200px] rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-sm text-white transition-colors focus:border-orange-light/50 focus:bg-black/20"
+                                                          className="focus:border-orange-light/50 w-full min-w-[200px] rounded border-b border-transparent border-white/10 bg-transparent px-1 py-1 text-sm text-white transition-colors focus:bg-black/20"
                                                           placeholder="Coach notes"
                                                         />
                                                       </td>
@@ -1390,7 +1390,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
                           <button
                             type="button"
                             onClick={() => addExerciseBlock(weekIndex, workoutIndex)}
-                            className="flex items-center gap-2 rounded-lg border border-orange-light/50 bg-orange-light/20 px-4 py-2 text-sm font-medium text-orange-light transition-colors hover:bg-orange-light/30"
+                            className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium text-orange-light transition-colors"
                           >
                             <Plus className="h-4 w-4" />
                             Add Exercise Block
@@ -1408,7 +1408,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
 
       {/* Partial Program Notice */}
       {missingWeeks > 0 && (
-        <div className="flex items-center justify-between gap-4 rounded-lg border border-orange-light/30 bg-orange-light/10 p-4">
+        <div className="border-orange-light/30 bg-orange-light/10 flex items-center justify-between gap-4 rounded-lg border p-4">
           <div className="flex items-center gap-3">
             <AlertCircle className="h-5 w-5 shrink-0 text-orange-light" />
             <p className="text-sm text-white">
@@ -1420,7 +1420,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
             type="button"
             onClick={handleExtendProgram}
             disabled={extending || saving}
-            className="flex items-center gap-2 rounded-lg border border-orange-light bg-orange-light/20 px-4 py-2 text-sm font-medium text-orange-light transition-colors hover:bg-orange-light/30 disabled:opacity-50"
+            className="bg-orange-light/20 hover:bg-orange-light/30 flex items-center gap-2 rounded-lg border border-orange-light px-4 py-2 text-sm font-medium text-orange-light transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${extending ? 'animate-spin' : ''}`} />
             <span>
@@ -1447,7 +1447,7 @@ const ProgramBlueprintEditor: React.FC<ProgramBlueprintEditorProps> = ({
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+          className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors disabled:opacity-50"
         >
           <Save className="h-5 w-5" />
           <span>{saving ? 'Saving...' : 'Save Program'}</span>

@@ -102,7 +102,7 @@ const SyncToCalendarModal: React.FC<SyncToCalendarModalProps> = ({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors focus:border-orange-light/50"
+                className="focus:border-orange-light/50 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors"
                 required
               />
             </div>

@@ -996,11 +996,11 @@ const App: React.FC = () => {
                     <div>
                       <div className="mb-2 flex items-center justify-between">
                         <span className="font-mono text-xs uppercase text-white/50">CNS Load</span>
-                        <span className="font-bold text-orange-500">88%</span>
+                        <span className="text-orange-500 font-bold">88%</span>
                       </div>
                       <div className="h-1 overflow-hidden rounded-full bg-white/10">
                         <motion.div
-                          className="h-full bg-orange-500"
+                          className="bg-orange-500 h-full"
                           animate={{ width: ['80%', '92%', '80%'] }}
                           transition={{ duration: 2, repeat: Infinity }}
                         />

@@ -14,7 +14,6 @@ import {
   parseOnboardingFromSearchParams,
   onboardingToSearchParams,
   equipmentAccessToArray,
-  equipmentArrayToAccess,
 } from '@/lib/urlOnboarding';
 import { buildSignupUrl } from '@/lib/buildSignupUrl';
 import { IntroScreen } from './IntroScreen';
@@ -31,8 +30,7 @@ export interface WorkoutPlanBuilderProps {
 function mergeWithDefaults(partial: Partial<WebsiteOnboardingData>): WebsiteOnboardingData {
   const base = { ...DEFAULT_ONBOARDING_DATA };
   if (partial.fitness_level) base.fitness_level = partial.fitness_level;
-  if (partial.current_activity_level)
-    base.current_activity_level = partial.current_activity_level;
+  if (partial.current_activity_level) base.current_activity_level = partial.current_activity_level;
   if (partial.fitness_goals?.length) base.fitness_goals = partial.fitness_goals;
   if (partial.equipment_access?.length) base.equipment_access = partial.equipment_access;
   if (partial.preferred_units)
@@ -101,11 +99,7 @@ export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProp
   const validateStepTwo = useCallback((): boolean => {
     const newErrors: FormErrors = {};
     if (formData.age !== undefined) {
-      if (
-        !Number.isInteger(formData.age) ||
-        formData.age < 13 ||
-        formData.age > 120
-      ) {
+      if (!Number.isInteger(formData.age) || formData.age < 13 || formData.age > 120) {
         newErrors.age = 'Age must be between 13 and 120';
       }
     }
@@ -114,13 +108,11 @@ export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProp
   }, [formData.age]);
 
   const handleGoalsChange = useCallback(
-    (goals: FitnessGoal[]) =>
-      updateFormAndUrl((prev) => ({ ...prev, fitness_goals: goals })),
+    (goals: FitnessGoal[]) => updateFormAndUrl((prev) => ({ ...prev, fitness_goals: goals })),
     [updateFormAndUrl]
   );
   const handleLevelChange = useCallback(
-    (level: FitnessLevel) =>
-      updateFormAndUrl((prev) => ({ ...prev, fitness_level: level })),
+    (level: FitnessLevel) => updateFormAndUrl((prev) => ({ ...prev, fitness_level: level })),
     [updateFormAndUrl]
   );
   const handleEquipmentChange = useCallback(
@@ -141,13 +133,11 @@ export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProp
     [updateFormAndUrl]
   );
   const handleGenderChange = useCallback(
-    (gender: Gender | undefined) =>
-      updateFormAndUrl((prev) => ({ ...prev, gender })),
+    (gender: Gender | undefined) => updateFormAndUrl((prev) => ({ ...prev, gender })),
     [updateFormAndUrl]
   );
   const handleAgeChange = useCallback(
-    (age: number | undefined) =>
-      updateFormAndUrl((prev) => ({ ...prev, age })),
+    (age: number | undefined) => updateFormAndUrl((prev) => ({ ...prev, age })),
     [updateFormAndUrl]
   );
   const handleUnitsChange = useCallback(
@@ -176,21 +166,16 @@ export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProp
   }, [formData]);
 
   const equipmentAccess: EquipmentAccess =
-    formData.equipment_access.includes('cardio') &&
-    formData.equipment_access.length >= 4
+    formData.equipment_access.includes('cardio') && formData.equipment_access.length >= 4
       ? 'full_gym'
-      : formData.equipment_access.includes('functional') &&
-          formData.equipment_access.length >= 3
+      : formData.equipment_access.includes('functional') && formData.equipment_access.length >= 3
         ? 'home'
         : formData.equipment_access.length >= 2
           ? 'minimal'
           : 'none';
 
   return (
-    <section
-      id="workout-builder"
-      className="relative py-16 md:py-24"
-    >
+    <section id="workout-builder" className="relative py-16 md:py-24">
       <div className="relative z-10 mx-auto max-w-[720px] px-4 md:px-6">
         {showIntro ? (
           <IntroScreen onComplete={() => setShowIntro(false)} />
@@ -215,9 +200,7 @@ export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProp
             <div className="rounded-2xl border border-white/10 bg-black/20 p-6 shadow-xl md:p-8">
               {!showPreview && (
                 <div className="mb-6">
-                  <span className="mb-1 block text-sm text-white/60">
-                    Step {currentStep} of 2
-                  </span>
+                  <span className="mb-1 block text-sm text-white/60">Step {currentStep} of 2</span>
                   <div className="h-1 overflow-hidden rounded-full bg-white/10">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-orange-light to-orange-medium transition-all duration-300"

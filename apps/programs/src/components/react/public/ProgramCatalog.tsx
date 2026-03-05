@@ -75,7 +75,7 @@ const ProgramCatalog: React.FC<ProgramCatalogProps> = ({ availablePrograms, zone
           <select
             value={selectedZone}
             onChange={(e) => setSelectedZone(e.target.value)}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+            className="focus:border-orange-light/50 focus:ring-orange-light/20 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:outline-none focus:ring-2"
           >
             {zoneOptions.map((opt) => (
               <option key={opt.value || 'all'} value={opt.value}>
@@ -89,7 +89,7 @@ const ProgramCatalog: React.FC<ProgramCatalogProps> = ({ availablePrograms, zone
           <select
             value={selectedGoal}
             onChange={(e) => setSelectedGoal(e.target.value)}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+            className="focus:border-orange-light/50 focus:ring-orange-light/20 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:outline-none focus:ring-2"
           >
             {GOAL_OPTIONS.map((opt) => (
               <option key={opt.value || 'all'} value={opt.value}>
@@ -112,13 +112,13 @@ const ProgramCatalog: React.FC<ProgramCatalogProps> = ({ availablePrograms, zone
           {filteredPrograms.map((program) => (
             <article
               key={program.id}
-              className="flex flex-col rounded-xl border border-white/10 bg-black/20 p-5 backdrop-blur-sm transition hover:border-orange-light/30 hover:bg-black/30"
+              className="hover:border-orange-light/30 flex flex-col rounded-xl border border-white/10 bg-black/20 p-5 backdrop-blur-sm transition hover:bg-black/30"
             >
               <div className="mb-3 flex items-start justify-between gap-2">
                 <h2 className="line-clamp-2 font-heading text-lg font-bold text-white">
                   {program.title || 'Untitled Program'}
                 </h2>
-                <span className="shrink-0 rounded bg-orange-light/20 px-2 py-0.5 text-xs font-medium text-orange-light">
+                <span className="bg-orange-light/20 shrink-0 rounded px-2 py-0.5 text-xs font-medium text-orange-light">
                   {program.durationWeeks} Weeks
                 </span>
               </div>

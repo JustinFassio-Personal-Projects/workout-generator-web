@@ -138,7 +138,7 @@ const ProgramEditor: React.FC = () => {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2.5 font-bold text-black transition-all hover:bg-orange-light/90 disabled:opacity-50"
+          className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2.5 font-bold text-black transition-all disabled:opacity-50"
         >
           {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
           {saving ? 'Saving...' : 'Save Changes'}
@@ -171,7 +171,7 @@ const ProgramEditor: React.FC = () => {
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-lg border border-white/10 bg-black/20 p-3 text-white outline-none transition-colors focus:border-orange-light/50"
+                  className="focus:border-orange-light/50 w-full rounded-lg border border-white/10 bg-black/20 p-3 text-white outline-none transition-colors"
                   placeholder="e.g. Hypertrophy Phase 1"
                 />
               </div>
@@ -184,7 +184,7 @@ const ProgramEditor: React.FC = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  className="w-full resize-none rounded-lg border border-white/10 bg-black/20 p-3 text-white outline-none transition-colors focus:border-orange-light/50"
+                  className="focus:border-orange-light/50 w-full resize-none rounded-lg border border-white/10 bg-black/20 p-3 text-white outline-none transition-colors"
                   placeholder="Describe the goals and methodology..."
                 />
               </div>
@@ -208,7 +208,7 @@ const ProgramEditor: React.FC = () => {
                 <select
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value)}
-                  className="w-full rounded-lg border border-white/10 bg-black/20 p-3 text-white outline-none focus:border-orange-light/50"
+                  className="focus:border-orange-light/50 w-full rounded-lg border border-white/10 bg-black/20 p-3 text-white outline-none"
                 >
                   <option value="beginner">Beginner</option>
                   <option value="intermediate">Intermediate</option>
@@ -226,7 +226,7 @@ const ProgramEditor: React.FC = () => {
                   max={52}
                   value={durationWeeks}
                   onChange={(e) => setDurationWeeks(parseInt(e.target.value) || 4)}
-                  className="w-full rounded-lg border border-white/10 bg-black/20 p-3 text-white outline-none focus:border-orange-light/50"
+                  className="focus:border-orange-light/50 w-full rounded-lg border border-white/10 bg-black/20 p-3 text-white outline-none"
                 />
               </div>
             </div>

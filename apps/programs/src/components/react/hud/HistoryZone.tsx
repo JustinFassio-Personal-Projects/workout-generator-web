@@ -174,7 +174,7 @@ const HistoryZone: React.FC = () => {
                 setProgramFilterId(null);
               }
             }}
-            className="appearance-none rounded-full border border-white/20 bg-white/5 px-3 py-1.5 pr-8 font-mono text-[10px] uppercase text-white/70 focus:outline-none focus:ring-1 focus:ring-orange-light/40"
+            className="focus:ring-orange-light/40 appearance-none rounded-full border border-white/20 bg-white/5 px-3 py-1.5 pr-8 font-mono text-[10px] uppercase text-white/70 focus:outline-none focus:ring-1"
             aria-label="Filter by program"
           >
             <option value="">By Program</option>

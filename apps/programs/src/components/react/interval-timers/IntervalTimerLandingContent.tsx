@@ -57,7 +57,7 @@ const IntervalTimerLandingContent: React.FC<IntervalTimerLandingContentProps> = 
             <button
               type="button"
               onClick={() => onNavigate('mindful')}
-              className="rounded-xl border border-orange-light/50 bg-orange-light/10 px-8 py-3 font-bold text-orange-light transition-colors hover:bg-orange-light/20"
+              className="border-orange-light/50 bg-orange-light/10 hover:bg-orange-light/20 rounded-xl border px-8 py-3 font-bold text-orange-light transition-colors"
             >
               Try Japanese Walking
             </button>
@@ -99,7 +99,7 @@ const IntervalTimerLandingContent: React.FC<IntervalTimerLandingContentProps> = 
             <button
               type="button"
               onClick={() => onNavigate(hero.secondaryCtaNavigateTo!)}
-              className="rounded-xl border border-orange-light/50 bg-orange-light/10 px-8 py-3 font-bold text-orange-light transition-colors hover:bg-orange-light/20"
+              className="border-orange-light/50 bg-orange-light/10 hover:bg-orange-light/20 rounded-xl border px-8 py-3 font-bold text-orange-light transition-colors"
             >
               {hero.secondaryCtaLabel}
             </button>

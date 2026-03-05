@@ -132,7 +132,7 @@ const LandingPageDescription: React.FC<LandingPageDescriptionProps> = ({
             {metadata.difficulty}
           </span>
           {metadata.theme && (
-            <span className="rounded bg-orange-light/20 px-3 py-1 text-sm text-orange-light">
+            <span className="bg-orange-light/20 rounded px-3 py-1 text-sm text-orange-light">
               {metadata.theme}
             </span>
           )}

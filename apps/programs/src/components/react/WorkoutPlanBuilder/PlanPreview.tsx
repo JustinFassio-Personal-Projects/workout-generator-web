@@ -73,11 +73,7 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
       </div>
 
       <div className="flex flex-col items-center gap-3">
-        <button
-          type="button"
-          onClick={onCreateAccount}
-          className="cta-primary w-full"
-        >
+        <button type="button" onClick={onCreateAccount} className="cta-primary w-full">
           Create account to generate workout
           <ArrowRight className="h-5 w-5" />
         </button>

@@ -6,6 +6,7 @@ import ComplexesHeader from '../components/astro/ComplexesHeader.astro';
 import WODHeader from '../components/astro/WODHeader.astro';
 import TabataHeader from '../components/astro/TabataHeader.astro';
 import ProgramsSection from '../components/astro/ProgramsSection.astro';
+import PricingSection from '../components/astro/PricingSection.astro';
 
 // Use ?url to bypass /_image endpoint (causes 500 in production on Firebase App Hosting)
 // Oxidative Core Ignition id '3' uses fallback URL from data
@@ -122,7 +123,7 @@ import TabataCards from '../components/react/TabataCards';
         </div>
       </section>
 
-      <div id="purchase-flow-mount"></div>
+      <PricingSection />
     </main>
   </div>
 </BaseLayout>

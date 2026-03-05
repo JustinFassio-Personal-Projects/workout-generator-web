@@ -59,7 +59,7 @@ const LogWorkoutModal: React.FC<LogWorkoutModalProps> = ({
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg overflow-hidden rounded-[2.5rem] border border-orange-light/30 bg-bg-dark p-8 shadow-[0_0_50px_rgba(255,191,0,0.1)] md:p-12"
+            className="border-orange-light/30 relative w-full max-w-lg overflow-hidden rounded-[2.5rem] border bg-bg-dark p-8 shadow-[0_0_50px_rgba(255,191,0,0.1)] md:p-12"
           >
             <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-transparent via-orange-light to-transparent" />
 
@@ -127,7 +127,7 @@ const LogWorkoutModal: React.FC<LogWorkoutModalProps> = ({
                   value={notesValue}
                   onChange={(e) => setNotesValue(e.target.value)}
                   placeholder="Log metabolic state, joint integrity, or engine feedback..."
-                  className="h-32 w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-white placeholder-white/20 transition-all focus:border-orange-light/50 focus:outline-none"
+                  className="focus:border-orange-light/50 h-32 w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-white placeholder-white/20 transition-all focus:outline-none"
                 />
               </div>
 

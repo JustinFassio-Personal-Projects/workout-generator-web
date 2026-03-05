@@ -77,7 +77,7 @@ const DynamicHIITInterval: React.FC<DynamicHIITIntervalProps> = ({ workout, onCl
 
   return (
     <div className="min-h-screen bg-bg-dark pb-20 font-sans text-slate-100">
-      <nav className="sticky top-0 z-50 border-b border-white/10 bg-bg-dark/95 backdrop-blur-md">
+      <nav className="bg-bg-dark/95 sticky top-0 z-50 border-b border-white/10 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <span className="font-display text-lg font-bold text-white">
             Pillar 4 · <span className="font-normal text-white/60">{workout.meta.protocol}</span>

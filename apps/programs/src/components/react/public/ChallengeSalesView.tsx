@@ -138,7 +138,7 @@ const ChallengeSalesView: React.FC<ChallengeSalesViewProps> = ({ challenge, zone
           {metadata.title || 'Untitled Challenge'}
         </h1>
         {metadata.theme && (
-          <span className="mb-3 inline-block rounded bg-orange-light/20 px-3 py-1 text-sm font-medium text-orange-light">
+          <span className="bg-orange-light/20 mb-3 inline-block rounded px-3 py-1 text-sm font-medium text-orange-light">
             {metadata.theme}
           </span>
         )}
@@ -316,7 +316,7 @@ const ChallengeSalesView: React.FC<ChallengeSalesViewProps> = ({ challenge, zone
       />
 
       {lockedWeeksCount > 0 && (
-        <div className="rounded-xl border border-orange-light/30 bg-orange-light/10 p-6 text-center">
+        <div className="border-orange-light/30 bg-orange-light/10 rounded-xl border p-6 text-center">
           <p className="mb-4 font-medium text-white">
             Get access to all {totalWeeks} weeks and full workout details.
           </p>

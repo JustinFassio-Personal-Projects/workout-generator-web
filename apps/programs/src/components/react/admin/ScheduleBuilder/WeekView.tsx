@@ -97,7 +97,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                         <div
                           key={workout.id}
                           onClick={() => onEditWorkout(workout)}
-                          className="group/card relative cursor-pointer rounded-lg border border-white/5 bg-[#1a1a1a] p-3 shadow-sm transition-all hover:border-orange-light/50 hover:bg-[#2a2a2a] hover:shadow-md"
+                          className="group/card hover:border-orange-light/50 relative cursor-pointer rounded-lg border border-white/5 bg-[#1a1a1a] p-3 shadow-sm transition-all hover:bg-[#2a2a2a] hover:shadow-md"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <h4 className="line-clamp-2 text-xs font-bold text-white group-hover/card:text-orange-light">

@@ -45,7 +45,7 @@ const DeploymentTimeline: React.FC<DeploymentTimelineProps> = ({
                 isActive
                   ? 'border-orange-light bg-orange-light text-black shadow-[0_0_20px_rgba(255,191,0,0.4)]'
                   : isUnlocked
-                    ? 'border-orange-light/30 bg-orange-light/10 text-white hover:bg-orange-light/20'
+                    ? 'border-orange-light/30 bg-orange-light/10 hover:bg-orange-light/20 text-white'
                     : 'cursor-not-allowed border-white/10 bg-white/5 text-white/10'
               }`}
             >

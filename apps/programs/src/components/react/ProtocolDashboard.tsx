@@ -98,11 +98,11 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                   <div>
                     <div className="mb-2 flex items-center justify-between">
                       <span className="font-mono text-xs uppercase text-white/50">CNS Load</span>
-                      <span className="font-bold text-orange-500">88%</span>
+                      <span className="text-orange-500 font-bold">88%</span>
                     </div>
                     <div className="h-1 overflow-hidden rounded-full bg-white/10">
                       <motion.div
-                        className="h-full bg-orange-500"
+                        className="bg-orange-500 h-full"
                         animate={{ width: ['80%', '92%', '80%'] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       />
@@ -125,7 +125,7 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-orange-light/20 bg-orange-light/5 p-6">
+                <div className="border-orange-light/20 bg-orange-light/5 rounded-2xl border p-6">
                   <div className="mb-4 flex items-center gap-3">
                     <User className="h-5 w-5 text-orange-light" />
                     <h5 className="font-heading text-xs font-bold uppercase">Cadet Stats</h5>
@@ -245,7 +245,7 @@ const ProtocolDashboard: React.FC<ProtocolDashboardProps> = ({
                           onClick={() => setCheckedIn(!checkedIn)}
                           className={`flex w-full items-center justify-center gap-3 rounded-xl py-5 text-sm font-black uppercase tracking-widest transition-all ${
                             checkedIn
-                              ? 'cursor-default border border-orange-light/30 bg-white/10 text-orange-light'
+                              ? 'border-orange-light/30 cursor-default border bg-white/10 text-orange-light'
                               : 'bg-white text-black hover:bg-orange-light'
                           }`}
                         >

@@ -59,7 +59,7 @@ const ReferenceImagePicker: React.FC<ReferenceImagePickerProps> = ({
               type="button"
               onClick={() => setReferenceFromDataUrl(recentGeneratedDataUrl)}
               disabled={loadingReference}
-              className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20 disabled:opacity-50"
+              className="hover:border-orange-light/30 hover:bg-orange-light/20 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50"
             >
               Use as reference
             </button>
@@ -84,13 +84,13 @@ const ReferenceImagePicker: React.FC<ReferenceImagePickerProps> = ({
             value={referenceImageUrl}
             onChange={(e) => setReferenceImageUrl(e.target.value)}
             placeholder="https://firebasestorage.googleapis.com/..."
-            className="flex-1 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+            className="focus:border-orange-light/50 focus:ring-orange-light/20 flex-1 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
           />
           <button
             type="button"
             onClick={loadReferenceImage}
             disabled={loadingReference || !referenceImageUrl.trim()}
-            className="rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20 disabled:opacity-50"
+            className="hover:border-orange-light/30 hover:bg-orange-light/20 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50"
           >
             {loadingReference ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Load'}
           </button>

@@ -16,30 +16,16 @@ export interface PricingPlan {
 
 // Fallback URL for payment links if environment variables are not set
 const FALLBACK_LOGIN_URL = `${getAppBaseUrl()}/login`
+// Premium $11.99 default payment link
+const DEFAULT_PREMIUM_PAYMENT_LINK = 'https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00'
 
 export const pricingPlans: PricingPlan[] = [
   {
-    id: 'free',
-    name: 'Free',
-    price: 0,
+    id: 'premium',
+    name: 'Premium',
+    price: 11.99,
     period: 'month',
-    description: 'Get started with AI workouts',
-    features: [
-      '5 AI-generated workouts (lifetime limit)',
-      'Basic exercise library',
-      'Daily check-in tracking',
-      'Profile customization',
-    ],
-    ctaText: 'Get Started',
-    ctaVariant: 'secondary',
-    ctaLink: FALLBACK_LOGIN_URL,
-  },
-  {
-    id: 'basic',
-    name: 'Basic',
-    price: 5.99,
-    period: 'month',
-    description: 'More workouts, monthly renewal',
+    description: 'Entry tier, monthly renewal',
     features: [
       '20 AI-generated workouts/month',
       'Basic exercise library',
@@ -48,7 +34,7 @@ export const pricingPlans: PricingPlan[] = [
     ],
     ctaText: 'Subscribe',
     ctaVariant: 'secondary',
-    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_BASIC || FALLBACK_LOGIN_URL,
+    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM || DEFAULT_PREMIUM_PAYMENT_LINK,
   },
   {
     id: 'pro',

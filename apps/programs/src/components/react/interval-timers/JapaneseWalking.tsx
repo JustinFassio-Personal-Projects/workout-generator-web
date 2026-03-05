@@ -448,7 +448,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
                   <button
                     type="button"
                     onClick={() => setSimMode('fast')}
-                    className={`w-1/2 rounded-xl font-bold transition-all ${simMode === 'fast' ? 'scale-105 bg-orange-600 text-white shadow-lg' : 'border border-white/20 bg-transparent text-white/70 hover:text-white'}`}
+                    className={`w-1/2 rounded-xl font-bold transition-all ${simMode === 'fast' ? 'bg-orange-600 scale-105 text-white shadow-lg' : 'border border-white/20 bg-transparent text-white/70 hover:text-white'}`}
                   >
                     3 MIN FAST
                   </button>
@@ -488,7 +488,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => setIsReportOpen(true)}
-              className="flex items-center gap-2 border-b border-orange-light/40 pb-0.5 text-sm font-bold text-orange-light transition-colors hover:text-orange-light/90"
+              className="border-orange-light/40 hover:text-orange-light/90 flex items-center gap-2 border-b pb-0.5 text-sm font-bold text-orange-light transition-colors"
             >
               <span>Protocol Details</span>
               <span>→</span>
@@ -534,7 +534,7 @@ const JapaneseWalking: React.FC<JapaneseWalkingProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => setIsReportOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white hover:bg-orange-light/20 hover:text-orange-light"
+                className="hover:bg-orange-light/20 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white hover:text-orange-light"
               >
                 &times;
               </button>

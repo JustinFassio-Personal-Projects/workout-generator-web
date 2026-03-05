@@ -1,7 +1,9 @@
 /**
  * Pricing plans for the Astro landing site.
- * Stripe payment links come from PUBLIC_STRIPE_PAYMENT_LINK_* env; fallback is login URL.
- * Premium ($11.99) default link: https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00
+ * Stripe payment links from PUBLIC_STRIPE_PAYMENT_LINK_* env.
+ * Fallback: Premium uses default link in production (see getPremiumLink); other tiers use login URL.
+ * Outside production, Premium CTA falls back to login URL when env unset to avoid accidental live checkout.
+ * Premium ($11.99) default: https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00
  */
 
 export interface PricingPlan {
@@ -35,7 +37,9 @@ function getEnv(name: string): string {
 
 function getPremiumLink(): string {
   const v = import.meta.env.PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM
-  return typeof v === 'string' && v ? v : DEFAULT_PREMIUM_PAYMENT_LINK
+  if (typeof v === 'string' && v) return v
+  // Outside production, avoid routing to live Stripe when env is unset
+  return import.meta.env.PROD ? DEFAULT_PREMIUM_PAYMENT_LINK : FALLBACK_LOGIN_URL
 }
 
 export const pricingPlans: PricingPlan[] = [

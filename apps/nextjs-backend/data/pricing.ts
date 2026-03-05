@@ -11,13 +11,19 @@ export interface PricingPlan {
   popular?: boolean
   ctaText: string
   ctaVariant: 'primary' | 'secondary'
-  ctaLink?: string // Optional link for CTA button
+  ctaLink?: string
 }
 
-// Fallback URL for payment links if environment variables are not set
+// Fallback URL for Pro/Elite (and other tiers) when env vars are not set. Premium uses its own default link below.
 const FALLBACK_LOGIN_URL = `${getAppBaseUrl()}/login`
-// Premium $11.99 default payment link
+// Premium $11.99 default payment link. Used when env unset only in production; outside production we fall back to login URL to avoid accidental live checkout.
 const DEFAULT_PREMIUM_PAYMENT_LINK = 'https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00'
+
+function getPremiumCtaLink(): string {
+  const v = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM
+  if (v) return v
+  return process.env.NODE_ENV === 'production' ? DEFAULT_PREMIUM_PAYMENT_LINK : FALLBACK_LOGIN_URL
+}
 
 export const pricingPlans: PricingPlan[] = [
   {
@@ -34,7 +40,7 @@ export const pricingPlans: PricingPlan[] = [
     ],
     ctaText: 'Subscribe',
     ctaVariant: 'secondary',
-    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM || DEFAULT_PREMIUM_PAYMENT_LINK,
+    ctaLink: getPremiumCtaLink(),
   },
   {
     id: 'pro',

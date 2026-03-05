@@ -1,6 +1,6 @@
-# Pre-Merge Report — ui/global-alignment
+# Pre-Merge Report — Pricing / Reverse Trial (Premium Entry Tier)
 
-**Branch:** ui/global-alignment  
+**Branch:** ui/align-main-content-with-programs  
 **Reviewer:** Senior Lead Engineer (Final PR Gatekeeper)  
 **Date:** 2025-03-03
 
@@ -10,19 +10,17 @@
 
 | Item | File | Resolution |
 |------|------|------------|
-| **Empty `fitness_goals` logic bug** | `PlanPreview.tsx` | Guard for `data.fitness_goals.length === 0`; display `"—"` instead of `" & undefined"`. |
-| **AuthModal tab state not reset** | `AuthModal.tsx` | Effect now syncs `isRegistering` to `defaultSignUp` when modal opens and resets to `false` when it closes. |
-| **Misindented cleanup block** | `AppIslands.tsx` | All four `window.removeEventListener` lines indented consistently inside the `try` block (Prettier/CI-safe). |
-| **Invalid README code blocks** | `packages/design-system/README.md` | Switched `css` fences to `js`; added note to import from app entry or root layout. |
+| **Redundant comment (slop)** | `apps/nextjs-backend/data/pricing.ts` | Removed `// Optional link for CTA button` from `ctaLink?: string` (obvious from type). |
+| **Doc accuracy** | `docs/PHASE2_APP_STRIPE_NOTE.md` | Updated fallback sentence: when env unset, default Premium link is used **only in production**; dev/staging use login URL to avoid accidental live checkout. |
 
 ---
 
 ## Slop Scrubbed
 
-- **Redundant comments:** None found. Comments in `WorkoutPlanBuilder.tsx` (“Always start with defaults…”, “After mount, sync form from URL…”) document hydration/URL behavior and are kept.
-- **Hallucinated APIs:** None. Imports verified (`lucide-react`, `@/types/onboarding`, `@/data/onboarding-options`, `@/lib/urlOnboarding`, `buildSignupUrl`, `supabase`, `framer-motion`, `sonner`).
-- **Dead logic / placeholders:** None. No unused variables or redundant try/catch in WorkoutPlanBuilder, AuthModal, or AppIslands.
-- **Commented-out code:** None in the changed files.
+- **Redundant comments:** One removed (nextjs `ctaLink` inline comment). Astro/programs “Outside production, avoid routing…” comments retained—they explain non-obvious production gating.
+- **Hallucinated APIs:** None. `getAppBaseUrl` from `@/lib/buildSignupUrl` verified. `import.meta.env.PROD` / `import.meta.env.PUBLIC_*` are standard Vite/Astro; `process.env.NODE_ENV` / `NEXT_PUBLIC_*` standard in Next.js.
+- **Dead logic / placeholders:** None. No unused variables or redundant try/catch in pricing data or PricingCard/PricingSection.
+- **Commented-out code:** None in changed files.
 
 ---
 
@@ -30,24 +28,16 @@
 
 | Suggestion / Check | Reason |
 |--------------------|--------|
-| N/A | All triaged Copilot comments were either applied or already addressed. No suggestions were discarded as false positives in this pass. |
-
-*Note: Pre-existing `import.meta.env.SITE` in `geminiService.ts` (no `PUBLIC_` prefix) was flagged in an earlier Astro Pre-PR checklist as optional follow-up; it is outside this PR’s scope and not a merge blocker.*
+| Trivial class-order / Prettier-only diffs (e.g. `focus:ring-2 focus:ring-orange-light/20` → reordered) | Style-only; matches existing codebase formatter. No functional change; no action. |
+| Extra abstraction for “get env with type” in programs | Current `(import.meta as unknown as { env?: … }).env` pattern is explicit and matches Vite typings; no new helper added. |
 
 ---
 
 ## Security & Architecture Verification
 
-- **Env in client-bound code:** `buildSignupUrl.ts` uses only `import.meta.env.PUBLIC_APP_URL` (with fallback). No non-`PUBLIC_` env in client bundles introduced by this PR.
-- **Astro frontmatter:** `onboard.astro` and layout imports contain no env; design-system import is side-effect only.
-- **Node APIs in client components:** No `fs` or `path` (or other Node-only APIs) in `apps/programs/src/components`; WorkoutPlanBuilder and AuthModal are client-safe.
-- **Islands:** `WorkoutPlanBuilder` and `AppWrapper` on `/onboard` use `client:load` appropriately; no unnecessary `client:only`.
-
----
-
-## Optional: .vscode/settings.json
-
-The diff includes `.vscode/settings.json` with `"css.lint.unknownAtRules": "ignore"`. This is a valid workspace setting for Tailwind/PostCSS. If the team does not commit IDE config, unstage and omit this file from the PR; otherwise it is safe to include.
+- **Astro / Programs (data layer):** `import.meta.env` used only in **data modules** (`astro-site/src/data/pricing.ts`, `apps/programs/src/data/pricing.ts`), which run at build time. `PUBLIC_STRIPE_PAYMENT_LINK_*` and `PUBLIC_APP_URL` are intended for client; `PROD` is Vite built-in. No server secrets in client bundle.
+- **Next.js:** `apps/nextjs-backend/data/pricing.ts` uses `process.env.NODE_ENV` and `NEXT_PUBLIC_*`; this file is server/build-only. No Node APIs (`fs`, `path`) in client components.
+- **PricingCard / PricingSection:** No env or Node APIs; receive `plan` from parent. Safe.
 
 ---
 
@@ -55,6 +45,6 @@ The diff includes `.vscode/settings.json` with `"css.lint.unknownAtRules": "igno
 
 **READY TO MERGE**
 
-- Critical and logic issues from Copilot are fixed.
-- No slop, dead code, or new debt in the reviewed scope.
-- Security and Astro boundaries verified; no blocking issues.
+- Critical/slop item and doc inaccuracy addressed.
+- No new debt, TODOs, or hallucinated APIs.
+- Env usage and build-time vs client boundaries verified for nextjs-backend, astro-site, and programs.

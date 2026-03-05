@@ -24,4 +24,4 @@ Pricing CTAs use **Stripe Payment Link URLs** (e.g. `https://buy.stripe.com/...`
 - **nextjs-backend:** `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM`
 - **astro-site / programs:** `PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM`
 
-If unset, astro-site and programs use the default Premium link above. If you only have a Stripe product/price ID: create a [Payment Link](https://dashboard.stripe.com/payment-links) and put the **link URL** in the env var.
+When unset: in **production** all three use the default Premium link above; in development/staging they fall back to the app login URL to avoid accidental live checkout. If you only have a Stripe product/price ID: create a [Payment Link](https://dashboard.stripe.com/payment-links) and put the **link URL** in the env var.

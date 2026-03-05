@@ -60,7 +60,9 @@ The source document is calibrated for $5.99. At **$11.99**:
 
 - `apps/nextjs-backend/data/pricing.ts` — Pricing display
 - `astro-site/src/data/pricing.ts` — Astro site pricing
-- Stripe env vars: `PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM` ($11.99), `_PRO`, `_ELITE`, etc.  
+- **Stripe env vars (per app):**
+  - **nextjs-backend:** `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM`, `_PRO`, `_ELITE`, etc.
+  - **astro-site / programs:** `PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM`, `_PRO`, `_ELITE`, etc.
 - Premium payment link (default): `https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00`
 
 ---

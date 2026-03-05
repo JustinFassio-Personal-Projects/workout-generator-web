@@ -113,7 +113,7 @@ function SortableItemRow({
           type="text"
           value={item.exerciseName}
           onChange={(e) => onUpdate(index, 'exerciseName', e.target.value)}
-          className="mb-2 w-full rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm text-white focus:border-orange-light/50 focus:bg-black/20"
+          className="focus:border-orange-light/50 mb-2 w-full rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm text-white focus:bg-black/20"
           placeholder="Exercise name (e.g., Neck Rolls)"
         />
         {showLinkBlock && (
@@ -127,7 +127,7 @@ function SortableItemRow({
                   onChange={(e) => onExerciseQueryChange(index, e.target.value)}
                   placeholder="e.g. bench press"
                   title="Map to approved exercise"
-                  className="w-full min-w-0 rounded border-b border-transparent border-white/10 bg-transparent px-2 py-0.5 text-sm text-white/80 focus:border-orange-light/50 focus:bg-black/20 focus:outline-none"
+                  className="focus:border-orange-light/50 w-full min-w-0 rounded border-b border-transparent border-white/10 bg-transparent px-2 py-0.5 text-sm text-white/80 focus:bg-black/20 focus:outline-none"
                 />
               </div>
             )}
@@ -168,7 +168,7 @@ function SortableItemRow({
             )
           }
           rows={2}
-          className="w-full resize-none rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 focus:border-orange-light/50 focus:bg-black/20"
+          className="focus:border-orange-light/50 w-full resize-none rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 focus:bg-black/20"
           placeholder="One instruction per line (e.g., Assume proper starting position)"
         />
       </div>
@@ -210,7 +210,7 @@ function StaticItemRow({
         type="text"
         value={item.exerciseName}
         onChange={(e) => onUpdate(index, 'exerciseName', e.target.value)}
-        className="mb-2 w-full rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm text-white focus:border-orange-light/50 focus:bg-black/20"
+        className="focus:border-orange-light/50 mb-2 w-full rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-sm text-white focus:bg-black/20"
         placeholder="Exercise name (e.g., Neck Rolls)"
       />
       {showLinkBlock && (
@@ -224,7 +224,7 @@ function StaticItemRow({
                 onChange={(e) => onExerciseQueryChange(index, e.target.value)}
                 placeholder="e.g. bench press"
                 title="Map to approved exercise"
-                className="w-full min-w-0 rounded border-b border-transparent border-white/10 bg-transparent px-2 py-0.5 text-sm text-white/80 focus:border-orange-light/50 focus:bg-black/20 focus:outline-none"
+                className="focus:border-orange-light/50 w-full min-w-0 rounded border-b border-transparent border-white/10 bg-transparent px-2 py-0.5 text-sm text-white/80 focus:bg-black/20 focus:outline-none"
               />
             </div>
           )}
@@ -265,7 +265,7 @@ function StaticItemRow({
           )
         }
         rows={2}
-        className="w-full resize-none rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 focus:border-orange-light/50 focus:bg-black/20"
+        className="focus:border-orange-light/50 w-full resize-none rounded border-b border-transparent border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 focus:bg-black/20"
         placeholder="One instruction per line (e.g., Assume proper starting position)"
       />
     </div>

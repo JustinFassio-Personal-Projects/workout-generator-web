@@ -190,7 +190,7 @@ const Navigation: React.FC<NavigationProps> = ({
       {isTrainer && (
         <a
           href="/trainer"
-          className="hidden cursor-pointer items-center gap-2 rounded-full bg-orange-light/20 px-4 py-2 text-xs font-bold uppercase tracking-wider text-orange-light transition-colors hover:bg-orange-light hover:text-black md:flex"
+          className="bg-orange-light/20 hidden cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider text-orange-light transition-colors hover:bg-orange-light hover:text-black md:flex"
         >
           Mission Control
         </a>
@@ -353,7 +353,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   <a
                     href="/trainer"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="mb-2 block w-full rounded-xl border border-orange-light bg-orange-light/10 px-4 py-3 font-heading text-lg font-black uppercase tracking-wide text-orange-light transition-colors hover:bg-orange-light hover:text-black"
+                    className="bg-orange-light/10 mb-2 block w-full rounded-xl border border-orange-light px-4 py-3 font-heading text-lg font-black uppercase tracking-wide text-orange-light transition-colors hover:bg-orange-light hover:text-black"
                   >
                     Mission Control
                   </a>

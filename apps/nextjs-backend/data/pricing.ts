@@ -11,35 +11,29 @@ export interface PricingPlan {
   popular?: boolean
   ctaText: string
   ctaVariant: 'primary' | 'secondary'
-  ctaLink?: string // Optional link for CTA button
+  ctaLink?: string
 }
 
-// Fallback URL for payment links if environment variables are not set
+// Fallback URL for Pro/Elite (and other tiers) when env vars are not set. Premium uses its own default link below.
 const FALLBACK_LOGIN_URL = `${getAppBaseUrl()}/login`
+// Premium $11.99 default payment link. Used when env unset only in production; outside production we fall back to login URL to avoid accidental live checkout.
+const DEFAULT_PREMIUM_PAYMENT_LINK = 'https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00'
+
+function getPremiumCtaLink(): string {
+  const v = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM
+  if (v) return v
+  // Use login URL only when explicitly in development. When NODE_ENV is unset (e.g. some serverless), use default Stripe link so production checkout works.
+  if (process.env.NODE_ENV === 'development') return FALLBACK_LOGIN_URL
+  return DEFAULT_PREMIUM_PAYMENT_LINK
+}
 
 export const pricingPlans: PricingPlan[] = [
   {
-    id: 'free',
-    name: 'Free',
-    price: 0,
+    id: 'premium',
+    name: 'Premium',
+    price: 11.99,
     period: 'month',
-    description: 'Get started with AI workouts',
-    features: [
-      '5 AI-generated workouts (lifetime limit)',
-      'Basic exercise library',
-      'Daily check-in tracking',
-      'Profile customization',
-    ],
-    ctaText: 'Get Started',
-    ctaVariant: 'secondary',
-    ctaLink: FALLBACK_LOGIN_URL,
-  },
-  {
-    id: 'basic',
-    name: 'Basic',
-    price: 5.99,
-    period: 'month',
-    description: 'More workouts, monthly renewal',
+    description: 'Entry tier, monthly renewal',
     features: [
       '20 AI-generated workouts/month',
       'Basic exercise library',
@@ -48,7 +42,7 @@ export const pricingPlans: PricingPlan[] = [
     ],
     ctaText: 'Subscribe',
     ctaVariant: 'secondary',
-    ctaLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_BASIC || FALLBACK_LOGIN_URL,
+    ctaLink: getPremiumCtaLink(),
   },
   {
     id: 'pro',

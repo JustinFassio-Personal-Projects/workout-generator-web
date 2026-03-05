@@ -181,7 +181,7 @@ const IntervalTimerLandingPage: React.FC<IntervalTimerLandingPageProps> = ({ onN
           </div>
           <h1 className="font-display mb-6 text-4xl font-bold leading-tight md:text-6xl lg:text-7xl">
             Master Every <br />
-            <span className="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
+            <span className="to-orange-400 bg-gradient-to-r from-red-400 bg-clip-text text-transparent">
               Energy System
             </span>
           </h1>

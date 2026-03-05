@@ -142,7 +142,7 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onClose, onActiv
                     {phase.deliverables.map((item, dIdx) => (
                       <div
                         key={dIdx}
-                        className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:border-orange-light/30"
+                        className="hover:border-orange-light/30 flex items-center gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 transition-all"
                       >
                         <div className="h-2 w-2 rounded-full bg-orange-light shadow-[0_0_10px_#ffbf00]" />
                         <span className="text-xs font-bold uppercase leading-relaxed tracking-widest text-gray-400">

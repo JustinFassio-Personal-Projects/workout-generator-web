@@ -313,7 +313,7 @@ const ProgramSalesView: React.FC<ProgramSalesViewProps> = ({ program }) => {
 
       {/* Unlock CTA */}
       {lockedWeeksCount > 0 && (
-        <div className="rounded-xl border border-orange-light/30 bg-orange-light/10 p-6 text-center">
+        <div className="border-orange-light/30 bg-orange-light/10 rounded-xl border p-6 text-center">
           <p className="mb-4 font-medium text-white">
             Get access to all {totalWeeks} weeks and full workout details.
           </p>

@@ -99,7 +99,7 @@ const ProgramLibraryTable: React.FC<ProgramLibraryTableProps> = ({ onEdit, onDel
           <select
             value={filter}
             onChange={(e) => setFilter((e.target.value as 'all' | 'draft' | 'active') || 'all')}
-            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none"
+            className="focus:border-orange-light/50 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-white focus:outline-none"
           >
             <option value="all">All</option>
             <option value="draft">Draft</option>

@@ -345,7 +345,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
               onClick={() =>
                 document.getElementById('simulator')?.scrollIntoView({ behavior: 'smooth' })
               }
-              className="rounded-xl bg-orange-600 px-8 py-3 font-bold text-white shadow-[0_0_20px_rgba(234,88,12,0.4)] transition-transform hover:-translate-y-1 hover:bg-orange-500"
+              className="bg-orange-600 hover:bg-orange-500 rounded-xl px-8 py-3 font-bold text-white shadow-[0_0_20px_rgba(234,88,12,0.4)] transition-transform hover:-translate-y-1"
             >
               Start Timer
             </button>
@@ -490,7 +490,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
                   <button
                     type="button"
                     onClick={() => setSimMode('pace')}
-                    className={`w-1/2 rounded-xl font-bold transition-all ${simMode === 'pace' ? 'scale-105 bg-orange-600 text-white shadow-lg' : 'border border-white/20 bg-transparent text-white/70 hover:text-white'}`}
+                    className={`w-1/2 rounded-xl font-bold transition-all ${simMode === 'pace' ? 'bg-orange-600 scale-105 text-white shadow-lg' : 'border border-white/20 bg-transparent text-white/70 hover:text-white'}`}
                   >
                     PACING
                   </button>
@@ -510,7 +510,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => setIsDurationSelectOpen(true)}
-              className="mx-auto flex items-center gap-3 rounded-full bg-orange-600 px-8 py-4 font-bold text-white shadow-2xl transition-all hover:scale-105 hover:bg-orange-500"
+              className="bg-orange-600 hover:bg-orange-500 mx-auto flex items-center gap-3 rounded-full px-8 py-4 font-bold text-white shadow-2xl transition-all hover:scale-105"
             >
               <span>⏱️</span>
               <span>Launch AMRAP Timer</span>
@@ -530,7 +530,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => setIsReportOpen(true)}
-              className="flex items-center gap-2 border-b border-orange-500/30 pb-0.5 text-sm font-bold text-orange-400 transition-colors hover:text-orange-300"
+              className="border-orange-500/30 text-orange-400 hover:text-orange-300 flex items-center gap-2 border-b pb-0.5 text-sm font-bold transition-colors"
             >
               <span>Protocol Details</span>
               <span>→</span>
@@ -567,7 +567,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
                 <button
                   type="button"
                   onClick={() => startRealTimer(5)}
-                  className="group w-full rounded-xl border-2 border-white/10 p-4 text-left transition-all hover:border-orange-500 hover:bg-orange-600/20"
+                  className="hover:border-orange-500 hover:bg-orange-600/20 group w-full rounded-xl border-2 border-white/10 p-4 text-left transition-all"
                 >
                   <div className="text-lg font-bold text-white">Sprint (5 Mins)</div>
                   <div className="text-xs font-medium text-white/60">High intensity, zero rest</div>
@@ -575,7 +575,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
                 <button
                   type="button"
                   onClick={() => startRealTimer(12)}
-                  className="group w-full rounded-xl border-2 border-white/10 p-4 text-left transition-all hover:border-orange-500 hover:bg-orange-600/20"
+                  className="hover:border-orange-500 hover:bg-orange-600/20 group w-full rounded-xl border-2 border-white/10 p-4 text-left transition-all"
                 >
                   <div className="text-lg font-bold text-white">Standard (12 Mins)</div>
                   <div className="text-xs font-medium text-white/60">
@@ -585,7 +585,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
                 <button
                   type="button"
                   onClick={() => startRealTimer(20)}
-                  className="group w-full rounded-xl border-2 border-white/10 p-4 text-left transition-all hover:border-orange-500 hover:bg-orange-600/20"
+                  className="hover:border-orange-500 hover:bg-orange-600/20 group w-full rounded-xl border-2 border-white/10 p-4 text-left transition-all"
                 >
                   <div className="text-lg font-bold text-white">Endurance (20 Mins)</div>
                   <div className="text-xs font-medium text-white/60">Pacing is critical</div>
@@ -650,7 +650,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
                   <button
                     type="button"
                     onClick={logRound}
-                    className="rounded-2xl bg-orange-600 px-12 py-6 text-xl font-bold text-white shadow-[0_0_40px_rgba(234,88,12,0.4)] transition-all hover:bg-orange-500 active:scale-95"
+                    className="bg-orange-600 hover:bg-orange-500 rounded-2xl px-12 py-6 text-xl font-bold text-white shadow-[0_0_40px_rgba(234,88,12,0.4)] transition-all active:scale-95"
                   >
                     LOG ROUND
                   </button>
@@ -661,7 +661,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
             <div className="pointer-events-none absolute inset-0 flex items-end justify-center px-4 pb-0 opacity-20">
               <div className="flex h-1/2 w-full max-w-3xl flex-wrap-reverse content-end justify-center gap-1">
                 {Array.from({ length: roundsCompleted }).map((_, i) => (
-                  <div key={i} className="animate-zoom-in h-8 w-12 rounded-sm bg-orange-500" />
+                  <div key={i} className="animate-zoom-in bg-orange-500 h-8 w-12 rounded-sm" />
                 ))}
               </div>
             </div>
@@ -705,7 +705,7 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => setIsReportOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white hover:bg-orange-600/20 hover:text-orange-400"
+                className="hover:bg-orange-600/20 hover:text-orange-400 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white"
               >
                 &times;
               </button>
@@ -715,13 +715,13 @@ const AmrapInterval: React.FC<AmrapIntervalProps> = ({ onNavigate }) => {
                 AMRAP is a time-priority workout structure. The time is fixed, and the work is the
                 variable.
               </p>
-              <h4 className="font-bold text-orange-500">Mental Fortitude</h4>
+              <h4 className="text-orange-500 font-bold">Mental Fortitude</h4>
               <p>
                 Because there is no built-in rest, AMRAPs require constant decision making. &quot;Do
                 I rest now or do one more rep?&quot; This builds a specific type of mental toughness
                 related to suffering and pacing.
               </p>
-              <h4 className="font-bold text-orange-500">Strategy</h4>
+              <h4 className="text-orange-500 font-bold">Strategy</h4>
               <p>
                 In short AMRAPs (5-8 mins), the intensity is high (threshold/VO2 max). In longer
                 AMRAPs (15-20+ mins), pacing is aerobic. The &quot;Concrete&quot; theme represents

@@ -194,7 +194,7 @@ const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
             exit={{ scale: 0.95, y: 20 }}
             transition={reduceMotion ? { duration: 0 } : undefined}
             onClick={(e) => e.stopPropagation()}
-            className="relative flex h-[90vh] max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[2.5rem] border border-orange-light/30 bg-bg-dark shadow-[0_0_100px_rgba(255,191,0,0.1)] md:flex-row"
+            className="border-orange-light/30 relative flex h-[90vh] max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[2.5rem] border bg-bg-dark shadow-[0_0_100px_rgba(255,191,0,0.1)] md:flex-row"
           >
             <button
               type="button"
@@ -330,7 +330,7 @@ const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
                   exit={{ scale: 0.95, y: 20 }}
                   transition={reduceMotion ? { duration: 0 } : undefined}
                   onClick={(e) => e.stopPropagation()}
-                  className="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-orange-light/30 bg-bg-dark shadow-[0_0_60px_rgba(255,191,0,0.1)]"
+                  className="border-orange-light/30 relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border bg-bg-dark shadow-[0_0_60px_rgba(255,191,0,0.1)]"
                 >
                   <button
                     type="button"

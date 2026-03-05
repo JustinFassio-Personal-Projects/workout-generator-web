@@ -6,8 +6,8 @@ interface IntroScreenProps {
 
 export function IntroScreen({ onComplete }: IntroScreenProps) {
   return (
-    <div className="relative mx-auto flex w-full max-w-[600px] flex-col items-center justify-start overflow-hidden rounded-2xl border border-white/10 bg-bg-dark px-6 pt-8 pb-12">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-orange-light/10 via-bg-dark to-black" />
+    <div className="relative mx-auto flex w-full max-w-[600px] flex-col items-center justify-start overflow-hidden rounded-2xl border border-white/10 bg-bg-dark px-6 pb-12 pt-8">
+      <div className="from-orange-light/10 pointer-events-none absolute inset-0 bg-gradient-to-b via-bg-dark to-black" />
       <div className="relative z-10 text-center">
         <h1 className="mb-2 text-3xl font-bold tracking-tight text-white md:text-5xl">
           AI PERSONAL <br />
@@ -22,7 +22,7 @@ export function IntroScreen({ onComplete }: IntroScreenProps) {
         <button
           type="button"
           onClick={onComplete}
-          className="cta-primary relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border border-orange-light/50 bg-transparent transition-all hover:bg-orange-light/20 group"
+          className="cta-primary border-orange-light/50 hover:bg-orange-light/20 group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border bg-transparent transition-all"
         >
           <span className="relative z-10 text-sm font-bold uppercase tracking-wider text-orange-light transition-colors group-hover:text-bg-dark">
             Generate Workout
@@ -33,7 +33,7 @@ export function IntroScreen({ onComplete }: IntroScreenProps) {
       <button
         type="button"
         onClick={onComplete}
-        className="absolute top-6 right-6 rounded-full border border-transparent px-4 py-2 text-xs uppercase tracking-wider text-slate-500 transition-all hover:border-white/10 hover:text-white"
+        className="absolute right-6 top-6 rounded-full border border-transparent px-4 py-2 text-xs uppercase tracking-wider text-slate-500 transition-all hover:border-white/10 hover:text-white"
       >
         Free Workout
       </button>

@@ -96,7 +96,7 @@ const ConversionModal: React.FC<ConversionModalProps> = ({
             <ul className="mb-10 space-y-6">
               {FEATURES.map(({ icon: Icon, title, description }) => (
                 <li key={title} className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-orange-light/20 bg-orange-light/10">
+                  <div className="border-orange-light/20 bg-orange-light/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border">
                     <Icon className="h-5 w-5 text-orange-light" />
                   </div>
                   <div>

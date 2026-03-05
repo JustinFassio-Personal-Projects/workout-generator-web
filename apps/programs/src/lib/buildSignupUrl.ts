@@ -1,18 +1,16 @@
 import type { WebsiteOnboardingData } from '@/types/onboarding';
 
-const APP_BASE = (
-  import.meta.env.PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com'
-).replace(/\/$/, '');
+const APP_BASE = (import.meta.env.PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com').replace(
+  /\/$/,
+  ''
+);
 const SIGNUP_BASE_URL = `${APP_BASE}/signup`;
 
 /**
  * Builds the signup URL with query parameters from the onboarding data.
  * Matches astro-site and app expected format (tab=signup, mode=signup, view=signup, etc.).
  */
-export function buildSignupUrl(
-  data: WebsiteOnboardingData,
-  tenantId?: string
-): string {
+export function buildSignupUrl(data: WebsiteOnboardingData, tenantId?: string): string {
   const params = new URLSearchParams();
 
   params.set('fitness_level', data.fitness_level);
@@ -26,8 +24,7 @@ export function buildSignupUrl(
   params.set('units_temperature', data.preferred_units.temperature);
 
   if (data.gender) params.set('gender', data.gender);
-  if (data.age !== undefined && data.age !== null)
-    params.set('age', String(data.age));
+  if (data.age !== undefined && data.age !== null) params.set('age', String(data.age));
 
   params.set('source', 'website_builder');
   params.set('theme', 'dark');

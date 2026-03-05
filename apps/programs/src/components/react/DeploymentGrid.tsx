@@ -76,7 +76,7 @@ const DeploymentGrid: React.FC<DeploymentGridProps> = ({
                     onSelectWorkout?.(workout);
                   }
                 }}
-                className={`group relative flex h-40 w-full cursor-pointer items-center overflow-hidden rounded-3xl border px-8 shadow-2xl transition-all ${isDone ? 'border-orange-light bg-orange-light/5 shadow-[#ffbf00]/5' : 'border-white/10 bg-black/40 hover:border-orange-light/30'}`}
+                className={`group relative flex h-40 w-full cursor-pointer items-center overflow-hidden rounded-3xl border px-8 shadow-2xl transition-all ${isDone ? 'bg-orange-light/5 border-orange-light shadow-[#ffbf00]/5' : 'hover:border-orange-light/30 border-white/10 bg-black/40'}`}
               >
                 <div className="absolute inset-0 overflow-hidden">
                   <img
@@ -111,7 +111,7 @@ const DeploymentGrid: React.FC<DeploymentGridProps> = ({
                     {workout.name}
                   </h4>
                   {isDone && (
-                    <span className="absolute right-4 top-4 rotate-12 rounded border border-orange-light/50 bg-black/50 px-2 py-1 font-mono text-[10px] font-black text-orange-light">
+                    <span className="border-orange-light/50 absolute right-4 top-4 rotate-12 rounded border bg-black/50 px-2 py-1 font-mono text-[10px] font-black text-orange-light">
                       COMPLETED
                     </span>
                   )}

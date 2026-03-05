@@ -629,7 +629,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
             <div className="max-h-[70vh] overflow-y-auto p-6">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-orange-light/20 border-t-orange-light"></div>
+                  <div className="border-orange-light/20 mb-4 h-12 w-12 animate-spin rounded-full border-4 border-t-orange-light"></div>
                   <p className="text-lg font-medium text-white">{loadingMessage}</p>
                   <div className="mt-4 flex gap-2">
                     {[1, 2, 3, 4].map((s) => (
@@ -741,7 +741,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                             },
                           }))
                         }
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                         placeholder="Challenge title"
                         required
                       />
@@ -762,7 +762,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                           }))
                         }
                         rows={3}
-                        className="w-full resize-none rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full resize-none rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                         placeholder="Challenge description"
                         required
                       />
@@ -783,7 +783,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                             },
                           }))
                         }
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                         placeholder="e.g. 30-Day Core, Sprint to Summer"
                       />
                     </div>
@@ -813,7 +813,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                             }
                             className={`rounded-lg border px-4 py-3 font-medium transition-colors ${
                               challengeConfig.requirements.durationWeeks === weeks
-                                ? 'border-orange-light bg-orange-light/20 text-orange-light'
+                                ? 'bg-orange-light/20 border-orange-light text-orange-light'
                                 : 'border-white/10 bg-black/20 text-white/70 hover:border-white/20 hover:text-white'
                             }`}
                           >
@@ -858,7 +858,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                             }));
                           }
                         }}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                       >
                         <option value="">None - Generate without zone context</option>
                         {zones.map((zone) => (
@@ -871,7 +871,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                     </div>
 
                     {selectedZone && (
-                      <div className="rounded-lg border border-orange-light/20 bg-orange-light/10 p-4">
+                      <div className="border-orange-light/20 bg-orange-light/10 rounded-lg border p-4">
                         <div className="mb-2 font-medium text-white">{selectedZone.name}</div>
                         <div className="mt-4">
                           <label className="mb-2 block text-sm font-medium text-white/80">
@@ -910,7 +910,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                                         }));
                                       }
                                     }}
-                                    className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
+                                    className="focus:ring-orange-light/50 h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2"
                                   />
                                   <span
                                     className={`text-sm ${isSelected ? 'text-white' : 'text-white/50'}`}
@@ -933,7 +933,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                               selectedEquipmentIds: undefined,
                             }));
                           }}
-                          className="mt-3 text-sm text-orange-light underline hover:text-orange-light/80"
+                          className="hover:text-orange-light/80 mt-3 text-sm text-orange-light underline"
                         >
                           Clear Zone
                         </button>
@@ -951,7 +951,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         <select
                           value={challengeConfig.targetAudience.ageRange}
                           onChange={(e) => handleTargetAudienceChange('ageRange', e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                         >
                           <option value="18-25">18-25</option>
                           <option value="26-35">26-35</option>
@@ -968,7 +968,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         <select
                           value={challengeConfig.targetAudience.sex}
                           onChange={(e) => handleTargetAudienceChange('sex', e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                         >
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
@@ -987,7 +987,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                           onChange={(e) =>
                             handleTargetAudienceChange('weight', parseInt(e.target.value) || 0)
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                         />
                       </div>
                       <div>
@@ -1002,7 +1002,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                               e.target.value as 'beginner' | 'intermediate' | 'advanced'
                             )
                           }
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                         >
                           <option value="beginner">Beginner</option>
                           <option value="intermediate">Intermediate</option>
@@ -1023,7 +1023,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         onChange={(e) =>
                           handleMedicalContextChange('includeInjuries', e.target.checked)
                         }
-                        className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
+                        className="focus:ring-orange-light/50 h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2"
                       />
                       <span className="text-sm font-medium text-white/80">
                         Include Injury Constraints?
@@ -1034,7 +1034,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         value={challengeConfig.medicalContext?.injuries || ''}
                         onChange={(e) => handleMedicalContextChange('injuries', e.target.value)}
                         rows={2}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                         placeholder="e.g., Right shoulder impingement"
                       />
                     )}
@@ -1045,7 +1045,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         onChange={(e) =>
                           handleMedicalContextChange('includeConditions', e.target.checked)
                         }
-                        className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
+                        className="focus:ring-orange-light/50 h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2"
                       />
                       <span className="text-sm font-medium text-white/80">
                         Include Medical Conditions?
@@ -1056,7 +1056,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         value={challengeConfig.medicalContext?.conditions || ''}
                         onChange={(e) => handleMedicalContextChange('conditions', e.target.value)}
                         rows={2}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                         placeholder="e.g., Non-Alcoholic Fatty Liver Disease (mild)"
                       />
                     )}
@@ -1072,7 +1072,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         <select
                           value={challengeConfig.goals.primary}
                           onChange={(e) => handleGoalChange('primary', e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                         >
                           <option value="Fat Loss">Fat Loss</option>
                           <option value="Strength">Strength</option>
@@ -1089,7 +1089,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         <select
                           value={challengeConfig.goals.secondary}
                           onChange={(e) => handleGoalChange('secondary', e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                         >
                           <option value="Fat Loss">Fat Loss</option>
                           <option value="Strength">Strength</option>
@@ -1125,7 +1125,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                         type="button"
                         onClick={(e) => handleGenerateChain(e)}
                         disabled={loading}
-                        className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+                        className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors disabled:opacity-50"
                       >
                         <Sparkles className="h-5 w-5" />
                         <span>{loading ? 'Generating...' : 'Generate Challenge'}</span>
@@ -1138,14 +1138,14 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
 
             {pendingCloseAction != null && (
               <div
-                className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl border border-orange-light/30 bg-black/90 p-6 backdrop-blur-sm"
+                className="border-orange-light/30 absolute inset-0 z-10 flex items-center justify-center rounded-2xl border bg-black/90 p-6 backdrop-blur-sm"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="unsaved-changes-title"
               >
                 <div className="w-full max-w-sm rounded-xl border border-white/10 bg-bg-dark p-6 shadow-xl">
                   <div className="mb-4 flex justify-center">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-light/20">
+                    <div className="bg-orange-light/20 flex h-12 w-12 items-center justify-center rounded-full">
                       <AlertTriangle className="h-6 w-6 text-orange-light" />
                     </div>
                   </div>
@@ -1169,7 +1169,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
                     <button
                       type="button"
                       onClick={handleConfirmLeave}
-                      className="flex-1 rounded-lg bg-orange-light py-2.5 font-medium text-black transition-colors hover:bg-orange-light/90"
+                      className="hover:bg-orange-light/90 flex-1 rounded-lg bg-orange-light py-2.5 font-medium text-black transition-colors"
                     >
                       Leave anyway
                     </button>

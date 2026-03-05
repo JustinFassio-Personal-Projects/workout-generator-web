@@ -24,7 +24,7 @@ const TrainerDashboard: React.FC<TrainerDashboardProps> = ({ profile: profilePro
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-orange-light/50">
+        <div className="hover:border-orange-light/50 group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors">
           <h2 className="mb-2 text-2xl font-bold">Roster</h2>
           <p className="mb-6 text-white/60">Manage active cadets and assignments.</p>
           <button
@@ -36,7 +36,7 @@ const TrainerDashboard: React.FC<TrainerDashboardProps> = ({ profile: profilePro
           </button>
         </div>
 
-        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-orange-light/50">
+        <div className="hover:border-orange-light/50 group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors">
           <h2 className="mb-2 text-2xl font-bold">Programming</h2>
           <p className="mb-6 text-white/60">Design workouts and training blocks.</p>
           <button
@@ -50,7 +50,7 @@ const TrainerDashboard: React.FC<TrainerDashboardProps> = ({ profile: profilePro
           </button>
         </div>
 
-        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-orange-light/50">
+        <div className="hover:border-orange-light/50 group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 transition-colors">
           <h2 className="mb-2 text-2xl font-bold">Intel</h2>
           <p className="mb-6 text-white/60">Review performance metrics and compliance.</p>
           <button

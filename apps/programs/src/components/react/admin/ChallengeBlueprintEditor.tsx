@@ -138,7 +138,7 @@ const ChallengeBlueprintEditor: React.FC<ChallengeBlueprintEditorProps> = ({
                     max={initialData.durationWeeks || 6}
                     value={m.week}
                     onChange={(e) => updateMilestone(i, 'week', parseInt(e.target.value, 10) || 1)}
-                    className="w-full rounded border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white focus:border-orange-light/50 focus:outline-none"
+                    className="focus:border-orange-light/50 w-full rounded border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white focus:outline-none"
                   />
                 </div>
                 <div className="min-w-[120px] flex-[2]">
@@ -147,7 +147,7 @@ const ChallengeBlueprintEditor: React.FC<ChallengeBlueprintEditorProps> = ({
                     type="text"
                     value={m.label}
                     onChange={(e) => updateMilestone(i, 'label', e.target.value)}
-                    className="w-full rounded border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none"
+                    className="focus:border-orange-light/50 w-full rounded border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white placeholder:text-white/40 focus:outline-none"
                     placeholder="e.g. Halfway"
                   />
                 </div>
@@ -159,7 +159,7 @@ const ChallengeBlueprintEditor: React.FC<ChallengeBlueprintEditorProps> = ({
                     type="text"
                     value={m.checkInPrompt || ''}
                     onChange={(e) => updateMilestone(i, 'checkInPrompt', e.target.value)}
-                    className="w-full rounded border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none"
+                    className="focus:border-orange-light/50 w-full rounded border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white placeholder:text-white/40 focus:outline-none"
                     placeholder="Reflection question for the user"
                   />
                 </div>

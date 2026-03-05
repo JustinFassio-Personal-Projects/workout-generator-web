@@ -182,7 +182,7 @@ const SessionDetailDrawer: React.FC<SessionDetailDrawerProps> = ({
             type="button"
             onClick={handleDoAgain}
             disabled={doAgainLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-orange-light/50 bg-orange-light/20 py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors hover:bg-orange-light/30 disabled:opacity-50"
+            className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 flex w-full items-center justify-center gap-2 rounded-2xl border py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors disabled:opacity-50"
           >
             <Play className="h-4 w-4" />
             {doAgainLoading ? 'Loading…' : 'Do Again'}

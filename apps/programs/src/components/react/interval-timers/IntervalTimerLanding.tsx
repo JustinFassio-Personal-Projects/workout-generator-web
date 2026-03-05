@@ -51,7 +51,7 @@ const IntervalTimerLanding: React.FC<IntervalTimerLandingProps> = ({
   return (
     <IntervalTimerAccentContext.Provider value={accentTheme ?? null}>
       <div className="min-h-screen bg-bg-dark pb-20 font-sans text-white">
-        <nav className="sticky top-0 z-50 border-b border-white/10 bg-bg-dark/95 backdrop-blur-md">
+        <nav className="bg-bg-dark/95 sticky top-0 z-50 border-b border-white/10 backdrop-blur-md">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-2">
               <span className="font-heading text-lg font-bold tracking-wide text-white/80">

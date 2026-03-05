@@ -259,7 +259,7 @@ const ActiveChallengeView: React.FC<ActiveChallengeViewProps> = ({ challenge, ch
 
       <header className="mb-12">
         <div className="mb-3 flex items-center gap-2">
-          <span className="rounded bg-orange-light/20 px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-orange-light">
+          <span className="bg-orange-light/20 rounded px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-orange-light">
             Active Challenge
           </span>
           {theme && (
@@ -288,7 +288,7 @@ const ActiveChallengeView: React.FC<ActiveChallengeViewProps> = ({ challenge, ch
               .map((m, i) => (
                 <div key={i} className="rounded-lg border border-white/10 bg-black/20 p-4">
                   <div className="mb-1 flex items-center gap-2">
-                    <span className="rounded bg-orange-light/20 px-2 py-0.5 text-xs font-medium text-orange-light">
+                    <span className="bg-orange-light/20 rounded px-2 py-0.5 text-xs font-medium text-orange-light">
                       Week {m.week}
                     </span>
                     <span className="font-medium text-white">{m.label}</span>

@@ -62,7 +62,7 @@ const AIChat: React.FC = () => {
             className="mb-4 w-[90vw] overflow-hidden rounded-2xl border border-white/10 bg-black/80 shadow-2xl shadow-[#ff4000]/20 backdrop-blur-xl md:w-96"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#ff4000]/50 to-orange-darkest/50 p-4">
+            <div className="to-orange-darkest/50 flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#ff4000]/50 p-4">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 animate-pulse text-orange-light" />
                 <h3 className="font-heading text-xs font-bold tracking-wider text-white">

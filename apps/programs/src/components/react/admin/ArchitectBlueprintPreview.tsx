@@ -158,7 +158,7 @@ const ArchitectBlueprintPreview: React.FC<ArchitectBlueprintPreviewProps> = ({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">Program Structure</h3>
-        <span className="rounded-full bg-orange-light/20 px-3 py-1 text-xs text-orange-light">
+        <span className="bg-orange-light/20 rounded-full px-3 py-1 text-xs text-orange-light">
           Review & Edit (2-Phase Flow)
         </span>
       </div>
@@ -293,7 +293,7 @@ const ArchitectBlueprintPreview: React.FC<ArchitectBlueprintPreviewProps> = ({
           type="button"
           onClick={onGenerateWorkouts}
           disabled={loading}
-          className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+          className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors disabled:opacity-50"
         >
           <Sparkles className={`h-5 w-5 ${loading ? 'animate-pulse' : ''}`} />
           <span>{loading ? 'Generating Workouts...' : 'Generate Detailed Workouts'}</span>

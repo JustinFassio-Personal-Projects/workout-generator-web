@@ -60,7 +60,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick, optimizedImage
           }}
           transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
         />
-        <div className="absolute inset-0 bg-black/30 transition-colors duration-500 group-hover:bg-orange-medium/20" />
+        <div className="group-hover:bg-orange-medium/20 absolute inset-0 bg-black/30 transition-colors duration-500" />
       </div>
 
       {/* Overlay Info */}

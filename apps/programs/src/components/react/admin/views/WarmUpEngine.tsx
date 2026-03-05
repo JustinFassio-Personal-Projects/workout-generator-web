@@ -107,14 +107,14 @@ function SlotRow({
           type="text"
           value={slot.exerciseName}
           onChange={(e) => onUpdate(index, 'exerciseName', e.target.value)}
-          className="w-full rounded border border-white/10 bg-transparent px-2 py-1.5 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none"
+          className="focus:border-orange-light/50 w-full rounded border border-white/10 bg-transparent px-2 py-1.5 text-sm text-white placeholder:text-white/40 focus:outline-none"
           placeholder="Exercise name"
         />
         <input
           type="text"
           value={slot.detail}
           onChange={(e) => onUpdate(index, 'detail', e.target.value)}
-          className="w-full rounded border border-white/10 bg-transparent px-2 py-1.5 text-sm text-white/80 placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none"
+          className="focus:border-orange-light/50 w-full rounded border border-white/10 bg-transparent px-2 py-1.5 text-sm text-white/80 placeholder:text-white/40 focus:outline-none"
           placeholder="Detail (e.g. Left Side)"
         />
         <div className="flex flex-wrap items-center gap-2">
@@ -144,7 +144,7 @@ function SlotRow({
           type="url"
           value={slot.fallbackImageUrl ?? ''}
           onChange={(e) => onUpdate(index, 'fallbackImageUrl', e.target.value || undefined)}
-          className="w-full rounded border border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none"
+          className="focus:border-orange-light/50 w-full rounded border border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 placeholder:text-white/40 focus:outline-none"
           placeholder="Fallback image URL"
         />
         <textarea
@@ -160,7 +160,7 @@ function SlotRow({
             )
           }
           rows={2}
-          className="w-full resize-none rounded border border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none"
+          className="focus:border-orange-light/50 w-full resize-none rounded border border-white/10 bg-transparent px-2 py-1 text-xs text-white/80 placeholder:text-white/40 focus:outline-none"
           placeholder="Fallback instructions (one per line)"
         />
       </div>

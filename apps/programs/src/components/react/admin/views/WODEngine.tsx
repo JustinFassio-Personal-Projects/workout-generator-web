@@ -637,7 +637,7 @@ const WODEngine: React.FC = () => {
               onClick={() => handleModeChange('new')}
               className={`flex flex-col items-start rounded-xl border-2 p-6 text-left transition-all ${
                 mode === 'new'
-                  ? 'border-orange-light bg-orange-light/10'
+                  ? 'bg-orange-light/10 border-orange-light'
                   : 'border-white/10 bg-black/20 hover:border-white/30'
               }`}
             >
@@ -736,7 +736,7 @@ const WODEngine: React.FC = () => {
                     setSelectedEquipmentIds([]);
                   }
                 }}
-                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
               >
                 <option value="">None — generate without zone context</option>
                 {zones.map((z) => (
@@ -746,7 +746,7 @@ const WODEngine: React.FC = () => {
                 ))}
               </select>
               {selectedZone && (
-                <div className="mt-4 rounded-lg border border-orange-light/20 bg-orange-light/10 p-4">
+                <div className="border-orange-light/20 bg-orange-light/10 mt-4 rounded-lg border p-4">
                   <div className="mb-2 font-medium text-white">{selectedZone.name}</div>
                   <label className="mb-2 block text-xs font-medium text-white/80">
                     Equipment ({selectedEquipmentIds.length} selected)
@@ -774,7 +774,7 @@ const WODEngine: React.FC = () => {
                                 );
                               }
                             }}
-                            className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2 focus:ring-orange-light/50"
+                            className="focus:ring-orange-light/50 h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-2"
                           />
                           <span className={isSelected ? 'text-white' : 'text-white/50'}>
                             {item?.name ?? equipmentId}
@@ -789,7 +789,7 @@ const WODEngine: React.FC = () => {
                       setSelectedZone(null);
                       setSelectedEquipmentIds([]);
                     }}
-                    className="mt-3 text-sm text-orange-light underline hover:text-orange-light/80"
+                    className="hover:text-orange-light/80 mt-3 text-sm text-orange-light underline"
                   >
                     Clear zone
                   </button>
@@ -827,7 +827,7 @@ const WODEngine: React.FC = () => {
                         }
                         className={`flex items-center gap-2 rounded-lg border-2 px-4 py-2 text-sm transition-all ${
                           isSelected
-                            ? 'border-orange-light bg-orange-light/10 text-white'
+                            ? 'bg-orange-light/10 border-orange-light text-white'
                             : 'border-white/10 bg-black/20 text-white/70 hover:border-white/20'
                         }`}
                       >
@@ -999,7 +999,7 @@ const WODEngine: React.FC = () => {
                         onClick={() => setParameters((p) => ({ ...p, loadProfile: opt.id }))}
                         className={`flex items-center gap-2 rounded-lg border-2 px-4 py-2 text-sm transition-all ${
                           isSelected
-                            ? 'border-orange-light bg-orange-light/10 text-white'
+                            ? 'bg-orange-light/10 border-orange-light text-white'
                             : 'border-white/10 bg-black/20 text-white/70 hover:border-white/20'
                         }`}
                       >
@@ -1028,7 +1028,7 @@ const WODEngine: React.FC = () => {
                         onClick={() => setParameters((p) => ({ ...p, socialConfig: opt.id }))}
                         className={`flex items-center gap-2 rounded-lg border-2 px-4 py-2 text-sm transition-all ${
                           isSelected
-                            ? 'border-orange-light bg-orange-light/10 text-white'
+                            ? 'bg-orange-light/10 border-orange-light text-white'
                             : 'border-white/10 bg-black/20 text-white/70 hover:border-white/20'
                         }`}
                       >
@@ -1276,7 +1276,7 @@ const WODEngine: React.FC = () => {
         <button
           type="submit"
           disabled={loading || (mode === 'iterate' && (!selectedSourceWOD || !selectedProtocol))}
-          className="flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+          className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors disabled:opacity-50"
         >
           {loading ? (
             <>
@@ -1306,7 +1306,7 @@ const WODEngine: React.FC = () => {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 rounded-lg border border-orange-light/50 bg-orange-light/20 px-4 py-2 text-sm font-medium text-orange-light transition-colors hover:bg-orange-light/30 disabled:opacity-50"
+              className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium text-orange-light transition-colors disabled:opacity-50"
             >
               {saving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -1452,7 +1452,7 @@ const WODEngine: React.FC = () => {
                         type="text"
                         value={draftName}
                         onChange={(e) => setEditingWODName(e.target.value)}
-                        className="w-full min-w-[120px] max-w-md rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 font-heading text-xl font-bold text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full min-w-[120px] max-w-md rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 font-heading text-xl font-bold text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                         placeholder="WOD title"
                       />
                       <span className="shrink-0 font-heading text-xl font-bold text-white/70">
@@ -1507,7 +1507,7 @@ const WODEngine: React.FC = () => {
                     type="button"
                     onClick={handleSaveWODName}
                     disabled={!canSaveName}
-                    className="flex items-center gap-1.5 rounded-lg bg-orange-light px-3 py-1.5 text-sm font-medium text-black transition-colors hover:bg-orange-light/90 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="hover:bg-orange-light/90 flex items-center gap-1.5 rounded-lg bg-orange-light px-3 py-1.5 text-sm font-medium text-black transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {savingWODName ? (
                       <>
@@ -1548,7 +1548,9 @@ const WODEngine: React.FC = () => {
                           key={blockKey}
                           className="rounded-lg border border-white/10 bg-black/20 p-4"
                         >
-                          <h3 className="font-heading font-bold text-orange-light">{block.title}</h3>
+                          <h3 className="font-heading font-bold text-orange-light">
+                            {block.title}
+                          </h3>
                           <p className="text-xs text-white/60">{block.duration}</p>
                           <ul className="mt-2 space-y-1">
                             {block.exercises.map((ex, i) => {

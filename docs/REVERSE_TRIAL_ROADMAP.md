@@ -44,8 +44,7 @@ The source document is calibrated for $5.99. At **$11.99**:
 
 | Tier | Price | Workouts | Features |
 |------|-------|----------|----------|
-| Free | $0 | 5 lifetime | Basic exercise library, daily check-in, profile customization |
-| Basic | $5.99/mo | 20/month | Same as Free |
+| Premium | $11.99/mo | 20/month | Basic exercise library, daily check-in, profile customization |
 | Pro | $19/mo | 50/month | Calendar, workout history analytics |
 | Elite | $49/mo | Unlimited | Priority support, coach access (coming soon) |
 | Coach | $99/mo | — | Live classes, coaching sessions |
@@ -53,7 +52,7 @@ The source document is calibrated for $5.99. At **$11.99**:
 
 ### Current Model
 
-- **Usage-bound freemium** — Paywall triggers when free users hit 5-workout lifetime limit
+- **Reverse trial / paid entry** — No free tier; Premium $11.99 is the entry tier
 - **Stripe payment links** — Per-tier links; no trial logic in app yet
 - **No trial infrastructure** — Stripe products/prices not configured for trials
 
@@ -61,7 +60,10 @@ The source document is calibrated for $5.99. At **$11.99**:
 
 - `apps/nextjs-backend/data/pricing.ts` — Pricing display
 - `astro-site/src/data/pricing.ts` — Astro site pricing
-- Stripe env vars: `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_BASIC`, `_PRO`, `_ELITE`, etc.
+- **Stripe env vars (per app):**
+  - **nextjs-backend:** `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM`, `_PRO`, `_ELITE`, etc.
+  - **astro-site / programs:** `PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM`, `_PRO`, `_ELITE`, etc.
+- Premium payment link (default): `https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00`
 
 ---
 
@@ -107,13 +109,10 @@ App-side events (`Set_Logged`, `Workout_Completed`, `Adaptation_Requested`, `pay
 
 **Tasks:**
 
-- [ ] Decide tier mapping:
-  - **Option A:** Replace Basic ($5.99) with new $11.99 tier
-  - **Option B:** Add new $11.99 tier between Basic and Pro
-  - **Option C:** Collapse Basic into Pro, set Pro at $11.99
-- [ ] Create/update Stripe products and prices for $11.99
-- [ ] Update `apps/nextjs-backend/data/pricing.ts` and `astro-site/src/data/pricing.ts`
-- [ ] Grandfather existing Basic ($5.99) subscribers
+- [x] Tier mapping: **Premium $11.99** replaces Basic; Free tier removed
+- [ ] Create/update Stripe products and prices for $11.99 (Premium link: `https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00`)
+- [x] Update `apps/nextjs-backend/data/pricing.ts` and `astro-site/src/data/pricing.ts` (Premium tier; no Free tier)
+- [ ] Grandfather existing Basic ($5.99) subscribers if any
 - [ ] Update FAQ and marketing copy for new price
 
 **Deliverable:** Live $11.99 tier; no change to trial/paywall flow yet.
@@ -122,13 +121,13 @@ App-side events (`Set_Logged`, `Workout_Completed`, `Adaptation_Requested`, `pay
 
 Implemented in this repo:
 
-- **Pricing data:** Basic tier `price` set to 11.99 in [apps/nextjs-backend/data/pricing.ts](apps/nextjs-backend/data/pricing.ts) and [astro-site/src/data/pricing.ts](astro-site/src/data/pricing.ts).
+- **Pricing data:** Free tier removed. **Premium** tier at $11.99 replaces Basic in [astro-site/src/data/pricing.ts](astro-site/src/data/pricing.ts) and [apps/programs/src/data/pricing.ts](apps/programs/src/data/pricing.ts). nextjs-backend updated similarly.
 - **FAQ:** "approx. $15/month" updated to "approx. $12/month" in [apps/nextjs-backend/data/faq-data.ts](apps/nextjs-backend/data/faq-data.ts) and [astro-site/src/data/faq-data.ts](astro-site/src/data/faq-data.ts).
-- **Env:** `.env.example` in both apps documents Basic = $11.99; Stripe payment link must be set to the new $11.99 link in Vercel/local env.
+- **Env:** `PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM` in astro-site and programs `.env.example`; default link used in code: `https://buy.stripe.com/dRm6oHcW3gW19RZ6qlgnK00`.
 
-**Manual steps:** Create new $11.99 price and payment link in Stripe; point `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_BASIC` (and Astro `PUBLIC_STRIPE_PAYMENT_LINK_BASIC` if used) to the new link. Do not modify or archive the existing $5.99 price.
+**Manual steps:** Set `PUBLIC_STRIPE_PAYMENT_LINK_PREMIUM` in astro-site (and programs) .env to the $11.99 Stripe payment link, or rely on the default link in code.
 
-**App team:** See [docs/PHASE2_APP_STRIPE_NOTE.md](PHASE2_APP_STRIPE_NOTE.md) — ensure both Basic price IDs map to `subscription_tier: 'basic'`.
+**App team:** See [docs/PHASE2_APP_STRIPE_NOTE.md](PHASE2_APP_STRIPE_NOTE.md) — map Premium price ID to `subscription_tier: 'premium'` (or retain `basic` for backward compatibility if needed).
 
 ---
 
@@ -199,7 +198,7 @@ Implemented in this repo:
 | Decision | Options | Status |
 |----------|---------|--------|
 | Trial length | 7 days (standard) vs. 14 days (doc’s "Goldilocks" for fitness) | TBD |
-| Tier mapping | $11.99 replaces Basic, sits between Basic, or becomes Pro | TBD |
+| Tier mapping | $11.99 Premium tier; Free tier removed | Done |
 | Existing free users | Keep 5-workout freemium for legacy vs. migrate to trial | TBD |
 | Post-trial downgrade | What "restricted" looks like (workouts/month, history access) | TBD |
 

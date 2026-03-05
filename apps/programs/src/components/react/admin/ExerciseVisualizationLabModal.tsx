@@ -358,7 +358,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                     onChange={(e) => setExerciseTopic(e.target.value)}
                     placeholder="e.g. Barbell Squat, Push Up"
                     required
-                    className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                    className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                   />
                 </div>
 
@@ -370,7 +370,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                     <select
                       value={complexityLevel}
                       onChange={(e) => setComplexityLevel(e.target.value)}
-                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                      className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                     >
                       <option value="beginner">Beginner</option>
                       <option value="intermediate">Intermediate</option>
@@ -385,7 +385,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                     <select
                       value={visualStyle}
                       onChange={(e) => setVisualStyle(e.target.value)}
-                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                      className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                     >
                       <option value="photorealistic">Photorealistic</option>
                       <option value="illustration">Illustration</option>
@@ -400,7 +400,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                     <select
                       value={outputMode}
                       onChange={(e) => setOutputMode(e.target.value as 'single' | 'sequence')}
-                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                      className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                     >
                       <option value="single">Single image</option>
                       <option value="sequence">3 image sequence</option>
@@ -412,7 +412,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                       id="modal-review-prompts"
                       checked={reviewPromptsBeforeGenerate}
                       onChange={(e) => setReviewPromptsBeforeGenerate(e.target.checked)}
-                      className="h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-orange-light/50"
+                      className="focus:ring-orange-light/50 h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light"
                     />
                     <label
                       htmlFor="modal-review-prompts"
@@ -431,7 +431,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                     <select
                       value={movementPhase}
                       onChange={(e) => setMovementPhase(e.target.value)}
-                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                      className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                     >
                       <option value="">Not specified</option>
                       <option value="bottom">Bottom</option>
@@ -449,7 +449,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                         <select
                           value={bodySideStart}
                           onChange={(e) => setBodySideStart(e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                         >
                           <option value="">Not specified</option>
                           <option value="left">Left</option>
@@ -463,7 +463,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                         <select
                           value={bodySideEnd}
                           onChange={(e) => setBodySideEnd(e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                          className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                         >
                           <option value="">Not specified</option>
                           <option value="left">Left</option>
@@ -479,7 +479,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                       <select
                         value={bodySide}
                         onChange={(e) => setBodySide(e.target.value)}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                       >
                         <option value="">Not specified</option>
                         <option value="right">Right</option>
@@ -499,7 +499,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                       const text = getPresetTextById(e.target.value);
                       if (text != null) setDemographics(text);
                     }}
-                    className="mb-2 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                    className="focus:border-orange-light/50 focus:ring-orange-light/20 mb-2 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                   >
                     <option value="">Select a preset...</option>
                     {DEMOGRAPHICS_PRESETS.map((grp) => (
@@ -517,7 +517,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                     onChange={(e) => setDemographics(e.target.value)}
                     placeholder="e.g. Female athlete, 30s"
                     rows={3}
-                    className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                    className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                   />
                 </div>
 
@@ -535,7 +535,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                         onChange={(e) => setFormCuesToEmphasize(e.target.value)}
                         placeholder="e.g. Arms pumping by hips, low curl, legs at 45°"
                         rows={2}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                       />
                     </div>
                     <div>
@@ -547,7 +547,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                         onChange={(e) => setMisrenderingsToAvoid(e.target.value)}
                         placeholder="e.g. Do NOT show V-up or jackknife"
                         rows={2}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                       />
                     </div>
                     <div>
@@ -559,7 +559,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                         onChange={(e) => setDomainContext(e.target.value)}
                         placeholder="e.g. Pilates: control, precision. Avoid maximal effort aesthetic."
                         rows={2}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                       />
                     </div>
                   </div>
@@ -580,13 +580,13 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                       value={referenceImageUrl}
                       onChange={(e) => setReferenceImageUrl(e.target.value)}
                       placeholder="https://firebasestorage.googleapis.com/..."
-                      className="flex-1 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                      className="focus:border-orange-light/50 focus:ring-orange-light/20 flex-1 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                     />
                     <button
                       type="button"
                       onClick={loadReferenceImage}
                       disabled={loadingReference || !referenceImageUrl.trim()}
-                      className="rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-orange-light/30 hover:bg-orange-light/20 disabled:opacity-50"
+                      className="hover:border-orange-light/30 hover:bg-orange-light/20 rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50"
                     >
                       {loadingReference ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Load'}
                     </button>
@@ -622,7 +622,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                 <button
                   type="submit"
                   disabled={loading || promptStep === 'review'}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-light px-4 py-3 font-bold text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+                  className="hover:bg-orange-light/90 flex w-full items-center justify-center gap-2 rounded-lg bg-orange-light px-4 py-3 font-bold text-black transition-colors disabled:opacity-50"
                 >
                   {loading ? (
                     <>
@@ -643,7 +643,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
               </form>
 
               {promptStep === 'review' && researchResult && (
-                <div className="mb-6 rounded-lg border border-orange-light/30 bg-black/30 p-6">
+                <div className="border-orange-light/30 mb-6 rounded-lg border bg-black/30 p-6">
                   <h3 className="mb-2 text-lg font-semibold text-white">Review image prompts</h3>
                   <p className="mb-4 text-sm text-white/70">
                     Edit the prompts below before generating. Changes will be used for image
@@ -664,7 +664,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                               setEditedPrompts(next);
                             }}
                             rows={3}
-                            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                            className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                           />
                         </div>
                       ))}
@@ -678,7 +678,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                         value={editedPrompt}
                         onChange={(e) => setEditedPrompt(e.target.value)}
                         rows={5}
-                        className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                        className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                       />
                     </div>
                   )}
@@ -716,7 +716,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                         )
                       }
                       disabled={loading}
-                      className="flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-bold text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+                      className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-bold text-black transition-colors disabled:opacity-50"
                     >
                       {loading ? (
                         <>
@@ -743,7 +743,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
               {result && (
                 <div className="animate-fade-in space-y-6">
                   {previewMode && previewPayload && (
-                    <div className="rounded-lg border border-orange-light/30 bg-black/30 p-6">
+                    <div className="border-orange-light/30 rounded-lg border bg-black/30 p-6">
                       <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
                         <BookOpen className="h-5 w-5 text-orange-light" />
                         Preview before save
@@ -765,7 +765,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                             <code className="rounded bg-white/10 px-1">{previewPayload.slug}</code>
                           </p>
                           <div className="mt-2 flex flex-wrap gap-2">
-                            <span className="rounded-full border border-orange-light/50 bg-orange-light/10 px-2 py-0.5 text-xs text-orange-light">
+                            <span className="border-orange-light/50 bg-orange-light/10 rounded-full border px-2 py-0.5 text-xs text-orange-light">
                               {previewPayload.kineticChainType}
                             </span>
                             <span className="rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-xs text-white/80">
@@ -846,7 +846,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                           type="button"
                           onClick={() => handleSaveToWOD(previewPayload.slug)}
                           disabled={saving}
-                          className="inline-flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+                          className="hover:bg-orange-light/90 inline-flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 text-sm font-medium text-black transition-colors disabled:opacity-50"
                         >
                           {saving ? (
                             <>
@@ -913,7 +913,7 @@ const ExerciseVisualizationLabModal: React.FC<ExerciseVisualizationLabModalProps
                             type="button"
                             onClick={handleOpenPreview}
                             disabled={saving || !!savedImageUrl || previewLoading}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+                            className="hover:bg-orange-light/90 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors disabled:opacity-50"
                           >
                             {previewLoading ? (
                               <>

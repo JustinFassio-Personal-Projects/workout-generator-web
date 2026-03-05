@@ -42,7 +42,7 @@ const TodayZone: React.FC<TodayZoneProps> = ({
 
   return (
     <section aria-label="Today" className="flex flex-col gap-6">
-      <h4 className="border-b border-orange-light/20 pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
+      <h4 className="border-orange-light/20 border-b pb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light">
         Today
       </h4>
       <ReadinessCheckIn userId={user.uid} key={`readiness-${refreshKey}`} />

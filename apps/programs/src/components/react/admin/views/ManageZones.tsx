@@ -266,7 +266,7 @@ const ManageZones: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-light/20 border-t-orange-light"></div>
+        <div className="border-orange-light/20 h-12 w-12 animate-spin rounded-full border-4 border-t-orange-light"></div>
       </div>
     );
   }
@@ -291,7 +291,7 @@ const ManageZones: React.FC = () => {
             </button>
             <button
               onClick={() => handleOpenZoneModal()}
-              className="flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors hover:bg-orange-light/90"
+              className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors"
             >
               <Plus className="h-5 w-5" />
               <span>Create Zone</span>
@@ -301,7 +301,7 @@ const ManageZones: React.FC = () => {
         {activeTab === 'inventory' && (
           <button
             onClick={() => setShowEquipmentForm(!showEquipmentForm)}
-            className="flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors hover:bg-orange-light/90"
+            className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors"
           >
             <Plus className="h-5 w-5" />
             <span>Add Equipment</span>
@@ -367,7 +367,7 @@ const ManageZones: React.FC = () => {
                     onChange={(e) =>
                       setEquipmentFormData({ ...equipmentFormData, name: e.target.value })
                     }
-                    className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                    className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                     placeholder="e.g. Kettlebell"
                     required
                   />
@@ -383,7 +383,7 @@ const ManageZones: React.FC = () => {
                         category: e.target.value as EquipmentCategoryCode,
                       })
                     }
-                    className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                    className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                     required
                   >
                     {(Object.keys(EQUIPMENT_CATEGORY_LABELS) as EquipmentCategoryCode[]).map(
@@ -399,7 +399,7 @@ const ManageZones: React.FC = () => {
                 <div className="flex gap-3 pt-2">
                   <button
                     type="submit"
-                    className="rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90"
+                    className="hover:bg-orange-light/90 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors"
                   >
                     Create Equipment
                   </button>
@@ -613,7 +613,7 @@ const ManageZones: React.FC = () => {
                       type="text"
                       value={zoneFormData.name}
                       onChange={(e) => setZoneFormData({ ...zoneFormData, name: e.target.value })}
-                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                      className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                       placeholder="e.g. Home Gym (Garage Iron)"
                       required
                     />
@@ -635,7 +635,7 @@ const ManageZones: React.FC = () => {
                             | 'outdoor',
                         })
                       }
-                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                      className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
                       required
                     >
                       <option value="domestic">Domestic</option>
@@ -655,7 +655,7 @@ const ManageZones: React.FC = () => {
                         setZoneFormData({ ...zoneFormData, description: e.target.value })
                       }
                       rows={3}
-                      className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                      className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                       placeholder="Describe this zone..."
                     />
                   </div>
@@ -763,7 +763,7 @@ const ManageZones: React.FC = () => {
                                   });
                                 }
                               }}
-                              className="h-4 w-4 rounded border-white/20 text-orange-light focus:ring-orange-light/50"
+                              className="focus:ring-orange-light/50 h-4 w-4 rounded border-white/20 text-orange-light"
                             />
                             <span
                               className={`rounded-full px-2 py-0.5 text-xs font-medium ${getCategoryColor(
@@ -806,7 +806,7 @@ const ManageZones: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90"
+                      className="hover:bg-orange-light/90 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors"
                     >
                       {editingZone ? 'Save Changes' : 'Create Zone'}
                     </button>

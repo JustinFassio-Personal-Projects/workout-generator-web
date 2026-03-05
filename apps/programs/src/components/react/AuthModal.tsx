@@ -105,7 +105,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultSignUp = 
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
             transition={reduceMotion ? { duration: 0 } : undefined}
-            className="relative w-full max-w-md overflow-hidden rounded-[2.5rem] border border-orange-light/30 bg-bg-dark p-8 shadow-[0_0_50px_rgba(255,191,0,0.1)] md:p-10"
+            className="border-orange-light/30 relative w-full max-w-md overflow-hidden rounded-[2.5rem] border bg-bg-dark p-8 shadow-[0_0_50px_rgba(255,191,0,0.1)] md:p-10"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-transparent via-orange-light to-transparent" />
@@ -139,7 +139,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultSignUp = 
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-orange-light/50"
+                    className="focus:border-orange-light/50 w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all"
                     placeholder="Sgt. Rock"
                     required
                   />
@@ -157,7 +157,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultSignUp = 
                   type="email"
                   value={authEmail}
                   onChange={(e) => setAuthEmail(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-orange-light/50"
+                  className="focus:border-orange-light/50 w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all"
                   placeholder="cadet@pt.army"
                   required
                 />
@@ -174,7 +174,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultSignUp = 
                   type="password"
                   value={authPassword}
                   onChange={(e) => setAuthPassword(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all focus:border-orange-light/50"
+                  className="focus:border-orange-light/50 w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none transition-all"
                   placeholder="••••••••"
                   required
                 />

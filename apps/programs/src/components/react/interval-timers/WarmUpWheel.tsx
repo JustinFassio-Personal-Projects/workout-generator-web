@@ -103,7 +103,9 @@ const WarmUpWheel: React.FC<WarmUpWheelProps> = ({
             transform: activeIndex === exercises.length ? 'scale(1.1)' : 'scale(0.9)',
           }}
         >
-          <h3 className="font-display m-0 text-lg font-bold text-orange-light">Warm-up Complete!</h3>
+          <h3 className="font-display m-0 text-lg font-bold text-orange-light">
+            Warm-up Complete!
+          </h3>
         </div>
       </div>
 

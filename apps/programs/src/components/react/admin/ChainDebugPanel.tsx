@@ -37,7 +37,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-light/20 text-xs font-bold text-orange-light">
+        <span className="bg-orange-light/20 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-orange-light">
           {stepNumber}
         </span>
         {icon}
@@ -217,7 +217,7 @@ const ChainDebugPanel: React.FC<ChainDebugPanelProps> = ({ metadata }) => {
           {/* Step 4: Summary */}
           <CollapsibleSection
             title="Progression Applied"
-            icon={<Calculator className="h-4 w-4 text-orange-400" />}
+            icon={<Calculator className="text-orange-400 h-4 w-4" />}
             stepNumber={4}
           >
             <div className="rounded bg-white/5 p-3 text-sm">

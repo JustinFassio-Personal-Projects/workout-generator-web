@@ -46,7 +46,7 @@ const EditorMetaForm: React.FC<EditorMetaFormProps> = ({
             type="text"
             value={formData.title}
             onChange={(e) => onChange({ ...formData, title: e.target.value })}
-            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+            className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
             placeholder="Program title"
             required
             disabled={saving}
@@ -59,7 +59,7 @@ const EditorMetaForm: React.FC<EditorMetaFormProps> = ({
             value={formData.description}
             onChange={(e) => onChange({ ...formData, description: e.target.value })}
             rows={4}
-            className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+            className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
             placeholder="Program description"
             disabled={saving}
           />
@@ -76,7 +76,7 @@ const EditorMetaForm: React.FC<EditorMetaFormProps> = ({
                   difficulty: e.target.value as 'beginner' | 'intermediate' | 'advanced',
                 })
               }
-              className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+              className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white focus:outline-none focus:ring-2"
               required
               disabled={saving}
             >
@@ -98,7 +98,7 @@ const EditorMetaForm: React.FC<EditorMetaFormProps> = ({
                 onChange={(e) =>
                   onChange({ ...formData, durationWeeks: parseInt(e.target.value, 10) || 0 })
                 }
-                className="w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:border-orange-light/50 focus:outline-none focus:ring-2 focus:ring-orange-light/20"
+                className="focus:border-orange-light/50 focus:ring-orange-light/20 w-full rounded-lg border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2"
                 placeholder="0"
                 required
                 disabled={saving}
@@ -113,7 +113,7 @@ const EditorMetaForm: React.FC<EditorMetaFormProps> = ({
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+            className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-6 py-2 font-medium text-black transition-colors disabled:opacity-50"
           >
             <Save className="h-5 w-5" />
             <span>{saving ? 'Saving...' : 'Save Changes'}</span>

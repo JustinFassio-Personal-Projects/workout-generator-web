@@ -57,7 +57,7 @@ const ManagePrograms: React.FC = () => {
           <button
             onClick={handleCreateProgram}
             disabled={isCreating}
-            className="flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors hover:bg-orange-light/90 disabled:opacity-50"
+            className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors disabled:opacity-50"
           >
             <Plus className="h-5 w-5" />
             <span>{isCreating ? 'Creating...' : 'New Program'}</span>

@@ -497,7 +497,7 @@ const TabataInterval: React.FC<TabataTimerProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => setIsReportOpen(true)}
-              className="flex items-center gap-2 border-b border-orange-light/40 pb-0.5 text-sm font-bold text-orange-light transition-colors hover:text-orange-light/90"
+              className="border-orange-light/40 hover:text-orange-light/90 flex items-center gap-2 border-b pb-0.5 text-sm font-bold text-orange-light transition-colors"
             >
               <span>Protocol Details</span>
               <span>→</span>
@@ -566,7 +566,7 @@ const TabataInterval: React.FC<TabataTimerProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => setIsReportOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white hover:bg-orange-light/20 hover:text-orange-light"
+                className="hover:bg-orange-light/20 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-bold text-white hover:text-orange-light"
               >
                 &times;
               </button>

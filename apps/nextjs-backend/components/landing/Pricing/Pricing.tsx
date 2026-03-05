@@ -17,7 +17,7 @@ export const Pricing: React.FC = () => {
             <span className={styles.gradientText}> Perfect Plan</span>
           </h2>
           <p className={styles.subtitle}>
-            Start free and upgrade as you grow. All plans include our core features.
+            Start with Premium and upgrade as you grow. All plans include our core features.
           </p>
         </div>
         <div className={styles.grid}>

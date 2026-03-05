@@ -166,7 +166,7 @@ const WorkoutEventDrawer: React.FC<WorkoutEventDrawerProps> = ({
                     onClick={() =>
                       onStartWorkout(workout, event.programId, event.weekId, event.workoutId)
                     }
-                    className="flex items-center justify-center gap-2 rounded-2xl border border-orange-light/50 bg-orange-light/20 py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors hover:bg-orange-light/30"
+                    className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 flex items-center justify-center gap-2 rounded-2xl border py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors"
                   >
                     <Play className="h-4 w-4" />
                     Start Workout

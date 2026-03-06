@@ -13,6 +13,8 @@ import { AppProvider, useAppContext } from '@/contexts/AppContext';
 import DashboardHome from './admin/DashboardHome';
 import ManageUsers from './admin/views/ManageUsers';
 import ManageZones from './admin/views/ManageZones';
+import ManagePrograms from './admin/views/ManagePrograms';
+import ProgramEditor from './admin/views/ProgramEditor';
 import ComingSoon from './admin/ComingSoon';
 
 const navLinkClass = (isActive: boolean) =>
@@ -90,6 +92,8 @@ const AdminDashboard: React.FC = () => {
             <Route index element={<DashboardHome />} />
             <Route path="users" element={<ManageUsers />} />
             <Route path="zones" element={<ManageZones />} />
+            <Route path="programs/:id" element={<ProgramEditor />} />
+            <Route path="programs" element={<ManagePrograms />} />
             <Route path="*" element={<ComingSoon />} />
           </Route>
         </Routes>

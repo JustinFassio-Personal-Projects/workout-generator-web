@@ -10,7 +10,7 @@ import type { ProgramPersona, ProgramTemplateScaffold, ProgramConfig } from '@/t
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { parseJSONWithRepair } from '@/lib/json-parser';
 import { buildScaffoldPrompt, validateScaffoldOutput } from '@/lib/prompt-chain';
-import { callVertexAI } from '@/lib/vertex-ai-client';
+import { callVertexAI, getVertexAICredentials } from '@/lib/vertex-ai-client';
 import { createProgramWithScaffold } from '@/lib/supabase/admin/program-server';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -42,39 +42,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     const durationWeeks = persona.durationWeeks || 6;
 
-    const projectId =
-      import.meta.env.GOOGLE_PROJECT_ID || import.meta.env.PUBLIC_FIREBASE_PROJECT_ID;
-    if (!projectId) {
-      return new Response(
-        JSON.stringify({
-          error:
-            'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID not set. Add one to .env for AI generation.',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const region = import.meta.env.GOOGLE_LOCATION || 'global';
-    let accessToken: string;
-    try {
-      const { GoogleAuth } = await import('google-auth-library');
-      const auth = new GoogleAuth({
-        scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-        projectId,
-      });
-      const client = await auth.getClient();
-      const tokenResponse = await client.getAccessToken();
-      if (!tokenResponse.token) throw new Error('Failed to get access token');
-      accessToken = tokenResponse.token;
-    } catch (err) {
-      console.error('[generate-scaffold] Auth error:', err);
-      return new Response(
-        JSON.stringify({
-          error: 'Authentication failed. Run: gcloud auth application-default login',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    const creds = await getVertexAICredentials('[generate-scaffold]');
+    if ('error' in creds) return creds.error;
+    const { projectId, region, accessToken } = creds;
 
     const prompt = buildScaffoldPrompt(persona);
     const response = await callVertexAI({

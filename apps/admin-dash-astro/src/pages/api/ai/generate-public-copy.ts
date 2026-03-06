@@ -9,14 +9,15 @@
 import type { APIRoute } from 'astro';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { fetchFullProgram, getProgramScaffold } from '@/lib/supabase/admin/program-server';
+import { getSupabaseServer } from '@/lib/supabase/server';
 import { parseJSONWithRepair } from '@/lib/json-parser';
 import { buildPublicCopyPrompt, validatePublicCopyOutput } from '@/lib/prompt-chain';
-import { callVertexAI } from '@/lib/vertex-ai-client';
+import { callVertexAI, getVertexAICredentials } from '@/lib/vertex-ai-client';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-  let _adminInfo: { uid: string };
+  let adminInfo: { uid: string };
   try {
-    _adminInfo = await verifyAdminRequest(request, cookies);
+    adminInfo = await verifyAdminRequest(request, cookies);
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unauthorized';
     return new Response(JSON.stringify({ error: msg }), {
@@ -42,17 +43,23 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     }
 
-    const projectId =
-      import.meta.env.GOOGLE_PROJECT_ID || import.meta.env.PUBLIC_FIREBASE_PROJECT_ID;
-    if (!projectId) {
-      return new Response(
-        JSON.stringify({
-          error:
-            'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID not set. Add one to .env for AI generation.',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
+    // Verify program belongs to authenticated admin (same pattern as build-phase.ts)
+    const supabase = getSupabaseServer();
+    const { data: programRow, error: programError } = await supabase
+      .from('programs')
+      .select('id, trainer_id')
+      .eq('id', programId)
+      .single();
+    if (programError || !programRow || (programRow as { trainer_id: string }).trainer_id !== adminInfo.uid) {
+      return new Response(JSON.stringify({ error: 'Program not found or access denied' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
+
+    const creds = await getVertexAICredentials('[generate-public-copy]');
+    if ('error' in creds) return creds.error;
+    const { projectId, region, accessToken } = creds;
 
     const [program, scaffold] = await Promise.all([
       fetchFullProgram(programId),
@@ -74,29 +81,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    let accessToken: string;
-    try {
-      const { GoogleAuth } = await import('google-auth-library');
-      const auth = new GoogleAuth({
-        scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-        projectId,
-      });
-      const client = await auth.getClient();
-      const tokenResponse = await client.getAccessToken();
-      if (!tokenResponse.token) throw new Error('Failed to get access token');
-      accessToken = tokenResponse.token;
-    } catch (err) {
-      console.error('[generate-public-copy] Auth error:', err);
-      return new Response(
-        JSON.stringify({
-          error: 'Authentication failed. Run: gcloud auth application-default login',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
     const userPrompt = buildPublicCopyPrompt(program, scaffold);
-    const region = import.meta.env.GOOGLE_LOCATION || 'global';
 
     const response = await callVertexAI({
       systemPrompt:

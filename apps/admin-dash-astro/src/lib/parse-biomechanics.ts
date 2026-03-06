@@ -136,7 +136,7 @@ export function transformSearchResultsToSources(
         .replace(/-/g, ' ')
         .split(' ')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join('');
+        .join(' ');
       sources.push({ title, domain, searchQuery: `${exerciseName} biomechanics site:${domain}` });
     } catch {
       continue;

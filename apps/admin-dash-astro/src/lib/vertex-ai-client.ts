@@ -8,6 +8,58 @@
 
 const MAX_ERROR_LOG_LENGTH = 500;
 
+const JSON_HEADERS = { 'Content-Type': 'application/json' };
+
+export type VertexAICredentials =
+  | { projectId: string; region: string; accessToken: string }
+  | { error: Response };
+
+/**
+ * Resolves project ID, region, and access token for Vertex AI.
+ * Use in API routes: if ('error' in creds) return creds.error; then use creds.projectId, etc.
+ * @param logPrefix - Optional prefix for auth error logs (e.g. '[generate-scaffold]').
+ */
+export async function getVertexAICredentials(
+  logPrefix = '[vertex-ai]'
+): Promise<VertexAICredentials> {
+  const projectId =
+    import.meta.env.GOOGLE_PROJECT_ID || import.meta.env.PUBLIC_FIREBASE_PROJECT_ID;
+  if (!projectId) {
+    return {
+      error: new Response(
+        JSON.stringify({
+          error:
+            'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID not set. Add one to .env for AI generation.',
+        }),
+        { status: 500, headers: JSON_HEADERS }
+      ),
+    };
+  }
+
+  const region = import.meta.env.GOOGLE_LOCATION || 'global';
+  try {
+    const { GoogleAuth } = await import('google-auth-library');
+    const auth = new GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+      projectId,
+    });
+    const client = await auth.getClient();
+    const tokenResponse = await client.getAccessToken();
+    if (!tokenResponse.token) throw new Error('Failed to get access token');
+    return { projectId, region, accessToken: tokenResponse.token };
+  } catch (err) {
+    console.error(`${logPrefix} Auth error:`, err);
+    return {
+      error: new Response(
+        JSON.stringify({
+          error: 'Authentication failed. Run: gcloud auth application-default login',
+        }),
+        { status: 500, headers: JSON_HEADERS }
+      ),
+    };
+  }
+}
+
 export interface VertexAICallOptions {
   systemPrompt: string;
   userPrompt: string;

@@ -66,7 +66,8 @@ type WeekRow = {
 };
 
 function rowToLibraryItem(row: ProgramRow): ProgramLibraryItemRow {
-  const status = row.is_public ? 'published' : 'draft';
+  // Use stored status column; fallback for legacy rows (aligns with client admin/programs.ts)
+  const status = row.status ?? 'draft';
   return {
     id: row.id,
     title: row.title,

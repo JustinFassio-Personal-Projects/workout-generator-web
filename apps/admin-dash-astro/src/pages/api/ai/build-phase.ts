@@ -39,7 +39,7 @@ import {
   buildMathematicianPrompt,
   validateMathematicianOutput,
 } from '@/lib/prompt-chain';
-import { callVertexAI } from '@/lib/vertex-ai-client';
+import { callVertexAI, getVertexAICredentials } from '@/lib/vertex-ai-client';
 
 interface ZoneContext {
   zoneName: string;
@@ -147,35 +147,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     }
 
-    const projectId =
-      import.meta.env.GOOGLE_PROJECT_ID || import.meta.env.PUBLIC_FIREBASE_PROJECT_ID;
-    if (!projectId) {
-      return new Response(
-        JSON.stringify({
-          error: 'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID not set.',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-    const region = import.meta.env.GOOGLE_LOCATION || 'global';
-    let accessToken: string;
-    try {
-      const { GoogleAuth } = await import('google-auth-library');
-      const auth = new GoogleAuth({
-        scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-        projectId,
-      });
-      const client = await auth.getClient();
-      const tokenResponse = await client.getAccessToken();
-      if (!tokenResponse.token) throw new Error('Failed to get access token');
-      accessToken = tokenResponse.token;
-    } catch (err) {
-      console.error('[build-phase] Auth error:', err);
-      return new Response(
-        JSON.stringify({ error: 'Authentication failed.' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    const creds = await getVertexAICredentials('[build-phase]');
+    if ('error' in creds) return creds.error;
+    const { projectId, region, accessToken } = creds;
 
     const phaseContext: PhaseScaffold = phase;
 
@@ -321,7 +295,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       model_used: 'deepseek-v3.2',
     };
 
-    const { error: updateMetaError } = await supabase
+    // Update chain_metadata on program (client at point of use to avoid relying on supabase from ~200 lines above)
+    const { error: updateMetaError } = await getSupabaseServer()
       .from('programs')
       .update({
         chain_metadata: {

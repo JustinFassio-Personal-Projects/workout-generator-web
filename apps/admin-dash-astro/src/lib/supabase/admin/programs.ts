@@ -41,7 +41,8 @@ const mapProgram = (row: ProgramRow): ProgramLibraryItem => ({
   createdAt: row.created_at,
   updatedAt: row.updated_at,
   tags: row.tags ?? [],
-  status: row.is_public ? 'active' : 'draft',
+  // Use stored status column; fallback for legacy rows that may lack it
+  status: row.status ?? 'draft',
   isPublic: row.is_public,
   trainerId: row.trainer_id,
 });

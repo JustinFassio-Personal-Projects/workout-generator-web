@@ -181,6 +181,8 @@ export function validateMathematicianOutput(
     return { valid: false, error: 'schedule must have at least one week' };
   }
 
+  // Mathematician output uses local 1-based week numbers for this phase only.
+  // build-phase.ts remaps to global week numbers (startWeek + i); do not ask the prompt for global weeks.
   for (let i = 0; i < obj.schedule.length; i++) {
     const week = obj.schedule[i] as Record<string, unknown>;
 

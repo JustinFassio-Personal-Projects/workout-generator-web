@@ -166,6 +166,8 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
 
   // Chain metadata for debugging (saved with program)
   const [chainMetadata, setChainMetadata] = useState<PromptChainMetadata | null>(null);
+  /** Author uid from chain response; use when saving so ownership matches admin who ran the chain. */
+  const [generatedProgramAuthorId, setGeneratedProgramAuthorId] = useState<string | null>(null);
   const [chainStep, setChainStep] = useState<number>(0); // 0-4 for progress display
 
   // Unsaved changes guard (Program Blueprint Editor)
@@ -202,6 +204,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
       setScaffoldProgramId(null);
       setBuildingPhaseIndex(null);
       setChainMetadata(null);
+      setGeneratedProgramAuthorId(null);
       setChainStep(0);
       setHasUnsavedBlueprintChanges(false);
       setPendingCloseAction(null);
@@ -233,6 +236,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
     } else {
       setStep('config');
       setChainMetadata(null);
+      setGeneratedProgramAuthorId(null);
     }
   };
 
@@ -246,6 +250,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
       setHasUnsavedBlueprintChanges(false);
       setStep('config');
       setChainMetadata(null);
+      setGeneratedProgramAuthorId(null);
     }
   };
 
@@ -338,77 +343,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
     };
   };
 
-  // Phase 1: Generate Blueprint (kept for two-phase flow; main flow uses handleGenerateChain)
-  const _handleGenerateBlueprint = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    // Validation
-    if (!programConfig.programInfo.title.trim()) {
-      setError('Program title is required');
-      return;
-    }
-
-    if (!programConfig.programInfo.description.trim()) {
-      setError('Program description is required');
-      return;
-    }
-
-    setLoading(true);
-    setLoadingMessage('Generating Program Blueprint...');
-
-    try {
-      const requestPayload = buildRequestPayload();
-      const headers = await getAuthHeaders();
-
-      const response = await fetch('/api/ai/generate-blueprint', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(requestPayload),
-      });
-
-      if (!response.ok) {
-        const raw = await response.text();
-        let errorMessage = response.statusText || 'Failed to generate blueprint';
-        try {
-          const parsed = JSON.parse(raw);
-          if (typeof parsed?.error === 'string' && parsed.error.trim()) {
-            errorMessage = parsed.error;
-          }
-        } catch {
-          if (raw.trim().length > 0) {
-            errorMessage = raw.length > 200 ? raw.slice(0, 200) + '…' : raw.trim();
-          }
-        }
-        throw new Error(errorMessage);
-      }
-
-      const blueprintData: ProgramBlueprint = await response.json();
-
-      // Store blueprint and move to blueprint step
-      setBlueprint(blueprintData);
-      setStep('blueprint');
-      setLoading(false);
-      setLoadingMessage('');
-    } catch (err) {
-      console.error('[ProgramGeneratorModal] Blueprint error:', err);
-      let message = err instanceof Error ? err.message : 'Failed to generate blueprint';
-      const lower = message.toLowerCase();
-      if (
-        lower.includes('fetch failed') ||
-        lower.includes('failed to fetch') ||
-        lower.includes('networkerror') ||
-        lower.includes('network error')
-      ) {
-        message = 'Network error. Check your connection and try again.';
-      }
-      setError(message);
-      setLoading(false);
-      setLoadingMessage('');
-    }
-  };
-
-  // Phase 2: Generate Detailed Workouts using Blueprint
+  // Phase 2: Generate Detailed Workouts using Blueprint (two-phase: architect → chain uses handleGenerateArchitect + handleBuildChainFromArchitect)
   const handleGenerateWorkouts = async () => {
     if (!blueprint) {
       setError('Blueprint is required to generate workouts');
@@ -547,9 +482,10 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
 
       const chainResponse: ChainGenerationResponse = await response.json();
 
-      // Store program and chain metadata
+      // Store program, chain metadata, and author (use when saving to library)
       setGeneratedProgram(chainResponse.program);
       setChainMetadata(chainResponse.chain_metadata);
+      setGeneratedProgramAuthorId(chainResponse.authorId);
       setStep('preview');
       setLoading(false);
       setLoadingMessage('');
@@ -704,6 +640,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
       const chainResponse: ChainGenerationResponse = await response.json();
       setGeneratedProgram(chainResponse.program);
       setChainMetadata(chainResponse.chain_metadata);
+      setGeneratedProgramAuthorId(chainResponse.authorId);
       setStep('preview');
       setChainStep(4);
       toast.success('Program generated successfully!', {
@@ -1009,6 +946,9 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
         );
       }
 
+      // Use author from chain response when saving chain-generated program (ownership = admin who ran chain)
+      const authorId = generatedProgramAuthorId ?? userId;
+
       // Save to library: update existing or create new (persistence uses Supabase auth)
       let savedProgramId: string | undefined;
       if (editingProgramId) {
@@ -1023,7 +963,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
         savedProgramId = await saveProgramToLibrary(
           editedProgram,
           programConfig,
-          userId,
+          authorId,
           chainMetadata || undefined
         );
       }
@@ -1052,6 +992,7 @@ const ProgramGeneratorModal: React.FC<ProgramGeneratorModalProps> = ({
         setSelectedEquipmentIds([]);
         setSaveSuccess(false);
         setChainMetadata(null);
+        setGeneratedProgramAuthorId(null);
         setChainStep(0);
       }, 2000);
     } catch (err) {

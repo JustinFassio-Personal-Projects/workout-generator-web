@@ -33,7 +33,7 @@ import {
   validateMathematicianOutput,
 } from '@/lib/prompt-chain';
 import { normalizeProgramSchedule } from '@/lib/program-schedule-utils';
-import { callVertexAI } from '@/lib/vertex-ai-client';
+import { callVertexAI, getVertexAICredentials } from '@/lib/vertex-ai-client';
 
 interface ZoneContext {
   zoneName: string;
@@ -47,8 +47,9 @@ interface ZoneContext {
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const startTime = Date.now();
+  let adminInfo: { uid: string };
   try {
-    await verifyAdminRequest(request, cookies);
+    adminInfo = await verifyAdminRequest(request, cookies);
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unauthorized';
     return new Response(JSON.stringify({ error: msg }), {
@@ -107,41 +108,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     }
 
-    // Get credentials
-    const projectId =
-      import.meta.env.GOOGLE_PROJECT_ID || import.meta.env.PUBLIC_FIREBASE_PROJECT_ID;
-    if (!projectId) {
-      return new Response(
-        JSON.stringify({
-          error:
-            'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID environment variable is not set. Add one to .env for AI program generation (Vertex AI).',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const region = import.meta.env.GOOGLE_LOCATION || 'global';
-
-    let accessToken: string;
-    try {
-      const { GoogleAuth } = await import('google-auth-library');
-      const auth = new GoogleAuth({
-        scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-        projectId,
-      });
-      const client = await auth.getClient();
-      const tokenResponse = await client.getAccessToken();
-      if (!tokenResponse.token) throw new Error('Failed to get access token');
-      accessToken = tokenResponse.token;
-    } catch (err) {
-      console.error('[generate-program-chain] Auth error:', err);
-      return new Response(
-        JSON.stringify({
-          error: 'Authentication failed. Run: gcloud auth application-default login',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    const creds = await getVertexAICredentials('[generate-program-chain]');
+    if ('error' in creds) return creds.error;
+    const { projectId, region, accessToken } = creds;
 
     // ========================================================================
     // STEP 1: THE ARCHITECT (or use provided blueprint from two-phase flow)
@@ -316,6 +285,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const response: ChainGenerationResponse = {
       program,
       chain_metadata: chainMetadata,
+      authorId: adminInfo.uid,
     };
 
     const elapsedMs = Date.now() - startTime;

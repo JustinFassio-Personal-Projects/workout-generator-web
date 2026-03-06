@@ -220,11 +220,14 @@ export interface PromptChainMetadata {
 }
 
 /**
- * Response from the chain endpoint
+ * Response from the chain endpoint.
+ * authorId is the verified admin uid so the client can set program ownership when saving.
  */
 export interface ChainGenerationResponse {
   program: ProgramTemplate;
   chain_metadata: PromptChainMetadata;
+  /** Verified admin uid; use as authorId when saving to library. */
+  authorId: string;
 }
 
 /**

@@ -1,16 +1,18 @@
 # Vertex AI Permissions Fix - Production
 
+> **Note:** This doc uses placeholders for security. Replace `YOUR_PROJECT_ID` with your GCP project ID and `YOUR_PROJECT_NUMBER` with your project’s numeric ID (from GCP Console or `gcloud projects describe YOUR_PROJECT_ID --format='value(projectNumber)'`).
+
 ## Project and account
 
-**GCP project:** `ai-fitness-guy-26523278-3e978`  
-**Use this project** for all Vertex AI calls (programs app and admin-dash-astro “Generate with AI” routes).
+**GCP project:** `YOUR_PROJECT_ID`  
+Use this project for all Vertex AI calls (programs app and admin-dash-astro “Generate with AI” routes).
 
 ### Connecting apps to this project
 
 Set **one** of these in each app’s `.env` (or Vercel/Firebase secrets) so requests go to this project:
 
-- `GOOGLE_PROJECT_ID=ai-fitness-guy-26523278-3e978`
-- or `PUBLIC_FIREBASE_PROJECT_ID=ai-fitness-guy-26523278-3e978` (same value; Firebase project id matches)
+- `GOOGLE_PROJECT_ID=YOUR_PROJECT_ID`
+- or `PUBLIC_FIREBASE_PROJECT_ID=YOUR_PROJECT_ID` (same value; Firebase project id matches)
 
 Optional: `GOOGLE_LOCATION=us-central1` (or another [Vertex AI region](https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations)).
 
@@ -21,9 +23,9 @@ Optional: `GOOGLE_LOCATION=us-central1` (or another [Vertex AI region](https://c
 
 ### Verify you’re on the right project
 
-1. **Local:** In the app’s `.env`, confirm `GOOGLE_PROJECT_ID` or `PUBLIC_FIREBASE_PROJECT_ID` is `ai-fitness-guy-26523278-3e978`.
+1. **Local:** In the app’s `.env`, confirm `GOOGLE_PROJECT_ID` or `PUBLIC_FIREBASE_PROJECT_ID` is your project ID.
 2. **gcloud:** `gcloud config get-value project` should match if you use Application Default Credentials (e.g. `gcloud auth application-default login`).
-3. **Console:** In [Google Cloud Console](https://console.cloud.google.com/), ensure you’re in project `ai-fitness-guy-26523278-3e978` when enabling APIs or checking IAM.
+3. **Console:** In [Google Cloud Console](https://console.cloud.google.com/), ensure you’re in the correct project when enabling APIs or checking IAM.
 
 ---
 
@@ -40,23 +42,23 @@ Firebase App Hosting service accounts did not have the `roles/aiplatform.user` I
 ### Service Accounts Granted Permissions
 
 1. **Firebase App Hosting Compute Service Account**
-   - Service Account: `firebase-app-hosting-compute@ai-fitness-guy-26523278-3e978.iam.gserviceaccount.com`
+   - Service Account: `firebase-app-hosting-compute@YOUR_PROJECT_ID.iam.gserviceaccount.com`
    - Role Granted: `roles/aiplatform.user`
    - Command:
      ```bash
-     gcloud projects add-iam-policy-binding ai-fitness-guy-26523278-3e978 \
-       --member="serviceAccount:firebase-app-hosting-compute@ai-fitness-guy-26523278-3e978.iam.gserviceaccount.com" \
+     gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+       --member="serviceAccount:firebase-app-hosting-compute@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
        --role="roles/aiplatform.user" \
        --condition=None
      ```
 
 2. **Default Compute Service Account**
-   - Service Account: `294607443271-compute@developer.gserviceaccount.com`
+   - Service Account: `YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com`
    - Role Granted: `roles/aiplatform.user`
    - Command:
      ```bash
-     gcloud projects add-iam-policy-binding ai-fitness-guy-26523278-3e978 \
-       --member="serviceAccount:294607443271-compute@developer.gserviceaccount.com" \
+     gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+       --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
        --role="roles/aiplatform.user" \
        --condition=None
      ```
@@ -70,8 +72,8 @@ Firebase App Hosting service accounts did not have the `roles/aiplatform.user` I
 
 ### Permissions Status
 
-- ✅ `firebase-app-hosting-compute@ai-fitness-guy-26523278-3e978.iam.gserviceaccount.com` has `roles/aiplatform.user`
-- ✅ `294607443271-compute@developer.gserviceaccount.com` has `roles/aiplatform.user`
+- ✅ `firebase-app-hosting-compute@YOUR_PROJECT_ID.iam.gserviceaccount.com` has `roles/aiplatform.user`
+- ✅ `YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com` has `roles/aiplatform.user`
 
 ## What This Fixes
 

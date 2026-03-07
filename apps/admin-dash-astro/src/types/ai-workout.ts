@@ -1,0 +1,226 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Shared type definitions for AI Workout Generation (Workout Factory)
+ * Workouts are 1–N sessions (single, split, or two-a-day) with no week-by-week schedule.
+ */
+
+import type {
+  UserDemographics,
+  MedicalProfile,
+  Goals,
+  ExerciseBlock,
+  Exercise,
+  WarmupBlock,
+  ProgressionProtocol,
+  VolumeLandmark,
+  PatternSkeleton,
+  ExerciseSelection,
+} from '@/types/ai-program';
+
+/** Split type for workout persona */
+export type WorkoutSplitType =
+  | 'upper_lower'
+  | 'ppl'
+  | 'full_body'
+  | 'push_pull_legs'
+  | 'bro_split'
+  | 'custom';
+
+/** Lifestyle for recovery and volume calibration */
+export type WorkoutLifestyle = 'sedentary' | 'active' | 'athlete';
+
+// --- HIIT (Metabolic Conditioning) Mode ---
+
+export type HiitProtocolFormat =
+  | 'standard_ratio'
+  | 'tabata'
+  | 'emom'
+  | 'amrap'
+  | 'ladder'
+  | 'chipper';
+
+export type HiitWorkRestRatio = '1:1' | '2:1' | '1:2' | '1:3';
+
+export interface HiitCircuitStructure {
+  includeWarmup: boolean;
+  circuit1: boolean;
+  circuit2: boolean;
+  circuit3: boolean;
+  includeCooldown: boolean;
+}
+
+export type HiitSessionDurationTier = 'micro_dose' | 'standard_interval' | 'high_volume';
+
+export type HiitPrimaryGoal = 'vo2_max' | 'lactate_tolerance' | 'explosive_power' | 'fat_oxidation';
+
+export interface HiitOptions {
+  protocolFormat: HiitProtocolFormat;
+  workRestRatio?: HiitWorkRestRatio;
+  circuitStructure: HiitCircuitStructure;
+  sessionDurationTier: HiitSessionDurationTier;
+  primaryGoal: HiitPrimaryGoal;
+}
+
+/**
+ * Block structure options for workout generation (Workout Factory)
+ */
+export interface BlockOptions {
+  includeWarmup: boolean;
+  mainBlockCount: 1 | 2 | 3 | 4 | 5;
+  includeFinisher: boolean;
+  includeCooldown: boolean;
+}
+
+/**
+ * Complete user persona for workout generation (API request payload)
+ */
+export interface WorkoutPersona {
+  title?: string;
+  description?: string;
+  demographics: UserDemographics;
+  medical: MedicalProfile;
+  goals: Goals;
+  zoneId?: string;
+  selectedEquipmentIds?: string[];
+  weeklyTimeMinutes: number;
+  sessionsPerWeek: number;
+  sessionDurationMinutes: number;
+  splitType: WorkoutSplitType;
+  lifestyle: WorkoutLifestyle;
+  twoADay: boolean;
+  preferredFocus?: string;
+  hiitMode?: boolean;
+  hiitOptions?: HiitOptions;
+}
+
+/**
+ * Admin configuration for workout generation (Workout Factory UI)
+ */
+export interface WorkoutConfig {
+  workoutInfo: {
+    title: string;
+    description: string;
+  };
+  targetAudience: UserDemographics;
+  requirements: {
+    sessionsPerWeek: number;
+    sessionDurationMinutes: number;
+    splitType: WorkoutSplitType;
+    lifestyle: WorkoutLifestyle;
+    twoADay: boolean;
+    weeklyTimeMinutes: number;
+  };
+  medicalContext?: {
+    includeInjuries: boolean;
+    injuries?: string;
+    includeConditions: boolean;
+    conditions?: string;
+  };
+  goals: Goals;
+  zoneId?: string;
+  selectedEquipmentIds?: string[];
+  preferredFocus?: string;
+  blockOptions?: BlockOptions;
+  hiitMode?: boolean;
+  hiitOptions?: HiitOptions;
+}
+
+/**
+ * Single session definition from Workout Architect (Step 1)
+ */
+export interface WorkoutSessionSpec {
+  session_number: number;
+  session_name: string;
+  focus: string;
+  duration_minutes: number;
+  volume_targets?: string;
+}
+
+/**
+ * Step 1: Workout Architect Blueprint
+ */
+export interface WorkoutArchitectBlueprint {
+  workout_set_name: string;
+  rationale: string;
+  sessions: WorkoutSessionSpec[];
+  split: {
+    type: string;
+    days_per_week: number;
+    session_duration_minutes: number;
+  };
+  progression_protocol: ProgressionProtocol;
+  progression_rules: {
+    description: string;
+    weeks_1_3: string;
+    weeks_4_6: string;
+  };
+  volume_landmarks: VolumeLandmark[];
+}
+
+/**
+ * Single workout in a set (same shape as ProgramSchedule.workouts[n])
+ */
+export interface WorkoutInSet {
+  title: string;
+  description: string;
+  warmupBlocks?: WarmupBlock[];
+  blocks?: Exercise[];
+  exerciseBlocks?: ExerciseBlock[];
+  finisherBlocks?: WarmupBlock[];
+  cooldownBlocks?: WarmupBlock[];
+  exerciseOverrides?: Record<string, { name?: string; instructions?: string; imageUrl?: string }>;
+}
+
+/**
+ * Workout set template (chain output) – 1–N workouts, no weeks
+ */
+export interface WorkoutSetTemplate {
+  title: string;
+  description: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  workouts: WorkoutInSet[];
+}
+
+/**
+ * Workout metadata stored in Firestore (master document)
+ */
+export interface WorkoutMetadata {
+  title: string;
+  description: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  targetAudience: UserDemographics;
+  equipmentProfile?: {
+    zoneId?: string;
+    equipmentIds?: string[];
+  };
+  goals?: Goals;
+  workoutConfig?: WorkoutConfig;
+  chain_metadata?: WorkoutChainMetadata;
+  status: 'draft' | 'published';
+  createdAt: Date;
+  updatedAt: Date;
+  authorId: string;
+  workoutCount?: number;
+}
+
+/**
+ * Chain metadata for workout generation
+ */
+export interface WorkoutChainMetadata {
+  step1_workout_architect: WorkoutArchitectBlueprint;
+  step2_biomechanist: PatternSkeleton;
+  step3_coach: ExerciseSelection[];
+  step4_workout_mathematician: WorkoutInSet[];
+  generated_at: Date;
+  model_used: string;
+  total_tokens?: number;
+}
+
+/**
+ * Workout library item (metadata + id for listing)
+ */
+export interface WorkoutLibraryItem extends WorkoutMetadata {
+  id: string;
+}

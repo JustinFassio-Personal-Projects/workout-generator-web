@@ -2,6 +2,15 @@
 // Footer component - Pure Astro (static HTML)
 const currentYear = new Date().getFullYear();
 
+// Content Admin link: use env in production; in dev default to programs on port 3006 so link shows without .env
+const programsAdminBase = (import.meta.env.PUBLIC_PROGRAMS_ADMIN_URL as string | undefined)?.trim() || undefined;
+const programsAdminHref =
+  programsAdminBase
+    ? `${programsAdminBase.replace(/\/$/, '')}/admin`
+    : import.meta.env.DEV
+      ? 'http://localhost:3006/admin'
+      : null;
+
 const footerLinks = {
   product: [
     { name: 'Features', href: '/#features' },
@@ -19,6 +28,7 @@ const footerLinks = {
   support: [
     { name: 'Contact', href: 'mailto:support@aiworkoutgenerator.com' },
     { name: 'Help Center', href: '/faq' },
+    ...(programsAdminHref ? [{ name: 'Admin', href: programsAdminHref }] : []),
   ],
 };
 

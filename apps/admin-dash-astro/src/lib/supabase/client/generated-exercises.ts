@@ -1,5 +1,5 @@
 /**
- * Client-side generated exercises. Replaces firebase/client/generated-exercises.
+ * Client-side generated exercises for ExerciseMapPickerModal, approved-exercise-maps, and Visualization Lab.
  */
 
 import { supabase } from '../client';
@@ -97,7 +97,7 @@ export async function getGeneratedExercises(
   if (statusFilter) q = q.eq('status', statusFilter);
   const { data, error } = await q;
   if (error) throw error;
-  return (data ?? []).map(mapRowToExercise);
+  return (data ?? []).map((row) => mapRowToExercise(row as GeneratedExerciseRow));
 }
 
 export async function getGeneratedExerciseById(id: string): Promise<GeneratedExercise | null> {

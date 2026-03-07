@@ -8,6 +8,7 @@ This monorepo has multiple deployable apps. Each needs its own Vercel project wi
 |-----------|-------------------|---------------------------------------------|
 | nextjs-backend  | `apps/nextjs-backend`   | APIs, admin proxy target, legacy routes (not the primary marketing site)    |
 | admin-dash| `apps/admin-dash` | Admin dashboard (blog, leads, analytics)    |
+| programs  | `apps/programs`   | Workout/program/challenge content app; full admin at `/admin` (Program Factory, Challenge Factory, etc.). See **Programs app and Content Admin** below. |
 
 **Required:** In each Vercel project → **Settings** → **General** → set **Root Directory** to the app path above. Without this, Vercel looks for `.next` at the repo root and fails with `routes-manifest.json` not found.
 
@@ -37,3 +38,12 @@ The `vercel.json` in each app configures `buildCommand` and `installCommand` to 
 2. Log in at `https://admin.aiworkoutgenerator.com/admin/login` (use the exact domain you'll access admin from).
 3. Clear cookies for the domain and try again; stale or wrong-domain cookies can block the new one.
 4. In DevTools → Application → Cookies, confirm `__Secure-sb-admin-session` is set for your admin domain after login.
+
+## Programs app and Content Admin
+
+The **programs** app (`apps/programs`) provides the content admin (programs, workouts, challenges, exercises, WOD, etc.). Deploy it as its own Vercel project with **Root Directory** `apps/programs`.
+
+- **Programs app root URL:** Set by your programs deployment (e.g. `https://programs.aiworkoutgenerator.com`).
+- **Content Admin URL:** `{programs-root}/admin` (e.g. `https://programs.aiworkoutgenerator.com/admin`). Login at `/admin/login`; access requires Supabase auth and `profiles.role === 'admin'`.
+
+**Opening the Content Admin from the marketing site (astro-site):** Set `PUBLIC_PROGRAMS_ADMIN_URL` in the astro-site Vercel project (or local `.env`) to the programs app root (e.g. `https://programs.aiworkoutgenerator.com`). The astro-site footer then shows an **Admin** link under Support that goes to `{PUBLIC_PROGRAMS_ADMIN_URL}/admin`. If the variable is unset, the link is hidden. The main site’s `/admin` path continues to point to **admin-dash** (blog, leads) via existing rewrites.

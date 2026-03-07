@@ -96,7 +96,7 @@ INSERT INTO storage.buckets (id, name, public, created_at, updated_at)
 VALUES ('exercise-images', 'exercise-images', true, now(), now())
 ON CONFLICT (id) DO NOTHING;
 
--- 9. Storage policies (owner-scoped for authenticated users)
+-- 9. Storage policies (owner-scoped: match apps/programs 00061/00062 so users cannot overwrite/delete each other's uploads)
 DROP POLICY IF EXISTS "Allow authenticated uploads to exercise-images" ON storage.objects;
 DROP POLICY IF EXISTS "Allow authenticated select exercise-images" ON storage.objects;
 DROP POLICY IF EXISTS "Allow authenticated update exercise-images" ON storage.objects;
@@ -104,20 +104,20 @@ DROP POLICY IF EXISTS "Allow authenticated delete exercise-images" ON storage.ob
 
 CREATE POLICY "Allow authenticated uploads to exercise-images" ON storage.objects
   FOR INSERT TO authenticated
-  WITH CHECK (bucket_id = 'exercise-images');
+  WITH CHECK (bucket_id = 'exercise-images' AND owner_id = auth.uid()::text);
 
 CREATE POLICY "Allow authenticated select exercise-images" ON storage.objects
   FOR SELECT TO authenticated
-  USING (bucket_id = 'exercise-images');
+  USING (bucket_id = 'exercise-images' AND owner_id = auth.uid()::text);
 
 CREATE POLICY "Allow authenticated update exercise-images" ON storage.objects
   FOR UPDATE TO authenticated
-  USING (bucket_id = 'exercise-images')
-  WITH CHECK (bucket_id = 'exercise-images');
+  USING (bucket_id = 'exercise-images' AND owner_id = auth.uid()::text)
+  WITH CHECK (bucket_id = 'exercise-images' AND owner_id = auth.uid()::text);
 
 CREATE POLICY "Allow authenticated delete exercise-images" ON storage.objects
   FOR DELETE TO authenticated
-  USING (bucket_id = 'exercise-images');
+  USING (bucket_id = 'exercise-images' AND owner_id = auth.uid()::text);
 
 -- 10. Public read for storage (bucket is public; anon can read for display)
 DROP POLICY IF EXISTS "Public read exercise-images" ON storage.objects;

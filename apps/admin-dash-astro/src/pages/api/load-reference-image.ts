@@ -26,14 +26,15 @@ export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const imageUrl = url.searchParams.get('url');
 
-  if (!imageUrl || !imageUrl.trim()) {
+  const trimmed = (imageUrl ?? '').trim();
+  if (!trimmed) {
     return new Response(JSON.stringify({ error: 'url is required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  if (!isAllowedUrl(imageUrl)) {
+  if (!isAllowedUrl(trimmed)) {
     return new Response(
       JSON.stringify({ error: 'URL must be from project Supabase storage' }),
       {
@@ -44,7 +45,7 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   try {
-    const response = await fetch(imageUrl);
+    const response = await fetch(trimmed);
     if (!response.ok) {
       return new Response(JSON.stringify({ error: 'Failed to load image' }), {
         status: 400,

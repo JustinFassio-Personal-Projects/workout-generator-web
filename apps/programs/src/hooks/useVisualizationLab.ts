@@ -134,30 +134,30 @@ export function useVisualizationLab(
     };
   }, []);
 
+  // Reset form when topic/slug context changes. Runs when topicKey goes undefined too (e.g. navigate
+  // from /exercise-image-gen?slug=foo back to /exercise-image-gen) so the form is not stuck on the previous exercise.
   useEffect(() => {
-    if (topicKey !== undefined) {
-      const topic = initialExercise?.exerciseName ?? initialTopic;
-      setExerciseTopic(topic);
-      if (initialExercise) {
-        setComplexityLevel(initialExercise.complexityLevel ?? 'intermediate');
-        setVisualStyle(initialExercise.visualStyle ?? 'photorealistic');
-      }
-      setResult(null);
-      setError(null);
-      setResearchResult(null);
-      setPromptStep('idle');
-      setReferenceImageData(null);
-      setReferenceImageUrl('');
-      setReferenceError(null);
-      // Reset exercise-specific context; keep complexityLevel, visualStyle, demographics as user preferences
-      setFormCuesToEmphasize('');
-      setMisrenderingsToAvoid('');
-      setDomainContext('');
-      setMovementPhase('');
-      setBodySide('');
-      setBodySideStart('');
-      setBodySideEnd('');
+    const topic = initialExercise?.exerciseName ?? initialTopic;
+    setExerciseTopic(topic);
+    if (initialExercise) {
+      setComplexityLevel(initialExercise.complexityLevel ?? 'intermediate');
+      setVisualStyle(initialExercise.visualStyle ?? 'photorealistic');
     }
+    setResult(null);
+    setError(null);
+    setResearchResult(null);
+    setPromptStep('idle');
+    setReferenceImageData(null);
+    setReferenceImageUrl('');
+    setReferenceError(null);
+    // Reset exercise-specific context; keep complexityLevel, visualStyle, demographics as user preferences
+    setFormCuesToEmphasize('');
+    setMisrenderingsToAvoid('');
+    setDomainContext('');
+    setMovementPhase('');
+    setBodySide('');
+    setBodySideStart('');
+    setBodySideEnd('');
   }, [topicKey, initialTopic, initialExercise]);
 
   useEffect(() => {

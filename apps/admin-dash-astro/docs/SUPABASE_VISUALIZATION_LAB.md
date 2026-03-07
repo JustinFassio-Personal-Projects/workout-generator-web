@@ -73,7 +73,7 @@ No Firebase or Firestore is used; everything is Supabase (Postgres + Storage).
 
 - **Storage**: Images are uploaded to the **`exercise-images`** bucket via `uploadExerciseImage()` in `src/lib/supabase/client/storage.ts`. Paths look like `generated-exercises/{userId}/{slug}-{timestamp}.png`.
 - **Database**: After upload, the public URL and path are stored in `generated_exercises` (primary image) and `exercise_images` (gallery/carousel) so the app can display and manage them.
-- **Auth**: Uploads use the Supabase client with your anon key; the bucket policies require the user to be **authenticated** and restrict access by `owner_id = auth.uid()`, so only the signed-in admin can upload/update/delete their own objects.
+- **Auth**: Uploads use the Supabase client with your anon key; the bucket policies (in Option C’s `SUPABASE_VISUALIZATION_LAB_SETUP.sql`, matching apps/programs 00061/00062) require the user to be **authenticated** and restrict access by `owner_id = auth.uid()`, so only the signed-in admin can upload/update/delete their own objects.
 
 If you see **400 "Bucket not found"**, the bucket has not been created yet — apply the migrations below.
 

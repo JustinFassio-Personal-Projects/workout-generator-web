@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 import {
   Zap,
   AlertTriangle,
@@ -23,6 +24,8 @@ import {
   X,
   Loader2,
   ImagePlus,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import type {
   GeneratedExercise,
@@ -120,6 +123,8 @@ const GeneratedExerciseDetail: React.FC<GeneratedExerciseDetailProps> = ({
   const [isSavingImage, setIsSavingImage] = useState(false);
   // Edit mode state (for accessing admin controls on approved/rejected exercises)
   const [isEditMode, setIsEditMode] = useState(false);
+  // Collapsible "Learn more" (biomechanics) when user instructions are shown — closed by default
+  const [learnMoreOpen, setLearnMoreOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -185,6 +190,7 @@ const GeneratedExerciseDetail: React.FC<GeneratedExerciseDetailProps> = ({
   };
 
   const { biomechanics, sources } = exercise;
+  const hasUserInstructions = !isAdmin && !!exercise.userFriendlyInstructions?.trim();
   const allVideos =
     exercise.videos && exercise.videos.length > 0
       ? exercise.videos.map((v, i) => ({
@@ -406,167 +412,297 @@ const GeneratedExerciseDetail: React.FC<GeneratedExerciseDetailProps> = ({
         onGalleryChange={onGalleryChange}
       />
 
-      {/* 2. PERFORMANCE CUES - The "Do This" */}
-      <div className="px-4 md:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="rounded-xl border-l-4 border-emerald-500 bg-slate-800 p-5"
-        >
-          <h3 className="mb-3 flex items-center gap-2 text-lg font-bold">
-            <Zap className="h-5 w-5 text-emerald-400" />
-            Performance Cues
-          </h3>
-          <ul className="space-y-4">
-            {(() => {
-              const items = normalizeListItems(biomechanics.performanceCues ?? []);
-              return items.map((cue, idx) => (
-                <li key={idx} className="flex items-start gap-6 text-slate-300">
-                  <span className="font-mono text-lg font-bold text-emerald-400 opacity-80">
-                    {(idx + 1).toString().padStart(items.length.toString().length, '0')}
-                  </span>
-                  <span>{cue}</span>
-                </li>
-              ));
-            })()}
-          </ul>
-        </motion.div>
-      </div>
+      {/* When user-friendly instructions exist (public view): show as main content, biomechanics in "Learn More" */}
+      {hasUserInstructions && (
+        <div className="px-4 md:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="prose prose-invert prose-slate prose-headings:text-white prose-p:text-slate-300 prose-li:text-slate-300 prose-strong:text-white max-w-none rounded-xl border border-slate-700 bg-slate-800 p-5"
+          >
+            <ReactMarkdown>{exercise.userFriendlyInstructions!.trim()}</ReactMarkdown>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mt-4 overflow-hidden rounded-xl border border-slate-700 bg-slate-800"
+          >
+            <button
+              type="button"
+              onClick={() => setLearnMoreOpen((prev) => !prev)}
+              className="flex w-full items-center justify-between gap-2 p-5 text-left font-bold text-slate-200 transition-colors hover:bg-slate-700/50"
+            >
+              <span>Learn more about the biomechanics</span>
+              {learnMoreOpen ? (
+                <ChevronDown className="h-5 w-5 text-slate-400" />
+              ) : (
+                <ChevronRight className="h-5 w-5 text-slate-400" />
+              )}
+            </button>
+            {learnMoreOpen && (
+              <div className="space-y-4 border-t border-slate-700 px-5 pb-5 pt-2">
+                {(biomechanics.performanceCues?.length ?? 0) > 0 && (
+                  <div className="rounded-lg border-l-4 border-emerald-500 bg-slate-800/50 p-4">
+                    <h4 className="mb-2 flex items-center gap-2 text-base font-bold text-emerald-400">
+                      <Zap className="h-4 w-4" />
+                      Performance Cues
+                    </h4>
+                    <ul className="space-y-2">
+                      {normalizeListItems(biomechanics.performanceCues ?? []).map((cue, idx) => (
+                        <li key={idx} className="flex items-start gap-3 text-sm text-slate-300">
+                          <span className="font-mono text-emerald-400/80">{idx + 1}.</span>
+                          <span>{cue}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {(biomechanics.commonMistakes?.length ?? 0) > 0 && (
+                  <div className="rounded-lg border border-red-900/30 bg-red-900/10 p-4">
+                    <h4 className="mb-2 flex items-center gap-2 text-base font-bold text-red-400">
+                      <AlertTriangle className="h-4 w-4" />
+                      Common Mistakes
+                    </h4>
+                    <ul className="space-y-2">
+                      {normalizeListItems(biomechanics.commonMistakes ?? []).map((mistake, idx) => (
+                        <li key={idx} className="flex items-start gap-3 text-sm text-slate-300">
+                          <span className="font-mono text-red-400/80">{idx + 1}.</span>
+                          <span>{mistake}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {(biomechanics.biomechanicalChain ||
+                  biomechanics.pivotPoints ||
+                  biomechanics.stabilizationNeeds) && (
+                  <div className="rounded-lg border border-slate-600 bg-slate-800/50 p-4">
+                    <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-blue-400">
+                      <Shield className="h-4 w-4" />
+                      Biomechanical Analysis
+                    </h4>
+                    <div className="flex gap-2 border-b border-slate-700 pb-3">
+                      {[
+                        { id: 'chain' as const, label: 'The Chain' },
+                        { id: 'pivot' as const, label: 'Pivot Points' },
+                        { id: 'stabilization' as const, label: 'Stabilization' },
+                      ].map(({ id, label }) => (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setActiveAnalysisTab(id)}
+                          className={`rounded px-3 py-1.5 text-sm font-medium ${
+                            activeAnalysisTab === id
+                              ? 'bg-blue-500/20 text-blue-400'
+                              : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-3 text-sm leading-relaxed text-slate-400">
+                      {activeAnalysisTab === 'chain' && (
+                        <div
+                          className="[&_p:last-child]:mb-0 [&_p]:mb-0"
+                          dangerouslySetInnerHTML={{
+                            __html: formatParagraphContent(biomechanics.biomechanicalChain ?? ''),
+                          }}
+                        />
+                      )}
+                      {activeAnalysisTab === 'pivot' && (
+                        <div
+                          className="[&_p:last-child]:mb-0 [&_p]:mb-0"
+                          dangerouslySetInnerHTML={{
+                            __html: formatParagraphContent(biomechanics.pivotPoints ?? ''),
+                          }}
+                        />
+                      )}
+                      {activeAnalysisTab === 'stabilization' && (
+                        <div
+                          className="[&_p:last-child]:mb-0 [&_p]:mb-0"
+                          dangerouslySetInnerHTML={{
+                            __html: formatParagraphContent(biomechanics.stabilizationNeeds ?? ''),
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
 
-      {/* 3. COMMON MISTAKES - The "Don't Do This" */}
-      <div className="px-4 md:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="rounded-xl border border-red-900/50 bg-red-900/20 p-5"
-        >
-          <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-red-400">
-            <AlertTriangle className="h-5 w-5" />
-            Common Mistakes
-          </h3>
-          <ul className="space-y-4">
-            {(() => {
-              const items = normalizeListItems(biomechanics.commonMistakes ?? []);
-              return items.map((mistake, idx) => (
-                <li key={idx} className="flex items-start gap-6 text-slate-300">
-                  <span className="font-mono text-lg font-bold text-red-400 opacity-80">
-                    {(idx + 1).toString().padStart(items.length.toString().length, '0')}
-                  </span>
-                  <span>{mistake}</span>
-                </li>
-              ));
-            })()}
-          </ul>
-        </motion.div>
-      </div>
+      {/* When no user instructions (or admin): show Performance Cues, Common Mistakes, Biomechanical Analysis as main content */}
+      {!hasUserInstructions && (
+        <>
+          {/* 2. PERFORMANCE CUES - The "Do This" */}
+          <div className="px-4 md:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="rounded-xl border-l-4 border-emerald-500 bg-slate-800 p-5"
+            >
+              <h3 className="mb-3 flex items-center gap-2 text-lg font-bold">
+                <Zap className="h-5 w-5 text-emerald-400" />
+                Performance Cues
+              </h3>
+              <ul className="space-y-4">
+                {(() => {
+                  const items = normalizeListItems(biomechanics.performanceCues ?? []);
+                  return items.map((cue, idx) => (
+                    <li key={idx} className="flex items-start gap-6 text-slate-300">
+                      <span className="font-mono text-lg font-bold text-emerald-400 opacity-80">
+                        {(idx + 1).toString().padStart(items.length.toString().length, '0')}
+                      </span>
+                      <span>{cue}</span>
+                    </li>
+                  ));
+                })()}
+              </ul>
+            </motion.div>
+          </div>
 
-      {/* 4. BIOMECHANICAL ANALYSIS - Tabbed */}
-      <div className="px-4 md:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="overflow-hidden rounded-xl bg-slate-800"
-        >
-          <div className="flex items-center justify-between gap-2 p-5 font-bold">
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-blue-400" />
-              Biomechanical Analysis
-            </div>
-            {isAdmin && onAddAnatomicalImage && (
-              <button
-                type="button"
-                onClick={onAddAnatomicalImage}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
-              >
-                <ImagePlus className="h-3.5 w-3.5" />
-                Add anatomical image
-              </button>
-            )}
+          {/* 3. COMMON MISTAKES - The "Don't Do This" */}
+          <div className="px-4 md:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="rounded-xl border border-red-900/50 bg-red-900/20 p-5"
+            >
+              <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-red-400">
+                <AlertTriangle className="h-5 w-5" />
+                Common Mistakes
+              </h3>
+              <ul className="space-y-4">
+                {(() => {
+                  const items = normalizeListItems(biomechanics.commonMistakes ?? []);
+                  return items.map((mistake, idx) => (
+                    <li key={idx} className="flex items-start gap-6 text-slate-300">
+                      <span className="font-mono text-lg font-bold text-red-400 opacity-80">
+                        {(idx + 1).toString().padStart(items.length.toString().length, '0')}
+                      </span>
+                      <span>{mistake}</span>
+                    </li>
+                  ));
+                })()}
+              </ul>
+            </motion.div>
           </div>
-          <div className="flex gap-2 border-t border-slate-700 px-5 pb-2 pt-4">
-            {[
-              { id: 'chain' as const, label: 'The Chain' },
-              { id: 'pivot' as const, label: 'Pivot Points' },
-              { id: 'stabilization' as const, label: 'Stabilization' },
-            ].map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setActiveAnalysisTab(id)}
-                className={`rounded-lg px-4 py-2 font-medium transition-colors ${
-                  activeAnalysisTab === id
-                    ? 'bg-blue-500/20 text-blue-400'
-                    : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <div className="border-t border-slate-700 p-5">
-            {activeAnalysisTab === 'chain' && (
-              <div className="flex gap-4">
-                {anatomicalImagesBySection.chain && (
-                  <div className="w-48 flex-shrink-0 md:w-56">
-                    <img
-                      src={anatomicalImagesBySection.chain.imageUrl}
-                      alt="The Chain"
-                      className="w-full rounded-lg border border-slate-700 object-contain"
+
+          {/* 4. BIOMECHANICAL ANALYSIS - Tabbed */}
+          <div className="px-4 md:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="overflow-hidden rounded-xl bg-slate-800"
+            >
+              <div className="flex items-center justify-between gap-2 p-5 font-bold">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-blue-400" />
+                  Biomechanical Analysis
+                </div>
+                {isAdmin && onAddAnatomicalImage && (
+                  <button
+                    type="button"
+                    onClick={onAddAnatomicalImage}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
+                  >
+                    <ImagePlus className="h-3.5 w-3.5" />
+                    Add anatomical image
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-2 border-t border-slate-700 px-5 pb-2 pt-4">
+                {[
+                  { id: 'chain' as const, label: 'The Chain' },
+                  { id: 'pivot' as const, label: 'Pivot Points' },
+                  { id: 'stabilization' as const, label: 'Stabilization' },
+                ].map(({ id, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setActiveAnalysisTab(id)}
+                    className={`rounded-lg px-4 py-2 font-medium transition-colors ${
+                      activeAnalysisTab === id
+                        ? 'bg-blue-500/20 text-blue-400'
+                        : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="border-t border-slate-700 p-5">
+                {activeAnalysisTab === 'chain' && (
+                  <div className="flex gap-4">
+                    {anatomicalImagesBySection.chain && (
+                      <div className="w-48 flex-shrink-0 md:w-56">
+                        <img
+                          src={anatomicalImagesBySection.chain.imageUrl}
+                          alt="The Chain"
+                          className="w-full rounded-lg border border-slate-700 object-contain"
+                        />
+                      </div>
+                    )}
+                    <div
+                      className="min-w-0 flex-1 text-sm leading-relaxed text-slate-400 [&_p:last-child]:mb-0 [&_p]:mb-0"
+                      dangerouslySetInnerHTML={{
+                        __html: formatParagraphContent(biomechanics.biomechanicalChain ?? ''),
+                      }}
                     />
                   </div>
                 )}
-                <div
-                  className="min-w-0 flex-1 text-sm leading-relaxed text-slate-400 [&_p:last-child]:mb-0 [&_p]:mb-0"
-                  dangerouslySetInnerHTML={{
-                    __html: formatParagraphContent(biomechanics.biomechanicalChain ?? ''),
-                  }}
-                />
-              </div>
-            )}
-            {activeAnalysisTab === 'pivot' && (
-              <div className="flex gap-4">
-                {anatomicalImagesBySection.pivot && (
-                  <div className="w-48 flex-shrink-0 md:w-56">
-                    <img
-                      src={anatomicalImagesBySection.pivot.imageUrl}
-                      alt="Pivot Points"
-                      className="w-full rounded-lg border border-slate-700 object-contain"
+                {activeAnalysisTab === 'pivot' && (
+                  <div className="flex gap-4">
+                    {anatomicalImagesBySection.pivot && (
+                      <div className="w-48 flex-shrink-0 md:w-56">
+                        <img
+                          src={anatomicalImagesBySection.pivot.imageUrl}
+                          alt="Pivot Points"
+                          className="w-full rounded-lg border border-slate-700 object-contain"
+                        />
+                      </div>
+                    )}
+                    <div
+                      className="min-w-0 flex-1 text-sm leading-relaxed text-slate-400 [&_p:last-child]:mb-0 [&_p]:mb-0"
+                      dangerouslySetInnerHTML={{
+                        __html: formatParagraphContent(biomechanics.pivotPoints ?? ''),
+                      }}
                     />
                   </div>
                 )}
-                <div
-                  className="min-w-0 flex-1 text-sm leading-relaxed text-slate-400 [&_p:last-child]:mb-0 [&_p]:mb-0"
-                  dangerouslySetInnerHTML={{
-                    __html: formatParagraphContent(biomechanics.pivotPoints ?? ''),
-                  }}
-                />
-              </div>
-            )}
-            {activeAnalysisTab === 'stabilization' && (
-              <div className="flex gap-4">
-                {anatomicalImagesBySection.stabilization && (
-                  <div className="w-48 flex-shrink-0 md:w-56">
-                    <img
-                      src={anatomicalImagesBySection.stabilization.imageUrl}
-                      alt="Stabilization"
-                      className="w-full rounded-lg border border-slate-700 object-contain"
+                {activeAnalysisTab === 'stabilization' && (
+                  <div className="flex gap-4">
+                    {anatomicalImagesBySection.stabilization && (
+                      <div className="w-48 flex-shrink-0 md:w-56">
+                        <img
+                          src={anatomicalImagesBySection.stabilization.imageUrl}
+                          alt="Stabilization"
+                          className="w-full rounded-lg border border-slate-700 object-contain"
+                        />
+                      </div>
+                    )}
+                    <div
+                      className="min-w-0 flex-1 text-sm leading-relaxed text-slate-400 [&_p:last-child]:mb-0 [&_p]:mb-0"
+                      dangerouslySetInnerHTML={{
+                        __html: formatParagraphContent(biomechanics.stabilizationNeeds ?? ''),
+                      }}
                     />
                   </div>
                 )}
-                <div
-                  className="min-w-0 flex-1 text-sm leading-relaxed text-slate-400 [&_p:last-child]:mb-0 [&_p]:mb-0"
-                  dangerouslySetInnerHTML={{
-                    __html: formatParagraphContent(biomechanics.stabilizationNeeds ?? ''),
-                  }}
-                />
               </div>
-            )}
+            </motion.div>
           </div>
-        </motion.div>
-      </div>
+        </>
+      )}
 
       {/* 5. SOURCES FOOTER - Credibility (excludes Vertex AI Search placeholders) */}
       {(() => {

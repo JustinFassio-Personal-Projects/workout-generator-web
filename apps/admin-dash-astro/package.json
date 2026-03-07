@@ -10,6 +10,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@google/genai": "^1.29.0",
     "@workout-generator/design-system": "*",
     "@astrojs/node": "^9.0.0",
     "@astrojs/react": "^4.0.0",
@@ -20,6 +21,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.4.0",
     "framer-motion": "^12.23.24",
+    "fuse.js": "^7.0.0",
     "lucide-react": "^0.553.0",
     "react-select": "^5.10.2",
     "react": "^19.2.0",

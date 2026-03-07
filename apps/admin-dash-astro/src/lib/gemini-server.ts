@@ -1,0 +1,354 @@
+import { GoogleGenAI } from '@google/genai';
+
+// NOTE: This must only be used server-side to protect the API key
+const apiKey = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  // In development, we might not have the key set yet, but we shouldn't crash until we try to use it
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn('GEMINI_API_KEY is not set in environment variables');
+  }
+}
+
+const client = new GoogleGenAI({ apiKey: apiKey || '' });
+
+const GEMINI_API_KEY_MESSAGE =
+  'GEMINI_API_KEY is not set. Set it in your deployment environment or server secrets (e.g. host dashboard, CI/CD, or .env) for deep dive and AI features.';
+
+function requireGeminiApiKey(): void {
+  if (!apiKey || apiKey.trim() === '') {
+    throw new Error(GEMINI_API_KEY_MESSAGE);
+  }
+}
+
+function isRetryableError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error);
+  const lower = msg.toLowerCase();
+  if (lower.includes('503') || lower.includes('unavailable')) return true;
+  if (lower.includes('deadline expired') || lower.includes('deadline_exceeded')) return true;
+  if (error && typeof error === 'object') {
+    const obj = error as { status?: string; code?: number };
+    if (obj.status === 'UNAVAILABLE' || obj.code === 503) return true;
+  }
+  return false;
+}
+
+const MAX_RETRIES = 3;
+const BASE_DELAY_MS = 2000;
+
+async function withRetry<T>(fn: () => Promise<T>, logPrefix = '[gemini]'): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      const canRetry = attempt < MAX_RETRIES && isRetryableError(error);
+      if (!canRetry) throw error;
+      // Standard exponential backoff (2s, 4s, 8s). Shorter first delay would risk hammering rate-limited/overloaded Gemini API.
+      const delay = BASE_DELAY_MS * Math.pow(2, attempt);
+      const snippet = error instanceof Error ? error.message : String(error);
+      console.warn(
+        `${logPrefix} Retryable error (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retrying in ${delay}ms:`,
+        snippet.substring(0, 120)
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
+
+const RESEARCH_SYSTEM_PROMPT = `
+Role: "Biomechanical Analyst and Professional Strength Coach."
+
+Tasks:
+
+Use Google Search to verify postural cues, joint angles, and safety for the exercise.
+
+Output 5 biomechanical points: Biomechanical Chain, Pivot Points, Stabilization Needs, Common Mistakes, Performance Cues.
+
+Use Unicode symbols for math and units (e.g. τ, ×, θ, °) and plain text only; do not use LaTeX or $...$ math notation.
+
+Output an IMAGE_PROMPT with technical accuracy, style, complexity, and demographics when given. When form cues, misrenderings to avoid, or domain context are provided, incorporate them strictly into the imagePrompt. When Output Mode is Sequence, output imagePrompts (array of 3 strings) instead of imagePrompt.
+
+Output: STRICT valid JSON with biomechanicalPoints (string array) and either imagePrompt (string) or imagePrompts (array of 3 strings for start/mid/end). Do not include markdown code blocks.
+`;
+
+/** Raw grounding chunk from Gemini (structure varies) */
+export interface GroundingChunk {
+  web?: { uri?: string; title?: string };
+  uri?: string;
+  title?: string;
+}
+
+export interface ResearchResult {
+  biomechanicalPoints: string[];
+  imagePrompt: string;
+  /** When outputMode=sequence: 3 prompts for start, mid, end */
+  imagePrompts?: string[];
+  searchResults?: GroundingChunk[];
+}
+
+export async function researchTopicForPrompt(
+  exerciseTopic: string,
+  complexityLevel: string = 'intermediate',
+  visualStyle: string = 'photorealistic',
+  demographics?: string,
+  movementPhase?: string,
+  bodySide?: string,
+  formCuesToEmphasize?: string,
+  misrenderingsToAvoid?: string,
+  domainContext?: string,
+  outputMode?: 'single' | 'sequence',
+  bodySideStart?: string,
+  bodySideEnd?: string
+): Promise<ResearchResult> {
+  requireGeminiApiKey();
+  const isSequence = outputMode === 'sequence';
+  const prompt = `
+Exercise Topic: ${exerciseTopic}
+Complexity Level: ${complexityLevel}
+Visual Style: ${
+    visualStyle === 'multiplicity' && !isSequence
+      ? 'Multiplicity (Sequence Composite) - Show subject in multiple positions (start, mid, end) in a single frame to demonstrate full range of motion. Use a static background with the subject appearing multiple times to show the path of movement.'
+      : isSequence
+        ? 'Photorealistic/consistent style - each of 3 images will show ONE phase. Same subject, background, lighting.'
+        : visualStyle
+  }
+${isSequence ? '\nOutput Mode: Sequence - Produce 3 separate image prompts for the START, MID, and END positions of the movement. Same subject, style, and background for all 3. Each prompt describes ONE phase only. Output JSON with biomechanicalPoints (array) and imagePrompts (array of exactly 3 strings: [startPrompt, midPrompt, endPrompt]).' : ''}
+${demographics ? `Demographics: ${demographics}` : ''}
+${movementPhase && !isSequence ? `Movement Phase: ${movementPhase}` : ''}
+${
+  isSequence && (bodySideStart || bodySideEnd)
+    ? `Start view: ${bodySideStart || 'not specified'}; End view: ${bodySideEnd || 'not specified'}`
+    : bodySide
+      ? `Body Side: ${bodySide}`
+      : ''
+}
+${formCuesToEmphasize ? `\n\nForm cues to emphasize in the image (MUST be reflected in imagePrompt(s)):\n${formCuesToEmphasize}` : ''}
+${misrenderingsToAvoid ? `\n\nCommon misrenderings to AVOID (do NOT describe these in imagePrompt(s)):\n${misrenderingsToAvoid}` : ''}
+${domainContext ? `\n\nDomain/style context:\n${domainContext}` : ''}
+`;
+
+  try {
+    const response = await withRetry(
+      () =>
+        client.models.generateContent({
+          model: 'gemini-3-pro-preview',
+          config: {
+            systemInstruction: RESEARCH_SYSTEM_PROMPT,
+            tools: [{ googleSearch: {} }],
+          },
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        }),
+      '[generate-exercise-image:research]'
+    );
+
+    const candidate = response.candidates?.[0];
+    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
+    const text = textPart?.text || '';
+
+    // Robust JSON parsing
+    let parsed: { biomechanicalPoints?: string[]; imagePrompt?: string; imagePrompts?: string[] };
+
+    // First try cleaning markdown code blocks (any language hint); extract first block content
+    const blockMatch = text.match(/```[\w+-]*\s*\n?([\s\S]*?)```/);
+    const cleanedText = blockMatch
+      ? blockMatch[1].trim()
+      : text.replace(/```json\n?|\n?```/g, '').trim();
+
+    try {
+      parsed = JSON.parse(cleanedText);
+    } catch {
+      // Fallback: try to find JSON object structure
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.error('Failed to parse JSON. Raw text:', text);
+        throw new Error('Failed to parse JSON from research response');
+      }
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch {
+        console.error('Failed to parse extracted JSON block. Block:', jsonMatch[0]);
+        throw new Error('Failed to parse extracted JSON block');
+      }
+    }
+
+    // Extract search results
+    const searchResults = candidate?.groundingMetadata?.groundingChunks;
+
+    const imagePrompts = parsed.imagePrompts;
+    const validImagePrompts =
+      Array.isArray(imagePrompts) &&
+      imagePrompts.length === 3 &&
+      imagePrompts.every((s) => typeof s === 'string')
+        ? imagePrompts
+        : undefined;
+
+    return {
+      biomechanicalPoints: parsed.biomechanicalPoints || [],
+      imagePrompt: validImagePrompts ? validImagePrompts[0]! : parsed.imagePrompt || '',
+      imagePrompts: validImagePrompts,
+      searchResults,
+    };
+  } catch (error) {
+    console.error('Error in researchTopicForPrompt:', error);
+    throw error;
+  }
+}
+
+/** Content part type for multimodal requests */
+interface ContentPart {
+  text?: string;
+  inlineData?: {
+    mimeType: string;
+    data: string;
+  };
+}
+
+export interface GenerateInfographicImageOptions {
+  /** When true, the reference shows a different phase; output MUST be a different pose (sequence mode). */
+  requireDifferentPose?: boolean;
+}
+
+export async function generateInfographicImage(
+  imagePrompt: string,
+  referenceImageBase64?: string,
+  options?: GenerateInfographicImageOptions
+): Promise<string> {
+  try {
+    // Build content parts - include reference image if provided
+    const parts: ContentPart[] = [];
+
+    if (referenceImageBase64) {
+      // Strip data URL prefix if present to get raw base64 (subtype may include + or -, e.g. image/svg+xml, image/x-icon)
+      const base64Data = referenceImageBase64.replace(/^data:image\/[^;]+;base64,/, '');
+      // Detect mime type from data URL or default to png
+      const mimeMatch = referenceImageBase64.match(/^data:(image\/[^;]+);base64,/);
+      const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+
+      // Add reference image first
+      parts.push({
+        inlineData: {
+          mimeType,
+          data: base64Data,
+        },
+      });
+
+      const requireDifferentPose = options?.requireDifferentPose;
+      const referenceInstruction = requireDifferentPose
+        ? `This reference image shows ONE phase of an exercise. Generate a NEW image with a DIFFERENT body position and pose as described below. Use the reference ONLY for subject appearance (same person: face, body type, skin tone, hair, clothing). The POSE and BODY POSITION must be DISTINCTLY different from the reference. Do NOT replicate the reference pose. The prompt below specifies the exact position/phase you must show:`
+        : `Using the person/subject from this reference image, generate a new exercise image. Maintain the same subject appearance (face, body type, skin tone, hair, clothing style).`;
+
+      // Add prompt with reference instruction
+      parts.push({
+        text: `${referenceInstruction} ${imagePrompt}`,
+      });
+    } else {
+      // No reference image - just use the prompt
+      parts.push({ text: imagePrompt });
+    }
+
+    const response = await withRetry(
+      () =>
+        client.models.generateContent({
+          model: 'gemini-3-pro-image-preview',
+          config: {
+            responseModalities: ['IMAGE'],
+          },
+          contents: [{ role: 'user', parts }],
+        }),
+      '[generate-exercise-image:image]'
+    );
+
+    const candidate = response.candidates?.[0];
+    const imagePart = candidate?.content?.parts?.find(
+      (p: { inlineData?: { mimeType?: string; data?: string } }) => p.inlineData
+    );
+
+    if (imagePart && imagePart.inlineData) {
+      return `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+    }
+
+    throw new Error('No image data found in response');
+  } catch (error) {
+    console.error('Error in generateInfographicImage:', error);
+    throw error;
+  }
+}
+
+/** Biomechanics context for user-friendly instruction generation */
+export interface ParsedBiomechanicsContext {
+  biomechanicalChain?: string;
+  pivotPoints?: string;
+  stabilizationNeeds?: string;
+  commonMistakes?: string[];
+  performanceCues?: string[];
+}
+
+const USER_INSTRUCTIONS_SYSTEM_PROMPT = `You are a friendly personal trainer. Your goal is to write clear, simple instructions for people who have never done this exercise and have no background in kinesiology or anatomy.
+
+Rules:
+- Use plain language. Avoid jargon (e.g. "kinetic chain", "pivot points", "eccentric phase"). If you must use a term, explain it in one short phrase.
+- Write step-by-step instructions: what to do first, then next, and so on. Use numbered steps.
+- Keep each step short and actionable. Focus on what the user should do and feel, not on biomechanics theory.
+- Include 1–3 brief "tips" or "what to avoid" based on common mistakes, phrased in simple terms.
+- Output valid Markdown only: use ## for section headings, ** for bold, numbered lists for steps. No HTML, no code blocks.
+- Tone: encouraging and clear, not clinical. Write for someone reading on their phone before a workout.`;
+
+/**
+ * Generates user-friendly, plain-language exercise instructions (markdown).
+ * Used as the main content on the public exercise page when present.
+ */
+export async function generateUserFriendlyInstructions(
+  exerciseName: string,
+  biomechanics?: ParsedBiomechanicsContext | null
+): Promise<string> {
+  requireGeminiApiKey();
+  const chain = biomechanics?.biomechanicalChain?.trim() || 'Not specified';
+  const pivots = biomechanics?.pivotPoints?.trim() || 'Not specified';
+  const stabilization = biomechanics?.stabilizationNeeds?.trim() || 'Not specified';
+  const mistakes =
+    (biomechanics?.commonMistakes?.length ?? 0) > 0
+      ? biomechanics!.commonMistakes!.join('; ')
+      : 'None specified';
+  const cues =
+    (biomechanics?.performanceCues?.length ?? 0) > 0
+      ? biomechanics!.performanceCues!.join('; ')
+      : 'None specified';
+
+  const prompt = `Write user-friendly instructions for the exercise: "${exerciseName}".
+
+Use this technical context only to keep the instructions accurate; translate everything into simple language:
+- Movement / chain: ${chain}
+- Pivot points: ${pivots}
+- Stabilization: ${stabilization}
+- Common mistakes to warn about: ${mistakes}
+- Performance cues (translate into "do this" steps): ${cues}
+
+Output only the Markdown. Start with a short 1–2 sentence intro, then a "How to do it" section with numbered steps, then optional "Tips" or "What to avoid" if relevant.`;
+
+  try {
+    const response = await withRetry(
+      () =>
+        client.models.generateContent({
+          model: 'gemini-2.0-flash',
+          config: {
+            systemInstruction: USER_INSTRUCTIONS_SYSTEM_PROMPT,
+            responseMimeType: 'text/plain',
+          },
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        }),
+      '[generateUserFriendlyInstructions]'
+    );
+
+    const candidate = response.candidates?.[0];
+    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
+    let markdown = (textPart?.text || '').trim();
+    // Strip markdown code fences if the model wrapped output
+    markdown = markdown.replace(/^```markdown\n?|\n?```$/g, '').trim();
+    return markdown;
+  } catch (error) {
+    console.error('Error in generateUserFriendlyInstructions:', error);
+    throw error;
+  }
+}

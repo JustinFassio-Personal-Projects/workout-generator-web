@@ -44,6 +44,7 @@ interface GeneratedExerciseRow {
   rejected_by: string | null;
   rejection_reason: string | null;
   deep_dive_html_content: string | null;
+  user_friendly_instructions: string | null;
   suitable_blocks: unknown[] | null;
   main_workout_type: string | null;
   video_url: string | null;
@@ -77,6 +78,7 @@ function mapRowToExercise(row: GeneratedExerciseRow): GeneratedExercise {
     rejectedBy: row.rejected_by ?? undefined,
     rejectionReason: row.rejection_reason ?? undefined,
     deepDiveHtmlContent: row.deep_dive_html_content ?? undefined,
+    userFriendlyInstructions: row.user_friendly_instructions ?? undefined,
     suitableBlocks: (row.suitable_blocks ?? []) as GeneratedExercise['suitableBlocks'],
     mainWorkoutType: (row.main_workout_type ?? undefined) as GeneratedExercise['mainWorkoutType'],
     videoUrl: row.video_url ?? undefined,

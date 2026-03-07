@@ -597,6 +597,14 @@ const AdminExerciseDetailWrapper: React.FC<AdminExerciseDetailWrapperProps> = ({
             {EXERCISE_LABELS.backLink}
           </Link>
           <div className="flex items-center gap-4">
+            <Link
+              to={`/exercise-image-gen?slug=${exercise.slug}`}
+              className="inline-flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-white"
+              title="Edit in Visualization Lab"
+            >
+              <Sparkles className="h-4 w-4" />
+              Edit in Visualization Lab
+            </Link>
             <button
               onClick={() => {
                 setLoading(true);

@@ -10,19 +10,11 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import type { BiomechanicalPoints, ResearchOnlyResult } from '@/lib/visualization-lab/types';
 
-export interface InitialExerciseForLab {
-  exerciseName: string;
-  visualStyle?: string;
-  complexityLevel?: string;
-}
-
 export interface UseVisualizationLabOptions {
   /** Initial exercise topic (modal pre-fill). Default ''. */
   initialTopic?: string;
   /** When this changes, topic is reset to initialTopic (modal: exerciseName when isOpen). */
   topicKey?: string;
-  /** When provided (e.g. edit mode), initializes topic, visualStyle, complexityLevel from existing exercise. */
-  initialExercise?: InitialExerciseForLab | null;
 }
 
 export interface UseVisualizationLabReturn {
@@ -86,13 +78,11 @@ export interface UseVisualizationLabReturn {
 export function useVisualizationLab(
   options: UseVisualizationLabOptions = {}
 ): UseVisualizationLabReturn {
-  const { initialTopic = '', topicKey, initialExercise } = options;
+  const { initialTopic = '', topicKey } = options;
 
-  const [exerciseTopic, setExerciseTopic] = useState(initialExercise?.exerciseName ?? initialTopic);
-  const [complexityLevel, setComplexityLevel] = useState(
-    initialExercise?.complexityLevel ?? 'intermediate'
-  );
-  const [visualStyle, setVisualStyle] = useState(initialExercise?.visualStyle ?? 'photorealistic');
+  const [exerciseTopic, setExerciseTopic] = useState(initialTopic);
+  const [complexityLevel, setComplexityLevel] = useState('intermediate');
+  const [visualStyle, setVisualStyle] = useState('photorealistic');
   const [outputMode, setOutputMode] = useState<'single' | 'sequence'>('single');
   const [demographics, setDemographics] = useState('');
   const [movementPhase, setMovementPhase] = useState('');
@@ -134,34 +124,27 @@ export function useVisualizationLab(
     };
   }, []);
 
-  // Reset form when topic/slug context changes. Runs when topicKey goes undefined too (e.g. navigate
-  // from /exercise-image-gen?slug=foo back to /exercise-image-gen) so the form is not stuck on the previous exercise.
   useEffect(() => {
-    const topic = initialExercise?.exerciseName ?? initialTopic;
-    setExerciseTopic(topic);
-    if (initialExercise) {
-      setComplexityLevel(initialExercise.complexityLevel ?? 'intermediate');
-      setVisualStyle(initialExercise.visualStyle ?? 'photorealistic');
+    if (topicKey !== undefined) {
+      setExerciseTopic(initialTopic);
+      setResult(null);
+      setError(null);
+      setResearchResult(null);
+      setPromptStep('idle');
+      setReferenceImageData(null);
+      setReferenceImageUrl('');
+      setReferenceError(null);
+      setFormCuesToEmphasize('');
+      setMisrenderingsToAvoid('');
+      setDomainContext('');
+      setMovementPhase('');
+      setBodySide('');
+      setBodySideStart('');
+      setBodySideEnd('');
     }
-    setResult(null);
-    setError(null);
-    setResearchResult(null);
-    setPromptStep('idle');
-    setReferenceImageData(null);
-    setReferenceImageUrl('');
-    setReferenceError(null);
-    // Reset exercise-specific context; keep complexityLevel, visualStyle, demographics as user preferences
-    setFormCuesToEmphasize('');
-    setMisrenderingsToAvoid('');
-    setDomainContext('');
-    setMovementPhase('');
-    setBodySide('');
-    setBodySideStart('');
-    setBodySideEnd('');
-  }, [topicKey, initialTopic, initialExercise]);
+  }, [topicKey, initialTopic]);
 
   useEffect(() => {
-    // Changing output mode invalidates any previously researched prompts (single vs sequence mismatch).
     setResearchResult(null);
     setPromptStep('idle');
     if (outputMode === 'sequence') {

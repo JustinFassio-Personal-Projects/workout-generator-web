@@ -1,11 +1,16 @@
 /**
- * Parser for biomechanical points. Converts the 5-point string array into structured data.
+ * Parser for biomechanical points returned by the Gemini research model.
+ * Converts the 5-point string array into structured data for the detail page.
  */
 
 import type { ParsedBiomechanics, ExerciseSource } from '@/types/generated-exercise';
 
+/** Number of items in the full biomechanical card: Chain, Pivot, Stabilization, Mistakes, Cues. Used to detect legacy/stored 5-point arrays vs plain performance-cues lists. */
 export const FULL_BIOMECHANICS_CARD_LENGTH = 5;
 
+/**
+ * Extract content after the "Point N: Label - " prefix.
+ */
 function extractPointContent(point: string): string {
   const match = point.match(/^Point\s*\d+:\s*[^-]+-\s*(.*)$/i);
   if (match) return match[1].trim();
@@ -14,6 +19,9 @@ function extractPointContent(point: string): string {
   return point;
 }
 
+/**
+ * Parse a point that may contain multiple items (mistakes or cues).
+ */
 function parseMultipleItems(content: string): string[] {
   const bulletPatterns = [
     /(?:^|\n)\s*[•●◦▪-]\s*/g,
@@ -31,6 +39,10 @@ function parseMultipleItems(content: string): string[] {
   return [content.trim()];
 }
 
+/**
+ * Normalize list items for display. When a single element contains comma-separated
+ * quoted phrases (e.g. "'A', 'B', and 'C'"), split into separate items.
+ */
 export function normalizeListItems(items: string[]): string[] {
   if (!items.length || items.length !== 1) return items;
   const s = items[0];
@@ -60,7 +72,6 @@ function detectKineticChainType(biomechanicalChain: string): string {
   if (lower.includes('isolation')) return 'ISOLATION MOVEMENT';
   return 'MOVEMENT PATTERN';
 }
-
 export function parseBiomechanicalPoints(points: string[]): {
   biomechanics: ParsedBiomechanics;
   kineticChainType: string;
@@ -103,10 +114,8 @@ export function parseBiomechanicalPoints(points: string[]): {
     defaults.commonMistakes = parseMultipleItems(extractPointContent(points[3]));
   if (defaults.performanceCues.length === 0 && points.length >= FULL_BIOMECHANICS_CARD_LENGTH)
     defaults.performanceCues = parseMultipleItems(extractPointContent(points[4]));
-  return {
-    biomechanics: defaults,
-    kineticChainType: detectKineticChainType(biomechanicalChainContent),
-  };
+  const kineticChainType = detectKineticChainType(biomechanicalChainContent);
+  return { biomechanics: defaults, kineticChainType };
 }
 
 interface RawGroundingChunk {
@@ -144,7 +153,6 @@ export function transformSearchResultsToSources(
   }
   return sources;
 }
-
 export function filterRealSources(sources: ExerciseSource[] | undefined): ExerciseSource[] {
   if (!sources?.length) return [];
   const lower = (d: string) => d?.toLowerCase() ?? '';

@@ -158,6 +158,8 @@ export interface GeneratedExercise {
   rejectionReason?: string;
   /** Generated HTML content for the deep dive page */
   deepDiveHtmlContent?: string;
+  /** AI-generated plain-language instructions for the public page (markdown). */
+  userFriendlyInstructions?: string;
   /** Block suitability: which workout phases this exercise fits. */
   suitableBlocks?: SuitableBlock[];
   /** When 'main' is in suitableBlocks: Strength, Cardio, or HIIT. */

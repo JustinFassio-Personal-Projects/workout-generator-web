@@ -16,6 +16,9 @@ import ManageZones from './admin/views/ManageZones';
 import ManagePrograms from './admin/views/ManagePrograms';
 import ProgramEditor from './admin/views/ProgramEditor';
 import ComingSoon from './admin/ComingSoon';
+import ManageExercises from './admin/views/ManageExercises';
+import AdminExerciseDetail from './admin/AdminExerciseDetail';
+import ExerciseImageGenerator from '@/components/ExerciseImageGenerator';
 
 const navLinkClass = (isActive: boolean) =>
   `flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
@@ -92,6 +95,9 @@ const AdminDashboard: React.FC = () => {
             <Route index element={<DashboardHome />} />
             <Route path="users" element={<ManageUsers />} />
             <Route path="zones" element={<ManageZones />} />
+            <Route path="exercises/:slug" element={<AdminExerciseDetail />} />
+            <Route path="exercises" element={<ManageExercises />} />
+            <Route path="exercise-image-gen" element={<ExerciseImageGenerator />} />
             <Route path="programs/:id" element={<ProgramEditor />} />
             <Route path="programs" element={<ManagePrograms />} />
             <Route path="*" element={<ComingSoon />} />

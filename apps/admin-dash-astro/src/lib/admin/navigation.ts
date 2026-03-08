@@ -18,6 +18,7 @@ import {
   LayoutList,
   ImageIcon,
   Activity,
+  Video,
 } from 'lucide-react';
 import { EXERCISE_LABELS } from '@/lib/labels/exercises';
 
@@ -37,6 +38,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { path: '/warmup', label: 'Warm-Up Engine', icon: Activity },
   { path: '/exercises', label: EXERCISE_LABELS.section, icon: Dumbbell },
   { path: '/exercise-image-gen', label: EXERCISE_LABELS.visualizationLab, icon: ImageIcon },
+  { path: '/tutorial-lab', label: 'Tutorial Lab', icon: Video },
   { path: '/zones', label: 'Zones', icon: LayoutGrid },
 ];
 

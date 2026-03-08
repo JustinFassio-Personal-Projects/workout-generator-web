@@ -11,6 +11,7 @@ import type {
   ExerciseVideo,
   ParsedBiomechanics,
 } from '@/types/generated-exercise';
+import type { ExerciseConfig } from '@/features/TutorialLab/types/tutorial';
 import { normalizeExerciseName } from '@/lib/approved-exercise-maps';
 
 function toDate(v: string | null | undefined): Date {
@@ -50,6 +51,7 @@ interface GeneratedExerciseRow {
   video_url: string | null;
   video_storage_path: string | null;
   videos: unknown[] | null;
+  tutorial_config: Record<string, unknown> | null;
 }
 
 function mapRowToExercise(row: GeneratedExerciseRow): GeneratedExercise {
@@ -84,6 +86,7 @@ function mapRowToExercise(row: GeneratedExerciseRow): GeneratedExercise {
     videoUrl: row.video_url ?? undefined,
     videoStoragePath: row.video_storage_path ?? undefined,
     videos: (row.videos ?? []) as GeneratedExercise['videos'],
+    tutorialConfig: (row.tutorial_config ?? undefined) as ExerciseConfig | undefined,
   };
 }
 
@@ -146,6 +149,7 @@ function toPayload(input: Partial<CreateGeneratedExerciseInput>): Record<string,
   if (input.videos != null) row.videos = input.videos;
   if (input.deepDiveHtmlContent != null) row.deep_dive_html_content = input.deepDiveHtmlContent;
   if (input.userFriendlyInstructions != null) row.user_friendly_instructions = input.userFriendlyInstructions;
+  if (input.tutorialConfig != null) row.tutorial_config = input.tutorialConfig as unknown as Record<string, unknown>;
   return row;
 }
 
@@ -177,6 +181,7 @@ export async function updateGeneratedExercise(
   if (updates.rejectedBy != null) row.rejected_by = updates.rejectedBy;
   if (updates.rejectionReason != null) row.rejection_reason = updates.rejectionReason;
   if (updates.userFriendlyInstructions != null) row.user_friendly_instructions = updates.userFriendlyInstructions;
+  if (updates.tutorialConfig != null) row.tutorial_config = updates.tutorialConfig as unknown as Record<string, unknown>;
   const { error } = await supabase.from('generated_exercises').update(row).eq('id', id);
   if (error) throw error;
 }

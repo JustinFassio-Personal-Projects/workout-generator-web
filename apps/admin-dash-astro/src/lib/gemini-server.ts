@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import type { ExerciseConfig } from '@/features/TutorialLab/types/tutorial';
 
 // NOTE: This must only be used server-side to protect the API key
 const apiKey = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;

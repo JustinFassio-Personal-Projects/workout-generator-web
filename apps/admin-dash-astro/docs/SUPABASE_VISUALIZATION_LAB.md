@@ -84,3 +84,7 @@ If you see **400 "Bucket not found"**, the bucket has not been created yet — a
 3. **Storage**: In Dashboard → **Storage**, confirm a bucket named **`exercise-images`** exists.
 4. **Tables**: In **Table Editor**, confirm **`generated_exercises`** and **`exercise_images`** exist under the `public` schema. You can run: `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('generated_exercises', 'exercise_images');` — it should return both rows.
 5. **After saving an exercise**: In Storage → `exercise-images` → `generated-exercises` you should see objects under `{user-id}/{slug}-{timestamp}.png`.
+
+## Tutorial Lab (tutorial_config)
+
+The Tutorial Lab stores per-exercise tutorial configuration (phases, success criteria) in **`generated_exercises.tutorial_config`** (jsonb). If you added the admin dashboard after the initial schema was created, ensure this column exists: re-run the full `SUPABASE_VISUALIZATION_LAB_SETUP.sql` script (it includes `ALTER TABLE ... ADD COLUMN IF NOT EXISTS tutorial_config jsonb`) or run that statement manually in the SQL Editor.

@@ -352,3 +352,187 @@ Output only the Markdown. Start with a short 1–2 sentence intro, then a "How t
     throw error;
   }
 }
+
+/** Context for generating a tutorial config from exercise data */
+export interface TutorialConfigContext {
+  biomechanics?: ParsedBiomechanicsContext | null;
+  userFriendlyInstructions?: string | null;
+}
+
+const TUTORIAL_CONFIG_SYSTEM_PROMPT = `You generate a tutorial configuration for a camera-based exercise tutorial. The config drives phases and pose checks (MediaPipe Pose Landmarker).
+
+Output STRICT valid JSON only, no markdown. Shape:
+{
+  "id": "slug-like-id",
+  "name": "Exercise Name",
+  "description": "Short intro for the user (1-2 sentences).",
+  "phases": [
+    {
+      "id": "phase-id",
+      "name": "Phase Name",
+      "instructionText": "What the user should do in this phase.",
+      "targetJoints": [23, 24, 25, 26, 27, 28],
+      "successCriteria": [
+        { "jointA": 23, "jointB": 25, "jointC": 27, "targetAngle": 90, "operator": "<" }
+      ],
+      "cameraOrientation": "front"
+    }
+  ]
+}
+
+MediaPipe Pose Landmark indices (0-32): 0=nose, 11/12=left/right shoulder, 13/14=left/right elbow, 15/16=left/right wrist, 23/24=left/right hip, 25/26=left/right knee, 27/28=left/right ankle, 29/30=left/right heel, 31/32=left/right foot index.
+- Angles are at the vertex: jointB is the vertex; angle is between (jointA, jointB, jointC). operator "<" means angle at jointB must be less than targetAngle (e.g. knee bend).
+- Use only these indices in targetJoints and successCriteria. Phases without pose checks can have empty successCriteria and minimal targetJoints.
+- cameraOrientation: "front" when user faces camera (e.g. push-up plank), "side" when user stands sideways for profile view (e.g. squat depth, knee angle). Choose per phase.`;
+
+/**
+ * Generates a Tutorial Lab ExerciseConfig from exercise name and context (biomechanics, user instructions).
+ * Used to seed a camera-based tutorial for an approved exercise.
+ */
+export async function generateTutorialConfig(
+  exerciseName: string,
+  context: TutorialConfigContext
+): Promise<ExerciseConfig> {
+  requireGeminiApiKey();
+  const chain = context.biomechanics?.biomechanicalChain?.trim() || 'Not specified';
+  const pivots = context.biomechanics?.pivotPoints?.trim() || 'Not specified';
+  const stabilization = context.biomechanics?.stabilizationNeeds?.trim() || 'Not specified';
+  const mistakes =
+    (context.biomechanics?.commonMistakes?.length ?? 0) > 0
+      ? context.biomechanics!.commonMistakes!.join('; ')
+      : 'None specified';
+  const cues =
+    (context.biomechanics?.performanceCues?.length ?? 0) > 0
+      ? context.biomechanics!.performanceCues!.join('; ')
+      : 'None specified';
+  const userInstructions = (context.userFriendlyInstructions ?? '').slice(0, 800);
+
+  const prompt = `Generate a tutorial config for the exercise: "${exerciseName}".
+
+Technical context (use to choose phases and angles):
+- Movement / chain: ${chain}
+- Pivot points: ${pivots}
+- Stabilization: ${stabilization}
+- Common mistakes: ${mistakes}
+- Performance cues: ${cues}
+${userInstructions ? `\nUser-friendly instructions (use for description and phase text): ${userInstructions}` : ''}
+
+Create 3-6 phases (e.g. Setup, Descent/Movement, Hold/Check, Return, Complete). For phases that check form, add successCriteria with jointA, jointB, jointC (vertex), targetAngle in degrees, and operator "<" or ">" or "==". Use MediaPipe indices only. Add cameraOrientation "front" or "side" per phase (e.g. side for squat depth, front for push-up).
+Output only the JSON object, no other text.`;
+
+  try {
+    const response = await withRetry(
+      () =>
+        client.models.generateContent({
+          model: 'gemini-2.0-flash',
+          config: {
+            systemInstruction: TUTORIAL_CONFIG_SYSTEM_PROMPT,
+            responseMimeType: 'application/json',
+          },
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        }),
+      '[generateTutorialConfig]'
+    );
+
+    const candidate = response.candidates?.[0];
+    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
+    const raw = (textPart?.text || '').trim();
+    const parsed = JSON.parse(raw) as ExerciseConfig;
+    if (!parsed.phases || !Array.isArray(parsed.phases)) {
+      throw new Error('Invalid config: missing phases array');
+    }
+    if (!parsed.id) {
+      parsed.id = exerciseName.toLowerCase().replace(/\s+/g, '-');
+    }
+    if (!parsed.name) {
+      parsed.name = exerciseName;
+    }
+    parsed.description = parsed.description ?? `Tutorial for ${exerciseName}`;
+    for (let i = 0; i < parsed.phases.length; i++) {
+      const p = parsed.phases[i];
+      if (typeof p.id !== 'string' || !p.id.trim()) {
+        p.id = `phase-${i}`;
+      } else {
+        p.id = p.id.trim();
+      }
+      if (typeof p.name !== 'string' || !p.name.trim()) {
+        p.name = `Phase ${i + 1}`;
+      } else {
+        p.name = p.name.trim();
+      }
+      if (typeof p.instructionText !== 'string' || !p.instructionText.trim()) {
+        p.instructionText = 'Follow the on-screen guidance.';
+      } else {
+        p.instructionText = p.instructionText.trim();
+      }
+      p.targetJoints = Array.isArray(p.targetJoints) ? p.targetJoints : [];
+      p.successCriteria = Array.isArray(p.successCriteria) ? p.successCriteria : [];
+      if (p.cameraOrientation !== 'front' && p.cameraOrientation !== 'side') {
+        p.cameraOrientation = 'front';
+      }
+    }
+    return parsed;
+  } catch (error) {
+    console.error('Error in generateTutorialConfig:', error);
+    throw error;
+  }
+}
+
+const PERFORMANCE_SUMMARY_SYSTEM_PROMPT = `You are a friendly coach. Given an exercise and its biomechanics, write 3–5 short, actionable tips to improve form. Focus on common mistakes and performance cues. Use plain language; avoid jargon. Output valid Markdown only: use ## for headings, ** for bold, numbered or bulleted lists. No HTML, no code blocks.`;
+
+/**
+ * Generates a post-tutorial performance summary (how to improve form).
+ * Used when the user completes a Tutorial Lab session.
+ */
+export async function generatePerformanceSummary(
+  exerciseName: string,
+  biomechanics?: ParsedBiomechanicsContext | null
+): Promise<string> {
+  requireGeminiApiKey();
+  const chain = biomechanics?.biomechanicalChain?.trim() || 'Not specified';
+  const pivots = biomechanics?.pivotPoints?.trim() || 'Not specified';
+  const stabilization = biomechanics?.stabilizationNeeds?.trim() || 'Not specified';
+  const mistakes =
+    (biomechanics?.commonMistakes?.length ?? 0) > 0
+      ? biomechanics!.commonMistakes!.join('; ')
+      : 'None specified';
+  const cues =
+    (biomechanics?.performanceCues?.length ?? 0) > 0
+      ? biomechanics!.performanceCues!.join('; ')
+      : 'None specified';
+
+  const prompt = `Write a short "How to improve your ${exerciseName}" guide for someone who just completed a camera-based tutorial.
+
+Context:
+- Movement / chain: ${chain}
+- Pivot points: ${pivots}
+- Stabilization: ${stabilization}
+- Common mistakes to address: ${mistakes}
+- Performance cues (translate into tips): ${cues}
+
+Output only the Markdown. Start with a brief intro (1 sentence), then 3–5 actionable tips.`;
+
+  try {
+    const response = await withRetry(
+      () =>
+        client.models.generateContent({
+          model: 'gemini-2.0-flash',
+          config: {
+            systemInstruction: PERFORMANCE_SUMMARY_SYSTEM_PROMPT,
+            responseMimeType: 'text/plain',
+          },
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        }),
+      '[generatePerformanceSummary]'
+    );
+
+    const candidate = response.candidates?.[0];
+    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
+    let markdown = (textPart?.text || '').trim();
+    markdown = markdown.replace(/^```markdown\n?|\n?```$/g, '').trim();
+    return markdown || `## Tips for ${exerciseName}\n\nPractice regularly and focus on the cues from the tutorial.`;
+  } catch (error) {
+    console.error('Error in generatePerformanceSummary:', error);
+    throw error;
+  }
+}

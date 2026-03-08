@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import type { ExerciseConfig } from '@/features/TutorialLab/types/tutorial';
 
 // NOTE: This must only be used server-side to protect the API key
 const apiKey = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
@@ -359,27 +360,6 @@ export interface TutorialConfigContext {
   userFriendlyInstructions?: string | null;
 }
 
-/** ExerciseConfig shape for Tutorial Lab (phases, success criteria). Matches @/features/TutorialLab/types/tutorial */
-export interface TutorialExerciseConfig {
-  id: string;
-  name: string;
-  description: string;
-  phases: {
-    id: string;
-    name: string;
-    instructionText: string;
-    targetJoints: number[];
-    successCriteria: Array<{
-      jointA: number;
-      jointB: number;
-      jointC: number;
-      targetAngle: number;
-      operator: '<' | '>' | '==';
-    }>;
-    cameraOrientation?: 'front' | 'side';
-  }[];
-}
-
 const TUTORIAL_CONFIG_SYSTEM_PROMPT = `You generate a tutorial configuration for a camera-based exercise tutorial. The config drives phases and pose checks (MediaPipe Pose Landmarker).
 
 Output STRICT valid JSON only, no markdown. Shape:
@@ -413,7 +393,7 @@ MediaPipe Pose Landmark indices (0-32): 0=nose, 11/12=left/right shoulder, 13/14
 export async function generateTutorialConfig(
   exerciseName: string,
   context: TutorialConfigContext
-): Promise<TutorialExerciseConfig> {
+): Promise<ExerciseConfig> {
   requireGeminiApiKey();
   const chain = context.biomechanics?.biomechanicalChain?.trim() || 'Not specified';
   const pivots = context.biomechanics?.pivotPoints?.trim() || 'Not specified';
@@ -458,7 +438,7 @@ Output only the JSON object, no other text.`;
     const candidate = response.candidates?.[0];
     const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
     const raw = (textPart?.text || '').trim();
-    const parsed = JSON.parse(raw) as TutorialExerciseConfig;
+    const parsed = JSON.parse(raw) as ExerciseConfig;
     if (!parsed.phases || !Array.isArray(parsed.phases)) {
       throw new Error('Invalid config: missing phases array');
     }

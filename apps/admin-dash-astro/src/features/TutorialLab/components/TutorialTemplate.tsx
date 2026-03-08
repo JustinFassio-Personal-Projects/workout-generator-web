@@ -163,7 +163,6 @@ export default function TutorialTemplate({
   }, [showIntro, phaseIndex, currentPhase?.instructionText, speakPhaseCue]);
 
   // Voice: wrong pose (angle-based or performance cue)
-  const performanceCues = biomechanics?.performanceCues ?? [];
   useEffect(() => {
     if (showIntro || !voiceEnabled || !currentPhase?.successCriteria?.length || !landmarks) return;
     const criteria = currentPhase.successCriteria;
@@ -171,9 +170,10 @@ export default function TutorialTemplate({
     const met = evaluateCriteria(landmarks, criteria);
     if (!canEval || met) return;
     const angles = getAnglesForCriteria(landmarks, criteria);
+    const performanceCues = biomechanics?.performanceCues ?? [];
     const cue = getWrongPoseCue(angles, criteria) ?? performanceCues[0];
     if (cue) speakWrongCue(typeof cue === 'string' ? cue : String(cue));
-  }, [showIntro, voiceEnabled, landmarks, currentPhase?.successCriteria, speakWrongCue, performanceCues]);
+  }, [showIntro, voiceEnabled, landmarks, currentPhase?.successCriteria, speakWrongCue, biomechanics?.performanceCues]);
 
   // Voice: correct pose (once when first met)
   const spokeCorrectRef = useRef(false);
@@ -210,7 +210,10 @@ export default function TutorialTemplate({
       return;
     }
     setLoadingSummary(true);
-    fetch(`/api/admin/exercises/${exerciseId}/performance-summary`, { credentials: 'include' })
+    fetch(`/api/admin/exercises/${exerciseId}/performance-summary`, {
+      method: 'POST',
+      credentials: 'include',
+    })
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Failed to fetch'))))
       .then((data: { summary?: string }) => {
         setPerformanceSummary(data.summary ?? '');

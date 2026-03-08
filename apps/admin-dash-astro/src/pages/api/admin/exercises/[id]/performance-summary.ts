@@ -1,6 +1,7 @@
 /**
- * GET: Fetch performance summary (how to improve) for a tutorial.
+ * POST: Generate performance summary (how to improve) for a tutorial.
  * Admin only. Used when user completes a Tutorial Lab session.
+ * Uses POST because it triggers an AI generation call (non-idempotent, expensive).
  */
 
 import type { APIRoute } from 'astro';
@@ -13,7 +14,7 @@ import {
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params, request, cookies }) => {
+export const POST: APIRoute = async ({ params, request, cookies }) => {
   const id = params.id;
   if (!id) {
     return new Response(JSON.stringify({ error: 'Exercise ID is required' }), {

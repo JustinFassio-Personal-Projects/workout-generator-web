@@ -194,6 +194,7 @@ export default function TutorialLabView() {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ save: false }),
+                      credentials: 'include',
                     }
                   );
                   if (!res.ok) throw new Error('Failed to generate');

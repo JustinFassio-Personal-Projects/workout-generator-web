@@ -52,12 +52,12 @@ export default function JointOverlay({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !landmarks?.length) return;
-
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
+    // Always clear the canvas first to avoid showing stale skeleton frames when user moves out of frame.
     ctx.clearRect(0, 0, width, height);
+    if (!landmarks?.length) return;
 
     const toX = (x: number) => x * width;
     const toY = (y: number) => y * height;

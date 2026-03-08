@@ -229,7 +229,7 @@ export default function ConfigBuilder({
       </div>
 
       <div className="mt-4">
-        <p className="mb-2 text-sm font-medium text-white/80">JSON (read-only view)</p>
+        <p className="mb-2 text-sm font-medium text-white/80">JSON editor</p>
         <textarea
           value={jsonText}
           onChange={(e) => setJsonText(e.target.value)}

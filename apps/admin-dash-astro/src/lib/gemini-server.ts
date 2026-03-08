@@ -449,7 +449,23 @@ Output only the JSON object, no other text.`;
       parsed.name = exerciseName;
     }
     parsed.description = parsed.description ?? `Tutorial for ${exerciseName}`;
-    for (const p of parsed.phases) {
+    for (let i = 0; i < parsed.phases.length; i++) {
+      const p = parsed.phases[i];
+      if (typeof p.id !== 'string' || !p.id.trim()) {
+        p.id = `phase-${i}`;
+      } else {
+        p.id = p.id.trim();
+      }
+      if (typeof p.name !== 'string' || !p.name.trim()) {
+        p.name = `Phase ${i + 1}`;
+      } else {
+        p.name = p.name.trim();
+      }
+      if (typeof p.instructionText !== 'string' || !p.instructionText.trim()) {
+        p.instructionText = 'Follow the on-screen guidance.';
+      } else {
+        p.instructionText = p.instructionText.trim();
+      }
       p.targetJoints = Array.isArray(p.targetJoints) ? p.targetJoints : [];
       p.successCriteria = Array.isArray(p.successCriteria) ? p.successCriteria : [];
       if (p.cameraOrientation !== 'front' && p.cameraOrientation !== 'side') {

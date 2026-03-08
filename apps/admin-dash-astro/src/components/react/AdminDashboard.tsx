@@ -19,6 +19,7 @@ import ComingSoon from './admin/ComingSoon';
 import ManageExercises from './admin/views/ManageExercises';
 import AdminExerciseDetail from './admin/AdminExerciseDetail';
 import ExerciseImageGenerator from '@/components/ExerciseImageGenerator';
+import TutorialLabView from '@/features/TutorialLab/components/TutorialLabView';
 
 const navLinkClass = (isActive: boolean) =>
   `flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
@@ -98,6 +99,7 @@ const AdminDashboard: React.FC = () => {
             <Route path="exercises/:slug" element={<AdminExerciseDetail />} />
             <Route path="exercises" element={<ManageExercises />} />
             <Route path="exercise-image-gen" element={<ExerciseImageGenerator />} />
+            <Route path="tutorial-lab" element={<TutorialLabView />} />
             <Route path="programs/:id" element={<ProgramEditor />} />
             <Route path="programs" element={<ManagePrograms />} />
             <Route path="*" element={<ComingSoon />} />

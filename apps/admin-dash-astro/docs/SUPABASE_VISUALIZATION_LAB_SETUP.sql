@@ -128,3 +128,7 @@ CREATE POLICY "Public read exercise-images" ON storage.objects
 -- 11. User-friendly instructions (AI-generated plain-language; shown on public exercise page)
 ALTER TABLE public.generated_exercises
   ADD COLUMN IF NOT EXISTS user_friendly_instructions text;
+
+-- 12. Tutorial Lab: per-exercise tutorial config (phases, success criteria for camera-based tutorials)
+ALTER TABLE public.generated_exercises
+  ADD COLUMN IF NOT EXISTS tutorial_config jsonb;

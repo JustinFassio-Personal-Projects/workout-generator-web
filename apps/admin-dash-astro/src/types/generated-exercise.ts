@@ -4,6 +4,7 @@
  */
 
 import type { TimestampLike } from './timestamp';
+import type { ExerciseConfig } from '@/features/TutorialLab/types/tutorial';
 
 /**
  * Source reference with search verification pattern.
@@ -114,6 +115,8 @@ export interface GeneratedExercise {
   deepDiveHtmlContent?: string;
   /** AI-generated plain-language instructions for the public page (markdown). */
   userFriendlyInstructions?: string;
+  /** Tutorial Lab: phases and success criteria for camera-based tutorial (stored per exercise). */
+  tutorialConfig?: ExerciseConfig;
   suitableBlocks?: SuitableBlock[];
   mainWorkoutType?: MainWorkoutType;
   videoUrl?: string;

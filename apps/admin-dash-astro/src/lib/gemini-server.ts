@@ -462,8 +462,10 @@ Output only the JSON object, no other text.`;
     if (!parsed.phases || !Array.isArray(parsed.phases)) {
       throw new Error('Invalid config: missing phases array');
     }
-    if (!parsed.id || !parsed.name) {
+    if (!parsed.id) {
       parsed.id = exerciseName.toLowerCase().replace(/\s+/g, '-');
+    }
+    if (!parsed.name) {
       parsed.name = exerciseName;
     }
     parsed.description = parsed.description ?? `Tutorial for ${exerciseName}`;

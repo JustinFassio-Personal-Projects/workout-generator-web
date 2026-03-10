@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2, Info, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Info, Sparkles, Globe, GlobeLock } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   fetchFullProgram,
@@ -60,17 +60,21 @@ const ProgramEditor: React.FC = () => {
   const [scaffold, setScaffold] = useState<ProgramTemplateScaffold | null>(null);
   const [buildingPhaseIndex, setBuildingPhaseIndex] = useState<number | null>(null);
   const [generatingPublicCopy, setGeneratingPublicCopy] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
+  const [publishLoading, setPublishLoading] = useState(false);
 
   const loadProgram = useCallback(async () => {
     if (!id) return;
     try {
       setLoading(true);
       setError(null);
-      const [data, scaffoldData] = await Promise.all([
+      const [data, scaffoldData, meta] = await Promise.all([
         fetchFullProgram(id),
         fetchScaffold(id).catch(() => null),
+        fetchProgramMetadata(id).catch(() => null),
       ]);
       setProgramData(data);
+      setIsPublished(meta?.status === 'published');
       setTitle(data.title);
       setDescription(data.description ?? '');
       setDifficulty(
@@ -202,6 +206,34 @@ const ProgramEditor: React.FC = () => {
     [id, scaffold, buildPersonaForPhase]
   );
 
+  const handlePublishToggle = useCallback(async () => {
+    if (!id) return;
+    const nextStatus = isPublished ? 'draft' : 'published';
+    setPublishLoading(true);
+    try {
+      const token = (await supabase.auth.getSession()).data.session?.access_token;
+      const res = await fetch(`/api/admin/programs/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: 'include',
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? 'Failed to update status');
+      }
+      setIsPublished(nextStatus === 'published');
+      toast.success(nextStatus === 'published' ? 'Program published.' : 'Program unpublished.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update status');
+    } finally {
+      setPublishLoading(false);
+    }
+  }, [id, isPublished]);
+
   const handleSave = async () => {
     if (!id || !user?.uid || !programData) return;
     try {
@@ -283,7 +315,23 @@ const ProgramEditor: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handlePublishToggle}
+            disabled={publishLoading}
+            className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-medium text-white/80 transition-colors hover:bg-white/10 disabled:opacity-50"
+            title={isPublished ? 'Unpublish (remove from programs landing)' : 'Publish (show on programs landing)'}
+          >
+            {publishLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : isPublished ? (
+              <GlobeLock className="h-5 w-5" />
+            ) : (
+              <Globe className="h-5 w-5" />
+            )}
+            {publishLoading ? 'Updating...' : isPublished ? 'Unpublish' : 'Publish'}
+          </button>
           <button
             type="button"
             onClick={() => setGeneratorOpen(true)}

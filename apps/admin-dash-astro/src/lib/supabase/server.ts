@@ -5,9 +5,12 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { config as loadEnv } from 'dotenv';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-// Load env so API routes get correct values (no override — process.env / CI wins)
+// Load env so API routes get correct values. Load monorepo root first so admin + programs share Supabase.
+const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../..');
+loadEnv({ path: resolve(rootDir, '.env.local') });
 loadEnv({ path: resolve(process.cwd(), '.env') });
 loadEnv({ path: resolve(process.cwd(), '.env.local') });
 

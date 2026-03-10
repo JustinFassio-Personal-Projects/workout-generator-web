@@ -8,10 +8,10 @@ import { config as loadEnv } from 'dotenv';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-// Force-load .env.local so API routes get correct env (Vite dev can fail to pass process.env to workers).
-const rootFromFile = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+// Force-load .env.local. Root loads last so it wins — admin + programs share Supabase when root has the vars.
+const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../..');
 loadEnv({ path: resolve(process.cwd(), '.env.local'), override: true });
-loadEnv({ path: resolve(rootFromFile, '.env.local'), override: true });
+loadEnv({ path: resolve(rootDir, '.env.local'), override: true });
 
 function normalizeEnvVar(v: string | undefined): string {
   if (v == null || typeof v !== 'string') return '';

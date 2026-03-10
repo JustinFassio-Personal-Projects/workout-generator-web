@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Edit, Trash2, Loader2 } from 'lucide-react';
+import { Edit, Trash2, Loader2, Globe, GlobeLock } from 'lucide-react';
 import { toast } from 'sonner';
 import { fetchPrograms, deleteProgram } from '@/lib/supabase/admin/programs';
 import type { ProgramLibraryItem } from '@/lib/supabase/admin/programs';
@@ -27,6 +27,7 @@ const ProgramLibraryTable: React.FC<ProgramLibraryTableProps> = ({ onEdit, onDel
   const [programToDelete, setProgramToDelete] = useState<{ id: string; title: string } | null>(
     null
   );
+  const [publishingId, setPublishingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.uid) {
@@ -63,6 +64,29 @@ const ProgramLibraryTable: React.FC<ProgramLibraryTableProps> = ({ onEdit, onDel
   const handleDeleteRequest = (programId: string, programTitle: string) => {
     setProgramToDelete({ id: programId, title: programTitle });
     setDeleteModalOpen(true);
+  };
+
+  const handlePublishToggle = async (program: ProgramLibraryItem) => {
+    const nextStatus = program.isPublic ? 'draft' : 'published';
+    try {
+      setPublishingId(program.id);
+      const res = await fetch(`/api/admin/programs/${program.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to update status');
+      }
+      toast.success(nextStatus === 'published' ? 'Program published.' : 'Program unpublished.');
+      await loadPrograms();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update status');
+    } finally {
+      setPublishingId(null);
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -165,6 +189,20 @@ const ProgramLibraryTable: React.FC<ProgramLibraryTableProps> = ({ onEdit, onDel
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handlePublishToggle(program)}
+                        disabled={publishingId === program.id}
+                        className="rounded-lg p-2 text-white/60 hover:bg-white/10 hover:text-orange-light disabled:opacity-50"
+                        title={program.isPublic ? 'Unpublish' : 'Publish'}
+                      >
+                        {publishingId === program.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : program.isPublic ? (
+                          <GlobeLock className="h-4 w-4" />
+                        ) : (
+                          <Globe className="h-4 w-4" />
+                        )}
+                      </button>
                       <button
                         onClick={() => handleEdit(program.id)}
                         className="rounded-lg p-2 text-white/60 hover:bg-white/10 hover:text-orange-light"

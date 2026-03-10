@@ -9,7 +9,7 @@ Astro-based admin dashboard. Scaffolded so you can **copy features one at a time
 ## Setup
 
 1. From repo root: `npm install`
-2. Copy `.env.example` to `.env` (or `.env.local`) and set `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` (same Supabase project as admin-dash).
+2. Copy `.env.example` to `.env` (or `.env.local`) and set `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` (same Supabase project as admin-dash and **programs**).
 3. Ensure your admin user exists in **Supabase Auth** and in **`admin_users`** (see [docs/ADMIN_USER_SETUP.md](docs/ADMIN_USER_SETUP.md) for SQL and CLI).
 4. Run from root: `npm run dev:admin-astro` or from this dir: `npm run dev`.
 5. Open http://localhost:3009 → redirects to login. Sign in with the same admin email/password as admin-dash.
@@ -25,3 +25,13 @@ Copy in small steps:
 5. **Nav and routes** — In `AdminDashboard.tsx`, add a `NavLink` and a `<Route>` for the new section.
 
 See **FEATURES.md** in this directory for a checklist of program features and copy order.
+
+## Programs Landing Page
+
+Programs created in the admin appear on the **programs** app landing page (`/programs`) only when published. Both `admin-dash-astro` and `apps/programs` must connect to the **same Supabase project**. If they use different projects, programs created here will not show on the programs landing page.
+
+### Published program not showing on /programs?
+
+1. **Same Supabase project** — Ensure both apps use the same `PUBLIC_SUPABASE_URL`. Easiest: put `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` in **repo root** `.env.local`; both apps load it automatically.
+2. **Both dev servers running** — Admin is port 3009; programs landing is port 3006 (`npm run dev:programs`). Visit `http://localhost:3006/programs`.
+3. **Publish succeeded** — Confirm the program shows a globe-with-lock (published) icon in the admin library table.

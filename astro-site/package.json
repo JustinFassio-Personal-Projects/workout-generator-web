@@ -17,10 +17,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@workout-generator/design-system": "file:../packages/design-system",
     "@astrojs/react": "^4.4.2",
     "@astrojs/sitemap": "^3.7.0",
-    "@astrojs/vercel": "8.0.4",
+    "@astrojs/vercel": "^9.0.4",
     "@fontsource/cinzel": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/space-grotesk": "^5.2.10",
@@ -29,8 +28,9 @@
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
+    "@workout-generator/design-system": "file:../packages/design-system",
     "aos": "^3.0.0-beta.6",
-    "astro": "^5.17.1",
+    "astro": "^5.18.0",
     "chart.js": "^4.5.1",
     "lucide-react": "^0.563.0",
     "marked": "^17.0.1",

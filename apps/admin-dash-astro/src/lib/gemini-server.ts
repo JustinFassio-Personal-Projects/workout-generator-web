@@ -479,6 +479,90 @@ Output only the JSON object, no other text.`;
   }
 }
 
+const DEEP_DIVE_SYSTEM_PROMPT = `
+You are an Elite Strength Coach and Web Developer. Your goal is to output a single, beautiful, responsive HTML5 file (with embedded Tailwind CSS via CDN) that serves as the 'Ultimate Guide' for a specific exercise.
+
+Structure:
+1. One <h1> — the exercise name as the main page title (no other <h1> on the page).
+2. Hero Section (use the provided image URL)
+3. Biomechanics (Deep dive: Moment arms, Force vectors, Kinetic chain)
+4. Muscle Map (Description of primary/secondary movers and stabilizers)
+5. Execution Protocol — use an <h2> or <h3> titled exactly "Execution Protocol" and a single <ol> with one <li> per step (numbered execution steps). This section is used by the Daily Warm-Up timer.
+6. Common Mistakes table
+
+Headings: Use a single <h1> for the exercise name; use <h2> for major sections and <h3> for subsections; keep a logical hierarchy (do not skip levels, e.g. no h4 without h3).
+
+Tone: Clinical, educational, and encouraging.
+Content: Deeply research the specific biomechanics for the given exercise name.
+Images: Embed the provided image URL in the Hero Section.
+
+Use Unicode symbols for math and units (e.g. τ, ×, θ, °) and plain text only; do not use LaTeX or $...$ math notation.
+
+Do not include a Sources or References section; sources are added by the application.
+
+Output: Return ONLY the raw HTML string. Do not include markdown code blocks.
+`;
+
+/**
+ * Generates Deep Dive HTML for an exercise. Used by admin generate-page API.
+ * Model aligned with programs app for consistent output.
+ */
+export async function generateExerciseHtml(
+  exerciseName: string,
+  imageUrl: string,
+  biomechanics?: {
+    biomechanicalChain: string;
+    pivotPoints: string;
+    stabilizationNeeds: string;
+  },
+  /** URL for the "Go Back" button (default: /exercises). */
+  backLinkHref: string = '/exercises'
+): Promise<string> {
+  requireGeminiApiKey();
+  const prompt = `
+Generate a Deep Dive HTML page for the exercise: "${exerciseName}".
+The first heading must be a single <h1> containing the exercise name.
+
+Image URL: ${imageUrl}
+
+Biomechanics Context:
+- Chain: ${biomechanics?.biomechanicalChain || 'N/A'}
+- Pivots: ${biomechanics?.pivotPoints || 'N/A'}
+- Stabilization: ${biomechanics?.stabilizationNeeds || 'N/A'}
+
+Ensure the HTML is fully self-contained with Tailwind CSS (via CDN) and uses a high-contrast, clean typography design (Inter/Roboto).
+Include a "Go Back" button that links to "${backLinkHref}".
+`;
+
+  try {
+    const response = await withRetry(
+      () =>
+        client.models.generateContent({
+          model: 'gemini-3-pro-preview',
+          config: {
+            systemInstruction: DEEP_DIVE_SYSTEM_PROMPT,
+            responseMimeType: 'text/plain',
+          },
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        }),
+      '[generateExerciseHtml]'
+    );
+
+    const candidate = response.candidates?.[0];
+    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
+    let html = textPart?.text || '';
+
+    // Clean up markdown if present
+    html = html.replace(/```html\n?|\n?```/g, '').trim();
+
+    return html;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in generateExerciseHtml:', message);
+    throw error;
+  }
+}
+
 const PERFORMANCE_SUMMARY_SYSTEM_PROMPT = `You are a friendly coach. Given an exercise and its biomechanics, write 3–5 short, actionable tips to improve form. Focus on common mistakes and performance cues. Use plain language; avoid jargon. Output valid Markdown only: use ## for headings, ** for bold, numbered or bulleted lists. No HTML, no code blocks.`;
 
 /**

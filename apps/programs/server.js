@@ -15,10 +15,10 @@ if (typeof globalThis.__dirname === 'undefined') {
   globalThis.__dirname = __dirname;
 }
 
-// Firebase App Hosting sets PORT (8080). Use 8080 in production when unset; 3002 for local dev.
+// Firebase App Hosting sets PORT (8080). Use 8080 in production when unset; 3010 for local dev.
 const PORT =
   Number(process.env.PORT) ||
-  (process.env.NODE_ENV === 'production' ? 8080 : 3002);
+  (process.env.NODE_ENV === 'production' ? 8080 : 3010);
 const HOST = process.env.HOST || '0.0.0.0';
 
 // Prevent Astro entry from auto-starting; only server.js starts the server (avoids EADDRINUSE on 8080)

@@ -20,6 +20,8 @@ import {
   ChevronDown,
   ChevronRight,
   FileText,
+  ExternalLink,
+  Pencil,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import {
@@ -30,6 +32,9 @@ import { normalizeListItems, filterRealSources } from '@/lib/parse-biomechanics'
 import type { GeneratedExercise, GeneratedExerciseStatus } from '@/types/generated-exercise';
 import { EXERCISE_LABELS } from '@/lib/labels/exercises';
 import { toast } from 'sonner';
+import DeepDiveEditor from '@/components/react/admin/DeepDiveEditor';
+
+const PUBLIC_SITE_URL = import.meta.env.PUBLIC_SITE_URL || '';
 
 /** Strip HTML tags for safe plain-text display of biomechanics content. */
 function stripHtml(html: string): string {
@@ -66,6 +71,8 @@ const AdminExerciseDetail: React.FC = () => {
   const [generationDetailsOpen, setGenerationDetailsOpen] = useState(false);
   const [isGeneratingInstructions, setIsGeneratingInstructions] = useState(false);
   const [userInstructionsOpen, setUserInstructionsOpen] = useState(false);
+  const [showDeepDiveEditor, setShowDeepDiveEditor] = useState(false);
+  const [isGeneratingDeepDive, setIsGeneratingDeepDive] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -140,6 +147,43 @@ const AdminExerciseDetail: React.FC = () => {
   const handleReject = () => {
     const reason = window.prompt('Rejection reason (optional):') ?? '';
     handleStatusUpdate('rejected', reason);
+  };
+
+  const handleGenerateDeepDive = async () => {
+    if (!exercise || isGeneratingDeepDive) return;
+    setIsGeneratingDeepDive(true);
+    try {
+      const res = await fetch(`/api/admin/exercises/${exercise.id}/generate-page`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data.error ?? 'Failed to generate deep dive');
+        return;
+      }
+      toast.success('Deep dive page generated.');
+      const updated = await getGeneratedExerciseBySlug(slug!);
+      if (updated) setExercise(updated);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to generate deep dive');
+    } finally {
+      setIsGeneratingDeepDive(false);
+    }
+  };
+
+  const handleUpdateDeepDive = async (html: string) => {
+    if (!exercise) return;
+    const res = await fetch(`/api/admin/exercises/${exercise.id}/update-deep-dive`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deepDiveHtmlContent: html }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error ?? 'Failed to update');
+    setExercise((prev) => (prev ? { ...prev, deepDiveHtmlContent: html } : null));
+    setShowDeepDiveEditor(false);
   };
 
   const handleGenerateInstructions = async () => {
@@ -239,6 +283,45 @@ const AdminExerciseDetail: React.FC = () => {
             <Sparkles className="h-4 w-4" />
             Edit in Visualization Lab
           </Link>
+          <button
+            type="button"
+            onClick={handleGenerateDeepDive}
+            disabled={isGeneratingDeepDive || loading}
+            className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-300 transition-colors hover:bg-emerald-500/20 disabled:opacity-50"
+            title="Generate AI deep dive HTML page"
+          >
+            {isGeneratingDeepDive ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <BookOpen className="h-4 w-4" />
+            )}
+            {exercise.deepDiveHtmlContent ? 'Regenerate' : 'Generate'} Deep Dive Page
+          </button>
+          {exercise.deepDiveHtmlContent && (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowDeepDiveEditor(true)}
+                className="inline-flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm font-medium text-amber-300 transition-colors hover:bg-amber-500/20"
+                title="Edit deep dive HTML"
+              >
+                <Pencil className="h-4 w-4" />
+                Edit Page
+              </button>
+              {PUBLIC_SITE_URL && (
+                <a
+                  href={`${PUBLIC_SITE_URL.replace(/\/$/, '')}/exercises/${exercise.slug}/learn`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10"
+                  title="View public deep dive page"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View Page
+                </a>
+              )}
+            </>
+          )}
           <button
             type="button"
             onClick={handleGenerateInstructions}
@@ -526,6 +609,15 @@ const AdminExerciseDetail: React.FC = () => {
         <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           <strong>Rejection reason:</strong> {exercise.rejectionReason}
         </div>
+      )}
+
+      {showDeepDiveEditor && exercise && (
+        <DeepDiveEditor
+          exercise={exercise}
+          onSave={handleUpdateDeepDive}
+          onCancel={() => setShowDeepDiveEditor(false)}
+          currentUserId={user?.id}
+        />
       )}
     </div>
   );

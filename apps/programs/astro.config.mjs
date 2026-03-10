@@ -58,7 +58,7 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: Number(process.env.PORT) || 3006,
+    port: Number(process.env.PORT) || 3010,
     host: true
   },
   vite: {

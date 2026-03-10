@@ -26,6 +26,8 @@ import {
   ImagePlus,
   ChevronDown,
   ChevronRight,
+  ListOrdered,
+  Lightbulb,
 } from 'lucide-react';
 import type {
   GeneratedExercise,
@@ -93,6 +95,106 @@ const StatusBadge: React.FC<{ status: GeneratedExerciseStatus }> = ({ status }) 
     </span>
   );
 };
+
+/** Parsed section from user instructions markdown */
+interface ParsedSection {
+  title: string;
+  content: string;
+}
+
+function parseUserInstructions(markdown: string): {
+  intro: string;
+  sections: ParsedSection[];
+} {
+  const trimmed = markdown.trim();
+  if (!trimmed) return { intro: '', sections: [] };
+
+  const headingRegex = /^##\s+(.+)$/gm;
+  const matches = [...trimmed.matchAll(headingRegex)];
+
+  if (matches.length === 0) {
+    return { intro: trimmed, sections: [] };
+  }
+
+  const intro = trimmed.slice(0, matches[0]!.index).trim();
+  const sections: ParsedSection[] = [];
+
+  for (let i = 0; i < matches.length; i++) {
+    const title = matches[i]![1]!.trim();
+    const start = (matches[i]!.index ?? 0) + matches[i]![0].length;
+    const end = i < matches.length - 1 ? (matches[i + 1]!.index ?? trimmed.length) : trimmed.length;
+    const content = trimmed.slice(start, end).trim();
+    sections.push({ title, content });
+  }
+
+  return { intro, sections };
+}
+
+const proseClasses =
+  'prose prose-invert prose-slate prose-headings:text-white prose-p:text-slate-300 prose-li:text-slate-300 prose-strong:text-white max-w-none [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2';
+
+function UserInstructionsContent({ markdown }: { markdown: string }) {
+  const { intro, sections } = parseUserInstructions(markdown);
+
+  const getSectionStyle = (title: string) => {
+    const lower = title.toLowerCase();
+    if (
+      lower.includes('how to') ||
+      lower.includes('do it') ||
+      lower.includes('instructions') ||
+      lower.includes('step')
+    )
+      return {
+        border: 'border-l-4 border-emerald-500',
+        bg: 'bg-slate-800/60',
+        header: 'text-emerald-400',
+        icon: ListOrdered,
+      };
+    if (lower.includes('tip') || lower.includes('avoid') || lower.includes('what to'))
+      return {
+        border: 'border-l-4 border-amber-500',
+        bg: 'bg-slate-800/60',
+        header: 'text-amber-400',
+        icon: Lightbulb,
+      };
+    return {
+      border: 'border-l-4 border-slate-500',
+      bg: 'bg-slate-800/40',
+      header: 'text-slate-300',
+      icon: null,
+    };
+  };
+
+  return (
+    <div className="space-y-6">
+      {intro && (
+        <div className={`${proseClasses} text-slate-300`}>
+          <ReactMarkdown>{intro}</ReactMarkdown>
+        </div>
+      )}
+      {sections.map((section, idx) => {
+        const style = getSectionStyle(section.title);
+        const Icon = style.icon;
+        return (
+          <div
+            key={idx}
+            className={`rounded-xl border border-slate-700 ${style.border} ${style.bg} p-5`}
+          >
+            <h3
+              className={`mb-4 flex items-center gap-2 text-base font-bold uppercase tracking-wide ${style.header}`}
+            >
+              {Icon && <Icon className="h-4 w-4" />}
+              {section.title}
+            </h3>
+            <div className={`${proseClasses} text-sm`}>
+              <ReactMarkdown>{section.content}</ReactMarkdown>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 const GeneratedExerciseDetail: React.FC<GeneratedExerciseDetailProps> = ({
   exercise,
@@ -414,14 +516,14 @@ const GeneratedExerciseDetail: React.FC<GeneratedExerciseDetailProps> = ({
 
       {/* When user-friendly instructions exist (public view): show as main content, biomechanics in "Learn More" */}
       {hasUserInstructions && (
-        <div className="px-4 md:px-6">
+        <div className="space-y-6 px-4 md:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="prose prose-invert prose-slate prose-headings:text-white prose-p:text-slate-300 prose-li:text-slate-300 prose-strong:text-white max-w-none rounded-xl border border-slate-700 bg-slate-800 p-5"
+            className="rounded-xl border border-slate-700 bg-slate-800 p-6"
           >
-            <ReactMarkdown>{exercise.userFriendlyInstructions!.trim()}</ReactMarkdown>
+            <UserInstructionsContent markdown={exercise.userFriendlyInstructions!.trim()} />
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -30,6 +30,20 @@ import { toast } from 'sonner';
 import { extractExecutionProtocolFromDeepDiveHtml } from '@/lib/parse-execution-protocol';
 import ExecutionProtocolSteps from '@/components/react/ExecutionProtocolSteps';
 
+/**
+ * Replace primary image URL in img src attributes only. Uses regex to avoid
+ * DOMParser normalization (which wraps fragments in html/head/body and can
+ * corrupt manually-edited document structure).
+ */
+function replaceImgSrcInHtml(html: string, oldUrl: string, newUrl: string): string {
+  return html.replace(/<img\b[^>]*\ssrc=(["'])(.+?)\1[^>]*>/gi, (match, quote, src) => {
+    if (src === oldUrl) {
+      return match.replace(`src=${quote}${oldUrl}${quote}`, `src=${quote}${newUrl}${quote}`);
+    }
+    return match;
+  });
+}
+
 interface DeepDiveEditorProps {
   exercise: GeneratedExercise;
   onSave: (html: string) => Promise<void>;
@@ -174,23 +188,20 @@ const DeepDiveEditor: React.FC<DeepDiveEditorProps> = ({
     );
 
     if (htmlContent) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlContent, 'text/html');
-      doc.querySelectorAll('img').forEach((imgEl) => {
-        const src = imgEl.getAttribute('src');
-        if (src === currentPrimary.imageUrl) {
-          imgEl.setAttribute('src', image.imageUrl);
-        }
-      });
-      const hasDoctype = /^\s*<!DOCTYPE/i.test(htmlContent);
-      const updatedHtml = (hasDoctype ? '<!DOCTYPE html>\n' : '') + doc.documentElement.outerHTML;
+      const updatedHtml = replaceImgSrcInHtml(
+        htmlContent,
+        currentPrimary.imageUrl,
+        image.imageUrl
+      );
       setHtmlContent(updatedHtml);
       await onSave(updatedHtml);
+      toast.success('Image promoted to Primary and HTML updated');
+      toast.info('Please refresh the main admin view to see changes there.');
+    } else {
+      toast.success('Image promoted to Primary');
+      await fetchImages();
+      toast.info('Please refresh the main admin view to see changes there.');
     }
-
-    toast.success('Image promoted to Primary and HTML updated');
-    await fetchImages();
-    toast.info('Please refresh the main admin view to see changes there.');
   };
 
   const handlePromoteToPrimaryClick = (image: ExerciseImage) => {

@@ -54,7 +54,6 @@ const DeepDiveEditor: React.FC<DeepDiveEditorProps> = ({
   /** When set, show confirmation modal for promoting this image to primary */
   const [promoteConfirmImage, setPromoteConfirmImage] = useState<ExerciseImage | null>(null);
 
-  // Fetch available images on mount
   const fetchImages = async () => {
     setLoadingImages(true);
     try {
@@ -111,11 +110,20 @@ const DeepDiveEditor: React.FC<DeepDiveEditorProps> = ({
     }
   };
 
-  const copyToClipboard = (url: string, id: string) => {
-    navigator.clipboard.writeText(url);
-    setCopiedImageId(id);
-    toast.success('Image URL copied to clipboard');
-    setTimeout(() => setCopiedImageId(null), 2000);
+  const copyToClipboard = async (url: string, id: string) => {
+    if (!navigator.clipboard?.writeText) {
+      toast.error('Clipboard not available');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedImageId(id);
+      toast.success('Image URL copied to clipboard');
+      setTimeout(() => setCopiedImageId(null), 2000);
+    } catch (err) {
+      console.error('Clipboard copy failed:', err);
+      toast.error('Failed to copy image URL to clipboard');
+    }
   };
 
   const handleMoveImage = async (index: number, direction: 'up' | 'down') => {
@@ -255,10 +263,12 @@ const DeepDiveEditor: React.FC<DeepDiveEditorProps> = ({
         {/* Preview Column (Conditional) */}
         {showPreview && (
           <div className="w-1/2 overflow-hidden bg-white">
+            {/* sandbox prevents script execution and same-origin access (XSS mitigation for AI/user-editable HTML) */}
             <iframe
               srcDoc={htmlContent}
               className="h-full w-full border-none"
               title="Deep Dive Preview"
+              sandbox=""
             />
           </div>
         )}

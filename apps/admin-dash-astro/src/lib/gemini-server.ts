@@ -550,10 +550,18 @@ Include a "Go Back" button that links to "${backLinkHref}".
 
     const candidate = response.candidates?.[0];
     const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
-    let html = textPart?.text || '';
+    let html = (textPart?.text || '').trim();
 
-    // Clean up markdown if present
-    html = html.replace(/```html\n?|\n?```/g, '').trim();
+    // Extract HTML document or strip markdown fences (handles ```html, ```XML, ```, etc.)
+    const htmlMatch = html.match(/<html[\s\S]*<\/html\s*>/i);
+    if (htmlMatch) {
+      html = htmlMatch[0].trim();
+    } else {
+      html = html
+        .replace(/^```[\w-]*\s*\n?/i, '')
+        .replace(/\n?```\s*$/, '')
+        .trim();
+    }
 
     return html;
   } catch (error) {

@@ -31,8 +31,16 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
   }
 
   try {
-    const body = await request.json();
-    const { deepDiveHtmlContent } = body;
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    const { deepDiveHtmlContent } = body as { deepDiveHtmlContent?: unknown };
 
     if (typeof deepDiveHtmlContent !== 'string') {
       return new Response(

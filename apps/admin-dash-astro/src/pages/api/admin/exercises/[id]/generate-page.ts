@@ -54,9 +54,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    const safeMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[generate-page] Error generating deep dive page:', safeMessage);
-    console.error('[generate-page] Full error:', error);
+    console.error('[generate-page] Error generating deep dive:', error);
 
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,

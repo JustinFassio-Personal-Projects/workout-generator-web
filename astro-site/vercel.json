@@ -7,6 +7,22 @@
     {
       "source": "/api/admin/:path*",
       "destination": "https://aiworkoutgenerator-admin.vercel.app/api/admin/:path*"
+    },
+    {
+      "source": "/exercises",
+      "destination": "https://programs.aiworkoutgenerator.com/exercises"
+    },
+    {
+      "source": "/exercises/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/exercises/:path*"
+    },
+    {
+      "source": "/learn",
+      "destination": "https://programs.aiworkoutgenerator.com/learn"
+    },
+    {
+      "source": "/learn/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/learn/:path*"
     }
   ]
 }

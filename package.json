@@ -8,9 +8,11 @@
     "dev:nextjs": "turbo run dev --filter=main-web",
     "dev:admin": "turbo run dev --filter=admin-dash",
     "dev:admin-astro": "turbo run dev --filter=admin-dash-astro",
-    "dev:programs": "turbo run dev --filter=programs"
+    "dev:programs": "turbo run dev --filter=programs",
+    "env:pull": "vercel env pull .env.local"
   },
   "devDependencies": {
-    "turbo": "^2.3.0"
+    "turbo": "^2.3.0",
+    "vercel": "^37.4.1"
   }
 }

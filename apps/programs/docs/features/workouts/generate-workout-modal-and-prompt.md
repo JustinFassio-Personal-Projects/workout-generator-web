@@ -294,7 +294,7 @@ The API runs four steps in order. Each step calls Vertex AI with a **system prom
 
 - **Model params:** temperature 0.5, maxTokens 2048.
 
-- **Output:** Validated by `validateWorkoutArchitectOutput(data, hiitMode?)`. Must have: workout_set_name, rationale, sessions (1–7), split, progression_protocol, progression_rules, volume_landmarks. When `hiitMode` is true, `session_duration_minutes` and `sessions[].duration_minutes` are allowed to be as low as 4 (HIIT caps); otherwise minimum 10. This is the **Workout Architect blueprint**.
+- **Output:** Validated by `validateWorkoutArchitectOutput(data, hiitMode?)`. Must have: workout_set_name, rationale, sessions (1–7), split, progression_protocol, progression_rules, volume_landmarks. When `hiitMode` is true, `session_duration_minutes` and `sessions[].duration_minutes` are allowed to be as low as 4 (HIIT caps); otherwise minimum 15 (aligned with API and UI). This is the **Workout Architect blueprint**.
 
 - **Passed to Step 2:** The API builds `architectForStep2` from the blueprint by adding `program_name: workoutArchitect.workout_set_name` (and keeping split, progression_protocol, progression_rules, volume_landmarks) so Step 2’s function gets the shape it expects.
 

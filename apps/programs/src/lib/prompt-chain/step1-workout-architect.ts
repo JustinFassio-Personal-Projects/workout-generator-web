@@ -176,7 +176,7 @@ export function validateWorkoutArchitectOutput(
     if (typeof s.focus !== 'string' || !s.focus.trim()) {
       return { valid: false, error: `sessions[${i}].focus is required` };
     }
-    const minDuration = hiitMode ? 4 : 10;
+    const minDuration = hiitMode ? 4 : 15;
     if (typeof s.duration_minutes !== 'number' || s.duration_minutes < minDuration) {
       return {
         valid: false,
@@ -200,7 +200,7 @@ export function validateWorkoutArchitectOutput(
   ) {
     return { valid: false, error: 'split.days_per_week must be between 1 and 7' };
   }
-  const minSplitDuration = hiitMode ? 4 : 10;
+  const minSplitDuration = hiitMode ? 4 : 15;
   if (
     typeof split.session_duration_minutes !== 'number' ||
     split.session_duration_minutes < minSplitDuration

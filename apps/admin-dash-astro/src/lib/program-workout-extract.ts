@@ -55,7 +55,7 @@ export function programWorkoutToWorkoutSet(
     },
     goals: {
       primary: 'General Fitness',
-      secondary: '',
+      secondary: 'Strength',
     },
   };
 

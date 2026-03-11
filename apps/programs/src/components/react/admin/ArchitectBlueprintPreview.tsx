@@ -57,7 +57,7 @@ const ArchitectBlueprintPreview: React.FC<ArchitectBlueprintPreviewProps> = ({
       }
     } else if (editingField === 'session_duration_minutes') {
       const duration = parseInt(editValue, 10);
-      if (!isNaN(duration) && duration >= 10) {
+      if (!isNaN(duration) && duration >= 15) {
         updated.split = { ...updated.split, session_duration_minutes: duration };
       }
     } else if (editingField === 'progression_protocol') {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Client-side persistence for Workout Factory. Calls admin API endpoints (Supabase-backed).
- * Note: saveWorkoutToLibrary will fail at runtime until Workout Factory API is added (Phase 3+).
+ * Workout Factory API (Phase 1) provides the endpoints.
  */
 
 import { supabase } from '@/lib/supabase/client';

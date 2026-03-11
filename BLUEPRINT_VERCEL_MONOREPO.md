@@ -158,7 +158,7 @@ Use `globalEnv` and `env` so Turborepo invalidates cache when env vars change.
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**", ".vercel/output/**"],
-      "env": ["VITE_*", "PUBLIC_*", "SUPABASE_*", "GEMINI_*", "GOOGLE_*"]
+      "env": ["VITE_*", "PUBLIC_*", "NEXT_PUBLIC_*", "SUPABASE_*", "GEMINI_*", "GOOGLE_*"]
     },
     "dev": {
       "cache": false,
@@ -308,15 +308,19 @@ Runs `vercel env pull .env.local` from repo root. For multi-project monorepos, l
 
 | Variable | astro-site | admin-dash-astro | programs | nextjs-backend |
 |----------|------------|------------------|----------|----------------|
-| `PUBLIC_SUPABASE_URL` | ✓ | ✓ | ✓ | — |
-| `PUBLIC_SUPABASE_ANON_KEY` | ✓ | ✓ | ✓ | — |
+| `PUBLIC_SUPABASE_URL` (Astro) | ✓ | ✓ | ✓ | — |
+| `PUBLIC_SUPABASE_ANON_KEY` (Astro) | ✓ | ✓ | ✓ | — |
+| `NEXT_PUBLIC_SUPABASE_URL` (Next.js) | — | — | — | ✓ |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Next.js) | — | — | — | ✓ |
 | `SUPABASE_SERVICE_ROLE_KEY` | — | ✓ | ✓ | ✓ |
-| `PUBLIC_SITE_URL` | ✓ | ✓ | ✓ | ✓ |
-| `PUBLIC_APP_URL` | ✓ | — | — | ✓ |
+| `PUBLIC_SITE_URL` (Astro) | ✓ | ✓ | ✓ | — |
+| `NEXT_PUBLIC_SITE_URL` (Next.js) | — | — | — | ✓ |
+| `PUBLIC_APP_URL` (Astro) | ✓ | — | ✓ | — |
+| `NEXT_PUBLIC_APP_URL` (Next.js) | — | — | — | ✓ |
 | `GEMINI_API_KEY` | — | ✓ | ✓ | — |
 | `GOOGLE_PROJECT_ID` | — | ✓ | ✓ | — |
 
-Use `PUBLIC_` for Astro and Next.js client-exposed vars. Never commit secrets.
+Use `PUBLIC_` for Astro client-exposed vars and `NEXT_PUBLIC_` for Next.js client-exposed vars. Never commit secrets.
 
 **Cross-project URLs:** Rewrite destinations in `astro-site/vercel.json` are hardcoded (Vercel rewrites don't support env vars). For staging/preview, use a separate Vercel project or branch-specific `vercel.json` if needed. Prefer [Vercel Related Projects](https://vercel.com/docs/monorepos#how-to-link-projects-together-in-a-monorepo) for runtime URLs between apps (e.g. `PUBLIC_PROGRAMS_URL`).
 

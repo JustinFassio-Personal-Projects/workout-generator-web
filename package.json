@@ -12,6 +12,7 @@
     "env:pull": "vercel env pull .env.local"
   },
   "devDependencies": {
-    "turbo": "^2.3.0"
+    "turbo": "^2.3.0",
+    "vercel": "^37.4.1"
   }
 }

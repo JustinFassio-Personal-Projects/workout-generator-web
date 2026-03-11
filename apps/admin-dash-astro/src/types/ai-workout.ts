@@ -170,7 +170,41 @@ export interface WorkoutInSet {
   exerciseBlocks?: ExerciseBlock[];
   finisherBlocks?: WarmupBlock[];
   cooldownBlocks?: WarmupBlock[];
+  /** Per-exercise image/instruction overrides. Key = exercise name from workout. */
   exerciseOverrides?: Record<string, { name?: string; instructions?: string; imageUrl?: string }>;
+}
+
+// --- HIIT Playback (Dynamic Protocol Engine) ---
+
+/** Single block in the linear timeline consumed by the interval timer */
+export interface HIITTimelineBlock {
+  type: 'warmup' | 'work' | 'rest' | 'cooldown';
+  duration: number; // seconds
+  name: string;
+  notes?: string;
+  /** Primary exercise image URL when available (e.g. from exerciseOverrides). */
+  imageUrl?: string;
+}
+
+/** Target goal for theming and science copy */
+export type HIITTargetGoal = 'VO2' | 'Lactate' | 'Power' | 'FatOx';
+
+/** Data contract for the Dynamic Protocol Engine: meta, science, linear timeline */
+export interface HIITWorkoutData {
+  meta: {
+    title: string;
+    protocol: string;
+    description: string;
+    targetGoal: HIITTargetGoal;
+    durationMin?: number;
+  };
+  science: {
+    title: string;
+    summary: string;
+    benefit1: string;
+    benefit2: string;
+  };
+  timeline: HIITTimelineBlock[];
 }
 
 /**

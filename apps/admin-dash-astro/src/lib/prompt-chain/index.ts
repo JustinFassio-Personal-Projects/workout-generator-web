@@ -16,3 +16,5 @@ export {
   validatePublicCopyOutput,
   type PublicCopyOutput,
 } from './step5-public-copy';
+export { buildWorkoutArchitectPrompt, validateWorkoutArchitectOutput } from './step1-workout-architect';
+export { buildWorkoutMathematicianPrompt, validateWorkoutMathematicianOutput } from './step4-workout-mathematician';

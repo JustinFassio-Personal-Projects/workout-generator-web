@@ -411,8 +411,7 @@ export async function updateProgramStatus(
 export async function promoteWorkoutToCanonical(
   programId: string,
   weekIndex: number,
-  workoutIndex: number,
-  userId: string
+  workoutIndex: number
 ): Promise<{ workoutId: string }> {
   const program = await fetchFullProgram(programId);
   const schedule = program.schedule ?? [];
@@ -460,6 +459,6 @@ export async function promoteWorkoutToCanonical(
     goals: { primary: 'Muscle Gain', secondary: 'Strength' },
   };
 
-  const workoutId = await saveWorkoutToLibrary(workoutSet, config, userId);
+  const workoutId = await saveWorkoutToLibrary(workoutSet, config);
   return { workoutId };
 }

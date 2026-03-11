@@ -7,7 +7,7 @@
  */
 
 import React, { useState } from 'react';
-import { Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
 import type { ProgramSchedule } from '@/types/ai-program';
 
 type ScheduleWorkout = ProgramSchedule['workouts'][number];
@@ -26,6 +26,12 @@ export interface ScheduleBuilderProps {
   durationWeeks: number;
   onScheduleChange: (schedule: ProgramSchedule[]) => void;
   readOnly?: boolean;
+  /** Called when user clicks "Edit in Workout Factory" for a workout */
+  onEditWorkout?: (
+    weekNumber: number,
+    workoutIndex: number,
+    workout: ScheduleWorkout
+  ) => void;
 }
 
 const ScheduleBuilder: React.FC<ScheduleBuilderProps> = ({
@@ -33,6 +39,7 @@ const ScheduleBuilder: React.FC<ScheduleBuilderProps> = ({
   durationWeeks,
   onScheduleChange,
   readOnly = false,
+  onEditWorkout,
 }) => {
   const [expandedWeeks, setExpandedWeeks] = useState<Record<number, boolean>>(() => {
     const o: Record<number, boolean> = {};
@@ -130,17 +137,32 @@ const ScheduleBuilder: React.FC<ScheduleBuilderProps> = ({
                         </div>
                       </div>
                       {!readOnly && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteWorkout(weekNum, idx);
-                          }}
-                          className="rounded p-1.5 text-white/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
-                          title="Remove workout"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          {onEditWorkout && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditWorkout(weekNum, idx, workout);
+                              }}
+                              className="rounded p-1.5 text-white/40 transition-colors hover:bg-orange-500/20 hover:text-orange-light"
+                              title="Edit in Workout Factory"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteWorkout(weekNum, idx);
+                            }}
+                            className="rounded p-1.5 text-white/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                            title="Remove workout"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       )}
                     </div>
                   ))}

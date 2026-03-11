@@ -13,6 +13,8 @@ import {
   fetchScaffold,
   updateProgram,
 } from '@/lib/supabase/client/program-persistence';
+import { saveWorkoutToLibrary } from '@/lib/supabase/client/workout-persistence';
+import { programWorkoutToWorkoutSet } from '@/lib/program-workout-extract';
 import { supabase } from '@/lib/supabase/client';
 import type {
   ProgramTemplate,
@@ -62,6 +64,38 @@ const ProgramEditor: React.FC = () => {
   const [generatingPublicCopy, setGeneratingPublicCopy] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [publishLoading, setPublishLoading] = useState(false);
+  const [extractingWorkout, setExtractingWorkout] = useState(false);
+
+  const handleEditWorkoutInFactory = useCallback(
+    async (
+      weekNumber: number,
+      workoutIndex: number,
+      workout: ProgramSchedule['workouts'][number]
+    ) => {
+      if (!id || !user?.uid) {
+        toast.error('You must be logged in to edit workouts.');
+        return;
+      }
+      setExtractingWorkout(true);
+      try {
+        const { workoutSet, workoutConfig } = programWorkoutToWorkoutSet(workout);
+        const workoutId = await saveWorkoutToLibrary(
+          workoutSet,
+          workoutConfig,
+          undefined
+        );
+        navigate(`/workouts/sets/${workoutId}`, {
+          state: { fromProgram: { programId: id, weekNumber, workoutIndex } },
+        });
+        toast.success('Workout extracted to Workout Factory.');
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to extract workout');
+      } finally {
+        setExtractingWorkout(false);
+      }
+    },
+    [id, user?.uid, navigate]
+  );
 
   const loadProgram = useCallback(async () => {
     if (!id) return;
@@ -336,6 +370,7 @@ const ProgramEditor: React.FC = () => {
             type="button"
             onClick={() => setGeneratorOpen(true)}
             className="flex items-center gap-2 rounded-lg border border-orange-light/50 bg-orange-light/10 px-4 py-2.5 font-medium text-orange-light transition-colors hover:bg-orange-light/20"
+            title="Open AI program editor (scaffold, phases)"
           >
             <Sparkles className="h-5 w-5" />
             Edit with AI
@@ -416,6 +451,7 @@ const ProgramEditor: React.FC = () => {
             schedule={programData.schedule ?? []}
             durationWeeks={durationWeeks}
             onScheduleChange={handleScheduleChange}
+            onEditWorkout={extractingWorkout ? undefined : handleEditWorkoutInFactory}
           />
         </div>
 

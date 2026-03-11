@@ -15,6 +15,8 @@ import ManageUsers from './admin/views/ManageUsers';
 import ManageZones from './admin/views/ManageZones';
 import ManagePrograms from './admin/views/ManagePrograms';
 import ProgramEditor from './admin/views/ProgramEditor';
+import ManageWorkouts from './admin/views/ManageWorkouts';
+import WorkoutSetEditor from './admin/views/WorkoutSetEditor';
 import ComingSoon from './admin/ComingSoon';
 import ManageExercises from './admin/views/ManageExercises';
 import AdminExerciseDetail from './admin/AdminExerciseDetail';
@@ -102,6 +104,8 @@ const AdminDashboard: React.FC = () => {
             <Route path="tutorial-lab" element={<TutorialLabView />} />
             <Route path="programs/:id" element={<ProgramEditor />} />
             <Route path="programs" element={<ManagePrograms />} />
+            <Route path="workouts/sets/:id" element={<WorkoutSetEditor />} />
+            <Route path="workouts" element={<ManageWorkouts />} />
             <Route path="*" element={<ComingSoon />} />
           </Route>
         </Routes>

@@ -1,9 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["NODE_ENV", "CI"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", ".vercel/output/**"],
+      "env": ["VITE_*", "PUBLIC_*", "SUPABASE_*", "GEMINI_*", "GOOGLE_*"]
     },
     "dev": {
       "cache": false,

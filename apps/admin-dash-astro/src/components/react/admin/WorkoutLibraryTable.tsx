@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Trash2, Loader2, AlertCircle, Upload, EyeOff } from 'lucide-react';
+import { Edit, Trash2, Loader2, AlertCircle, Upload, EyeOff, Sparkles } from 'lucide-react';
 import {
   fetchWorkoutLibrary,
   deleteWorkout,
@@ -15,11 +15,11 @@ import type { WorkoutLibraryItem } from '@/types/ai-workout';
 import { getAllZones } from '@/lib/supabase/client/equipment';
 
 interface WorkoutLibraryTableProps {
-  /** Optional: called when AI modal edit is triggered. When omitted, Edit links to WorkoutSetEditor. */
-  onEdit?: (workoutId: string) => void;
+  /** Optional: called when Regenerate with AI is triggered. Opens WorkoutGeneratorModal in edit mode. */
+  onRegenerate?: (workoutId: string) => void;
 }
 
-const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onEdit }) => {
+const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onRegenerate }) => {
   const [workouts, setWorkouts] = useState<WorkoutLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -246,22 +246,21 @@ const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onEdit }) => 
                             )}
                           </button>
                         )}
-                        {onEdit ? (
+                        <Link
+                          to={`sets/${item.id}`}
+                          className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-orange-light"
+                          title="View and edit workout"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                        {onRegenerate && (
                           <button
-                            onClick={() => onEdit(item.id)}
-                            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-orange-light"
-                            title="Edit workout"
+                            onClick={() => onRegenerate(item.id)}
+                            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-orange-500/20 hover:text-orange-light"
+                            title="Regenerate with AI"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Sparkles className="h-4 w-4" />
                           </button>
-                        ) : (
-                          <Link
-                            to={`sets/${item.id}`}
-                            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-orange-light"
-                            title="Edit workout"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Link>
                         )}
                         <button
                           onClick={() =>

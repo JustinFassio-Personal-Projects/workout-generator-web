@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Sparkles, RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
 import type { WorkoutSetTemplate, WorkoutConfig, WorkoutChainMetadata } from '@/types/ai-workout';
 import WorkoutLibraryTable from '../WorkoutLibraryTable';
 import WorkoutGeneratorModal from '../WorkoutGeneratorModal';
+import { fetchWorkoutDocument } from '@/lib/supabase/client/workout-persistence';
 
 const ManageWorkouts: React.FC = () => {
   const [showGeneratorModal, setShowGeneratorModal] = useState(false);
@@ -40,6 +42,45 @@ const ManageWorkouts: React.FC = () => {
     setRefreshKey((prev) => prev + 1);
   };
 
+  const handleRegenerate = useCallback(async (workoutId: string) => {
+    try {
+      const doc = await fetchWorkoutDocument(workoutId);
+      const workoutSet: WorkoutSetTemplate = {
+        title: doc.title,
+        description: doc.description,
+        difficulty: doc.difficulty,
+        workouts: doc.workouts ?? [],
+      };
+      const workoutConfig: WorkoutConfig =
+        doc.workoutConfig ??
+        ({
+          workoutInfo: { title: doc.title, description: doc.description },
+          targetAudience: doc.targetAudience ?? {
+            ageRange: '26-35',
+            sex: 'Male',
+            weight: 180,
+            experienceLevel: 'intermediate',
+          },
+          requirements: {
+            sessionsPerWeek: 3,
+            sessionDurationMinutes: 45,
+            splitType: 'upper_lower',
+            lifestyle: 'active',
+            twoADay: false,
+            weeklyTimeMinutes: 180,
+          },
+          goals: doc.goals ?? { primary: 'Muscle Gain', secondary: 'Strength' },
+        } as WorkoutConfig);
+      setEditingWorkout(workoutSet);
+      setEditingWorkoutId(workoutId);
+      setEditingWorkoutConfig(workoutConfig);
+      setEditingChainMetadata(doc.chain_metadata ?? null);
+      setShowGeneratorModal(true);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to load workout');
+    }
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -67,7 +108,7 @@ const ManageWorkouts: React.FC = () => {
         </div>
       </div>
 
-      <WorkoutLibraryTable key={refreshKey} />
+      <WorkoutLibraryTable key={refreshKey} onRegenerate={handleRegenerate} />
 
       <WorkoutGeneratorModal
         isOpen={showGeneratorModal}

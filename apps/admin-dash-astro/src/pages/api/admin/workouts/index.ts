@@ -43,7 +43,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     let body: {
       workoutSet: WorkoutSetTemplate;
       workoutConfig: WorkoutConfig;
-      authorId: string;
       chainMetadata?: WorkoutChainMetadata;
     };
     try {
@@ -55,10 +54,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     }
 
-    if (!body.workoutSet || !body.workoutConfig || !body.authorId) {
+    if (!body.workoutSet || !body.workoutConfig) {
       return new Response(
         JSON.stringify({
-          error: 'Missing required fields: workoutSet, workoutConfig, authorId',
+          error: 'Missing required fields: workoutSet, workoutConfig',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
@@ -71,15 +70,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    if (body.authorId !== adminInfo.uid) {
-      return new Response(JSON.stringify({ error: 'Author ID must match authenticated user' }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
     const workoutId = await createWorkoutSet(
-      body.authorId,
+      adminInfo.uid,
       body.workoutSet,
       body.workoutConfig,
       body.chainMetadata

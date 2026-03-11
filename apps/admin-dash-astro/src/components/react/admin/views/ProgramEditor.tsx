@@ -82,7 +82,6 @@ const ProgramEditor: React.FC = () => {
         const workoutId = await saveWorkoutToLibrary(
           workoutSet,
           workoutConfig,
-          user.uid,
           undefined
         );
         navigate(`/workouts/sets/${workoutId}`, {

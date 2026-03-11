@@ -101,7 +101,7 @@ export function workoutInSetToHIITWorkoutData(
 
   const overrides = workout.exerciseOverrides;
   const getPrimaryImage = (exerciseName: string): string | undefined =>
-    (overrides?.[exerciseName] as { images?: string[] })?.images?.[0];
+    (overrides?.[exerciseName] as { imageUrl?: string } | undefined)?.imageUrl;
 
   // Warmup
   const warmupBlocks = workout.warmupBlocks ?? [];

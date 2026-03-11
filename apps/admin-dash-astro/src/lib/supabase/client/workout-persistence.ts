@@ -56,15 +56,9 @@ function waitForAuth(): Promise<void> {
 export async function saveWorkoutToLibrary(
   workoutSet: WorkoutSetTemplate,
   workoutConfig: WorkoutConfig,
-  authorId: string,
   chainMetadata?: WorkoutChainMetadata
 ): Promise<string> {
   const token = await getAccessToken();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const currentUid = session?.user?.id;
-  if (!currentUid || currentUid !== authorId) throw new Error('Author ID must match current user');
 
   const response = await fetch('/api/admin/workouts', {
     method: 'POST',
@@ -76,7 +70,6 @@ export async function saveWorkoutToLibrary(
     body: JSON.stringify({
       workoutSet,
       workoutConfig,
-      authorId,
       chainMetadata,
     }),
   });

@@ -65,7 +65,10 @@ function rowToLibraryItem(row: Row): WorkoutLibraryItem {
     chain_metadata: row.chain_metadata
       ? ({
           ...row.chain_metadata,
-          generated_at: row.chain_metadata.generated_at,
+          generated_at:
+            typeof row.chain_metadata.generated_at === 'string'
+              ? new Date(row.chain_metadata.generated_at)
+              : row.chain_metadata.generated_at,
         } as WorkoutChainMetadata)
       : undefined,
     status: row.status === 'published' ? 'published' : 'draft',
@@ -211,7 +214,10 @@ export async function fetchWorkoutDocument(workoutId: string): Promise<WorkoutDo
     chain_metadata: r.chain_metadata
       ? ({
           ...r.chain_metadata,
-          generated_at: r.chain_metadata.generated_at,
+          generated_at:
+            typeof r.chain_metadata.generated_at === 'string'
+              ? new Date(r.chain_metadata.generated_at)
+              : r.chain_metadata.generated_at,
         } as WorkoutChainMetadata)
       : undefined,
     status: r.status === 'published' ? 'published' : 'draft',
@@ -243,17 +249,32 @@ export async function updateWorkoutSet(
     updatePayload.description = normalized.description ?? '';
     updatePayload.workouts = normalized.workouts ?? [];
     updatePayload.workout_count = (normalized.workouts ?? []).length;
-    const config: ConfigRow = { difficulty: normalized.difficulty };
+    let config: ConfigRow;
     if (updates.workoutConfig) {
-      config.targetAudience = updates.workoutConfig.targetAudience;
-      config.goals = updates.workoutConfig.goals;
-      config.workoutConfig = updates.workoutConfig;
+      config = {
+        difficulty: normalized.difficulty,
+        targetAudience: updates.workoutConfig.targetAudience,
+        goals: updates.workoutConfig.goals,
+        workoutConfig: updates.workoutConfig,
+      };
       if (updates.workoutConfig.zoneId !== undefined) {
         config.equipmentProfile = {
           zoneId: updates.workoutConfig.zoneId,
           equipmentIds: updates.workoutConfig.selectedEquipmentIds ?? [],
         };
       }
+    } else {
+      // Preserve existing config; only update difficulty (avoids wiping targetAudience, goals, etc.)
+      const { data: existing } = await supabase
+        .from('workout_sets')
+        .select('config')
+        .eq('id', workoutId)
+        .single();
+      const currentConfig = (existing?.config as ConfigRow) ?? {};
+      config = {
+        ...currentConfig,
+        difficulty: normalized.difficulty,
+      };
     }
     updatePayload.config = config;
   } else if (updates.workoutConfig) {

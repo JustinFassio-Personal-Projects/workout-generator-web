@@ -2,5 +2,19 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "buildCommand": "cd ../.. && npx turbo run build --filter=main-web",
-  "installCommand": "cd ../.. && npm install"
+  "installCommand": "cd ../.. && npm install",
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "https://aiworkoutgenerator-admin.vercel.app/admin"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "https://aiworkoutgenerator-admin.vercel.app/admin/:path*"
+    },
+    {
+      "source": "/api/admin/:path*",
+      "destination": "https://aiworkoutgenerator-admin.vercel.app/api/admin/:path*"
+    }
+  ]
 }

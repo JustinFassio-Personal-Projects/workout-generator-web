@@ -1,6 +1,7 @@
 ---
 // Import styles (design-system before Tailwind so tokens are available)
-import '@workout-generator/design-system';
+// Uses embedded design-system for standalone deploy; packages/design-system when in monorepo
+import '@/styles/design-system/index.css';
 import '@/styles/global.css';
 import '@/styles/globals.scss';
 import 'aos/dist/aos.css';

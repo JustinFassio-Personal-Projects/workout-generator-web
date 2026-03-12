@@ -270,6 +270,14 @@ const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
                         }
                         className="group flex items-start gap-6"
                       >
+                        <span className="font-mono text-lg font-bold text-orange-light opacity-40 transition-opacity group-hover:opacity-100">
+                          {(i + 1)
+                            .toString()
+                            .padStart(
+                              exercise.instructionsStructured!.steps.length.toString().length,
+                              '0',
+                            )}
+                        </span>
                         <div
                           className="text-sm font-light uppercase leading-relaxed tracking-wider text-gray-300 transition-colors group-hover:text-white md:text-base [&_p:last-child]:mb-0 [&_p]:mb-2"
                           dangerouslySetInnerHTML={{ __html: formatParagraphContent(step) }}

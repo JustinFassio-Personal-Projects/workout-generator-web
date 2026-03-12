@@ -11,7 +11,7 @@ import type {
   ExerciseVideo,
   ParsedBiomechanics,
 } from '@/types/generated-exercise';
-import { normalizeExerciseName } from '@/lib/approved-exercise-maps';
+import { normalizeExerciseName } from '@workout-generator/exercise-mapping';
 
 function toDate(v: string | null | undefined): Date {
   if (!v) return new Date();

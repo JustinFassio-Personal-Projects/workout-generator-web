@@ -17,7 +17,10 @@ import { getExerciseDetails } from '@/data/exercises';
 import { getGeneratedExercises } from '@/lib/supabase/client/generated-exercises';
 import type { GeneratedExercise } from '@/types/generated-exercise';
 import type { ExtendedBiomechanics } from '@/components/react/ExerciseDetailModal';
-import { buildApprovedExerciseMaps, normalizeExerciseName } from '@/lib/approved-exercise-maps';
+import {
+  buildApprovedExerciseMaps,
+  normalizeExerciseName,
+} from '@workout-generator/exercise-mapping';
 import ExerciseDetailModal from '@/components/react/ExerciseDetailModal';
 import { WEEK_LABELS } from '@/types/deployment';
 import DeploymentTimeline from '../DeploymentTimeline';

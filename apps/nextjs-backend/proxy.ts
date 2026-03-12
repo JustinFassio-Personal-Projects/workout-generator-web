@@ -72,7 +72,10 @@ export async function proxy(request: NextRequest) {
       'myplatform.com',
       'aiworkoutgenerator.com',
       'workoutgenerator.com',
+      'app.aiworkoutgenerator.com', // nextjs-backend production
     ]
+    // Vercel deployment URLs (preview, production) — this app's *.vercel.app should show platform, not tenant
+    const isVercelDeployment = normalizedHost.endsWith('.vercel.app')
 
     // 1. Admin domain → /admin routes
     if (normalizedHost === ADMIN_DOMAIN || normalizedHost.startsWith('admin.')) {
@@ -85,12 +88,13 @@ export async function proxy(request: NextRequest) {
       // Already on /admin route - continue to redirect logic, then admin auth check
     }
     // 2. Platform domains → Existing homepage (no rewrite, continue to redirect logic)
-    // Check if it's a non-platform domain (tenant) while treating localhost:3007 as platform.
+    // Check if it's a non-platform domain (tenant) while treating localhost:3007 and *.vercel.app as platform.
     // Note: We intentionally combine normalizedHost (without port) with the raw hostname port check
     // to distinguish `client-a.localhost:3007` (tenant) from `localhost:3007` (platform).
-    // Simplifying this condition would misclassify localhost tenant vs platform traffic.
+    // Vercel deployment URLs (nextjs-backend-xxx.vercel.app) are platform, not tenant.
     else if (
       !PLATFORM_DOMAINS.includes(normalizedHost) &&
+      !isVercelDeployment &&
       !(normalizedHost === 'localhost' && hostname.includes(':3007'))
     ) {
       // If this is a platform route, don't rewrite - let it fall through to platform handling

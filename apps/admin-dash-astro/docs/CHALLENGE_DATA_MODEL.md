@@ -132,5 +132,5 @@ Challenge AI generation requires Vercel serverless functions with sufficient `ma
 ## References
 
 - [CHALLENGE_SCHEMA_REFERENCE.md](./CHALLENGE_SCHEMA_REFERENCE.md) — canonical schema (columns, JSONB, indexes, RLS)
-- [challenge-factory-migration-roadmap.md](../../apps/programs/docs/audits/challenge-factory-migration-roadmap.md)
+- [challenge-factory-migration-roadmap.md](../../programs/docs/audits/challenge-factory-migration-roadmap.md)
 - [RUN_CHALLENGES_SCHEMA.sql](./RUN_CHALLENGES_SCHEMA.sql)

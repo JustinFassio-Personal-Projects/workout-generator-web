@@ -84,7 +84,8 @@ function rowToLibraryItem(row: {
 }
 
 /**
- * Fetch all challenges for admin list. Returns [] on any error (dev/MVP friendly when no challenges yet).
+ * Fetch all challenges for admin list. Returns [] only when the query succeeds with no rows.
+ * Throws on Supabase error or exception so the API can return 500 and the client can show an error.
  */
 export async function fetchChallengeLibrary(): Promise<ChallengeLibraryItem[]> {
   try {
@@ -97,15 +98,18 @@ export async function fetchChallengeLibrary(): Promise<ChallengeLibraryItem[]> {
       .order('created_at', { ascending: false });
 
     if (error) {
-      if (import.meta.env.DEV) console.warn('[challenges] fetchChallengeLibrary error:', error);
-      return [];
+      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+        console.warn('[challenges] fetchChallengeLibrary error:', error);
+      }
+      throw new Error(error.message || 'Failed to fetch challenges');
     }
     return (data ?? []).map(rowToLibraryItem);
   } catch (err) {
     if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
       console.error('[challenges] fetchChallengeLibrary error:', err);
     }
-    return [];
+    if (err instanceof Error) throw err;
+    throw new Error('Failed to fetch challenges');
   }
 }
 
@@ -172,7 +176,10 @@ export async function createChallenge(
       content: { workouts: week.workouts ?? [] },
     }));
     const { error: weeksError } = await supabase.from('challenge_weeks').insert(weeks);
-    if (weeksError) throw weeksError;
+    if (weeksError) {
+      await supabase.from('challenges').delete().eq('id', challengeId);
+      throw weeksError;
+    }
   }
 
   return challengeId;
@@ -271,20 +278,36 @@ export async function updateChallenge(
 
   if (updateError) throw updateError;
 
-  const { error: deleteWeeksError } = await supabase
-    .from('challenge_weeks')
-    .delete()
-    .eq('challenge_id', challengeId);
-  if (deleteWeeksError) throw deleteWeeksError;
-
   if (normalized.schedule?.length) {
     const weeks = normalized.schedule.map((week) => ({
       challenge_id: challengeId,
       week_number: week.weekNumber,
       content: { workouts: week.workouts ?? [] },
     }));
-    const { error: insertWeeksError } = await supabase.from('challenge_weeks').insert(weeks);
-    if (insertWeeksError) throw insertWeeksError;
+    const { error: upsertWeeksError } = await supabase
+      .from('challenge_weeks')
+      .upsert(weeks, { onConflict: 'challenge_id,week_number' });
+    if (upsertWeeksError) throw upsertWeeksError;
+    const weekNumbers = weeks.map((w) => w.week_number);
+    const { data: existing } = await supabase
+      .from('challenge_weeks')
+      .select('week_number')
+      .eq('challenge_id', challengeId);
+    const toDelete = (existing ?? []).filter((w) => !weekNumbers.includes(w.week_number));
+    for (const w of toDelete) {
+      const { error: delErr } = await supabase
+        .from('challenge_weeks')
+        .delete()
+        .eq('challenge_id', challengeId)
+        .eq('week_number', w.week_number);
+      if (delErr) throw delErr;
+    }
+  } else {
+    const { error: deleteWeeksError } = await supabase
+      .from('challenge_weeks')
+      .delete()
+      .eq('challenge_id', challengeId);
+    if (deleteWeeksError) throw deleteWeeksError;
   }
 }
 

@@ -147,6 +147,10 @@ const ChallengeEditor: React.FC = () => {
       setError('Challenge title is required');
       return;
     }
+    if (formData.durationWeeks < 2 || formData.durationWeeks > 6) {
+      setError('Duration must be 2–6 weeks');
+      return;
+    }
     const {
       data: { session },
     } = await supabase.auth.getSession();

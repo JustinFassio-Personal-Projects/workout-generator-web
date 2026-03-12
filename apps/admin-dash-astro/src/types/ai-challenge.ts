@@ -78,7 +78,7 @@ export interface ChallengeTemplate {
 }
 
 /**
- * Challenge metadata stored in Firestore master document
+ * Challenge metadata from Supabase challenges table (config JSONB, image URLs, etc.)
  */
 export interface ChallengeMetadata {
   title: string;

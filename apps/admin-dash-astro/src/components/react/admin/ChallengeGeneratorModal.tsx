@@ -247,6 +247,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
       const response = await fetch('/api/ai/generate-challenge-architect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 
@@ -319,7 +320,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
 
     const progressInterval = setInterval(() => {
       setChainStep((prev) => {
-        const next = Math.min(prev + 1, 2);
+        const next = Math.min(prev + 1, chainLoadingMessages.length - 1);
         setLoadingMessage(chainLoadingMessages[next]);
         return next;
       });
@@ -330,6 +331,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
       const response = await fetch('/api/ai/generate-challenge-chain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 
@@ -401,7 +403,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
 
     const progressInterval = setInterval(() => {
       setChainStep((prev) => {
-        const next = Math.min(prev + 1, 2);
+        const next = Math.min(prev + 1, chainLoadingMessages.length - 1);
         setLoadingMessage(chainLoadingMessages[next]);
         return next;
       });
@@ -417,6 +419,7 @@ const ChallengeGeneratorModal: React.FC<ChallengeGeneratorModalProps> = ({
       const response = await fetch('/api/ai/generate-challenge-chain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 

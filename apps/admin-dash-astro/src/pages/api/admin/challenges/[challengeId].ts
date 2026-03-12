@@ -151,6 +151,14 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       );
     }
 
+    const dw = body.challengeData.durationWeeks;
+    if (dw == null || dw < 2 || dw > 6) {
+      return new Response(
+        JSON.stringify({ error: 'durationWeeks must be 2, 3, 4, 5, or 6' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     await updateChallenge(challengeId, body.challengeData, body.challengeConfig);
 
     return new Response(JSON.stringify({ success: true }), {

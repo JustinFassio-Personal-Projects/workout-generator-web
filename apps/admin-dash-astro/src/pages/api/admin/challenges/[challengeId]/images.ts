@@ -111,7 +111,7 @@ export const POST: APIRoute = async ({ request, params, cookies }) => {
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'UNAUTHENTICATED' || error.message === 'UNAUTHORIZED') {
-        return jsonError(error.message, 401);
+        return jsonError('Unauthorized. Admin access required.', 401);
       }
     }
     if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
@@ -162,7 +162,7 @@ export const DELETE: APIRoute = async ({ request, params, cookies }) => {
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'UNAUTHENTICATED' || error.message === 'UNAUTHORIZED') {
-        return jsonError(error.message, 401);
+        return jsonError('Unauthorized. Admin access required.', 401);
       }
     }
     if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {

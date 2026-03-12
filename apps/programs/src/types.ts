@@ -1,3 +1,5 @@
+import type { Exercise, ExtendedBiomechanics } from '@workout-generator/exercise-mapping';
+
 // Placeholder for now
 export interface UserProfile {
   uid: string;
@@ -16,18 +18,8 @@ export interface UserProfile {
   customClaims?: Record<string, unknown>;
 }
 
-export interface Exercise {
-  name: string;
-  images: string[];
-  instructions: string[];
-  videoUrl?: string; // Optional video URL for exercise demonstrations
-  /** When set, modal renders structured layout (intro, section title, steps with their own numbering). */
-  instructionsStructured?: {
-    intro?: string;
-    sectionTitle?: string;
-    steps: string[];
-  };
-}
+/** Re-export from shared package; single source of truth for display Exercise and biomechanics. */
+export type { Exercise, ExtendedBiomechanics };
 
 /** Handler for when user selects an exercise (e.g. from WorkoutDetailModal). Parent resolves data and opens ExerciseDetailModal. */
 export type OnSelectExercise = (exerciseName: string) => void;

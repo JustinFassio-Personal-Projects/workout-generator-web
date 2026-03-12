@@ -6,7 +6,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ExternalLink, Zap, X } from 'lucide-react';
-import type { Exercise } from '@/types';
+import type { Exercise, ExtendedBiomechanics } from '@/types';
 import VideoPlayer from './VideoPlayer';
 import { formatParagraphContent } from '@/lib/sanitize-paragraph-html';
 import { normalizeListItems } from '@/lib/parse-biomechanics';
@@ -18,12 +18,8 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
   return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
 }
 
-export interface ExtendedBiomechanics {
-  biomechanicalChain?: string;
-  pivotPoints?: string;
-  stabilizationNeeds?: string;
-  commonMistakes?: string[];
-}
+/** Re-export for consumers that import from this component. */
+export type { ExtendedBiomechanics } from '@/types';
 
 interface ExerciseDetailModalProps {
   exercise: Exercise | null;

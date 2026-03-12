@@ -226,4 +226,4 @@ Phase 6 (consolidate admin) ← after Phase 3, 4 stable
 - [ADMIN_EXERCISES_AND_VIZ_LAB_REVIEW.md](../features/exercises/ADMIN_EXERCISES_AND_VIZ_LAB_REVIEW.md) — current admin exercise setup
 - [ExerciseDetailModal.md](../components/modals/workout-detail-modal/exercise-detail-modal/ExerciseDetailModal.md)
 - [workout-factory-migration-blueprint.md](./workout-factory-migration-blueprint.md)
-- [approved-exercise-maps.ts](../../src/lib/approved-exercise-maps.ts) — logic to extract (programs; admin-dash has copy)
+- [@workout-generator/exercise-mapping](../../../packages/exercise-mapping) — shared mapping logic (Phase 1 complete)

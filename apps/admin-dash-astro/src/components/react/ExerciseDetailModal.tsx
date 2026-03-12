@@ -11,7 +11,8 @@ import VideoPlayer from './VideoPlayer';
 import { formatParagraphContent } from '@/lib/sanitize-paragraph-html';
 import { normalizeListItems } from '@/lib/parse-biomechanics';
 
-export type { ExtendedBiomechanics };
+/** Re-export for consumers that import from this component. */
+export type { ExtendedBiomechanics } from '@/types';
 
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';

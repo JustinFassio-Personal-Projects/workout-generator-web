@@ -9,12 +9,21 @@
 import type { Exercise, ExtendedBiomechanics, GeneratedExerciseInput } from './types.js';
 import { parseBiomechanicalPoints, FULL_BIOMECHANICS_CARD_LENGTH } from './parse-biomechanics.js';
 
+/** Irregular plurals → singular for exercise-relevant terms. Checked before suffix rules. */
+const IRREGULAR_SINGULAR: Record<string, string> = {
+  calves: 'calf',
+  abs: 'abs', // Fitness canonical; avoid "ab"
+};
+
 /**
  * Converts the last word to singular form for consistent lookup.
  * Exercises are stored singular (e.g. "Bodyweight Squat"); workouts prescribe plural (e.g. "Bodyweight Squats").
  */
 function toSingular(word: string): string {
   if (!word || word.length < 2) return word;
+  const lowered = word.toLowerCase();
+  const irregular = IRREGULAR_SINGULAR[lowered];
+  if (irregular !== undefined) return irregular;
   if (word.endsWith('ss')) return word; // press, cross
   if (word.endsWith('ies') && word.length > 4) return word.slice(0, -3) + 'y'; // calories → calorie
   if (word.endsWith('es')) {
@@ -77,7 +86,7 @@ function parseUserInstructionsForDeploymentSteps(markdown: string): DeploymentSt
   const steps = sectionContent
     ? sectionContent
         .split(/\n\s*(?=\d+[.)]\s+)/)
-        .map((s) => s.trim())
+        .map((s) => s.trim().replace(/^\d+[.)]\s*/, ''))
         .filter(Boolean)
     : [];
 

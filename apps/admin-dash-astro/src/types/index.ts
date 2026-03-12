@@ -3,23 +3,5 @@
  * Program/schedule types live in ai-program.ts, ai-workout.ts.
  */
 
-export interface Exercise {
-  name: string;
-  images: string[];
-  instructions: string[];
-  videoUrl?: string;
-  /** When set, modal renders structured layout (intro, section title, steps with their own numbering). */
-  instructionsStructured?: {
-    intro?: string;
-    sectionTitle?: string;
-    steps: string[];
-  };
-}
-
-/** Extended biomechanics for ExerciseDetailModal; also used by approved-exercise-maps. */
-export interface ExtendedBiomechanics {
-  biomechanicalChain?: string;
-  pivotPoints?: string;
-  stabilizationNeeds?: string;
-  commonMistakes?: string[];
-}
+/** Re-export from shared package; single source of truth for display Exercise and biomechanics. */
+export type { Exercise, ExtendedBiomechanics } from '@workout-generator/exercise-mapping';

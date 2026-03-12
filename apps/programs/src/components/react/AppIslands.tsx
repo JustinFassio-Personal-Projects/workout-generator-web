@@ -17,7 +17,10 @@ import type { Exercise } from '@/types';
 import { getGeneratedExercises } from '@/lib/supabase/client/generated-exercises';
 import type { GeneratedExercise } from '@/types/generated-exercise';
 import type { ExtendedBiomechanics } from './ExerciseDetailModal';
-import { buildApprovedExerciseMaps, normalizeExerciseName } from '@/lib/approved-exercise-maps';
+import {
+  buildApprovedExerciseMaps,
+  normalizeExerciseName,
+} from '@workout-generator/exercise-mapping';
 import { parseBiomechanicalPoints, FULL_BIOMECHANICS_CARD_LENGTH } from '@/lib/parse-biomechanics';
 import HUDContent from './hud/HUDContent';
 import ProgramSidebar from './hud/ProgramSidebar';

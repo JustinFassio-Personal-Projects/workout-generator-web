@@ -20,8 +20,10 @@ import {
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Exercise } from '@/types/ai-program';
-import { normalizeExerciseName } from '@/lib/approved-exercise-maps';
-import type { ApprovedExerciseMaps } from '@/lib/approved-exercise-maps';
+import {
+  normalizeExerciseName,
+  type ApprovedExerciseMaps,
+} from '@workout-generator/exercise-mapping';
 import ExerciseBlockCard from './ExerciseBlockCard';
 
 export interface ExerciseBlockListProps {

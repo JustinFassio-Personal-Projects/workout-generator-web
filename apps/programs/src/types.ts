@@ -21,6 +21,12 @@ export interface Exercise {
   images: string[];
   instructions: string[];
   videoUrl?: string; // Optional video URL for exercise demonstrations
+  /** When set, modal renders structured layout (intro, section title, steps with their own numbering). */
+  instructionsStructured?: {
+    intro?: string;
+    sectionTitle?: string;
+    steps: string[];
+  };
 }
 
 /** Handler for when user selects an exercise (e.g. from WorkoutDetailModal). Parent resolves data and opens ExerciseDetailModal. */

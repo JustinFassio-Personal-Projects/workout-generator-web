@@ -246,33 +246,67 @@ const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
                 </h3>
               </div>
 
-              <ul className="space-y-6">
-                {exercise.instructions.length === 0 ? (
-                  <p className="text-sm text-white/50">No deployment steps available.</p>
-                ) : (
-                  exercise.instructions.map((step, i) => (
-                    <motion.li
-                      key={i}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={
-                        reduceMotion ? { duration: 0, delay: 0 } : { delay: i * 0.1 + 0.3 }
-                      }
-                      className="group flex items-start gap-6"
-                    >
-                      <span className="font-mono text-lg font-bold text-orange-light opacity-40 transition-opacity group-hover:opacity-100">
-                        {(i + 1)
-                          .toString()
-                          .padStart(exercise.instructions.length.toString().length, '0')}
-                      </span>
-                      <div
-                        className="text-sm font-light uppercase leading-relaxed tracking-wider text-gray-300 transition-colors group-hover:text-white md:text-base [&_p:last-child]:mb-0 [&_p]:mb-2"
-                        dangerouslySetInnerHTML={{ __html: formatParagraphContent(step) }}
-                      />
-                    </motion.li>
-                  ))
-                )}
-              </ul>
+              {exercise.instructionsStructured?.steps && exercise.instructionsStructured.steps.length > 0 ? (
+                <div className="space-y-6">
+                  {exercise.instructionsStructured.intro && (
+                    <p
+                      className="text-sm font-light uppercase leading-relaxed tracking-wider text-gray-300 md:text-base"
+                      dangerouslySetInnerHTML={{ __html: formatParagraphContent(exercise.instructionsStructured.intro) }}
+                    />
+                  )}
+                  {exercise.instructionsStructured.sectionTitle && (
+                    <h4 className="font-mono text-[10px] uppercase tracking-[0.4em] text-orange-light/80">
+                      {exercise.instructionsStructured.sectionTitle}
+                    </h4>
+                  )}
+                  <ul className="space-y-6">
+                    {exercise.instructionsStructured.steps.map((step, i) => (
+                      <motion.li
+                        key={i}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={
+                          reduceMotion ? { duration: 0, delay: 0 } : { delay: i * 0.1 + 0.3 }
+                        }
+                        className="group flex items-start gap-6"
+                      >
+                        <div
+                          className="text-sm font-light uppercase leading-relaxed tracking-wider text-gray-300 transition-colors group-hover:text-white md:text-base [&_p:last-child]:mb-0 [&_p]:mb-2"
+                          dangerouslySetInnerHTML={{ __html: formatParagraphContent(step) }}
+                        />
+                      </motion.li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <ul className="space-y-6">
+                  {exercise.instructions.length === 0 ? (
+                    <p className="text-sm text-white/50">No deployment steps available.</p>
+                  ) : (
+                    exercise.instructions.map((step, i) => (
+                      <motion.li
+                        key={i}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={
+                          reduceMotion ? { duration: 0, delay: 0 } : { delay: i * 0.1 + 0.3 }
+                        }
+                        className="group flex items-start gap-6"
+                      >
+                        <span className="font-mono text-lg font-bold text-orange-light opacity-40 transition-opacity group-hover:opacity-100">
+                          {(i + 1)
+                            .toString()
+                            .padStart(exercise.instructions.length.toString().length, '0')}
+                        </span>
+                        <div
+                          className="text-sm font-light uppercase leading-relaxed tracking-wider text-gray-300 transition-colors group-hover:text-white md:text-base [&_p:last-child]:mb-0 [&_p]:mb-2"
+                          dangerouslySetInnerHTML={{ __html: formatParagraphContent(step) }}
+                        />
+                      </motion.li>
+                    ))
+                  )}
+                </ul>
+              )}
 
               <div className="mt-12 space-y-4">
                 <button

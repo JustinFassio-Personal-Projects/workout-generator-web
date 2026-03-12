@@ -9,8 +9,10 @@
 
 import React, { useCallback } from 'react';
 import { Plus, Trash2, GripVertical, Link2, ExternalLink } from 'lucide-react';
-import { normalizeExerciseName } from '@/lib/approved-exercise-maps';
-import type { ApprovedExerciseMaps } from '@/lib/approved-exercise-maps';
+import {
+  normalizeExerciseName,
+  type ApprovedExerciseMaps,
+} from '@workout-generator/exercise-mapping';
 import {
   DndContext,
   closestCenter,

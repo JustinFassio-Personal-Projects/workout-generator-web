@@ -8,6 +8,12 @@ export interface Exercise {
   images: string[];
   instructions: string[];
   videoUrl?: string;
+  /** When set, modal renders structured layout (intro, section title, steps with their own numbering). */
+  instructionsStructured?: {
+    intro?: string;
+    sectionTitle?: string;
+    steps: string[];
+  };
 }
 
 /** Extended biomechanics for ExerciseDetailModal; also used by approved-exercise-maps. */

@@ -9,14 +9,14 @@
 
 ## Progress Summary
 
-| Phase | Status | Completed |
-|-------|--------|-----------|
-| **Phase 0: Foundation** | Done | RUN_WORKOUT_SETS_SCHEMA.sql, WORKOUT_DATA_MODEL.md; gates (Program Factory, auth, workout_sets table) verified or provided |
-| Phase 1: API and Data Layer | Completed | — |
-| Phase 2: Views and Modal | Completed | — |
-| Phase 3: Edit Flow and Regenerate | Completed | — |
-| Phase 4: Edit Program Integration | Not started | — |
-| Phase 5: Polish and Documentation | Not started | — |
+| Phase                             | Status      | Completed                                                                                                                  |
+| --------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Phase 0: Foundation**           | Done        | RUN_WORKOUT_SETS_SCHEMA.sql, WORKOUT_DATA_MODEL.md; gates (Program Factory, auth, workout_sets table) verified or provided |
+| Phase 1: API and Data Layer       | Completed   | —                                                                                                                          |
+| Phase 2: Views and Modal          | Completed   | —                                                                                                                          |
+| Phase 3: Edit Flow and Regenerate | Completed   | —                                                                                                                          |
+| Phase 4: Edit Program Integration | Not started | —                                                                                                                          |
+| Phase 5: Polish and Documentation | Not started | —                                                                                                                          |
 
 ---
 
@@ -34,13 +34,13 @@ This replaces Program Factory's current "Edit with AI" (100% AI-driven, no granu
 
 ### 1.2 Goals
 
-| Goal | Success Criteria |
-|------|------------------|
-| **Migrate to admin-dash-astro** | Workout Factory runs in admin-dash-astro; uses `verifyAdminRequest`, same nav/layout as Program Factory. |
-| **Fix edit flow** | Edit uses `workout_sets` API; dedicated WorkoutSetEditor for `workout_sets`; no confusion with `workouts` (trainer roster). |
-| **Wire Regenerate** | "Regenerate with AI" from WorkoutLibraryTable opens WorkoutGeneratorModal in edit mode with `editingWorkout`, `editingWorkoutConfig`, `editingWorkoutId`. |
+| Goal                            | Success Criteria                                                                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Migrate to admin-dash-astro** | Workout Factory runs in admin-dash-astro; uses `verifyAdminRequest`, same nav/layout as Program Factory.                                                     |
+| **Fix edit flow**               | Edit uses `workout_sets` API; dedicated WorkoutSetEditor for `workout_sets`; no confusion with `workouts` (trainer roster).                                  |
+| **Wire Regenerate**             | "Regenerate with AI" from WorkoutLibraryTable opens WorkoutGeneratorModal in edit mode with `editingWorkout`, `editingWorkoutConfig`, `editingWorkoutId`.    |
 | **Integrate with Edit Program** | Edit Program can deep-link to Workout Factory with a workout set ID or program-embedded workout context; Workout Factory loads and saves back appropriately. |
-| **Minimize threats** | Auth aligned; data model documented; dual table (`workout_sets` vs `workouts`) clearly explained and routed. |
+| **Minimize threats**            | Auth aligned; data model documented; dual table (`workout_sets` vs `workouts`) clearly explained and routed.                                                 |
 
 ---
 
@@ -80,96 +80,96 @@ This replaces Program Factory's current "Edit with AI" (100% AI-driven, no granu
 
 ### Phase 0: Foundation (Pre-Workout Factory)
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Program Factory migration complete | Gate | Verify ManagePrograms, api/admin/programs, routes exist before Phase 1 |
-| `workout_sets` table exists in Supabase | Setup | Run [RUN_WORKOUT_SETS_SCHEMA.sql](../../admin-dash-astro/docs/RUN_WORKOUT_SETS_SCHEMA.sql) in Supabase SQL Editor if missing (idempotent) |
-| Auth: `verifyAdminRequest` in use | Done | [auth.ts](../../admin-dash-astro/src/lib/supabase/admin/auth.ts) |
-| RUN_WORKOUT_SETS_SCHEMA.sql created | Done | [admin-dash-astro/docs/RUN_WORKOUT_SETS_SCHEMA.sql](../../admin-dash-astro/docs/RUN_WORKOUT_SETS_SCHEMA.sql) |
-| WORKOUT_DATA_MODEL.md created | Done | [admin-dash-astro/docs/WORKOUT_DATA_MODEL.md](../../admin-dash-astro/docs/WORKOUT_DATA_MODEL.md) — clarifies `workout_sets` vs `workouts`, routing, setup, RLS |
+| Task                                    | Status | Notes                                                                                                                                                          |
+| --------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Program Factory migration complete      | Gate   | Verify ManagePrograms, api/admin/programs, routes exist before Phase 1                                                                                         |
+| `workout_sets` table exists in Supabase | Setup  | Run [RUN_WORKOUT_SETS_SCHEMA.sql](../../admin-dash-astro/docs/RUN_WORKOUT_SETS_SCHEMA.sql) in Supabase SQL Editor if missing (idempotent)                      |
+| Auth: `verifyAdminRequest` in use       | Done   | [auth.ts](../../admin-dash-astro/src/lib/supabase/admin/auth.ts)                                                                                               |
+| RUN_WORKOUT_SETS_SCHEMA.sql created     | Done   | [admin-dash-astro/docs/RUN_WORKOUT_SETS_SCHEMA.sql](../../admin-dash-astro/docs/RUN_WORKOUT_SETS_SCHEMA.sql)                                                   |
+| WORKOUT_DATA_MODEL.md created           | Done   | [admin-dash-astro/docs/WORKOUT_DATA_MODEL.md](../../admin-dash-astro/docs/WORKOUT_DATA_MODEL.md) — clarifies `workout_sets` vs `workouts`, routing, setup, RLS |
 
 ### Phase 1: API and Data Layer
 
-| Task | Source | Target | Notes |
-|------|--------|--------|-------|
-| Copy `api/admin/workouts/index.ts` | programs | admin-dash-astro | GET list, POST create; use `verifyAdminRequest` |
-| Copy `api/admin/workouts/[workoutId].ts` | programs | admin-dash-astro | GET, PATCH, DELETE; use `verifyAdminRequest` |
-| Copy `api/ai/generate-workout-chain.ts` | programs | admin-dash-astro | Single AI route |
-| Copy prompt-chain steps | programs | admin-dash-astro | step1-workout-architect, step2-biomechanist, step3-coach, step4-workout-mathematician |
-| Copy `lib/supabase/admin/workout-sets.ts` | programs | admin-dash-astro | Supabase persistence for workout_sets |
-| Copy `lib/supabase/client/workout-persistence.ts` | programs | admin-dash-astro | Client API calls; adapt base URL if needed |
-| Copy `types/ai-workout.ts` | programs | admin-dash-astro | Shared types |
-| Copy `lib/program-schedule-utils.ts` (normalizeWorkoutSet) | programs | admin-dash-astro | If not already present from Program Factory |
-| Copy `lib/hiit-workout-data.ts` | programs | admin-dash-astro | isHIITWorkout, workoutInSetToHIITWorkoutData |
+| Task                                                       | Source   | Target           | Notes                                                                                 |
+| ---------------------------------------------------------- | -------- | ---------------- | ------------------------------------------------------------------------------------- |
+| Copy `api/admin/workouts/index.ts`                         | programs | admin-dash-astro | GET list, POST create; use `verifyAdminRequest`                                       |
+| Copy `api/admin/workouts/[workoutId].ts`                   | programs | admin-dash-astro | GET, PATCH, DELETE; use `verifyAdminRequest`                                          |
+| Copy `api/ai/generate-workout-chain.ts`                    | programs | admin-dash-astro | Single AI route                                                                       |
+| Copy prompt-chain steps                                    | programs | admin-dash-astro | step1-workout-architect, step2-biomechanist, step3-coach, step4-workout-mathematician |
+| Copy `lib/supabase/admin/workout-sets.ts`                  | programs | admin-dash-astro | Supabase persistence for workout_sets                                                 |
+| Copy `lib/supabase/client/workout-persistence.ts`          | programs | admin-dash-astro | Client API calls; adapt base URL if needed                                            |
+| Copy `types/ai-workout.ts`                                 | programs | admin-dash-astro | Shared types                                                                          |
+| Copy `lib/program-schedule-utils.ts` (normalizeWorkoutSet) | programs | admin-dash-astro | If not already present from Program Factory                                           |
+| Copy `lib/hiit-workout-data.ts`                            | programs | admin-dash-astro | isHIITWorkout, workoutInSetToHIITWorkoutData                                          |
 
 ### Phase 2: Views and Modal
 
-| Task | Source | Target | Notes |
-|------|--------|--------|-------|
-| Copy `ManageWorkouts.tsx` | programs | admin-dash-astro | Adapt imports, use admin-dash-astro layout |
-| Copy `WorkoutLibraryTable.tsx` | programs | admin-dash-astro | Wire `onEdit` (see Phase 3) |
-| Copy `WorkoutGeneratorModal.tsx` | programs | admin-dash-astro | Heavy; adapt imports, equipment/zones client |
-| Create `WorkoutSetEditor.tsx` | New | admin-dash-astro | Dedicated editor for `workout_sets`; uses fetchWorkoutDocument, updateWorkout. **Does not** use workout-details.ts (workouts table). Supports: view/edit metadata, sessions, blocks; "Regenerate with AI" opens WorkoutGeneratorModal in edit mode. |
-| Add route `/admin/workouts` | — | admin-dash-astro | ManageWorkouts |
-| Add route `/admin/workouts/sets/:id` | — | admin-dash-astro | WorkoutSetEditor |
-| Add nav item "Workout Factory" | — | admin-dash-astro | Existing nav entry; point to `/admin/workouts` |
+| Task                                 | Source   | Target           | Notes                                                                                                                                                                                                                                               |
+| ------------------------------------ | -------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Copy `ManageWorkouts.tsx`            | programs | admin-dash-astro | Adapt imports, use admin-dash-astro layout                                                                                                                                                                                                          |
+| Copy `WorkoutLibraryTable.tsx`       | programs | admin-dash-astro | Wire `onEdit` (see Phase 3)                                                                                                                                                                                                                         |
+| Copy `WorkoutGeneratorModal.tsx`     | programs | admin-dash-astro | Heavy; adapt imports, equipment/zones client                                                                                                                                                                                                        |
+| Create `WorkoutSetEditor.tsx`        | New      | admin-dash-astro | Dedicated editor for `workout_sets`; uses fetchWorkoutDocument, updateWorkout. **Does not** use workout-details.ts (workouts table). Supports: view/edit metadata, sessions, blocks; "Regenerate with AI" opens WorkoutGeneratorModal in edit mode. |
+| Add route `/admin/workouts`          | —        | admin-dash-astro | ManageWorkouts                                                                                                                                                                                                                                      |
+| Add route `/admin/workouts/sets/:id` | —        | admin-dash-astro | WorkoutSetEditor                                                                                                                                                                                                                                    |
+| Add nav item "Workout Factory"       | —        | admin-dash-astro | Existing nav entry; point to `/admin/workouts`                                                                                                                                                                                                      |
 
 ### Phase 3: Edit Flow and Regenerate (Opportunities)
 
-| Task | Detail |
-|------|--------|
-| **Wire Regenerate** | ManageWorkouts passes `onEdit` to WorkoutLibraryTable. `onEdit(workoutId)` fetches workout document, sets `editingWorkout`, `editingWorkoutConfig`, `editingWorkoutId`, `editingChainMetadata`, opens WorkoutGeneratorModal in edit mode. |
-| **Edit links to WorkoutSetEditor** | WorkoutLibraryTable "Edit" links to `/admin/workouts/sets/:id` (WorkoutSetEditor), not a generic `/admin/workouts/:id`. |
-| **WorkoutSetEditor "Regenerate with AI"** | Button opens WorkoutGeneratorModal with `editingWorkout`, `editingWorkoutConfig`, `editingWorkoutId`. On save, calls updateWorkout; refreshes editor. |
+| Task                                      | Detail                                                                                                                                                                                                                                    |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Wire Regenerate**                       | ManageWorkouts passes `onEdit` to WorkoutLibraryTable. `onEdit(workoutId)` fetches workout document, sets `editingWorkout`, `editingWorkoutConfig`, `editingWorkoutId`, `editingChainMetadata`, opens WorkoutGeneratorModal in edit mode. |
+| **Edit links to WorkoutSetEditor**        | WorkoutLibraryTable "Edit" links to `/admin/workouts/sets/:id` (WorkoutSetEditor), not a generic `/admin/workouts/:id`.                                                                                                                   |
+| **WorkoutSetEditor "Regenerate with AI"** | Button opens WorkoutGeneratorModal with `editingWorkout`, `editingWorkoutConfig`, `editingWorkoutId`. On save, calls updateWorkout; refreshes editor.                                                                                     |
 
 ### Phase 4: Edit Program Integration (Opportunity: Single hub)
 
-| Task | Detail |
-|------|--------|
+| Task                              | Detail                                                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Deep-link from Program Editor** | In ProgramBlueprintEditor (or equivalent), "Edit workout" for a program-embedded workout opens Workout Factory. Options: (A) If workout is already a `workout_sets` ref, link to `/admin/workouts/sets/:id`. (B) If embedded in program content only, "Extract to Workout Factory" creates a new workout set from that content and opens it; or open WorkoutGeneratorModal with that content as seed. |
-| **Save back to program** | When editing a workout that came from a program, WorkoutSetEditor can offer "Save back to program" to update the program's schedule content. Requires Program persistence API support. |
-| **Unify "Edit with AI"** | Remove or redirect Program Factory "Edit with AI" to open Workout Factory (WorkoutGeneratorModal or WorkoutSetEditor). Single location for AI-driven workout editing. |
+| **Save back to program**          | When editing a workout that came from a program, WorkoutSetEditor can offer "Save back to program" to update the program's schedule content. Requires Program persistence API support.                                                                                                                                                                                                                |
+| **Unify "Edit with AI"**          | Remove or redirect Program Factory "Edit with AI" to open Workout Factory (WorkoutGeneratorModal or WorkoutSetEditor). Single location for AI-driven workout editing.                                                                                                                                                                                                                                 |
 
 ### Phase 5: Polish and Documentation
 
-| Task | Detail |
-|------|--------|
-| **Preserve spec** | Copy or link `generate-workout-modal-and-prompt.md` into admin-dash-astro docs. |
-| **Error handling** | API `fetchWorkoutLibrary` on error: return 500 with message instead of `[]` when appropriate; client shows explicit error. |
-| **Template/presets** (optional) | Save config presets for faster creation; lower priority. |
+| Task                            | Detail                                                                                                                     |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Preserve spec**               | Copy or link `generate-workout-modal-and-prompt.md` into admin-dash-astro docs.                                            |
+| **Error handling**              | API `fetchWorkoutLibrary` on error: return 500 with message instead of `[]` when appropriate; client shows explicit error. |
+| **Template/presets** (optional) | Save config presets for faster creation; lower priority.                                                                   |
 
 ---
 
 ## 4. File Mapping
 
-| programs | admin-dash-astro |
-|----------|------------------|
-| `src/components/react/admin/views/ManageWorkouts.tsx` | `src/components/admin/views/ManageWorkouts.tsx` |
-| `src/components/react/admin/WorkoutLibraryTable.tsx` | `src/components/admin/WorkoutLibraryTable.tsx` |
-| `src/components/react/admin/WorkoutGeneratorModal.tsx` | `src/components/admin/WorkoutGeneratorModal.tsx` |
-| (New) WorkoutSetEditor | `src/components/admin/views/WorkoutSetEditor.tsx` |
-| `src/pages/api/admin/workouts/index.ts` | `src/pages/api/admin/workouts/index.ts` |
-| `src/pages/api/admin/workouts/[workoutId].ts` | `src/pages/api/admin/workouts/[workoutId].ts` |
-| `src/pages/api/ai/generate-workout-chain.ts` | `src/pages/api/ai/generate-workout-chain.ts` |
-| `src/lib/prompt-chain/step1-workout-architect.ts` | `src/lib/prompt-chain/step1-workout-architect.ts` |
-| `src/lib/prompt-chain/step2-biomechanist.ts` | `src/lib/prompt-chain/step2-biomechanist.ts` |
-| `src/lib/prompt-chain/step3-coach.ts` | `src/lib/prompt-chain/step3-coach.ts` |
-| `src/lib/prompt-chain/step4-workout-mathematician.ts` | `src/lib/prompt-chain/step4-workout-mathematician.ts` |
-| `src/lib/supabase/admin/workout-sets.ts` | `src/lib/supabase/admin/workout-sets.ts` |
-| `src/lib/supabase/client/workout-persistence.ts` | `src/lib/supabase/client/workout-persistence.ts` |
-| `src/types/ai-workout.ts` | `src/types/ai-workout.ts` |
-| `src/lib/hiit-workout-data.ts` | `src/lib/hiit-workout-data.ts` |
+| programs                                               | admin-dash-astro                                      |
+| ------------------------------------------------------ | ----------------------------------------------------- |
+| `src/components/react/admin/views/ManageWorkouts.tsx`  | `src/components/admin/views/ManageWorkouts.tsx`       |
+| `src/components/react/admin/WorkoutLibraryTable.tsx`   | `src/components/admin/WorkoutLibraryTable.tsx`        |
+| `src/components/react/admin/WorkoutGeneratorModal.tsx` | `src/components/admin/WorkoutGeneratorModal.tsx`      |
+| (New) WorkoutSetEditor                                 | `src/components/admin/views/WorkoutSetEditor.tsx`     |
+| `src/pages/api/admin/workouts/index.ts`                | `src/pages/api/admin/workouts/index.ts`               |
+| `src/pages/api/admin/workouts/[workoutId].ts`          | `src/pages/api/admin/workouts/[workoutId].ts`         |
+| `src/pages/api/ai/generate-workout-chain.ts`           | `src/pages/api/ai/generate-workout-chain.ts`          |
+| `src/lib/prompt-chain/step1-workout-architect.ts`      | `src/lib/prompt-chain/step1-workout-architect.ts`     |
+| `src/lib/prompt-chain/step2-biomechanist.ts`           | `src/lib/prompt-chain/step2-biomechanist.ts`          |
+| `src/lib/prompt-chain/step3-coach.ts`                  | `src/lib/prompt-chain/step3-coach.ts`                 |
+| `src/lib/prompt-chain/step4-workout-mathematician.ts`  | `src/lib/prompt-chain/step4-workout-mathematician.ts` |
+| `src/lib/supabase/admin/workout-sets.ts`               | `src/lib/supabase/admin/workout-sets.ts`              |
+| `src/lib/supabase/client/workout-persistence.ts`       | `src/lib/supabase/client/workout-persistence.ts`      |
+| `src/types/ai-workout.ts`                              | `src/types/ai-workout.ts`                             |
+| `src/lib/hiit-workout-data.ts`                         | `src/lib/hiit-workout-data.ts`                        |
 
 ---
 
 ## 5. Risk Register
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                                     | Mitigation                                                                                                                                                                                               |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | WorkoutEditor (workouts table) confusion | Use distinct route `/admin/workouts/sets/:id` for Workout Factory; document in WORKOUT_DATA_MODEL.md. Do not migrate programs' WorkoutEditor (trainer workouts) unless ScheduleBuilder is also migrated. |
-| Modal size / complexity | WorkoutGeneratorModal stays as-is for Phase 2; refactor in a later pass if needed. |
-| Program-embedded workout identity | Programs store workouts inline in schedule content. Define contract: workout set ID in program content vs embedded JSON. Phase 4 may require program schema or API changes. |
-| Shared Supabase project | Both programs and admin-dash-astro use same `workout_sets` table. No migration of data; same RLS. Ensure `author_id` matches admin users. |
+| Modal size / complexity                  | WorkoutGeneratorModal stays as-is for Phase 2; refactor in a later pass if needed.                                                                                                                       |
+| Program-embedded workout identity        | Programs store workouts inline in schedule content. Define contract: workout set ID in program content vs embedded JSON. Phase 4 may require program schema or API changes.                              |
+| Shared Supabase project                  | Both programs and admin-dash-astro use same `workout_sets` table. No migration of data; same RLS. Ensure `author_id` matches admin users.                                                                |
 
 ---
 

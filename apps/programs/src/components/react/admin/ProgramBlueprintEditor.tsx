@@ -37,7 +37,10 @@ import { validateWorkoutDescriptions } from '@/lib/validate-program-schedule';
 import { normalizeWorkoutForEditor } from '@/lib/program-schedule-utils';
 import { getGeneratedExercises } from '@/lib/supabase/client/generated-exercises';
 import type { GeneratedExercise } from '@/types/generated-exercise';
-import { buildApprovedExerciseMaps, normalizeExerciseName } from '@/lib/approved-exercise-maps';
+import {
+  buildApprovedExerciseMaps,
+  normalizeExerciseName,
+} from '@workout-generator/exercise-mapping';
 import type { Exercise as PublicExercise } from '@/types';
 import type { ExtendedBiomechanics } from '@/components/react/ExerciseDetailModal';
 import ExerciseMapPickerModal from '@/components/react/admin/ExerciseMapPickerModal';

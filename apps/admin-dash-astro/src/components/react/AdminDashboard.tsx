@@ -17,6 +17,8 @@ import ManagePrograms from './admin/views/ManagePrograms';
 import ProgramEditor from './admin/views/ProgramEditor';
 import ManageWorkouts from './admin/views/ManageWorkouts';
 import WorkoutSetEditor from './admin/views/WorkoutSetEditor';
+import ManageChallenges from './admin/views/ManageChallenges';
+import ChallengeEditor from './admin/views/ChallengeEditor';
 import ComingSoon from './admin/ComingSoon';
 import ManageExercises from './admin/views/ManageExercises';
 import AdminExerciseDetail from './admin/AdminExerciseDetail';
@@ -106,6 +108,8 @@ const AdminDashboard: React.FC = () => {
             <Route path="programs" element={<ManagePrograms />} />
             <Route path="workouts/sets/:id" element={<WorkoutSetEditor />} />
             <Route path="workouts" element={<ManageWorkouts />} />
+            <Route path="challenges/:id" element={<ChallengeEditor />} />
+            <Route path="challenges" element={<ManageChallenges />} />
             <Route path="*" element={<ComingSoon />} />
           </Route>
         </Routes>

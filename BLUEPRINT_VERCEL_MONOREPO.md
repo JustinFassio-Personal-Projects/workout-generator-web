@@ -106,7 +106,7 @@ The marketing site proxies selected paths to other deployments so `aiworkoutgene
 | Content admin (Astro) | `aiworkoutgenerator.com/admin` or `aiworkoutgenerator-admin.vercel.app` | Exercises, programs, workouts, challenges |
 | Legacy admin (Next.js) | `admin.aiworkoutgenerator.com` | Blog, leads, analytics, deep-research |
 
-Configure `admin.aiworkoutgenerator.com` in Vercel → admin-dash project → Domains. Configure `aiworkoutgenerator.com` → astro-site (which rewrites `/admin` to admin-dash-astro).
+Configure `admin.aiworkoutgenerator.com` in Vercel → admin-dash project → Domains. Configure `aiworkoutgenerator.com` and `www.aiworkoutgenerator.com` → astro-site (which rewrites `/admin` to admin-dash-astro). **Both apex and www must be on astro-site** for `/admin` to work; if www is on nextjs-backend, use its fallback rewrites (see DEPLOYMENT.md).
 
 **Deployment flow diagram:**
 

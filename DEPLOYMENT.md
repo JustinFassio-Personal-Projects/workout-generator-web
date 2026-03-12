@@ -51,3 +51,11 @@ The **programs** app (`apps/programs`) provides the content admin (programs, wor
 ## nextjs-backend: "Site Not Found – This tenant site does not exist"
 
 If the nextjs-backend deployment URL (e.g. `nextjs-backend-xxx.vercel.app`) shows this error, the proxy was treating the hostname as a tenant domain. Ensure `proxy.ts` treats `*.vercel.app` and `app.aiworkoutgenerator.com` as platform domains (no tenant rewrite). After deploy, the homepage should load.
+
+## www.aiworkoutgenerator.com/admin returns 404
+
+If `https://www.aiworkoutgenerator.com/admin` returns 404, the domain may be assigned to the wrong project:
+
+1. **Check Vercel Domains:** Vercel Dashboard → astro-site → Settings → Domains. Both `aiworkoutgenerator.com` and `www.aiworkoutgenerator.com` should be assigned to astro-site.
+2. **Fix domain assignment:** If `www.aiworkoutgenerator.com` is on nextjs-backend, remove it and add it to astro-site. All marketing traffic (including www) should go through astro-site so its rewrites proxy `/admin` to admin-dash-astro.
+3. **Fallback:** nextjs-backend has rewrites for `/admin` and `/api/admin` that proxy to admin-dash-astro. If www must stay on nextjs-backend, those rewrites will make `/admin` work; prefer moving www to astro-site for consistency.

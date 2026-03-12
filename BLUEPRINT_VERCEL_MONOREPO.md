@@ -99,6 +99,15 @@ The marketing site proxies selected paths to other deployments so `aiworkoutgene
 
 **Alternative (subdomains only):** Users can access admin at `admin.aiworkoutgenerator.com` and programs at `programs.aiworkoutgenerator.com` directly without relying on rewrites. Rewrites provide a single-domain UX from the marketing site.
 
+**Both admins live at separate URLs:**
+
+| Admin | URL | Purpose |
+|-------|-----|---------|
+| Content admin (Astro) | `aiworkoutgenerator.com/admin` or `aiworkoutgenerator-admin.vercel.app` | Exercises, programs, workouts, challenges |
+| Legacy admin (Next.js) | `admin.aiworkoutgenerator.com` | Blog, leads, analytics, deep-research |
+
+Configure `admin.aiworkoutgenerator.com` in Vercel → admin-dash project → Domains. Configure `aiworkoutgenerator.com` → astro-site (which rewrites `/admin` to admin-dash-astro).
+
 **Deployment flow diagram:**
 
 ```mermaid

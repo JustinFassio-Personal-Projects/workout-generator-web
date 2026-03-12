@@ -46,4 +46,8 @@ The **programs** app (`apps/programs`) provides the content admin (programs, wor
 - **Programs app root URL:** Set by your programs deployment (e.g. `https://programs.aiworkoutgenerator.com`).
 - **Content Admin URL:** `{programs-root}/admin` (e.g. `https://programs.aiworkoutgenerator.com/admin`). Login at `/admin/login`; access requires Supabase auth and `profiles.role === 'admin'`.
 
-**Opening the Content Admin from the marketing site (astro-site):** Set `PUBLIC_PROGRAMS_ADMIN_URL` in the astro-site Vercel project (or local `.env`) to the programs app root (e.g. `https://programs.aiworkoutgenerator.com`). The astro-site footer then shows an **Admin** link under Support that goes to `{PUBLIC_PROGRAMS_ADMIN_URL}/admin`. If the variable is unset, the link is hidden. The main site’s `/admin` path continues to point to **admin-dash** (blog, leads) via existing rewrites.
+**Opening the Content Admin from the marketing site (astro-site):** Set `PUBLIC_PROGRAMS_ADMIN_URL` in the astro-site Vercel project (or local `.env`) to the programs app root (e.g. `https://programs.aiworkoutgenerator.com`). The astro-site footer then shows an **Admin** link under Support that goes to `{PUBLIC_PROGRAMS_ADMIN_URL}/admin`. If the variable is unset, the link is hidden. The main site’s `/admin` path is proxied to **admin-dash-astro** (content admin) via astro-site rewrites.
+
+## nextjs-backend: "Site Not Found – This tenant site does not exist"
+
+If the nextjs-backend deployment URL (e.g. `nextjs-backend-xxx.vercel.app`) shows this error, the proxy was treating the hostname as a tenant domain. Ensure `proxy.ts` treats `*.vercel.app` and `app.aiworkoutgenerator.com` as platform domains (no tenant rewrite). After deploy, the homepage should load.

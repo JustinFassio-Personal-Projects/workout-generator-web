@@ -262,11 +262,14 @@ export const Footer: React.FC = () => {
           <p className={styles.copyright}>
             © {currentYear} Workout Generator. All rights reserved.
             <a
-              href={process.env.NEXT_PUBLIC_ADMIN_URL || '/admin'}
+              href={
+                process.env.NEXT_PUBLIC_ADMIN_URL ||
+                'https://aiworkoutgenerator.com/admin'
+              }
               className={styles.adminAccess}
               aria-label="Admin"
-              target={process.env.NEXT_PUBLIC_ADMIN_URL ? '_blank' : undefined}
-              rel={process.env.NEXT_PUBLIC_ADMIN_URL ? 'noopener noreferrer' : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               ◆
             </a>

@@ -17,7 +17,7 @@ const isVercel = process.env.VERCEL === '1';
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || undefined,
   output: 'server',
-  adapter: isVercel ? vercel() : node({ mode: 'standalone' }),
+  adapter: isVercel ? vercel({ maxDuration: 300 }) : node({ mode: 'standalone' }),
   integrations: [
     react(),
     tailwind({ applyBaseStyles: false }),

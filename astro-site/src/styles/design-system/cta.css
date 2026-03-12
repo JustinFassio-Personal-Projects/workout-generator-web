@@ -1,0 +1,87 @@
+/**
+ * Shared primary/secondary CTA styles.
+ * Use with data-cta for analytics (e.g. data-cta="hero-generate-workout").
+ * Primary: accent background, dark text. Secondary: outline/glass style.
+ */
+
+.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm, 0.5rem);
+  padding: var(--spacing-md, 1rem) var(--spacing-xl, 2rem);
+  border-radius: var(--radius-xl, 1rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--bg-dark);
+  background: var(--color-orange-light);
+  box-shadow: var(--shadow-lg);
+  transition:
+    color var(--transition-base),
+    background-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cta-primary:hover {
+  color: var(--bg-dark);
+  background: var(--color-orange-light);
+  filter: brightness(1.05);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.cta-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-dark),
+    0 0 0 4px var(--color-orange-light);
+}
+
+.cta-primary svg {
+  color: currentColor;
+  flex-shrink: 0;
+}
+
+/* Secondary: outline / glass style */
+.cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm, 0.5rem);
+  padding: var(--spacing-md, 1rem) var(--spacing-xl, 2rem);
+  border-radius: var(--radius-xl, 1rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--glass-border-hover, rgba(255, 255, 255, 0.2));
+  transition:
+    color var(--transition-base),
+    background-color var(--transition-base),
+    border-color var(--transition-base);
+  text-decoration: none;
+  cursor: pointer;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cta-secondary:hover {
+  background: var(--glass-bg-hover, rgba(255, 255, 255, 0.05));
+  border-color: var(--glass-border-hover);
+}
+
+.cta-secondary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-dark),
+    0 0 0 4px var(--color-orange-light);
+}
+
+.cta-secondary svg {
+  color: currentColor;
+  flex-shrink: 0;
+}

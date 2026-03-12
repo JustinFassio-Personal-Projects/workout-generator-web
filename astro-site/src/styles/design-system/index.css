@@ -1,0 +1,5 @@
+/* Design system - embedded for standalone astro-site deployment */
+@import './tokens.css';
+@import './base.css';
+@import './animations.css';
+@import './cta.css';

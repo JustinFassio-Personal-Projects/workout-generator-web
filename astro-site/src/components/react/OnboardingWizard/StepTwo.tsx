@@ -44,14 +44,14 @@ export function StepTwo({
     }
   }
 
-  const chipSelected = 'bg-emerald-500/20 border-emerald-500/50 text-lime-400'
-  const chipDefault = 'bg-slate-800 border-white/5 text-slate-300 hover:border-emerald-500/50'
+  const chipSelected = 'bg-[var(--color-orange-light)]/20 border-[var(--color-orange-light)]/50 text-[var(--color-orange-light)]'
+  const chipDefault = 'bg-slate-800 border-white/5 text-slate-300 hover:border-[var(--color-orange-light)]/50'
 
   return (
     <div className="relative flex flex-col">
       <div className="flex flex-col md:flex-row gap-2 p-2">
-        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-emerald-500/30 transition-colors relative overflow-hidden group/item">
-          <div className="p-2 bg-slate-800 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-[var(--color-orange-light)]/30 transition-colors relative overflow-hidden group/item">
+          <div className="p-2 bg-slate-800 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
             <Activity className="w-4 h-4" />
           </div>
           <div className="flex flex-col z-10 w-full overflow-hidden relative">
@@ -62,7 +62,7 @@ export function StepTwo({
               <select
                 value={activityLevel}
                 onChange={e => onActivityChange(e.target.value as ActivityLevel)}
-                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-emerald-500 transition-colors truncate pr-8 appearance-none"
+                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-[var(--color-orange-light)] transition-colors truncate pr-8 appearance-none"
               >
                 {activityLevelOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -82,8 +82,8 @@ export function StepTwo({
           )}
         </div>
 
-        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-lime-400/30 transition-colors relative overflow-hidden group/item">
-          <div className="p-2 bg-slate-800 rounded-lg text-lime-400 shrink-0 shadow-sm">
+        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-[var(--color-orange-light)]/30 transition-colors relative overflow-hidden group/item">
+          <div className="p-2 bg-slate-800 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
             <Users className="w-4 h-4" />
           </div>
           <div className="flex flex-col z-10 w-full overflow-hidden relative">
@@ -94,7 +94,7 @@ export function StepTwo({
               <select
                 value={gender ?? 'prefer_not_to_say'}
                 onChange={e => onGenderChange(e.target.value as Gender)}
-                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-lime-400 transition-colors truncate pr-8 appearance-none"
+                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-[var(--color-orange-light)] transition-colors truncate pr-8 appearance-none"
               >
                 {genderOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -110,8 +110,8 @@ export function StepTwo({
         </div>
       </div>
 
-      <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-emerald-500/30 transition-colors relative overflow-hidden group/item mt-2 mx-2">
-        <div className="p-2 bg-slate-800 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+      <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-[var(--color-orange-light)]/30 transition-colors relative overflow-hidden group/item mt-2 mx-2">
+        <div className="p-2 bg-slate-800 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
           <Calendar className="w-4 h-4" />
         </div>
         <div className="flex flex-col z-10 w-full overflow-hidden">
@@ -129,7 +129,7 @@ export function StepTwo({
             min={13}
             max={120}
             placeholder="Enter your age"
-            className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 p-0 w-full hover:text-emerald-500 transition-colors placeholder:text-slate-500"
+            className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 p-0 w-full hover:text-[var(--color-orange-light)] transition-colors placeholder:text-slate-500"
           />
         </div>
         {errors.age && (
@@ -152,7 +152,7 @@ export function StepTwo({
                 isActive ? chipSelected : chipDefault
               }`}
             >
-              <Activity className="w-3 h-3 text-emerald-500" />
+              <Activity className="w-3 h-3 text-[var(--color-orange-light)]" />
               <span>{option.label}</span>
             </button>
           )
@@ -169,7 +169,7 @@ export function StepTwo({
                 isActive ? chipSelected : chipDefault
               }`}
             >
-              <Activity className="w-3 h-3 text-emerald-500" />
+              <Activity className="w-3 h-3 text-[var(--color-orange-light)]" />
               <span>{option.label}</span>
             </button>
           )
@@ -188,7 +188,7 @@ export function StepTwo({
         <button
           type="submit"
           onClick={onSubmit}
-          className="flex-1 md:flex-initial bg-gradient-to-r from-emerald-500 to-lime-400 text-slate-900 px-8 py-4 rounded-2xl font-bold tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+          className="flex-1 md:flex-initial bg-gradient-to-r from-[var(--color-orange-light)] to-[var(--color-orange-medium)] text-slate-900 px-8 py-4 rounded-2xl font-bold tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

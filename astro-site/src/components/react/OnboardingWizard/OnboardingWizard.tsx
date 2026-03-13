@@ -250,12 +250,12 @@ export function OnboardingWizard({ tenantId, preselect }: OnboardingWizardProps)
       <main className="px-3 sm:px-6 py-4 md:py-8 relative z-10">
         <div className="max-w-6xl mx-auto transition-all duration-500 min-h-[50vh] md:min-h-[70vh] flex flex-col justify-center">
           <div className="text-center mb-6 md:mb-16 space-y-3 md:space-y-8">
-            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/15 border border-white/20 text-[var(--color-accent)] text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
+            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/15 border border-white/20 text-[var(--color-orange-light)] text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
               <Dumbbell className="w-3 h-3 md:w-4 md:h-4" /> Professional Kinetic Analysis Engine
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-8xl font-bold text-white tracking-tight leading-[0.95] md:leading-[0.9]">
               Master the Science of <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-orange-light)] via-[var(--color-orange)] to-[var(--color-orange-medium)]">
                 Human Motion.
               </span>
             </h1>
@@ -276,7 +276,7 @@ export function OnboardingWizard({ tenantId, preselect }: OnboardingWizardProps)
             className="relative z-20 transition-all duration-300 scale-100"
           >
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-500 rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur-xl" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-[var(--color-orange-light)] via-[var(--color-orange)] to-[var(--color-orange-medium)] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur-xl" />
               <div className="relative bg-slate-900/80 backdrop-blur-xl border border-white/10 p-2 rounded-3xl shadow-2xl">
                 <div className="relative flex flex-col min-h-[400px] md:min-h-[500px]">
                   {!showPreview && (
@@ -286,7 +286,7 @@ export function OnboardingWizard({ tenantId, preselect }: OnboardingWizardProps)
                       </span>
                       <div className="h-1 bg-slate-800 rounded-full overflow-hidden mt-2">
                         <div
-                          className="h-full bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-400 rounded-full transition-all duration-300"
+                          className="h-full bg-gradient-to-r from-[var(--color-orange-light)] via-[var(--color-orange)] to-[var(--color-orange-medium)] rounded-full transition-all duration-300"
                           style={{ width: currentStep === 1 ? '50%' : '100%' }}
                         />
                       </div>

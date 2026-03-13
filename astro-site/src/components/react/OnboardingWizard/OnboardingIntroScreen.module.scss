@@ -375,10 +375,10 @@
   left: 50%;
   width: 8px;
   height: 8px;
-  background: var(--color-accent);
+  background: var(--color-orange-light);
   border-radius: 50%;
   filter: blur(1px);
-  box-shadow: 0 0 10px var(--color-accent);
+  box-shadow: 0 0 10px var(--color-orange-light);
   transform: translate(-50%, -50%);
 }
 
@@ -386,7 +386,7 @@
   position: absolute;
   width: 4px;
   height: 4px;
-  background: var(--color-primary-500);
+  background: var(--color-orange-light);
   border-radius: 50%;
   transition: all 1s;
   transition-delay: 0.5s;
@@ -395,7 +395,7 @@
 .particleLine {
   position: absolute;
   height: 1px;
-  background: rgba(34, 197, 94, 0.2);
+  background: rgba(255, 191, 0, 0.2);
   transform-origin: right;
   right: 50%;
   top: 50%;
@@ -439,7 +439,7 @@
 }
 
 .gradientText {
-  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-accent) 100%);
+  background: linear-gradient(135deg, var(--color-orange-light) 0%, var(--color-orange-medium) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -479,18 +479,18 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-full);
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: rgba(255, 191, 0, 0.1);
+  border: 1px solid rgba(255, 191, 0, 0.3);
   backdrop-filter: blur(12px);
-  box-shadow: 0 0 15px rgba(34, 197, 94, 0.1);
+  box-shadow: 0 0 15px rgba(255, 191, 0, 0.1);
   animation: fadeInZoom 1s ease-out 0.5s both;
 }
 
 .badgeIcon {
   width: 12px;
   height: 12px;
-  color: var(--color-primary-500);
-  filter: drop-shadow(0 0 8px rgba(34, 197, 94, 1));
+  color: var(--color-orange-light);
+  filter: drop-shadow(0 0 8px rgba(255, 191, 0, 0.8));
   animation: pulseGlow 2s ease-in-out infinite;
 
   @media (min-width: 768px) {
@@ -502,7 +502,7 @@
 .badgeText {
   font-size: 9px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary-500);
+  color: var(--color-orange-light);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 
@@ -526,7 +526,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-accent) 100%);
+  background: linear-gradient(135deg, var(--color-orange-light) 0%, var(--color-orange-medium) 100%);
   opacity: 0.2;
   transition: opacity 0.3s;
 
@@ -538,12 +538,12 @@
 .ctaButtonBorder {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(34, 197, 94, 0.5);
+  border: 1px solid rgba(255, 191, 0, 0.5);
   border-radius: var(--radius-full);
   transition: border-color 0.3s;
 
   .ctaButton:hover & {
-    border-color: var(--color-accent);
+    border-color: var(--color-orange-light);
   }
 }
 
@@ -555,7 +555,7 @@
 }
 
 .ctaButtonText {
-  color: var(--color-primary-500);
+  color: var(--color-orange-light);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.1em;
   font-size: var(--font-size-sm);
@@ -569,7 +569,7 @@
 .ctaButtonIcon {
   width: 16px;
   height: 16px;
-  color: var(--color-primary-500);
+  color: var(--color-orange-light);
   fill: currentColor;
   transition: color 0.3s;
 

@@ -33,14 +33,14 @@ export function EquipmentCardGrid({ items }: EquipmentCardGridProps) {
             className="glass-card p-6 text-center group"
             id={card.id}
           >
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent)] group-hover:bg-[var(--color-accent)]/20 transition-colors">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-orange-light)]/10 flex items-center justify-center text-[var(--color-orange-light)] group-hover:bg-[var(--color-orange-light)]/20 transition-colors">
               <IconComponent className="w-8 h-8" strokeWidth={2} />
             </div>
-            <h3 className="text-lg font-bold mb-2 group-hover:text-[var(--color-accent)] transition-colors">
+            <h3 className="text-lg font-bold mb-2 group-hover:text-[var(--color-orange-light)] transition-colors">
               {card.name}
             </h3>
             <p className="text-sm text-secondary mb-4">{card.description}</p>
-            <div className="flex items-center justify-center gap-2 text-[var(--color-accent)] text-sm font-semibold">
+            <div className="flex items-center justify-center gap-2 text-[var(--color-orange-light)] text-sm font-semibold">
               <span>Get Started</span>
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>

@@ -90,7 +90,7 @@
 }
 
 .gradientText {
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-400) 100%);
+  background: linear-gradient(135deg, var(--color-orange-light) 0%, var(--color-orange-medium) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -189,8 +189,8 @@
   }
 
   &--active {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
+    background: var(--color-orange-light);
+    border-color: var(--color-orange-light);
     width: 24px;
     border-radius: var(--radius-full);
   }
@@ -224,7 +224,7 @@
 .rating {
   display: flex;
   gap: var(--spacing-xs);
-  color: var(--color-accent);
+  color: var(--color-orange-light);
 }
 
 .star {

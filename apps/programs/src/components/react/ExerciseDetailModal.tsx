@@ -279,7 +279,7 @@ const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
                             .toString()
                             .padStart(
                               exercise.instructionsStructured!.steps.length.toString().length,
-                              '0',
+                              '0'
                             )}
                         </span>
                         <div

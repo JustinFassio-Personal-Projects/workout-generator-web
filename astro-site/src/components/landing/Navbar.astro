@@ -19,17 +19,17 @@ const currentPath = Astro.url.pathname;
   <nav class="container-custom flex items-center justify-between gap-6 h-[var(--navbar-height)]">
     <a href="/" class="flex items-center gap-3 shrink-0 group nav-logo">
       <div class="relative scale-90 xl:scale-100">
-        <div class="absolute inset-0 bg-[var(--color-accent)] blur-lg opacity-40 group-hover:opacity-60 transition-opacity rounded-xl" aria-hidden="true"></div>
+        <div class="absolute inset-0 bg-[var(--color-orange-light)] blur-lg opacity-40 group-hover:opacity-60 transition-opacity rounded-xl" aria-hidden="true"></div>
         <div class="relative z-10 rounded-xl bg-gradient-to-br from-[var(--color-gray-900)] to-[var(--color-gray-800)] p-2.5 border border-white/10 shadow-sm">
           <!-- Lucide Activity (heartbeat/ECG) icon - matches Next.js navbar -->
-          <svg class="w-6 h-6 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg class="w-6 h-6 text-[var(--color-orange-light)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
           </svg>
         </div>
       </div>
       <div class="flex flex-col">
         <span class="font-display font-bold text-lg xl:text-2xl tracking-tight leading-none text-[var(--text-primary)]">
-          AI Workout <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary-500)] to-[var(--color-accent)]">Generator</span>
+          AI Workout <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-orange-light)] to-[var(--color-orange-medium)]">Generator</span>
         </span>
         <span class="text-[8px] xl:text-[10px] uppercase tracking-[0.2em] text-muted font-medium mt-0.5">AI-Powered Fitness Plans</span>
       </div>
@@ -44,8 +44,8 @@ const currentPath = Astro.url.pathname;
               href={link.href}
               class={`inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium transition-colors border border-[var(--glass-border-base)] shadow-sm whitespace-nowrap ${
                 isActive
-                  ? 'text-[var(--color-accent)] bg-[var(--color-accent)]/10'
-                  : 'text-secondary bg-[var(--glass-bg-base)] hover:text-[var(--color-accent)] hover:bg-[var(--glass-bg-hover)]'
+                  ? 'text-[var(--color-orange-light)] bg-[var(--color-orange-light)]/10'
+                  : 'text-secondary bg-[var(--glass-bg-base)] hover:text-[var(--color-orange-light)] hover:bg-[var(--glass-bg-hover)]'
               }`}
             >
               {link.name}
@@ -76,7 +76,7 @@ const currentPath = Astro.url.pathname;
       <button
         type="button"
         id="mobile-nav-toggle"
-        class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-[var(--glass-bg-base)] text-secondary border border-[var(--glass-border-base)] text-sm font-medium hover:text-[var(--color-accent)] hover:bg-[var(--glass-bg-hover)] transition-colors"
+        class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-[var(--glass-bg-base)] text-secondary border border-[var(--glass-border-base)] text-sm font-medium hover:text-[var(--color-orange-light)] hover:bg-[var(--glass-bg-hover)] transition-colors"
         aria-label="Toggle menu"
         aria-expanded="false"
         aria-controls="mobile-nav-drawer"
@@ -126,7 +126,7 @@ const currentPath = Astro.url.pathname;
       {navLinks.map((link) => (
         <a
           href={link.href}
-          class="inline-flex items-center justify-center w-full px-4 py-2 rounded-full text-sm font-medium text-secondary bg-[var(--glass-bg-base)] border border-[var(--glass-border-base)] hover:text-[var(--color-accent)] hover:bg-[var(--glass-bg-hover)] transition-colors"
+          class="inline-flex items-center justify-center w-full px-4 py-2 rounded-full text-sm font-medium text-secondary bg-[var(--glass-bg-base)] border border-[var(--glass-border-base)] hover:text-[var(--color-orange-light)] hover:bg-[var(--glass-bg-hover)] transition-colors"
         >
           {link.name}
         </a>
@@ -236,28 +236,28 @@ const currentPath = Astro.url.pathname;
 </script>
 
 <style is:global>
-  /* Sign Up button: transparent bg, lime green border and font; opens auth in Sign Up mode */
+  /* Sign Up button: transparent bg, orange border and font; opens auth in Sign Up mode */
   .nav-sign-up {
-    color: var(--color-accent);
+    color: var(--color-orange-light);
     background: transparent;
-    border: 1px solid var(--color-accent);
+    border: 1px solid var(--color-orange-light);
     transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
   }
   .nav-sign-up:hover {
-    color: var(--color-accent-light);
-    background: rgba(132, 204, 22, 0.1);
-    border-color: var(--color-accent-light);
+    color: var(--color-orange);
+    background: rgba(255, 191, 0, 0.1);
+    border-color: var(--color-orange);
   }
 
-  /* Sign In button: override global a{} so text is dark on accent bg and hover is visible */
+  /* Sign In button: override global a{} so text is dark on orange bg and hover is visible */
   .nav-sign-in {
     color: var(--bg-dark);
-    background: var(--color-accent);
+    background: var(--color-orange-light);
     transition: background-color var(--transition-base), color var(--transition-base);
   }
   .nav-sign-in:hover {
     color: var(--bg-dark);
-    background: var(--color-accent-light);
+    background: var(--color-orange);
   }
 
   /* Open state: must override Tailwind and apply to fixed overlay/drawer (may be outside scoped root) */

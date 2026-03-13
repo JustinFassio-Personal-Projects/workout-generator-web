@@ -59,8 +59,8 @@ export function StepOne({
     }
   }
 
-  const chipSelected = 'bg-emerald-500/20 border-emerald-500/50 text-lime-400'
-  const chipDefault = 'bg-slate-800 border-white/5 text-slate-300 hover:border-emerald-500/50'
+  const chipSelected = 'bg-[var(--color-orange-light)]/20 border-[var(--color-orange-light)]/50 text-[var(--color-orange-light)]'
+  const chipDefault = 'bg-slate-800 border-white/5 text-slate-300 hover:border-[var(--color-orange-light)]/50'
 
   return (
     <div className="relative flex flex-col">
@@ -81,7 +81,7 @@ export function StepOne({
                   isSelected ? chipSelected : chipDefault
                 }`}
               >
-                <Activity className="w-3 h-3 text-emerald-500" />
+                <Activity className="w-3 h-3 text-[var(--color-orange-light)]" />
                 <span>{option.label}</span>
               </button>
             )
@@ -93,8 +93,8 @@ export function StepOne({
       )}
 
       <div className="flex flex-col gap-2 p-2 mt-2">
-        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-emerald-500/30 transition-colors relative overflow-hidden group/item">
-          <div className="p-2 bg-slate-800 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 px-4 py-3 flex items-center gap-3 hover:border-[var(--color-orange-light)]/30 transition-colors relative overflow-hidden group/item">
+          <div className="p-2 bg-slate-800 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
             <GraduationCap className="w-4 h-4" />
           </div>
           <div className="flex flex-col z-10 w-full overflow-hidden relative">
@@ -105,7 +105,7 @@ export function StepOne({
               <select
                 value={fitnessLevel}
                 onChange={e => onLevelChange(e.target.value as FitnessLevel)}
-                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-emerald-500 transition-colors truncate pr-8 appearance-none"
+                className="bg-transparent border-none text-base font-bold text-slate-100 focus:ring-0 cursor-pointer p-0 w-full hover:text-[var(--color-orange-light)] transition-colors truncate pr-8 appearance-none"
               >
                 {fitnessLevelOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -123,9 +123,9 @@ export function StepOne({
           )}
         </div>
 
-        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 p-4 flex flex-col gap-2 hover:border-emerald-500/30 transition-colors relative overflow-hidden group/item">
+        <div className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 p-4 flex flex-col gap-2 hover:border-[var(--color-orange-light)]/30 transition-colors relative overflow-hidden group/item">
           <div className="flex items-center gap-2 mb-1">
-            <div className="p-2 bg-slate-800 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+            <div className="p-2 bg-slate-800 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
               <Dumbbell className="w-4 h-4" />
             </div>
             <div className="flex flex-col z-10 w-full overflow-hidden relative">
@@ -133,7 +133,7 @@ export function StepOne({
                 Equipment Categories
               </label>
               {equipmentAccess.length > 0 && (
-                <span className="text-[10px] text-emerald-500 font-semibold mt-0.5">
+                <span className="text-[10px] text-[var(--color-orange-light)] font-semibold mt-0.5">
                   {equipmentAccess.length} selected
                 </span>
               )}
@@ -153,7 +153,7 @@ export function StepOne({
                       isSelected ? chipSelected : chipDefault
                     }`}
                   >
-                    <Dumbbell className="w-3 h-3 text-emerald-500" />
+                    <Dumbbell className="w-3 h-3 text-[var(--color-orange-light)]" />
                     <span>{option.label}</span>
                   </button>
                 )
@@ -170,7 +170,7 @@ export function StepOne({
         <button
           type="submit"
           onClick={onContinue}
-          className="w-full bg-gradient-to-r from-emerald-500 to-lime-400 text-slate-900 px-8 py-4 rounded-2xl font-bold tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full bg-gradient-to-r from-[var(--color-orange-light)] to-[var(--color-orange-medium)] text-slate-900 px-8 py-4 rounded-2xl font-bold tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <Activity className="w-5 h-5" />
           <span>CONTINUE</span>

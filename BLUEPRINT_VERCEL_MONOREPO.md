@@ -416,6 +416,7 @@ When adding a new deployable app, follow this checklist. For projects with many 
 | Different behavior on preview vs production | Preview deployments use the same rewrites; targets point to production URLs. Staging would need a different vercel.json or env-based config. |
 | "Cloning …/astro-site to …/astro-site" / Vercel creates new repo | You used a Clone/Deploy-template flow. Use **Import** or **Add New… → Project** from `workout-generator-web` instead. See "Adding astro-site without creating a new GitHub repo" in §3. |
 | astro-site: "ENOENT: no such file or directory, open '/vercel/package.json'" on install | Vercel's Turbo detection uses `cd ../.. && npm install`, which goes above the repo root for astro-site (it's not in apps/). astro-site has `installCommand: "npm install"` in its vercel.json to override this. |
+| astro-site: Turbo runs `--filter=admin-dash` or fails to find package.json on build | Turbo detection overrides the build command; astro-site is not in workspaces. astro-site has `buildCommand: "npm run build"` in its vercel.json to bypass Turbo and run Astro directly. |
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for admin login, domain setup, and more.
 

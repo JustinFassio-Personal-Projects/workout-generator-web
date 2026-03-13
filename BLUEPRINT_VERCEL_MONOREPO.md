@@ -68,6 +68,20 @@ This blueprint targets:
 3. Do not use repo root as Root Directory for any project.
 4. Let Vercel infer framework from `vercel.json` or auto-detect.
 
+**Important: Adding astro-site without creating a new GitHub repo**
+
+Vercel can create a new repository (e.g. `JustinFassio-Personal-Projects/astro-site`) when you use the wrong flow. To add astro-site from the monorepo **without** creating a new repo:
+
+1. Go to [vercel.com/new](https://vercel.com/new).
+2. Under **Import Git Repository**, find `workout-generator-web`.
+3. Click **Import** (the main Import button, not "Clone" or any Deploy-template link).
+4. If `workout-generator-web` is already connected: click the **⋯** next to it → **Add New…** → **Project**. This adds a new Vercel *project* from the same repo.
+5. Set **Root Directory** → Edit → select `astro-site`.
+6. Set **Project Name** to `astro-site` (this is the Vercel project name, not a new repo).
+7. Deploy.
+
+**Avoid:** Using URLs like `vercel.com/new/clone?repository-url=.../tree/main/astro-site` or any "Clone and Deploy" flow—those create a new GitHub repo by copying the subdirectory. You want to deploy from the existing monorepo, not create a fork.
+
 **Benefits:**
 
 - Each app has its own URL (e.g. `*-xxx.vercel.app`).
@@ -398,8 +412,10 @@ When adding a new deployable app, follow this checklist. For projects with many 
 | 404 on `/exercises` or `/learn` | astro-site rewrites proxy to programs. Verify `programs.aiworkoutgenerator.com` is live and `astro-site/vercel.json` has correct destination URLs. Redeploy astro-site after changing rewrites. |
 | 404 on `/admin` | Rewrites proxy to admin-dash-astro. Verify that deployment is live. |
 | Build fails with "workspace not found" | Ensure `installCommand` runs from repo root (`cd ../.. && npm ci`). Root Directory must be set correctly. |
-| astro-site builds but missing design-system | astro-site uses `file:../packages/design-system`. Ensure repo root has `packages/design-system` and `npm install` ran in astro-site. |
+| astro-site builds but missing design-system | astro-site uses embedded design-system (`@/styles/design-system`). If using `file:../packages/design-system`, ensure repo root has `packages/design-system` and `npm install` ran in astro-site. |
 | Different behavior on preview vs production | Preview deployments use the same rewrites; targets point to production URLs. Staging would need a different vercel.json or env-based config. |
+| "Cloning …/astro-site to …/astro-site" / Vercel creates new repo | You used a Clone/Deploy-template flow. Use **Import** or **Add New… → Project** from `workout-generator-web` instead. See "Adding astro-site without creating a new GitHub repo" in §3. |
+| astro-site: "ENOENT: no such file or directory, open '/vercel/package.json'" on install | Vercel's Turbo detection uses `cd ../.. && npm install`, which goes above the repo root for astro-site (it's not in apps/). astro-site has `installCommand: "npm install"` in its vercel.json to override this. |
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for admin login, domain setup, and more.
 

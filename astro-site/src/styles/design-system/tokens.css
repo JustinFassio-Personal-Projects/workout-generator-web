@@ -40,9 +40,9 @@
 
   --glass-bg-base: rgba(25, 33, 51, 0.6);
   --glass-bg-hover: rgba(25, 33, 51, 0.8);
-  --glass-border-base: rgba(132, 204, 22, 0.15);
-  --glass-border-hover: rgba(132, 204, 22, 0.3);
-  --glass-border-accent: rgba(132, 204, 22, 0.5);
+  --glass-border-base: rgba(255, 191, 0, 0.15);
+  --glass-border-hover: rgba(255, 191, 0, 0.3);
+  --glass-border-accent: rgba(255, 191, 0, 0.4);
 
   --bg-dark: #0d0500;
   --bg-dark-secondary: #111827;
@@ -98,7 +98,7 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --shadow-glow: 0 0 20px rgba(132, 204, 22, 0.3);
+  --shadow-glow: 0 0 20px rgba(255, 191, 0, 0.15);
 
   /* Radius */
   --radius-sm: 0.25rem;

@@ -39,7 +39,7 @@
 }
 
 .gradientText {
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-400) 100%);
+  background: linear-gradient(135deg, var(--color-orange-light) 0%, var(--color-orange-medium) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -84,8 +84,8 @@
   }
 
   &--popular {
-    border: 2px solid var(--glass-border-accent);
-    box-shadow: var(--shadow-glass), var(--shadow-glow);
+    border: 2px solid rgba(255, 191, 0, 0.4);
+    box-shadow: var(--shadow-glass), 0 0 20px rgba(255, 191, 0, 0.15);
 
     &::before {
       content: '';
@@ -94,7 +94,7 @@
       left: 0;
       right: 0;
       height: 4px;
-      background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-primary-400) 100%);
+      background: linear-gradient(90deg, var(--color-orange-light) 0%, var(--color-orange-medium) 100%);
       border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     }
   }
@@ -104,7 +104,7 @@
   position: absolute;
   top: -12px;
   right: var(--spacing-lg);
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-400) 100%);
+  background: linear-gradient(135deg, var(--color-orange-light) 0%, var(--color-orange-medium) 100%);
   color: var(--bg-dark);
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-full);
@@ -179,7 +179,7 @@
 
 .checkIcon {
   flex-shrink: 0;
-  color: var(--color-accent);
+  color: var(--color-orange-light);
   margin-top: 2px;
 }
 
@@ -204,22 +204,22 @@
   cursor: pointer;
 
   &--primary {
-    background: var(--color-accent);
+    background: var(--color-orange-light);
     color: var(--bg-dark);
 
     &:hover {
-      background: var(--color-accent-light);
+      background: var(--color-orange);
     }
   }
 
   &--secondary {
     background: transparent;
-    color: var(--color-accent);
-    border: 2px solid var(--glass-border-accent);
+    color: var(--color-orange-light);
+    border: 2px solid rgba(255, 191, 0, 0.4);
 
     &:hover {
-      border-color: var(--color-accent);
-      background: rgba(132, 204, 22, 0.1);
+      border-color: var(--color-orange-light);
+      background: rgba(255, 191, 0, 0.1);
     }
   }
 }

@@ -120,7 +120,7 @@ const faqSchema = {
   title="AI Workout Generator | Free Science-Based Strength Plans"
   structuredData={[softwareApplicationSchema, homepageSchema, breadcrumbSchema, faqSchema]}
 >
-  <main class="min-h-screen">
+  <main class="min-h-screen text-white selection:bg-[var(--color-orange-light)] selection:text-black">
     <!-- Hero Section (Static Astro component) -->
     <Hero />
 
@@ -146,10 +146,10 @@ const faqSchema = {
     <BlogPreview client:load />
 
     <!-- FAQ Section (with React island for accordion) -->
-    <section class="section-padding bg-[var(--glass-bg-base)]">
+    <section class="section-padding overflow-hidden border-t border-white/10 bg-black/20 backdrop-blur-sm">
       <div class="container-custom">
         <div class="text-center mb-12">
-          <span class="text-[#0ea5e9] font-bold tracking-wider uppercase text-sm">
+          <span class="text-[var(--color-orange-light)] font-bold tracking-wider uppercase text-sm">
             FAQ
           </span>
           <h2 class="mt-4 text-3xl md:text-4xl font-extrabold">
@@ -168,7 +168,7 @@ const faqSchema = {
         </div>
         
         <div class="text-center mt-8">
-          <a href="/faq" class="text-[var(--color-accent)] font-semibold hover:underline">
+          <a href="/faq" class="text-[var(--color-orange-light)] font-semibold hover:underline">
             View All FAQs &rarr;
           </a>
         </div>
@@ -182,7 +182,7 @@ const faqSchema = {
     <Pricing />
 
     <!-- CTA Section -->
-    <section class="py-16 md:py-24 bg-gradient-to-br from-[var(--color-accent)]/5 to-[var(--color-primary-400)]/5">
+    <section class="py-16 md:py-24 bg-gradient-to-br from-[var(--color-orange-light)]/10 to-[var(--color-orange-medium)]/5">
       <div class="container-custom">
         <div class="text-center max-w-2xl mx-auto" data-aos="fade-up">
           <h2 class="text-3xl md:text-4xl font-extrabold mb-4">

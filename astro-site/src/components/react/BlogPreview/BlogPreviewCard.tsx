@@ -42,11 +42,11 @@ export function BlogPreviewCard({ post, className = '' }: BlogPreviewCardProps) 
         )}
         <div className="p-6">
           <div className="flex items-center gap-2 mb-3">
-            <span className="px-3 py-1 text-xs font-medium rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+            <span className="px-3 py-1 text-xs font-medium rounded-full bg-[var(--color-orange-light)]/10 text-[var(--color-orange-light)]">
               {post.category}
             </span>
           </div>
-          <h2 className="text-xl font-bold mb-3 group-hover:text-[var(--color-accent)] transition-colors line-clamp-2">
+          <h2 className="text-xl font-bold mb-3 group-hover:text-[var(--color-orange-light)] transition-colors line-clamp-2">
             {post.title}
           </h2>
           <p

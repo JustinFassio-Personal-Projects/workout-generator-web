@@ -55,7 +55,7 @@
 }
 
 .gradientText {
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary-400) 100%);
+  background: linear-gradient(135deg, var(--color-orange-light) 0%, var(--color-orange-medium) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -114,17 +114,17 @@
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-accent);
+  color: var(--color-orange-light);
   background: transparent;
-  border: 2px solid var(--glass-border-accent);
+  border: 2px solid rgba(255, 191, 0, 0.4);
   border-radius: var(--radius-lg);
   transition: all var(--transition-base);
   text-decoration: none;
 
   &:hover {
-    background: var(--color-accent);
+    background: var(--color-orange-light);
     color: var(--bg-dark);
-    border-color: var(--color-accent);
+    border-color: var(--color-orange-light);
   }
 }
 

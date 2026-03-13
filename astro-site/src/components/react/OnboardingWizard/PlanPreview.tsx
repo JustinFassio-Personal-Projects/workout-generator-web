@@ -47,10 +47,10 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        <div className="group relative flex flex-col p-5 bg-slate-900/60 border border-white/5 rounded-xl hover:border-emerald-500/30 hover:bg-slate-800/80 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
-          <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/0 group-hover:bg-emerald-500/50 transition-all duration-300" />
+        <div className="group relative flex flex-col p-5 bg-slate-900/60 border border-white/5 rounded-xl hover:border-[var(--color-orange-light)]/30 hover:bg-slate-800/80 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
+          <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-orange-light)]/0 group-hover:bg-[var(--color-orange-light)]/50 transition-all duration-300" />
           <div className="flex items-start gap-4 relative z-10">
-            <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+            <div className="p-2 bg-[var(--color-orange-light)]/20 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
               <Target className="w-5 h-5" />
             </div>
             <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -62,10 +62,10 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
           </div>
         </div>
 
-        <div className="group relative flex flex-col p-5 bg-slate-900/60 border border-white/5 rounded-xl hover:border-emerald-500/30 hover:bg-slate-800/80 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
-          <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/0 group-hover:bg-emerald-500/50 transition-all duration-300" />
+        <div className="group relative flex flex-col p-5 bg-slate-900/60 border border-white/5 rounded-xl hover:border-[var(--color-orange-light)]/30 hover:bg-slate-800/80 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
+          <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-orange-light)]/0 group-hover:bg-[var(--color-orange-light)]/50 transition-all duration-300" />
           <div className="flex items-start gap-4 relative z-10">
-            <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+            <div className="p-2 bg-[var(--color-orange-light)]/20 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
               <Dumbbell className="w-5 h-5" />
             </div>
             <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -77,10 +77,10 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
           </div>
         </div>
 
-        <div className="group relative flex flex-col p-5 bg-slate-900/60 border border-white/5 rounded-xl hover:border-emerald-500/30 hover:bg-slate-800/80 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
-          <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/0 group-hover:bg-emerald-500/50 transition-all duration-300" />
+        <div className="group relative flex flex-col p-5 bg-slate-900/60 border border-white/5 rounded-xl hover:border-[var(--color-orange-light)]/30 hover:bg-slate-800/80 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
+          <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-orange-light)]/0 group-hover:bg-[var(--color-orange-light)]/50 transition-all duration-300" />
           <div className="flex items-start gap-4 relative z-10">
-            <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+            <div className="p-2 bg-[var(--color-orange-light)]/20 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
               <Activity className="w-5 h-5" />
             </div>
             <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -92,10 +92,10 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
           </div>
         </div>
 
-        <div className="group relative flex flex-col p-5 bg-slate-900/60 border border-white/5 rounded-xl hover:border-emerald-500/30 hover:bg-slate-800/80 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
-          <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/0 group-hover:bg-emerald-500/50 transition-all duration-300" />
+        <div className="group relative flex flex-col p-5 bg-slate-900/60 border border-white/5 rounded-xl hover:border-[var(--color-orange-light)]/30 hover:bg-slate-800/80 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
+          <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-orange-light)]/0 group-hover:bg-[var(--color-orange-light)]/50 transition-all duration-300" />
           <div className="flex items-start gap-4 relative z-10">
-            <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-500 shrink-0 shadow-sm">
+            <div className="p-2 bg-[var(--color-orange-light)]/20 rounded-lg text-[var(--color-orange-light)] shrink-0 shadow-sm">
               <Wrench className="w-5 h-5" />
             </div>
             <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -114,7 +114,7 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
         <button
           type="button"
           onClick={onCreateAccount}
-          className="flex-1 md:flex-initial bg-gradient-to-r from-emerald-500 to-lime-400 text-slate-900 px-8 py-4 rounded-2xl font-bold tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+          className="flex-1 md:flex-initial bg-gradient-to-r from-[var(--color-orange-light)] to-[var(--color-orange-medium)] text-slate-900 px-8 py-4 rounded-2xl font-bold tracking-wide hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <span>CREATE ACCOUNT TO GENERATE WORKOUT</span>
           <ArrowRight className="w-5 h-5" />

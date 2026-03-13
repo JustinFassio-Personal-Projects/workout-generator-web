@@ -228,7 +228,7 @@ const DeepResearchEditor: React.FC = () => {
         setLastSaved(new Date());
         setHasChanges(false);
 
-        if (!isEditing || slugVal !== item?.slug) {
+        if (!isEditing || savedItem.slug !== slug) {
           navigate(`/deep-research/${savedItem.slug}/edit`);
         }
         toast.success('Saved');

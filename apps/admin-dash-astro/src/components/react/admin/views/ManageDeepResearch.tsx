@@ -42,7 +42,7 @@ const ManageDeepResearch: React.FC = () => {
 
   useEffect(() => {
     fetchItems();
-  }, [statusFilter]);
+  }, [statusFilter, search]);
 
   const filteredItems = useMemo(() => {
     if (!search.trim()) return items;

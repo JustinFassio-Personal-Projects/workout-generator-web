@@ -240,7 +240,7 @@ const BlogEditor: React.FC = () => {
         setLastSaved(new Date());
         setPost(savedPost);
 
-        if (!isEditing || slugVal !== slug) {
+        if (!isEditing || savedPost.slug !== slug) {
           navigate(`/blog/${savedPost.slug}/edit`);
         }
         toast.success('Saved');

@@ -19,6 +19,10 @@ import ManageWorkouts from './admin/views/ManageWorkouts';
 import WorkoutSetEditor from './admin/views/WorkoutSetEditor';
 import ManageChallenges from './admin/views/ManageChallenges';
 import ChallengeEditor from './admin/views/ChallengeEditor';
+import ManageBlog from './admin/views/ManageBlog';
+import BlogEditor from './admin/BlogEditor';
+import ManageDeepResearch from './admin/views/ManageDeepResearch';
+import DeepResearchEditor from './admin/DeepResearchEditor';
 import ComingSoon from './admin/ComingSoon';
 import ManageExercises from './admin/views/ManageExercises';
 import AdminExerciseDetail from './admin/AdminExerciseDetail';
@@ -110,6 +114,12 @@ const AdminDashboard: React.FC = () => {
             <Route path="workouts" element={<ManageWorkouts />} />
             <Route path="challenges/:id" element={<ChallengeEditor />} />
             <Route path="challenges" element={<ManageChallenges />} />
+            <Route path="blog/new" element={<BlogEditor />} />
+            <Route path="blog/:slug/edit" element={<BlogEditor />} />
+            <Route path="blog" element={<ManageBlog />} />
+            <Route path="deep-research/new" element={<DeepResearchEditor />} />
+            <Route path="deep-research/:slug/edit" element={<DeepResearchEditor />} />
+            <Route path="deep-research" element={<ManageDeepResearch />} />
             <Route path="*" element={<ComingSoon />} />
           </Route>
         </Routes>

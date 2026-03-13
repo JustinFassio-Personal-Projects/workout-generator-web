@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles, Star, Loader2 } from 'lucide-react';
 import type { ChallengeTemplate, ChallengeConfig } from '@/types/ai-challenge';
 import type { PromptChainMetadata } from '@/types/ai-program';
 import {
@@ -37,6 +37,8 @@ const ChallengeEditor: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showGeneratorModal, setShowGeneratorModal] = useState(false);
+  const [featuredOnLanding, setFeaturedOnLanding] = useState(false);
+  const [featuredLoading, setFeaturedLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -96,6 +98,7 @@ const ChallengeEditor: React.FC = () => {
         setChainMetadata(metadata.chain_metadata ?? null);
         setHeroImageUrl(metadata.heroImageUrl ?? undefined);
         setSectionImages(metadata.sectionImages ?? undefined);
+        setFeaturedOnLanding(metadata.featuredOnLanding ?? false);
       } catch (metaErr) {
         console.warn('[ChallengeEditor] Metadata fetch failed, using fallback config', metaErr);
         setChallengeConfig({
@@ -118,6 +121,7 @@ const ChallengeEditor: React.FC = () => {
         setChainMetadata(null);
         setHeroImageUrl(undefined);
         setSectionImages(undefined);
+        setFeaturedOnLanding(false);
       }
     } catch (err) {
       console.error('[ChallengeEditor] Error fetching challenge', err);
@@ -235,20 +239,69 @@ const ChallengeEditor: React.FC = () => {
     );
   }
 
+  const handleFeaturedToggle = async () => {
+    if (!id) return;
+    const next = !featuredOnLanding;
+    setFeaturedLoading(true);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const res = await fetch(`/api/admin/challenges/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        credentials: 'include',
+        body: JSON.stringify({ featured_on_landing: next }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? 'Failed to update');
+      }
+      setFeaturedOnLanding(next);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update');
+    } finally {
+      setFeaturedLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6" data-challenge-editor>
       <EditorHeader
         title="Edit Challenge"
         backPath="/challenges"
         actions={
-          <button
-            onClick={() => setShowGeneratorModal(true)}
-            disabled={!challengeConfig}
-            className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Sparkles className="h-5 w-5" />
-            <span>Edit schedule with AI</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleFeaturedToggle}
+              disabled={featuredLoading}
+              className={`flex items-center gap-2 rounded-lg border px-4 py-2 font-medium transition-colors disabled:opacity-50 ${
+                featuredOnLanding
+                  ? 'border-orange-light/50 bg-orange-light/20 text-orange-light'
+                  : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10'
+              }`}
+              title={featuredOnLanding ? 'Remove from homepage' : 'Feature on homepage'}
+            >
+              {featuredLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Star className={`h-5 w-5 ${featuredOnLanding ? 'fill-orange-light' : ''}`} />
+              )}
+              <span>{featuredLoading ? 'Updating...' : featuredOnLanding ? 'Featured' : 'Feature on Homepage'}</span>
+            </button>
+            <button
+              onClick={() => setShowGeneratorModal(true)}
+              disabled={!challengeConfig}
+              className="hover:bg-orange-light/90 flex items-center gap-2 rounded-lg bg-orange-light px-4 py-2 font-medium text-black transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Sparkles className="h-5 w-5" />
+              <span>Edit schedule with AI</span>
+            </button>
+          </div>
         }
       />
 

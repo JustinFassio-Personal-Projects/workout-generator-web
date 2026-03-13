@@ -374,6 +374,8 @@ export interface ProgramMetadata {
   /** Chain metadata from 4-step generation - for admin visibility, SEO, content generation */
   chain_metadata?: PromptChainMetadata;
   status: 'draft' | 'published';
+  /** Show on astro-site homepage when true */
+  featuredOnLanding?: boolean;
   createdAt: Date;
   updatedAt: Date;
   authorId: string;

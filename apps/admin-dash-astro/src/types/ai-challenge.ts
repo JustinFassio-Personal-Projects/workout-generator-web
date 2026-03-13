@@ -98,6 +98,8 @@ export interface ChallengeMetadata {
   heroImageUrl?: string;
   sectionImages?: Record<string, string>;
   status: 'draft' | 'published';
+  /** Show on astro-site homepage when true */
+  featuredOnLanding?: boolean;
   createdAt: Date;
   updatedAt: Date;
   authorId: string;

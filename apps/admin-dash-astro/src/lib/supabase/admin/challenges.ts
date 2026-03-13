@@ -42,6 +42,7 @@ function rowToLibraryItem(row: {
   description: string | null;
   author_id: string;
   status: string;
+  featured_on_landing?: boolean;
   config: ConfigRow | null;
   chain_metadata: Record<string, unknown> | null;
   created_at: string;
@@ -76,6 +77,7 @@ function rowToLibraryItem(row: {
     heroImageUrl: row.hero_image_url ?? undefined,
     sectionImages: row.section_images ?? undefined,
     status: row.status === 'published' ? 'published' : 'draft',
+    featuredOnLanding: row.featured_on_landing ?? false,
     createdAt: new Date(row.created_at),
     updatedAt: new Date(row.updated_at),
     authorId: row.author_id,
@@ -93,7 +95,7 @@ export async function fetchChallengeLibrary(): Promise<ChallengeLibraryItem[]> {
     const { data, error } = await supabase
       .from('challenges')
       .select(
-        'id, title, description, author_id, status, config, chain_metadata, created_at, updated_at, hero_image_url, section_images'
+        'id, title, description, author_id, status, featured_on_landing, config, chain_metadata, created_at, updated_at, hero_image_url, section_images'
       )
       .order('created_at', { ascending: false });
 
@@ -233,7 +235,7 @@ export async function fetchChallengeMetadata(challengeId: string): Promise<Chall
   const { data: row, error } = await supabase
     .from('challenges')
     .select(
-      'id, title, description, author_id, status, config, chain_metadata, created_at, updated_at, hero_image_url, section_images'
+      'id, title, description, author_id, status, featured_on_landing, config, chain_metadata, created_at, updated_at, hero_image_url, section_images'
     )
     .eq('id', challengeId)
     .single();
@@ -325,6 +327,18 @@ export async function updateChallengeStatus(
   const { error } = await supabase
     .from('challenges')
     .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', challengeId);
+  if (error) throw error;
+}
+
+export async function updateChallengeFeatured(
+  challengeId: string,
+  featuredOnLanding: boolean
+): Promise<void> {
+  const supabase = getSupabaseServer();
+  const { error } = await supabase
+    .from('challenges')
+    .update({ featured_on_landing: featuredOnLanding, updated_at: new Date().toISOString() })
     .eq('id', challengeId);
   if (error) throw error;
 }

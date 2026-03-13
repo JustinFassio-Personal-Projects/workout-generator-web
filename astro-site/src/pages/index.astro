@@ -9,12 +9,20 @@ import { EquipmentAdaptive } from '@/components/react/EquipmentAdaptive/Equipmen
 import { JourneySection } from '@/components/react/JourneySection/JourneySection';
 import { Testimonials } from '@/components/react/Testimonials/Testimonials';
 import { BlogPreview } from '@/components/react/BlogPreview/BlogPreview';
+import { ProgramsPreview } from '@/components/react/ProgramsPreview/ProgramsPreview';
+import { ChallengesPreview } from '@/components/react/ChallengesPreview/ChallengesPreview';
 import Pricing from '@/components/landing/Pricing.astro';
 import Bio from '@/components/landing/Bio.astro';
 import OnboardingIntroSection from '@/components/landing/OnboardingIntroSection.astro';
 import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
+import { getFeaturedPrograms, getFeaturedChallenges } from '@/lib/featured/queries';
 
 const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+const [featuredPrograms, featuredChallenges] = await Promise.all([
+  getFeaturedPrograms(Astro.cookies, 3),
+  getFeaturedChallenges(Astro.cookies, 3),
+]);
 
 // BreadcrumbList structured data (JSON-LD) for homepage — matches Next.js
 const breadcrumbSchema = buildBreadcrumbSchema(baseUrl, [{ name: 'Home', url: baseUrl }]);
@@ -144,6 +152,12 @@ const faqSchema = {
 
     <!-- Blog Preview Section (React Island: fetches /api/blog, shows up to 3 posts, View All Posts) -->
     <BlogPreview client:load />
+
+    <!-- Featured Programs Section (server-rendered) -->
+    <ProgramsPreview programs={featuredPrograms} client:visible />
+
+    <!-- Featured Challenges Section (server-rendered) -->
+    <ChallengesPreview challenges={featuredChallenges} client:visible />
 
     <!-- FAQ Section (with React island for accordion) -->
     <section class="section-padding overflow-hidden border-t border-white/10 bg-black/20 backdrop-blur-sm">

@@ -49,6 +49,7 @@ type ProgramRow = {
   duration_weeks: number | null;
   status: string;
   is_public: boolean;
+  featured_on_landing?: boolean;
   tags: string[] | null;
   config: {
     targetAudience?: UserDemographics;
@@ -358,7 +359,7 @@ export async function fetchProgramMetadata(
   const { data: row, error } = await supabase
     .from('programs')
     .select(
-      'id, trainer_id, title, description, difficulty, duration_weeks, status, is_public, config, chain_metadata, created_at, updated_at'
+      'id, trainer_id, title, description, difficulty, duration_weeks, status, is_public, featured_on_landing, config, chain_metadata, created_at, updated_at'
     )
     .eq('id', programId)
     .single();
@@ -383,10 +384,26 @@ export async function fetchProgramMetadata(
     goals: config.goals as ProgramMetadata['goals'],
     chain_metadata: r.chain_metadata as unknown as ProgramMetadata['chain_metadata'],
     status: r.is_public ? 'published' : 'draft',
+    featuredOnLanding: r.featured_on_landing ?? false,
     createdAt: new Date(r.created_at),
     updatedAt: new Date(r.updated_at),
     authorId: r.trainer_id,
   };
+}
+
+/**
+ * Update program featured_on_landing flag.
+ */
+export async function updateProgramFeatured(
+  programId: string,
+  featuredOnLanding: boolean
+): Promise<void> {
+  const supabase = getSupabaseServer();
+  const { error } = await supabase
+    .from('programs')
+    .update({ featured_on_landing: featuredOnLanding, updated_at: new Date().toISOString() })
+    .eq('id', programId);
+  if (error) throw new Error(error.message);
 }
 
 /**

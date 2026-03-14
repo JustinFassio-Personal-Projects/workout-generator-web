@@ -1,6 +1,7 @@
 ---
 // Post Content - Parses markdown to HTML (like Next.js ReactMarkdown) and renders with styling aligned to BlogPostContent.module.scss
 import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
 
 interface Props {
   content: string;
@@ -8,11 +9,28 @@ interface Props {
 
 const { content } = Astro.props;
 
+// Allowed tags for markdown-derived HTML (blocks raw HTML / script in posts; mitigates stored XSS)
+const BLOG_ALLOWED_TAGS = [
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul', 'ol', 'li', 'br',
+  'strong', 'em', 'b', 'i', 'a', 'blockquote', 'pre', 'code', 'span',
+  'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr',
+];
+const BLOG_ALLOWED_ATTRS: Record<string, string[]> = {
+  a: ['href', 'title', 'target', 'rel', 'class'],
+  img: ['src', 'alt', 'title', 'width', 'height', 'class'],
+  span: ['class'], code: ['class'], pre: ['class'],
+};
+
 // Parse markdown to HTML (Supabase stores markdown; Next.js uses ReactMarkdown)
 let html = content.trim();
 if (html) {
   const parsed = await marked.parse(html);
   html = typeof parsed === 'string' ? parsed : '';
+  // Sanitize to prevent stored XSS (marked allows raw HTML by default)
+  html = sanitizeHtml(html, {
+    allowedTags: BLOG_ALLOWED_TAGS,
+    allowedAttributes: BLOG_ALLOWED_ATTRS,
+  });
   // Shift headings down by one so page title stays the only h1 (matches Next.js BlogPostContent)
   html = html
     .replace(/<\/h5>/gi, '</h6>')

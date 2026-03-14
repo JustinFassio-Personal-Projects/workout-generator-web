@@ -11,6 +11,7 @@ import {
   updateChallenge,
   deleteChallenge,
   updateChallengeStatus,
+  updateChallengeFeatured,
 } from '@/lib/supabase/admin/challenges';
 import type { ChallengeTemplate, ChallengeConfig } from '@/types/ai-challenge';
 
@@ -72,7 +73,7 @@ export const PATCH: APIRoute = async ({ request, params, cookies }) => {
       });
     }
 
-    let body: { status: 'draft' | 'published' };
+    let body: { status?: 'draft' | 'published'; featured_on_landing?: boolean };
     try {
       body = await request.json();
     } catch {
@@ -82,16 +83,31 @@ export const PATCH: APIRoute = async ({ request, params, cookies }) => {
       });
     }
 
-    if (!body.status || (body.status !== 'draft' && body.status !== 'published')) {
+    const hasStatus = body.status !== undefined;
+    const hasFeatured = typeof body.featured_on_landing === 'boolean';
+    if (!hasStatus && !hasFeatured) {
       return new Response(
         JSON.stringify({
-          error: 'Missing or invalid field: status (must be "draft" or "published")',
+          error: 'Provide at least one field: status or featured_on_landing',
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    if (hasStatus && body.status !== 'draft' && body.status !== 'published') {
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid field: status (must be "draft" or "published")',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    await updateChallengeStatus(challengeId, body.status);
+    if (hasStatus) {
+      await updateChallengeStatus(challengeId, body.status!);
+    }
+    if (hasFeatured) {
+      await updateChallengeFeatured(challengeId, body.featured_on_landing!);
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

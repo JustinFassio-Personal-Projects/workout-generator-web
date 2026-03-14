@@ -33,6 +33,22 @@
     {
       "source": "/learn/:path*",
       "destination": "https://programs.aiworkoutgenerator.com/learn/:path*"
+    },
+    {
+      "source": "/programs",
+      "destination": "https://programs.aiworkoutgenerator.com/programs"
+    },
+    {
+      "source": "/programs/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/programs/:path*"
+    },
+    {
+      "source": "/challenges",
+      "destination": "https://programs.aiworkoutgenerator.com/challenges"
+    },
+    {
+      "source": "/challenges/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/challenges/:path*"
     }
   ]
 }

@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2, Info, Sparkles, Globe, GlobeLock } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Info, Sparkles, Globe, GlobeLock, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   fetchFullProgram,
@@ -64,6 +64,8 @@ const ProgramEditor: React.FC = () => {
   const [generatingPublicCopy, setGeneratingPublicCopy] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [publishLoading, setPublishLoading] = useState(false);
+  const [featuredOnLanding, setFeaturedOnLanding] = useState(false);
+  const [featuredLoading, setFeaturedLoading] = useState(false);
   const [extractingWorkout, setExtractingWorkout] = useState(false);
 
   const handleEditWorkoutInFactory = useCallback(
@@ -109,6 +111,7 @@ const ProgramEditor: React.FC = () => {
       ]);
       setProgramData(data);
       setIsPublished(meta?.status === 'published');
+      setFeaturedOnLanding(meta?.featuredOnLanding ?? false);
       setTitle(data.title);
       setDescription(data.description ?? '');
       setDifficulty(
@@ -268,6 +271,34 @@ const ProgramEditor: React.FC = () => {
     }
   }, [id, isPublished]);
 
+  const handleFeaturedToggle = useCallback(async () => {
+    if (!id) return;
+    const next = !featuredOnLanding;
+    setFeaturedLoading(true);
+    try {
+      const token = (await supabase.auth.getSession()).data.session?.access_token;
+      const res = await fetch(`/api/admin/programs/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: 'include',
+        body: JSON.stringify({ featured_on_landing: next }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? 'Failed to update');
+      }
+      setFeaturedOnLanding(next);
+      toast.success(next ? 'Featured on homepage.' : 'Removed from homepage.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update');
+    } finally {
+      setFeaturedLoading(false);
+    }
+  }, [id, featuredOnLanding]);
+
   const handleSave = async () => {
     if (!id || !user?.uid || !programData) return;
     try {
@@ -350,6 +381,24 @@ const ProgramEditor: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleFeaturedToggle}
+            disabled={featuredLoading}
+            className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 font-medium transition-colors disabled:opacity-50 ${
+              featuredOnLanding
+                ? 'border-orange-light/50 bg-orange-light/20 text-orange-light'
+                : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10'
+            }`}
+            title={featuredOnLanding ? 'Remove from homepage' : 'Feature on homepage'}
+          >
+            {featuredLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Star className={`h-5 w-5 ${featuredOnLanding ? 'fill-orange-light' : ''}`} />
+            )}
+            {featuredLoading ? 'Updating...' : featuredOnLanding ? 'Featured' : 'Feature on Homepage'}
+          </button>
           <button
             type="button"
             onClick={handlePublishToggle}

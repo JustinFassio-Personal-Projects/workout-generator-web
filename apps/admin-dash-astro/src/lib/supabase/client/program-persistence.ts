@@ -247,7 +247,7 @@ export async function fetchProgramMetadata(programId: string): Promise<ProgramLi
   const { data: row, error } = await supabase
     .from('programs')
     .select(
-      'id, trainer_id, title, description, difficulty, duration_weeks, config, chain_metadata, status, is_public, created_at, updated_at'
+      'id, trainer_id, title, description, difficulty, duration_weeks, config, chain_metadata, status, is_public, featured_on_landing, created_at, updated_at'
     )
     .eq('id', programId)
     .single();
@@ -270,6 +270,7 @@ export async function fetchProgramMetadata(programId: string): Promise<ProgramLi
     } | null;
     chain_metadata: Record<string, unknown> | null;
     is_public: boolean;
+    featured_on_landing?: boolean;
     created_at: string;
     updated_at: string;
   };
@@ -294,6 +295,7 @@ export async function fetchProgramMetadata(programId: string): Promise<ProgramLi
         }
       : undefined,
     status: r.is_public ? 'published' : 'draft',
+    featuredOnLanding: r.featured_on_landing ?? false,
     createdAt: new Date(r.created_at),
     updatedAt: new Date(r.updated_at),
     authorId: r.trainer_id || '',

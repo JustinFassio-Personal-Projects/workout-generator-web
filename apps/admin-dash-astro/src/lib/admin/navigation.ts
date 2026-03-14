@@ -19,6 +19,8 @@ import {
   ImageIcon,
   Activity,
   Video,
+  FileText,
+  FileSearch,
 } from 'lucide-react';
 import { EXERCISE_LABELS } from '@/lib/labels/exercises';
 
@@ -33,6 +35,8 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { path: '/users', label: 'Users', icon: Users },
   { path: '/programs', label: 'Program Factory', icon: BookOpen },
   { path: '/challenges', label: 'Challenge Factory', icon: Trophy },
+  { path: '/blog', label: 'Manage Blog', icon: FileText },
+  { path: '/deep-research', label: 'Deep Research', icon: FileSearch },
   { path: '/workouts', label: 'Workout Factory', icon: LayoutList },
   { path: '/wod', label: 'WOD Engine', icon: Flame },
   { path: '/warmup', label: 'Warm-Up Engine', icon: Activity },

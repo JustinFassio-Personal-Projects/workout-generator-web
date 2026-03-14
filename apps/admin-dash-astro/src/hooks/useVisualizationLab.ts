@@ -201,6 +201,13 @@ export function useVisualizationLab(
     reviewPromptsBeforeGenerate,
   });
 
+  // useVisualizationLab always passes useReference: true; reference is required for ReferenceImagePicker
+  if (!reference) {
+    throw new Error(
+      'useVisualizationLab requires useReference: true in useContentGenerationLab options'
+    );
+  }
+
   const generation = rawGeneration as {
     loading: boolean;
     result: BiomechanicalPoints | null;
@@ -312,15 +319,15 @@ export function useVisualizationLab(
       setDomainContext,
     },
     reference: {
-      referenceImageUrl: reference!.referenceImageUrl,
-      setReferenceImageUrl: reference!.setReferenceImageUrl,
-      referenceImageData: reference!.referenceImageData,
-      loadingReference: reference!.loadingReference,
-      referenceError: reference!.referenceError,
-      loadReferenceImage: reference!.loadReferenceImage,
-      loadReferenceFromUrl: reference!.loadReferenceFromUrl,
-      setReferenceFromDataUrl: reference!.setReferenceFromDataUrl,
-      clearReferenceImage: reference!.clearReferenceImage,
+      referenceImageUrl: reference.referenceImageUrl,
+      setReferenceImageUrl: reference.setReferenceImageUrl,
+      referenceImageData: reference.referenceImageData,
+      loadingReference: reference.loadingReference,
+      referenceError: reference.referenceError,
+      loadReferenceImage: reference.loadReferenceImage,
+      loadReferenceFromUrl: reference.loadReferenceFromUrl,
+      setReferenceFromDataUrl: reference.setReferenceFromDataUrl,
+      clearReferenceImage: reference.clearReferenceImage,
     },
     generation: {
       loading: generation.loading,

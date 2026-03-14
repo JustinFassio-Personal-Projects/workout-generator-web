@@ -17,6 +17,9 @@ import OnboardingIntroSection from '@/components/landing/OnboardingIntroSection.
 import { buildBreadcrumbSchema } from '@/lib/breadcrumbSchema';
 import { getFeaturedPrograms, getFeaturedChallenges } from '@/lib/featured/queries';
 
+// Enable SSR so featured programs/challenges update when admins toggle them (no redeploy)
+export const prerender = false;
+
 const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
 
 const [featuredPrograms, featuredChallenges] = await Promise.all([
@@ -153,11 +156,11 @@ const faqSchema = {
     <!-- Blog Preview Section (React Island: fetches /api/blog, shows up to 3 posts, View All Posts) -->
     <BlogPreview client:load />
 
-    <!-- Featured Programs Section (server-rendered) -->
-    <ProgramsPreview programs={featuredPrograms} client:visible />
+    <!-- Featured Programs Section (static HTML, no hydration) -->
+    <ProgramsPreview programs={featuredPrograms} />
 
-    <!-- Featured Challenges Section (server-rendered) -->
-    <ChallengesPreview challenges={featuredChallenges} client:visible />
+    <!-- Featured Challenges Section (static HTML, no hydration) -->
+    <ChallengesPreview challenges={featuredChallenges} />
 
     <!-- FAQ Section (with React island for accordion) -->
     <section class="section-padding overflow-hidden border-t border-white/10 bg-black/20 backdrop-blur-sm">

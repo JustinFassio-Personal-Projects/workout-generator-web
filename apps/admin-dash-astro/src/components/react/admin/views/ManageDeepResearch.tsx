@@ -1,12 +1,24 @@
 /**
  * Deep Research list and management UI. Fetches from /api/admin/deep-research.
+ * Search is debounced (300ms) to avoid API request per keystroke.
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase/client';
 import type { DeepResearch } from '@/types/deep-research';
+
+const DEBOUNCE_MS = 300;
+
+/** Augments fetch init with Bearer token and credentials (mirrors BlogEditor/ChallengeEditor). */
+async function authFetchInit(init: RequestInit = {}): Promise<RequestInit> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = new Headers(init.headers);
+  if (session?.access_token) headers.set('Authorization', `Bearer ${session.access_token}`);
+  return { ...init, headers, credentials: 'include' as RequestCredentials };
+}
 
 const siteUrl =
   (import.meta as { env?: Record<string, string> }).env?.PUBLIC_SITE_URL ||
@@ -17,18 +29,20 @@ const ManageDeepResearch: React.FC = () => {
   const [items, setItems] = useState<DeepResearch[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (statusFilter !== 'all') params.set('status', statusFilter);
-      if (search.trim()) params.set('search', search.trim());
+      if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim());
       const qs = params.toString();
-      const res = await fetch(`/api/admin/deep-research${qs ? `?${qs}` : ''}`);
+      const res = await fetch(`/api/admin/deep-research${qs ? `?${qs}` : ''}`, await authFetchInit());
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       setItems(data.items || []);
@@ -38,26 +52,27 @@ const ManageDeepResearch: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, debouncedSearch]);
+
+  // Debounce search input to avoid API request per keystroke
+  useEffect(() => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, DEBOUNCE_MS);
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [search]);
 
   useEffect(() => {
     fetchItems();
-  }, [statusFilter, search]);
-
-  const filteredItems = useMemo(() => {
-    if (!search.trim()) return items;
-    const s = search.toLowerCase();
-    return items.filter(
-      (item) =>
-        item.title.toLowerCase().includes(s) ||
-        (item.excerpt?.toLowerCase().includes(s) ?? false)
-    );
-  }, [items, search]);
+  }, [fetchItems]);
 
   async function handleDelete(slug: string) {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/deep-research/${slug}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/deep-research/${slug}`, await authFetchInit({ method: 'DELETE' }));
       if (res.ok) {
         setDeleteConfirm(null);
         toast.success('Deleted');
@@ -123,9 +138,9 @@ const ManageDeepResearch: React.FC = () => {
       </div>
 
       <div className="space-y-3">
-        {filteredItems.length === 0 ? (
+        {items.length === 0 ? (
           <div className="rounded-lg border border-white/10 bg-white/5 p-12 text-center">
-            {search || statusFilter !== 'all' ? (
+            {debouncedSearch || statusFilter !== 'all' ? (
               <p className="text-white/70">No items match your filters</p>
             ) : (
               <>
@@ -140,7 +155,7 @@ const ManageDeepResearch: React.FC = () => {
             )}
           </div>
         ) : (
-          filteredItems.map((item) => (
+          items.map((item) => (
             <div
               key={item.id}
               className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-white/10 bg-white/5 p-4"
@@ -220,7 +235,7 @@ const ManageDeepResearch: React.FC = () => {
       </div>
 
       <p className="text-sm text-white/50">
-        Showing {filteredItems.length} of {items.length} items
+        Showing {items.length} items
       </p>
     </div>
   );

@@ -29,6 +29,7 @@ function isSupabaseConfigured(): boolean {
 /**
  * Fetch featured programs for the homepage.
  * Uses RLS; requires "Anyone can read featured programs" policy.
+ * Defense-in-depth: also filter by is_public so non-public programs never appear.
  */
 export async function getFeaturedPrograms(
   cookies: AstroCookies,
@@ -41,6 +42,7 @@ export async function getFeaturedPrograms(
     .from('programs')
     .select('id, title, description, created_at')
     .eq('featured_on_landing', true)
+    .eq('is_public', true)
     .order('created_at', { ascending: false })
     .limit(limit)
 

@@ -6,6 +6,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
+import { supabase } from '@/lib/supabase/client';
 import { parsePastedHtml } from '@/lib/deep-research/parse-html';
 import type { DeepResearch } from '@/types/deep-research';
 import {
@@ -22,9 +24,19 @@ import {
 } from '@/data/deep-research-profile-options';
 
 const AUTO_SAVE_DELAY_MS = 30000;
+// 160 chars aligns with SEO meta description best practice (Google truncates ~155–160)
+const EXCERPT_MAX_LENGTH = 160;
 
 function toggleArray(arr: string[], value: string): string[] {
   return arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
+}
+
+/** Augments fetch init with Bearer token and credentials (mirrors BlogEditor/ProgramEditor). */
+async function authFetchInit(init: RequestInit = {}): Promise<RequestInit> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = new Headers(init.headers);
+  if (session?.access_token) headers.set('Authorization', `Bearer ${session.access_token}`);
+  return { ...init, headers, credentials: 'include' as RequestCredentials };
 }
 
 const DeepResearchEditor: React.FC = () => {
@@ -68,7 +80,7 @@ const DeepResearchEditor: React.FC = () => {
       }
       setLoading(true);
       try {
-        const res = await fetch(`/api/admin/deep-research/${slug}`);
+        const res = await fetch(`/api/admin/deep-research/${slug}`, await authFetchInit());
         if (!res.ok) {
           if (res.status === 404) {
             toast.error('Deep research not found');
@@ -212,11 +224,11 @@ const DeepResearchEditor: React.FC = () => {
           : '/api/admin/deep-research';
         const method = isEditing ? 'PUT' : 'POST';
 
-        const res = await fetch(url, {
+        const res = await fetch(url, await authFetchInit({
           method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-        });
+        }));
 
         if (!res.ok) {
           const data = await res.json();
@@ -392,7 +404,9 @@ const DeepResearchEditor: React.FC = () => {
           <div className="mb-6">
             <div className="mb-2 flex items-center justify-between">
               <label className="text-sm font-medium text-white/80">Excerpt</label>
-              <span className="text-xs text-white/40">{excerpt.length}/160</span>
+              <span className="text-xs text-white/40">
+                {excerpt.length}/{EXCERPT_MAX_LENGTH}
+              </span>
             </div>
             <textarea
               value={excerpt}
@@ -400,7 +414,7 @@ const DeepResearchEditor: React.FC = () => {
               className={`${inputBase} resize-y`}
               placeholder="Brief description for cards and SEO..."
               rows={3}
-              maxLength={300}
+              maxLength={EXCERPT_MAX_LENGTH}
             />
           </div>
 
@@ -430,7 +444,7 @@ const DeepResearchEditor: React.FC = () => {
             {showPreview ? (
               <div
                 className="min-h-[400px] overflow-y-auto rounded-lg border border-white/10 bg-white/[0.03] p-4"
-                dangerouslySetInnerHTML={{ __html: htmlContent }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(htmlContent) }}
               />
             ) : (
               <textarea

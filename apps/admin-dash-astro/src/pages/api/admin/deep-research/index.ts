@@ -7,6 +7,8 @@ import type { APIRoute } from 'astro';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { validateDeepResearchPayload } from '@/lib/deep-research/validation';
+import { sanitizeDeepResearchHtml } from '@/lib/deep-research/sanitize-html';
+import { escapePostgrestFilterValue } from '@/lib/escape-postgrest-filter';
 import { notifyMainSiteRevalidate } from '@/lib/notify-main-site';
 
 const json = (data: unknown, status = 200) =>
@@ -34,7 +36,8 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     }
 
     if (search) {
-      query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%`);
+      const escaped = escapePostgrestFilterValue(search);
+      query = query.or(`title.ilike.%${escaped}%,excerpt.ilike.%${escaped}%`);
     }
 
     const { data: items, error } = await query;
@@ -86,29 +89,38 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       ? data.status
       : 'draft') as 'draft' | 'published';
 
-    if (status === 'published' && !data.published_at) {
-      data.published_at = new Date().toISOString();
-    }
-
     const excerpt =
       typeof data.excerpt === 'string' && data.excerpt.trim().length > 0
         ? data.excerpt.trim()
         : null;
 
+    // Whitelist fields to prevent mass-assignment (id, timestamps, etc. are server-controlled)
     const insertData = {
-      ...data,
+      title: data.title,
+      slug: data.slug,
       excerpt,
+      html_content: sanitizeDeepResearchHtml(
+        typeof data.html_content === 'string' ? data.html_content : ''
+      ),
+      seo_title: typeof data.seo_title === 'string' ? data.seo_title : null,
+      seo_description: typeof data.seo_description === 'string' ? data.seo_description : null,
       status,
-      equipment_zones: data.equipment_zones || [],
-      experience_levels: data.experience_levels || [],
-      injuries_addressed: data.injuries_addressed || [],
-      goals: data.goals || [],
-      days_per_week_min: data.days_per_week_min ?? null,
-      days_per_week_max: data.days_per_week_max ?? null,
-      diet_types: data.diet_types || [],
-      nutrition_goals: data.nutrition_goals || [],
-      dietary_restrictions: data.dietary_restrictions || [],
-      macro_focus: data.macro_focus || [],
+      published_at:
+        status === 'published'
+          ? (typeof data.published_at === 'string' ? data.published_at : new Date().toISOString())
+          : null,
+      equipment_zones: Array.isArray(data.equipment_zones) ? data.equipment_zones : [],
+      experience_levels: Array.isArray(data.experience_levels) ? data.experience_levels : [],
+      injuries_addressed: Array.isArray(data.injuries_addressed) ? data.injuries_addressed : [],
+      goals: Array.isArray(data.goals) ? data.goals : [],
+      days_per_week_min: typeof data.days_per_week_min === 'number' ? data.days_per_week_min : null,
+      days_per_week_max: typeof data.days_per_week_max === 'number' ? data.days_per_week_max : null,
+      diet_types: Array.isArray(data.diet_types) ? data.diet_types : [],
+      nutrition_goals: Array.isArray(data.nutrition_goals) ? data.nutrition_goals : [],
+      dietary_restrictions: Array.isArray(data.dietary_restrictions)
+        ? data.dietary_restrictions
+        : [],
+      macro_focus: Array.isArray(data.macro_focus) ? data.macro_focus : [],
     };
 
     const supabase = getSupabaseServer();

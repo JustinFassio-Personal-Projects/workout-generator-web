@@ -7,6 +7,7 @@ import type { APIRoute } from 'astro';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { getSupabaseServer } from '@/lib/supabase/server';
 import { validateDeepResearchPayload } from '@/lib/deep-research/validation';
+import { sanitizeDeepResearchHtml } from '@/lib/deep-research/sanitize-html';
 import { notifyMainSiteRevalidate } from '@/lib/notify-main-site';
 
 const json = (data: unknown, status = 200) =>
@@ -98,7 +99,9 @@ export const PUT: APIRoute = async ({ params, request, cookies }) => {
       title: rawData.title,
       slug: rawData.slug,
       excerpt,
-      html_content: rawData.html_content,
+      html_content: sanitizeDeepResearchHtml(
+        typeof rawData.html_content === 'string' ? rawData.html_content : ''
+      ),
       seo_title: rawData.seo_title || null,
       seo_description: rawData.seo_description || null,
       status:

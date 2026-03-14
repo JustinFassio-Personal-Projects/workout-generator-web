@@ -6,6 +6,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
+import { supabase } from '@/lib/supabase/client';
 
 interface Category {
   id: string;
@@ -44,6 +46,14 @@ interface Post {
   author?: Author | null;
 }
 
+/** Augments fetch init with Bearer token and credentials (mirrors ProgramEditor/ChallengeEditor). */
+async function authFetchInit(init: RequestInit = {}): Promise<RequestInit> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = new Headers(init.headers);
+  if (session?.access_token) headers.set('Authorization', `Bearer ${session.access_token}`);
+  return { ...init, headers, credentials: 'include' as RequestCredentials };
+}
+
 const BlogEditor: React.FC = () => {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
@@ -80,7 +90,7 @@ const BlogEditor: React.FC = () => {
       setLoading(true);
       try {
         if (isEditing && slug) {
-          const res = await fetch(`/api/admin/blog/${slug}`);
+          const res = await fetch(`/api/admin/blog/${slug}`, await authFetchInit());
           if (!res.ok) {
             if (res.status === 404) {
               toast.error('Post not found');
@@ -106,7 +116,7 @@ const BlogEditor: React.FC = () => {
           setSeoTitle(p.seo_title || '');
           setSeoDescription(p.seo_description || '');
         } else {
-          const res = await fetch('/api/admin/blog');
+          const res = await fetch('/api/admin/blog', await authFetchInit());
           if (!res.ok) throw new Error('Failed to fetch');
           const data = await res.json();
           setCategories(data.categories || []);
@@ -189,7 +199,7 @@ const BlogEditor: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+      const res = await fetch('/api/admin/upload', await authFetchInit({ method: 'POST', body: formData }));
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || 'Upload failed');
@@ -225,11 +235,11 @@ const BlogEditor: React.FC = () => {
 
         const url = isEditing ? `/api/admin/blog/${slug}` : '/api/admin/blog';
         const method = isEditing ? 'PUT' : 'POST';
-        const res = await fetch(url, {
+        const res = await fetch(url, await authFetchInit({
           method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(postData),
-        });
+        }));
 
         if (!res.ok) {
           const data = await res.json();
@@ -398,7 +408,7 @@ const BlogEditor: React.FC = () => {
               className="w-full rounded border border-white/20 bg-white/5 px-4 py-2 text-white placeholder-white/40 focus:border-orange-light/50 focus:outline-none"
               placeholder="Brief description for search results..."
               rows={3}
-              maxLength={300}
+              maxLength={160}
             />
           </div>
 
@@ -417,13 +427,16 @@ const BlogEditor: React.FC = () => {
               <div
                 className="prose prose-invert max-w-none rounded border border-white/20 bg-white/5 p-4"
                 dangerouslySetInnerHTML={{
-                  __html: content
-                    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-                    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-                    .replace(/\*(.*)\*/gim, '<em>$1</em>')
-                    .replace(/\n/gim, '<br>'),
+                  __html: DOMPurify.sanitize(
+                    content
+                      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+                      .replace(/\*(.*)\*/gim, '<em>$1</em>')
+                      .replace(/\n/gim, '<br>'),
+                    { ALLOWED_TAGS: ['h1', 'h2', 'h3', 'strong', 'em', 'br'] }
+                  ),
                 }}
               />
             ) : (

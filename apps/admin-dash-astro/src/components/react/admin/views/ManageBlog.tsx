@@ -1,11 +1,24 @@
 /**
  * Blog list and management UI. Fetches from /api/admin/blog.
+ * Passes status, category, search as query params for server-side filtering.
+ * Search is debounced (300ms) to avoid API request per keystroke.
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase/client';
+
+const DEBOUNCE_MS = 300;
+
+/** Augments fetch init with Bearer token and credentials (mirrors BlogEditor/ManageDeepResearch). */
+async function authFetchInit(init: RequestInit = {}): Promise<RequestInit> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = new Headers(init.headers);
+  if (session?.access_token) headers.set('Authorization', `Bearer ${session.access_token}`);
+  return { ...init, headers, credentials: 'include' as RequestCredentials };
+}
 
 interface Category {
   id: string;
@@ -32,20 +45,27 @@ const siteUrl = (import.meta as { env?: Record<string, string> }).env?.PUBLIC_SI
 const blogBase = siteUrl.replace(/\/$/, '');
 
 const ManageBlog: React.FC = () => {
-  const navigate = useNavigate();
   const [posts, setPosts] = useState<PostListItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/blog');
+      const params = new URLSearchParams();
+      if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
+      if (categoryFilter && categoryFilter !== 'all') params.set('category', categoryFilter);
+      if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim());
+      const queryString = params.toString();
+      const url = queryString ? `/api/admin/blog?${queryString}` : '/api/admin/blog';
+      const res = await fetch(url, await authFetchInit());
       if (!res.ok) throw new Error('Failed to fetch posts');
       const data = await res.json();
       setPosts(data.posts || []);
@@ -56,28 +76,26 @@ const ManageBlog: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, categoryFilter, debouncedSearch]);
+
+  useEffect(() => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, DEBOUNCE_MS);
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [search]);
 
   useEffect(() => {
     fetchPosts();
-  }, []);
-
-  const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
-      const matchesSearch =
-        search === '' ||
-        post.title.toLowerCase().includes(search.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || post.status === statusFilter;
-      const matchesCategory = categoryFilter === 'all' || post.category?.id === categoryFilter;
-      return matchesSearch && matchesStatus && matchesCategory;
-    });
-  }, [posts, search, statusFilter, categoryFilter]);
+  }, [fetchPosts]);
 
   async function handleDelete(slug: string) {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/blog/${slug}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/blog/${slug}`, await authFetchInit({ method: 'DELETE' }));
       if (res.ok) {
         setDeleteConfirm(null);
         toast.success('Post deleted');
@@ -155,9 +173,9 @@ const ManageBlog: React.FC = () => {
       </div>
 
       <div className="space-y-3">
-        {filteredPosts.length === 0 ? (
+        {posts.length === 0 ? (
           <div className="rounded-lg border border-white/10 bg-white/5 p-12 text-center">
-            {search || statusFilter !== 'all' || categoryFilter !== 'all' ? (
+            {debouncedSearch || statusFilter !== 'all' || categoryFilter !== 'all' ? (
               <p className="text-white/70">No posts match your filters</p>
             ) : (
               <>
@@ -169,7 +187,7 @@ const ManageBlog: React.FC = () => {
             )}
           </div>
         ) : (
-          filteredPosts.map((post) => (
+          posts.map((post) => (
             <div
               key={post.id}
               className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-white/10 bg-white/5 p-4"
@@ -250,7 +268,7 @@ const ManageBlog: React.FC = () => {
       </div>
 
       <p className="text-sm text-white/50">
-        Showing {filteredPosts.length} of {posts.length} posts
+        Showing {posts.length} posts
       </p>
     </div>
   );

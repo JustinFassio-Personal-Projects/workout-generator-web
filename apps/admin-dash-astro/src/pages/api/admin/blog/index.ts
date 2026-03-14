@@ -6,6 +6,7 @@
 import type { APIRoute } from 'astro';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { getSupabaseServer } from '@/lib/supabase/server';
+import { escapePostgrestFilterValue } from '@/lib/escape-postgrest-filter';
 import { notifyMainSiteRevalidate } from '@/lib/notify-main-site';
 
 const json = (data: unknown, status = 200) =>
@@ -42,7 +43,8 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
       query = query.eq('category_id', category);
     }
     if (search) {
-      query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`);
+      const escaped = escapePostgrestFilterValue(search);
+      query = query.or(`title.ilike.%${escaped}%,content.ilike.%${escaped}%`);
     }
 
     const { data: posts, error } = await query;
@@ -70,26 +72,62 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     await verifyAdminRequest(request, cookies);
 
-    let data: Record<string, unknown>;
+    let rawData: Record<string, unknown>;
     try {
-      data = await request.json();
+      rawData = await request.json();
     } catch {
       return json({ error: 'Invalid request body. Expected JSON.' }, 400);
     }
 
-    if (!data.title || !data.slug || !data.excerpt || !data.content) {
-      return json({ error: 'Missing required fields: title, slug, excerpt, content' }, 400);
+    if (
+      typeof rawData.title !== 'string' ||
+      rawData.title.trim().length === 0 ||
+      typeof rawData.slug !== 'string' ||
+      rawData.slug.trim().length === 0 ||
+      typeof rawData.excerpt !== 'string' ||
+      rawData.excerpt.trim().length === 0 ||
+      typeof rawData.content !== 'string' ||
+      rawData.content.trim().length === 0
+    ) {
+      return json({ error: 'Missing or invalid required fields: title, slug, excerpt, content' }, 400);
     }
 
-    if (data.status === 'published' && !data.published_at) {
-      data.published_at = new Date().toISOString();
+    if (rawData.status !== undefined && rawData.status !== 'draft' && rawData.status !== 'published') {
+      return json({ error: 'Invalid status value' }, 400);
+    }
+
+    const status = (rawData.status === 'draft' || rawData.status === 'published'
+      ? rawData.status
+      : 'draft') as 'draft' | 'published';
+
+    // Whitelist fields to prevent mass-assignment (id, timestamps, etc. are server-controlled)
+    const insertData: Record<string, unknown> = {
+      title: rawData.title.trim(),
+      slug: rawData.slug.trim(),
+      excerpt: rawData.excerpt.trim(),
+      content: rawData.content.trim(),
+      category_id: typeof rawData.category_id === 'string' && rawData.category_id ? rawData.category_id : null,
+      author_id: typeof rawData.author_id === 'string' && rawData.author_id ? rawData.author_id : null,
+      tags: Array.isArray(rawData.tags) ? rawData.tags.filter((t): t is string => typeof t === 'string') : [],
+      featured_image: typeof rawData.featured_image === 'string' ? rawData.featured_image : null,
+      status,
+      seo_title: typeof rawData.seo_title === 'string' && rawData.seo_title ? rawData.seo_title : null,
+      seo_description:
+        typeof rawData.seo_description === 'string' && rawData.seo_description ? rawData.seo_description : null,
+    };
+
+    if (status === 'published') {
+      insertData.published_at =
+        typeof rawData.published_at === 'string' && rawData.published_at
+          ? rawData.published_at
+          : new Date().toISOString();
     }
 
     const supabase = getSupabaseServer();
 
     const { data: post, error } = await supabase
       .from('posts')
-      .insert(data)
+      .insert(insertData)
       .select(
         `
         *,

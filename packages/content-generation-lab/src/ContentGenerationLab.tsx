@@ -130,7 +130,7 @@ export function ContentGenerationLab<TResult, TResearch = never>(
     <div
       className={className}
       role="region"
-      aria-labelledby="content-gen-lab-title"
+      aria-labelledby={title ? 'content-gen-lab-title' : undefined}
     >
       {(title || onClose) && (
         <div className="content-gen-lab-header">

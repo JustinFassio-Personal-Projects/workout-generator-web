@@ -123,7 +123,10 @@ export function useGenerationState<TResult, TResearch = unknown>(
         ? twoPhase.buildResearchBody()
         : buildBody();
       const data = await doFetch(body);
-      if (data == null) return;
+      if (data == null) {
+        setPromptStep('idle');
+        return;
+      }
 
       if (twoPhase && reviewPromptsBeforeGenerate) {
         const parsed = twoPhase.parseResearchResponse(data) as TResearch;

@@ -53,8 +53,11 @@ const WorkoutInsightModal: React.FC<WorkoutInsightModalProps> = ({
       };
     },
     parseResponse: (d) => {
-      const data = d as { insight?: string };
-      return { insight: data.insight ?? '' };
+      const data = d as { insight?: string | null };
+      if (!data.insight || typeof data.insight !== 'string' || data.insight.trim() === '') {
+        throw new Error('Insight generation failed: missing insight in response');
+      }
+      return { insight: data.insight };
     },
   });
 

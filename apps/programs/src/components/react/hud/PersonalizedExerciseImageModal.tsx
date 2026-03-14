@@ -51,8 +51,11 @@ const PersonalizedExerciseImageModal: React.FC<PersonalizedExerciseImageModalPro
       };
     },
     parseResponse: (d) => {
-      const data = d as { image?: string };
-      return { image: data.image ?? '' };
+      const data = d as { image?: string | null };
+      if (!data.image || typeof data.image !== 'string' || data.image.trim() === '') {
+        throw new Error('Image generation failed: missing image in response');
+      }
+      return { image: data.image };
     },
   });
 

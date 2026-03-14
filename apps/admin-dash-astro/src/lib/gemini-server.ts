@@ -26,9 +26,11 @@ function isRetryableError(error: unknown): boolean {
   const lower = msg.toLowerCase();
   if (lower.includes('503') || lower.includes('unavailable')) return true;
   if (lower.includes('deadline expired') || lower.includes('deadline_exceeded')) return true;
+  if (lower.includes('429') || lower.includes('rate limit') || lower.includes('resource exhausted')) return true;
   if (error && typeof error === 'object') {
     const obj = error as { status?: string; code?: number };
     if (obj.status === 'UNAVAILABLE' || obj.code === 503) return true;
+    if (obj.status === 'RESOURCE_EXHAUSTED' || obj.code === 429) return true;
   }
   return false;
 }

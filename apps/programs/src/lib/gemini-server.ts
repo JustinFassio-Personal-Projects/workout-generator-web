@@ -24,10 +24,12 @@ function isRetryableError(error: unknown): boolean {
   const msg = error instanceof Error ? error.message : String(error);
   const lower = msg.toLowerCase();
   if (lower.includes('503') || lower.includes('unavailable')) return true;
+  if (lower.includes('429') || lower.includes('rate limit') || lower.includes('resource exhausted')) return true;
   if (lower.includes('deadline expired') || lower.includes('deadline_exceeded')) return true;
   if (error && typeof error === 'object') {
     const obj = error as { status?: string; code?: number };
     if (obj.status === 'UNAVAILABLE' || obj.code === 503) return true;
+    if (obj.status === 'RESOURCE_EXHAUSTED' || obj.code === 429) return true;
   }
   return false;
 }
@@ -628,6 +630,65 @@ export async function generateInfographicImage(
     console.error('Error in generateInfographicImage:', error);
     throw error;
   }
+}
+
+/**
+ * Generate an image of the person in the reference photo performing the given exercise.
+ * Uses generateInfographicImage with a personalized prompt. Server-side only.
+ */
+export async function generatePersonalizedExerciseImage(
+  exerciseName: string,
+  referenceImageBase64: string
+): Promise<string> {
+  const prompt = `Person performing ${exerciseName} with proper form, mid-rep, photorealistic, gym environment, full body visible.`;
+  return generateInfographicImage(prompt, referenceImageBase64);
+}
+
+const WORKOUT_RECOVERY_SYSTEM_PROMPT = `You are a certified personal trainer and exercise physiologist. Provide brief, evidence-based cardiovascular recovery assessments. Use plain language. Keep responses under 150 words. Include 2–3 actionable tips (hydration, cooldown, rest, etc.).`;
+
+/**
+ * Generate a cardiovascular recovery assessment from post-workout heart rate and context.
+ * Server-side only; uses GEMINI_API_KEY.
+ */
+export async function generateWorkoutRecoveryInsight(params: {
+  heartRate: number;
+  minutesSinceLastSet?: number;
+  notes?: string;
+  workoutTitle?: string;
+  programTitle?: string;
+  durationSeconds?: number;
+  exerciseCount?: number;
+}): Promise<string> {
+  requireGeminiApiKey();
+  const parts: string[] = [
+    `Post-workout heart rate: ${params.heartRate} bpm.`,
+  ];
+  if (params.minutesSinceLastSet != null) {
+    parts.push(`Measured ${params.minutesSinceLastSet} minutes after last set.`);
+  }
+  if (params.workoutTitle) parts.push(`Workout: ${params.workoutTitle}.`);
+  if (params.programTitle) parts.push(`Program: ${params.programTitle}.`);
+  if (params.durationSeconds != null) {
+    const min = Math.round(params.durationSeconds / 60);
+    parts.push(`Duration: ${min} minutes.`);
+  }
+  if (params.exerciseCount != null) parts.push(`Exercises: ${params.exerciseCount}.`);
+  if (params.notes?.trim()) parts.push(`User notes: ${params.notes.trim()}.`);
+  const userPrompt = `Provide a brief cardiovascular recovery assessment and 2–3 actionable tips.\n\n${parts.join(' ')}`;
+  const response = await withRetry(
+    () =>
+      client.models.generateContent({
+        model: 'gemini-2.0-flash',
+        config: { systemInstruction: WORKOUT_RECOVERY_SYSTEM_PROMPT },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      }),
+    '[generateWorkoutRecoveryInsight]'
+  );
+  const candidate = response.candidates?.[0];
+  const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
+  const text = textPart?.text?.trim();
+  if (!text) throw new Error('No insight text in response');
+  return text;
 }
 
 /** System instruction for the AI Fitcopilot chat (AIChat widget). */

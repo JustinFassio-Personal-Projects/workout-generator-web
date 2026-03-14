@@ -6,11 +6,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, Play } from 'lucide-react';
+import { X, Play, Sparkles, Camera } from 'lucide-react';
 import { getProgramWithSchedule } from '@/lib/supabase/client/user-programs';
 import type { SessionHistoryItem } from '@/lib/supabase/client/session-history';
 import type { ProgramSchedule } from '@/types/ai-program';
 import type { ExerciseLog, SetLog } from '@/types/tracking';
+import WorkoutInsightModal from './WorkoutInsightModal';
+import PersonalizedExerciseImageModal from './PersonalizedExerciseImageModal';
 
 type WorkoutFromSchedule = ProgramSchedule['workouts'][number];
 
@@ -96,6 +98,8 @@ const SessionDetailDrawer: React.FC<SessionDetailDrawerProps> = ({
   onDoAgain,
 }) => {
   const [doAgainLoading, setDoAgainLoading] = useState(false);
+  const [insightModalOpen, setInsightModalOpen] = useState(false);
+  const [personalizedImageModalOpen, setPersonalizedImageModalOpen] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -180,6 +184,24 @@ const SessionDetailDrawer: React.FC<SessionDetailDrawerProps> = ({
 
           <button
             type="button"
+            onClick={() => setInsightModalOpen(true)}
+            className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 mb-3 flex w-full items-center justify-center gap-2 rounded-2xl border py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors"
+          >
+            <Sparkles className="h-4 w-4" />
+            Get recovery insight
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPersonalizedImageModalOpen(true)}
+            className="border-white/20 bg-white/5 hover:bg-white/10 mb-3 flex w-full items-center justify-center gap-2 rounded-2xl border py-3 font-mono text-xs font-bold uppercase tracking-widest text-white/70 transition-colors"
+          >
+            <Camera className="h-4 w-4" />
+            Create your exercise moment
+          </button>
+
+          <button
+            type="button"
             onClick={handleDoAgain}
             disabled={doAgainLoading}
             className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 flex w-full items-center justify-center gap-2 rounded-2xl border py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors disabled:opacity-50"
@@ -189,6 +211,29 @@ const SessionDetailDrawer: React.FC<SessionDetailDrawerProps> = ({
           </button>
         </div>
       </div>
+
+      {insightModalOpen && (
+        <WorkoutInsightModal
+          session={{
+            id: session.id,
+            workoutTitle: session.workoutTitle,
+            programTitle: session.programTitle,
+            durationSeconds: session.durationSeconds,
+            exerciseCount: session.exercises.length,
+          }}
+          onClose={() => setInsightModalOpen(false)}
+        />
+      )}
+
+      {personalizedImageModalOpen && (
+        <PersonalizedExerciseImageModal
+          session={{
+            id: session.id,
+            exercises: session.exercises,
+          }}
+          onClose={() => setPersonalizedImageModalOpen(false)}
+        />
+      )}
     </>
   );
 };

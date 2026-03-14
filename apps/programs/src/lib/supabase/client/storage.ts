@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '../client';
+import { dataUrlToBlob } from '@/lib/data-url-to-blob';
 
 const BUCKET_IMAGES = 'exercise-images';
 
@@ -55,4 +56,18 @@ export async function uploadExerciseVideo(
     downloadUrl: urlData.publicUrl,
     storagePath: data.path,
   };
+}
+
+/**
+ * Upload a personalized exercise image to user-scoped storage.
+ * Path: user-content/{userId}/personalized-exercise-{exerciseSlug}-{timestamp}.png
+ */
+export async function uploadPersonalizedExerciseImage(
+  userId: string,
+  exerciseSlug: string,
+  imageDataUrl: string
+): Promise<UploadResult> {
+  const blob = dataUrlToBlob(imageDataUrl);
+  const path = `user-content/${userId}/personalized-exercise-${exerciseSlug}-${Date.now()}.png`;
+  return uploadExerciseImage(blob, path, 'image/png');
 }

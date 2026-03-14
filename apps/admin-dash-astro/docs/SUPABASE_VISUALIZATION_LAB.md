@@ -88,3 +88,11 @@ If you see **400 "Bucket not found"**, the bucket has not been created yet — a
 ## Tutorial Lab (tutorial_config)
 
 The Tutorial Lab stores per-exercise tutorial configuration (phases, success criteria) in **`generated_exercises.tutorial_config`** (jsonb). If you added the admin dashboard after the initial schema was created, ensure this column exists: re-run the full `SUPABASE_VISUALIZATION_LAB_SETUP.sql` script (it includes `ALTER TABLE ... ADD COLUMN IF NOT EXISTS tutorial_config jsonb`) or run that statement manually in the SQL Editor.
+
+## Viz Lab Templates (optional, team sharing)
+
+The Visualization Lab can persist form presets to Supabase for team-wide sharing. If the **`viz_lab_templates`** table does not exist, templates fall back to localStorage only. To enable team templates, run `docs/VIZ_LAB_TEMPLATES_SCHEMA.sql` in the SQL Editor.
+
+## Rate limit (429)
+
+If you see **"Rate limit exceeded. Please wait a few minutes and try again."**, the Gemini API has temporarily throttled requests. Wait a few minutes and retry. The Lab retries automatically with exponential backoff before surfacing this message.

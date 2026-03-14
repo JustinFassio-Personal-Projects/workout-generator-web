@@ -272,6 +272,8 @@ const DeepResearchEditor: React.FC = () => {
       macroFocus,
       isEditing,
       slug,
+      setItem,
+      setLastSaved,
       navigate,
     ]
   );

@@ -219,8 +219,8 @@ const DeepResearchEditor: React.FC = () => {
           macro_focus: macroFocus,
         };
 
-        const url = isEditing
-          ? `/api/admin/deep-research/${item?.slug}`
+        const url = isEditing && slug
+          ? `/api/admin/deep-research/${slug}`
           : '/api/admin/deep-research';
         const method = isEditing ? 'PUT' : 'POST';
 
@@ -271,7 +271,7 @@ const DeepResearchEditor: React.FC = () => {
       dietaryRestrictions,
       macroFocus,
       isEditing,
-      item?.slug,
+      slug,
       navigate,
     ]
   );

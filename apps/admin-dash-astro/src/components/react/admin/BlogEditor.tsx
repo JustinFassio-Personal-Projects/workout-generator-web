@@ -215,8 +215,20 @@ const BlogEditor: React.FC = () => {
 
   const handleSave = useCallback(
     async (publishStatus?: 'draft' | 'published') => {
-      setSaving(true);
       setError(null);
+
+      const missing: string[] = [];
+      if (!title.trim()) missing.push('title');
+      if (!slugVal.trim()) missing.push('slug');
+      if (!excerpt.trim()) missing.push('excerpt');
+      if (!content.trim()) missing.push('content');
+      if (missing.length > 0) {
+        setError(`Required: ${missing.join(', ')}`);
+        toast.error(`Please fill in: ${missing.join(', ')}`);
+        return;
+      }
+
+      setSaving(true);
       const finalStatus = publishStatus || status;
       try {
         const postData = {

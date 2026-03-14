@@ -475,6 +475,9 @@ const BlogEditor: React.FC = () => {
               onChange={(e) => setCategoryId(e.target.value)}
               className="w-full rounded border border-white/20 bg-white/5 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none"
             >
+              <option value="">
+                {categories.length === 0 ? 'No categories — add in Supabase' : 'Select category'}
+              </option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -490,6 +493,9 @@ const BlogEditor: React.FC = () => {
               onChange={(e) => setAuthorId(e.target.value)}
               className="w-full rounded border border-white/20 bg-white/5 px-3 py-2 text-white focus:border-orange-light/50 focus:outline-none"
             >
+              <option value="">
+                {authors.length === 0 ? 'No authors — add in Supabase' : 'Select author'}
+              </option>
               {authors.map((author) => (
                 <option key={author.id} value={author.id}>
                   {author.name}

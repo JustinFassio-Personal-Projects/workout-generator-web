@@ -17,6 +17,16 @@ export interface FeaturedChallenge {
 }
 
 /**
+ * Returns true if Supabase is configured (e.g. in production). When false, we skip
+ * queries so the build can complete without env vars (CI, preview deploys).
+ */
+function isSupabaseConfigured(): boolean {
+  const url = import.meta.env.PUBLIC_SUPABASE_URL
+  const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+  return typeof url === 'string' && url.length > 0 && typeof key === 'string' && key.length > 0
+}
+
+/**
  * Fetch featured programs for the homepage.
  * Uses RLS; requires "Anyone can read featured programs" policy.
  */
@@ -24,6 +34,8 @@ export async function getFeaturedPrograms(
   cookies: AstroCookies,
   limit = 3
 ): Promise<FeaturedProgram[]> {
+  if (!isSupabaseConfigured()) return []
+
   const supabase = createServerSupabaseClient(cookies)
   const { data, error } = await supabase
     .from('programs')
@@ -48,6 +60,8 @@ export async function getFeaturedChallenges(
   cookies: AstroCookies,
   limit = 3
 ): Promise<FeaturedChallenge[]> {
+  if (!isSupabaseConfigured()) return []
+
   const supabase = createServerSupabaseClient(cookies)
   const { data, error } = await supabase
     .from('challenges')

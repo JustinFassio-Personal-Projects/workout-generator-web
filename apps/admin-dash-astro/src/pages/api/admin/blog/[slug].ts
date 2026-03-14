@@ -86,7 +86,7 @@ export const PUT: APIRoute = async ({ params, request, cookies }) => {
       return json({ error: 'Missing or invalid required fields' }, 400);
     }
 
-    if (rawData.status && rawData.status !== 'draft' && rawData.status !== 'published') {
+    if (rawData.status !== undefined && rawData.status !== 'draft' && rawData.status !== 'published') {
       return json({ error: 'Invalid status value' }, 400);
     }
 
@@ -102,6 +102,11 @@ export const PUT: APIRoute = async ({ params, request, cookies }) => {
       return json({ error: 'Post not found' }, 404);
     }
 
+    const status: 'draft' | 'published' =
+      rawData.status === 'draft' || rawData.status === 'published'
+        ? rawData.status
+        : (currentPost.status === 'published' ? 'published' : 'draft');
+
     const updateData: Record<string, unknown> = {
       title: rawData.title,
       slug: rawData.slug,
@@ -111,7 +116,7 @@ export const PUT: APIRoute = async ({ params, request, cookies }) => {
       author_id: rawData.author_id || null,
       tags: rawData.tags || [],
       featured_image: rawData.featured_image || null,
-      status: rawData.status,
+      status,
       seo_title: rawData.seo_title || null,
       seo_description: rawData.seo_description || null,
     };

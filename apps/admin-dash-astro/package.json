@@ -21,6 +21,7 @@
     "@mediapipe/tasks-vision": "^0.10.32",
     "@supabase/supabase-js": "^2.97.0",
     "@types/sanitize-html": "^2.16.1",
+    "@workout-generator/content-generation-lab": "*",
     "@workout-generator/design-system": "*",
     "@workout-generator/exercise-mapping": "*",
     "astro": "^5.0.0",

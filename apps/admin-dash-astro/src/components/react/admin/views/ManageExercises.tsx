@@ -20,6 +20,8 @@ import {
   EyeOff,
   RefreshCw,
   UserPlus,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { getAllExercises, createExercise, deleteExercise } from '@/lib/supabase/client/exercises';
 import type { Exercise } from '@/lib/supabase/client/exercises';
@@ -54,6 +56,8 @@ const ManageExercises: React.FC = () => {
   const [generatedError, setGeneratedError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<GeneratedExerciseStatus | 'all'>('all');
   const [publishingExerciseId, setPublishingExerciseId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [batchPublishing, setBatchPublishing] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -227,6 +231,61 @@ const ManageExercises: React.FC = () => {
       setGeneratedError(err instanceof Error ? err.message : 'Failed to unpublish exercise');
     } finally {
       setPublishingExerciseId(null);
+    }
+  };
+
+  const pendingExerciseIds = generatedExercises
+    .filter((e) => e.status === 'pending')
+    .map((e) => e.id);
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAllPending = () => {
+    setSelectedIds(new Set(pendingExerciseIds));
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const handleBatchApprove = async () => {
+    if (selectedIds.size === 0) return;
+    setBatchPublishing(true);
+    setGeneratedError(null);
+    try {
+      for (const id of selectedIds) {
+        await updateGeneratedExerciseStatus(id, 'approved');
+      }
+      setSelectedIds(new Set());
+      await fetchGeneratedExercises();
+    } catch (err) {
+      setGeneratedError(err instanceof Error ? err.message : 'Failed to approve selected');
+    } finally {
+      setBatchPublishing(false);
+    }
+  };
+
+  const handleBatchReject = async () => {
+    if (selectedIds.size === 0) return;
+    setBatchPublishing(true);
+    setGeneratedError(null);
+    try {
+      for (const id of selectedIds) {
+        await updateGeneratedExerciseStatus(id, 'rejected');
+      }
+      setSelectedIds(new Set());
+      await fetchGeneratedExercises();
+    } catch (err) {
+      setGeneratedError(err instanceof Error ? err.message : 'Failed to reject selected');
+    } finally {
+      setBatchPublishing(false);
     }
   };
 
@@ -701,6 +760,56 @@ const ManageExercises: React.FC = () => {
                   {status}
                 </button>
               ))}
+              {pendingExerciseIds.length > 0 && (
+                <>
+                  <span className="mx-1 text-white/40">|</span>
+                  <button
+                    type="button"
+                    onClick={selectAllPending}
+                    className="rounded-lg px-3 py-1.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    Select all pending
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearSelection}
+                    disabled={selectedIds.size === 0}
+                    className="rounded-lg px-3 py-1.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+                  >
+                    Clear selection
+                  </button>
+                  {selectedIds.size > 0 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleBatchApprove}
+                        disabled={batchPublishing}
+                        className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-500 disabled:opacity-50"
+                      >
+                        {batchPublishing ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <CheckCircle className="h-4 w-4" />
+                        )}
+                        Approve selected ({selectedIds.size})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleBatchReject}
+                        disabled={batchPublishing}
+                        className="flex items-center gap-1.5 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+                      >
+                        {batchPublishing ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <XCircle className="h-4 w-4" />
+                        )}
+                        Reject selected
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
             </div>
             <Link
               to="/exercise-image-gen"
@@ -781,7 +890,21 @@ const ManageExercises: React.FC = () => {
                       </div>
                     </div>
                   </Link>
-                  <div className="flex items-center justify-end gap-2 border-t border-white/10 p-3">
+                  <div className="flex items-center justify-between gap-2 border-t border-white/10 p-3">
+                    {exercise.status === 'pending' ? (
+                      <label className="flex cursor-pointer items-center gap-2 text-sm text-white/70 hover:text-white">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(exercise.id)}
+                          onChange={() => toggleSelection(exercise.id)}
+                          className="h-4 w-4 rounded border-white/20 bg-black/20 text-[#ffbf00] focus:ring-[#ffbf00]/50"
+                        />
+                        <span>Select</span>
+                      </label>
+                    ) : (
+                      <span />
+                    )}
+                    <div className="flex items-center gap-2">
                     {exercise.status === 'approved' ? (
                       <button
                         type="button"
@@ -811,6 +934,7 @@ const ManageExercises: React.FC = () => {
                         )}
                       </button>
                     )}
+                    </div>
                   </div>
                 </div>
               ))}

@@ -6,11 +6,13 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Play, Check } from 'lucide-react';
+import { Play, Check, Sparkles, Camera } from 'lucide-react';
 import { getTodaysWorkoutOrRest } from '@/lib/supabase/client/schedule-resolver';
 import { getTodaysWorkoutLog } from '@/lib/supabase/client/progress-analytics';
 import { getExercisesFromWorkout } from '@/lib/program-schedule-utils';
 import WorkoutPlayer from '@/components/react/tracking/WorkoutPlayer';
+import WorkoutInsightModal from './WorkoutInsightModal';
+import PersonalizedExerciseImageModal from './PersonalizedExerciseImageModal';
 
 const REST_DAY_TIPS = [
   'Focus on mobility and stretching today.',
@@ -73,6 +75,8 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
     workoutIndex: number;
     programId: string;
   } | null>(null);
+  const [insightModalOpen, setInsightModalOpen] = useState(false);
+  const [personalizedImageModalOpen, setPersonalizedImageModalOpen] = useState(false);
 
   const load = useCallback(async () => {
     const [scheduleResult, logResult] = await Promise.all([
@@ -194,9 +198,27 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
           </ul>
         )}
         {isCompleted ? (
-          <div className="flex items-center gap-2 text-sm text-white/70">
-            <Check className="h-4 w-4 text-green-400" />
-            <span>Logged {formatDuration(todaysLog.durationSeconds)}</span>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-sm text-white/70">
+              <Check className="h-4 w-4 text-green-400" />
+              <span>Logged {formatDuration(todaysLog.durationSeconds)}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setInsightModalOpen(true)}
+              className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 flex w-full items-center justify-center gap-2 rounded-full border py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-orange-light transition-colors"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Get AI Insight
+            </button>
+            <button
+              type="button"
+              onClick={() => setPersonalizedImageModalOpen(true)}
+              className="border-white/20 bg-white/5 hover:bg-white/10 flex w-full items-center justify-center gap-2 rounded-full border py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-white/70 transition-colors"
+            >
+              <Camera className="h-3.5 w-3.5" />
+              Create your exercise moment
+            </button>
           </div>
         ) : isPaid ? (
           <button
@@ -230,6 +252,28 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
           workoutId={String(workoutPlayer.workoutIndex)}
           onClose={() => setWorkoutPlayer(null)}
           onComplete={handlePlayerComplete}
+        />
+      )}
+
+      {insightModalOpen && todaysLog && (
+        <WorkoutInsightModal
+          session={{
+            id: todaysLog.id,
+            workoutTitle: schedule.workout.title,
+            durationSeconds: todaysLog.durationSeconds,
+            exerciseCount: exercises.length,
+          }}
+          onClose={() => setInsightModalOpen(false)}
+        />
+      )}
+
+      {personalizedImageModalOpen && todaysLog && (
+        <PersonalizedExerciseImageModal
+          session={{
+            id: todaysLog.id,
+            exercises,
+          }}
+          onClose={() => setPersonalizedImageModalOpen(false)}
         />
       )}
     </>

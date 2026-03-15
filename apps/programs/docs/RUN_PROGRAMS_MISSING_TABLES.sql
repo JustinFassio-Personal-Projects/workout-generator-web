@@ -124,7 +124,8 @@ CREATE TABLE IF NOT EXISTS public.user_programs (
   UNIQUE(user_id, program_id)
 );
 -- Add source if table already existed without it (client requires it; avoids 400 on fetchUserPrograms).
-ALTER TABLE public.user_programs ADD COLUMN IF NOT EXISTS source text DEFAULT 'self';
+ALTER TABLE public.user_programs
+  ADD COLUMN IF NOT EXISTS source text DEFAULT 'self' CHECK (source IN ('self', 'trainer_assigned', 'cohort'));
 UPDATE public.user_programs SET source = 'self' WHERE source IS NULL;
 ALTER TABLE public.user_programs ALTER COLUMN source SET NOT NULL;
 

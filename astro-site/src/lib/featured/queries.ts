@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { AstroCookies } from 'astro'
+import { featuredContentConfig } from './config'
 
 export interface FeaturedProgram {
   id: string
@@ -13,6 +14,13 @@ export interface FeaturedChallenge {
   title: string
   description: string | null
   hero_image_url: string | null
+  created_at: string
+}
+
+export interface FeaturedWorkout {
+  id: string
+  title: string
+  description: string | null
   created_at: string
 }
 
@@ -79,4 +87,72 @@ export async function getFeaturedChallenges(
   }
 
   return (data ?? []) as FeaturedChallenge[]
+}
+
+/**
+ * Fetch featured workout sets for the homepage.
+ * Uses RLS; requires "Anyone can read published workout_sets" policy.
+ */
+export async function getFeaturedWorkouts(
+  cookies: AstroCookies,
+  limit = 3
+): Promise<FeaturedWorkout[]> {
+  if (!isSupabaseConfigured()) return []
+
+  const supabase = createServerSupabaseClient(cookies)
+  const { data, error } = await supabase
+    .from('workout_sets')
+    .select('id, title, description, created_at')
+    .eq('featured_on_landing', true)
+    .eq('status', 'published')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    console.error('[featured] getFeaturedWorkouts error:', error.message)
+    return []
+  }
+
+  return (data ?? []) as FeaturedWorkout[]
+}
+
+export interface FeaturedContentResult {
+  programs: FeaturedProgram[]
+  challenges: FeaturedChallenge[]
+  workouts: FeaturedWorkout[]
+}
+
+export interface FeaturedContentOptions {
+  programLimit?: number
+  challengeLimit?: number
+  workoutLimit?: number
+}
+
+/**
+ * Fetch all featured content in one call (programs, challenges, workouts).
+ * Uses config limits when options are omitted.
+ * On any unexpected error, returns empty arrays so the site still builds and serves.
+ */
+export async function getFeaturedContent(
+  cookies: AstroCookies,
+  options?: FeaturedContentOptions
+): Promise<FeaturedContentResult> {
+  const empty: FeaturedContentResult = { programs: [], challenges: [], workouts: [] }
+  try {
+    const { limits } = featuredContentConfig
+    const programLimit = options?.programLimit ?? limits.programs
+    const challengeLimit = options?.challengeLimit ?? limits.challenges
+    const workoutLimit = options?.workoutLimit ?? limits.workouts
+
+    const [programs, challenges, workouts] = await Promise.all([
+      getFeaturedPrograms(cookies, programLimit),
+      getFeaturedChallenges(cookies, challengeLimit),
+      getFeaturedWorkouts(cookies, workoutLimit),
+    ])
+
+    return { programs, challenges, workouts }
+  } catch (err) {
+    console.error('[featured] getFeaturedContent error:', err instanceof Error ? err.message : err)
+    return empty
+  }
 }

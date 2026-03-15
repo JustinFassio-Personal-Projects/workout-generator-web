@@ -5,13 +5,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Trash2, Loader2, AlertCircle, Upload, EyeOff } from 'lucide-react';
+import { Edit, Trash2, Loader2, AlertCircle, Upload, EyeOff, Star } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   fetchChallengeLibrary,
   fetchFullChallenge,
   deleteChallenge,
   updateChallengeStatus,
 } from '@/lib/supabase/client/challenge-persistence';
+import { supabase } from '@/lib/supabase/client';
 import type { ChallengeLibraryItem, ChallengeTemplate } from '@/types/ai-challenge';
 import { getAllZones } from '@/lib/supabase/client/equipment';
 import DeleteProgramModal from './DeleteProgramModal';
@@ -29,6 +31,7 @@ const ChallengeLibraryTable: React.FC<ChallengeLibraryTableProps> = ({ onEdit, o
   const [filter, setFilter] = useState<'all' | 'draft' | 'published'>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [featuredLoadingId, setFeaturedLoadingId] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [challengeToDelete, setChallengeToDelete] = useState<{
     id: string;
@@ -108,6 +111,39 @@ const ChallengeLibraryTable: React.FC<ChallengeLibraryTableProps> = ({ onEdit, o
       setError(err instanceof Error ? err.message : 'Failed to unpublish challenge');
     } finally {
       setPublishingId(null);
+    }
+  };
+
+  const handleFeaturedToggle = async (challenge: ChallengeLibraryItem) => {
+    const next = !challenge.featuredOnLanding;
+    if (next && challenge.status !== 'published') {
+      toast.error('Publish the challenge first to feature it on the homepage.');
+      return;
+    }
+    try {
+      setFeaturedLoadingId(challenge.id);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const res = await fetch(`/api/admin/challenges/${challenge.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        credentials: 'include',
+        body: JSON.stringify({ featured_on_landing: next }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? 'Failed to update');
+      }
+      toast.success(next ? 'Featured on homepage.' : 'Removed from homepage.');
+      await fetchChallenges();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update');
+    } finally {
+      setFeaturedLoadingId(null);
     }
   };
 
@@ -260,6 +296,23 @@ const ChallengeLibraryTable: React.FC<ChallengeLibraryTableProps> = ({ onEdit, o
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleFeaturedToggle(challenge)}
+                          disabled={
+                            featuredLoadingId === challenge.id ||
+                            (challenge.featuredOnLanding === false && challenge.status !== 'published')
+                          }
+                          className="rounded-lg p-2 text-white/60 hover:bg-white/10 hover:text-orange-light disabled:opacity-50"
+                          title={challenge.featuredOnLanding ? 'Remove from homepage' : 'Feature on homepage'}
+                        >
+                          {featuredLoadingId === challenge.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Star
+                              className={`h-4 w-4 ${challenge.featuredOnLanding ? 'fill-orange-light text-orange-light' : ''}`}
+                            />
+                          )}
+                        </button>
                         {challenge.status === 'draft' ? (
                           <button
                             onClick={() => handlePublish(challenge.id)}

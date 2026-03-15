@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Edit, Trash2, Loader2, Globe, GlobeLock } from 'lucide-react';
+import { Edit, Trash2, Loader2, Globe, GlobeLock, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { fetchPrograms, deleteProgram } from '@/lib/supabase/admin/programs';
 import type { ProgramLibraryItem } from '@/lib/supabase/admin/programs';
@@ -28,6 +28,7 @@ const ProgramLibraryTable: React.FC<ProgramLibraryTableProps> = ({ onEdit, onDel
     null
   );
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [featuredLoadingId, setFeaturedLoadingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.uid) {
@@ -102,6 +103,33 @@ const ProgramLibraryTable: React.FC<ProgramLibraryTableProps> = ({ onEdit, onDel
       toast.error(err instanceof Error ? err.message : 'Failed to delete program');
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleFeaturedToggle = async (program: ProgramLibraryItem) => {
+    const next = !program.featuredOnLanding;
+    if (next && !program.isPublic) {
+      toast.error('Publish the program first to feature it on the homepage.');
+      return;
+    }
+    try {
+      setFeaturedLoadingId(program.id);
+      const res = await fetch(`/api/admin/programs/${program.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ featured_on_landing: next }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? 'Failed to update');
+      }
+      toast.success(next ? 'Featured on homepage.' : 'Removed from homepage.');
+      await loadPrograms();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update');
+    } finally {
+      setFeaturedLoadingId(null);
     }
   };
 
@@ -189,6 +217,18 @@ const ProgramLibraryTable: React.FC<ProgramLibraryTableProps> = ({ onEdit, onDel
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleFeaturedToggle(program)}
+                        disabled={featuredLoadingId === program.id || (program.featuredOnLanding === false && !program.isPublic)}
+                        className="rounded-lg p-2 text-white/60 hover:bg-white/10 hover:text-orange-light disabled:opacity-50"
+                        title={program.featuredOnLanding ? 'Remove from homepage' : 'Feature on homepage'}
+                      >
+                        {featuredLoadingId === program.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Star className={`h-4 w-4 ${program.featuredOnLanding ? 'fill-orange-light text-orange-light' : ''}`} />
+                        )}
+                      </button>
                       <button
                         onClick={() => handlePublishToggle(program)}
                         disabled={publishingId === program.id}

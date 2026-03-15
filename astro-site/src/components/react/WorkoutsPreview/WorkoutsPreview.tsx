@@ -1,9 +1,9 @@
 import { ArrowRight } from 'lucide-react'
-import type { FeaturedProgram } from '@/lib/featured/queries'
-import styles from './ProgramsPreview.module.scss'
+import type { FeaturedWorkout } from '@/lib/featured/queries'
+import styles from './WorkoutsPreview.module.scss'
 
-interface ProgramsPreviewProps {
-  programs: FeaturedProgram[]
+interface WorkoutsPreviewProps {
+  workouts: FeaturedWorkout[]
 }
 
 function truncate(str: string | null | undefined, maxLen: number): string {
@@ -12,32 +12,32 @@ function truncate(str: string | null | undefined, maxLen: number): string {
   return str.slice(0, maxLen).trim() + '…'
 }
 
-export function ProgramsPreview({ programs }: ProgramsPreviewProps) {
-  if (programs.length === 0) return null
+export function WorkoutsPreview({ workouts }: WorkoutsPreviewProps) {
+  if (workouts.length === 0) return null
 
   return (
-    <section id="programs" className={styles.section}>
+    <section id="workouts" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
           <h2 className={styles.title}>
             Featured
-            <span className={styles.gradientText}> Programs</span>
+            <span className={styles.gradientText}> Workouts</span>
           </h2>
           <p className={styles.subtitle}>
-            Science-based training plans built by certified coaches. Follow a structured program to reach your goals.
+            Science-based workout sets: single sessions, splits, and two-a-days. Pick a set and run a session.
           </p>
         </div>
         <div className={styles.grid}>
-          {programs.map((program) => (
-            <article key={program.id} className={`glass-card overflow-hidden group ${styles.card}`}>
-              <a href={`/programs/${program.id}`} className="block" data-cta="programs-preview-card">
+          {workouts.map((workout) => (
+            <article key={workout.id} className={`glass-card overflow-hidden group ${styles.card}`}>
+              <a href="/workouts" className="block" data-cta="workouts-preview-card">
                 <div className={styles.cardContent}>
-                  <h3 className={styles.cardTitle}>{program.title}</h3>
+                  <h3 className={styles.cardTitle}>{workout.title}</h3>
                   <p className={styles.cardDescription}>
-                    {truncate(program.description, 120)}
+                    {truncate(workout.description, 120)}
                   </p>
                   <span className={styles.ctaText}>
-                    View Program
+                    View Workouts
                     <ArrowRight className={styles.ctaIcon} aria-hidden />
                   </span>
                 </div>
@@ -46,8 +46,8 @@ export function ProgramsPreview({ programs }: ProgramsPreviewProps) {
           ))}
         </div>
         <div className={styles.footer}>
-          <a href="/programs" className={styles.ctaLink} data-cta="programs-preview-view-all">
-            View All Programs
+          <a href="/workouts" className={styles.ctaLink} data-cta="workouts-preview-view-all">
+            View All Workouts
             <ArrowRight className={styles.ctaIcon} aria-hidden />
           </a>
         </div>

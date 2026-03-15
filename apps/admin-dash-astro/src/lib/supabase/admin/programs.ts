@@ -12,6 +12,7 @@ interface ProgramRow {
   tags?: string[] | null;
   status: string;
   is_public: boolean;
+  featured_on_landing?: boolean;
   trainer_id: string;
   config?: unknown;
   chain_metadata?: unknown;
@@ -29,6 +30,7 @@ export interface ProgramLibraryItem {
   tags: string[];
   status: string;
   isPublic: boolean;
+  featuredOnLanding?: boolean;
   trainerId: string;
 }
 
@@ -44,6 +46,7 @@ const mapProgram = (row: ProgramRow): ProgramLibraryItem => ({
   // Use stored status column; fallback for legacy rows that may lack it
   status: row.status ?? 'draft',
   isPublic: row.is_public,
+  featuredOnLanding: row.featured_on_landing ?? false,
   trainerId: row.trainer_id,
 });
 

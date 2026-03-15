@@ -49,9 +49,11 @@ flowchart TB
 
 ## 2. Data Model
 
-| Field                 | Type                  | Description                                                                      |
-| --------------------- | --------------------- | -------------------------------------------------------------------------------- |
-| `deepDiveHtmlContent` | `string \| undefined` | AI-generated full HTML document. Stored in Firestore `generated_exercises/{id}`. |
+**Data source:** Exercise and deep dive content live in **Supabase** (`public.generated_exercises`). The programs app reads via `getGeneratedExerciseBySlug` from `@/lib/supabase/public/generated-exercise-service`.
+
+| Field                 | Type                  | Description                                                                           |
+| --------------------- | --------------------- | ------------------------------------------------------------------------------------- |
+| `deepDiveHtmlContent` | `string \| undefined` | AI-generated full HTML document. Stored in Supabase `generated_exercises.deep_dive_html_content`. |
 
 - **Optional**: Not all exercises have deep dive content. Only those with content appear on `/learn` and show the "Start Learning" button on the detail page.
 - **Immutable until regenerated or edited**: Admin can generate (AI) or edit (manual) via DeepDiveEditor.
@@ -109,7 +111,7 @@ The deep dive content is AI-generated as a complete HTML document (with Tailwind
 
 | File                                                  | Role                                                                                           |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `src/pages/api/admin/exercises/[id]/generate-page.ts` | POST; admin-only; calls `generateExerciseHtml`, saves to Firestore                             |
+| `src/pages/api/admin/exercises/[id]/generate-page.ts` | POST; admin-only; calls `generateExerciseHtml`, saves to Supabase                             |
 | `src/lib/gemini-server.ts`                            | `generateExerciseHtml(exerciseName, imageUrl, biomechanics)` — Gemini model produces full HTML |
 
 **AI Prompt Structure (DEEP_DIVE_SYSTEM_PROMPT):**
@@ -135,7 +137,7 @@ The deep dive content is AI-generated as a complete HTML document (with Tailwind
 | File                                                        | Role                                                            |
 | ----------------------------------------------------------- | --------------------------------------------------------------- |
 | `src/components/react/admin/DeepDiveEditor.tsx`             | Rich editor for `deepDiveHtmlContent`                           |
-| `src/pages/api/admin/exercises/[id]/update-deep-dive.ts`    | POST; admin-only; updates `deepDiveHtmlContent` in Firestore    |
+| `src/pages/api/admin/exercises/[id]/update-deep-dive.ts`    | POST; admin-only; updates `deepDiveHtmlContent` in Supabase    |
 | `src/components/react/admin/AdminExerciseDetailWrapper.tsx` | Wires "Generate Deep Dive Page" and "Edit Page" to API + editor |
 
 **Flow:**

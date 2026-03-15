@@ -3,7 +3,8 @@
 const appBase = (
   import.meta.env.PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com'
 ).replace(/\/$/, '')
-const navLinks = [
+// Informational content (above separator in drawer)
+const informationalNavLinks = [
   { name: 'Home', href: '/#hero' },
   { name: 'About', href: '/about' },
   { name: 'Blog', href: '/blog' },
@@ -11,6 +12,15 @@ const navLinks = [
   { name: 'Deep Research', href: '/deep-research' },
   { name: 'Equipment', href: '/equipment' },
   { name: 'FAQ', href: '/faq' },
+];
+// Workout programming content (below separator in drawer)
+const workoutNavLinks = [
+  { name: 'Explore', href: '/explore' },
+  { name: 'Programs', href: '/programs' },
+  { name: 'Challenges', href: '/challenges' },
+  { name: 'Workouts', href: '/workouts' },
+  { name: 'Exercises', href: '/exercises' },
+  { name: 'Learn', href: '/learn' },
 ];
 const currentPath = Astro.url.pathname;
 ---
@@ -34,45 +44,25 @@ const currentPath = Astro.url.pathname;
         <span class="text-[8px] xl:text-[10px] uppercase tracking-[0.2em] text-muted font-medium mt-0.5">AI-Powered Fitness Plans</span>
       </div>
     </a>
-    <ul class="hidden xl:flex flex-1 items-center justify-center gap-2 min-w-0">
-      {navLinks.map((link) => {
-        const pathOnly = link.href.replace(/#.*/, '') || '/';
-        const isActive = pathOnly === '/' ? currentPath === '/' : (currentPath === pathOnly || currentPath.startsWith(pathOnly + '/'));
-        return (
-          <li>
-            <a
-              href={link.href}
-              class={`inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium transition-colors border border-[var(--glass-border-base)] shadow-sm whitespace-nowrap ${
-                isActive
-                  ? 'text-[var(--color-orange-light)] bg-[var(--color-orange-light)]/10'
-                  : 'text-secondary bg-[var(--glass-bg-base)] hover:text-[var(--color-orange-light)] hover:bg-[var(--glass-bg-hover)]'
-              }`}
-            >
-              {link.name}
-            </a>
-          </li>
-        );
-      })}
-    </ul>
-    <div class="hidden xl:flex shrink-0 items-center gap-2">
-      <a
-        href={`${appBase}/signup`}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="nav-sign-up inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm"
-      >
-        Sign Up
-      </a>
-      <a
-        href={`${appBase}/login`}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="nav-sign-in inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm border-0"
-      >
-        Sign In
-      </a>
-    </div>
-    <div class="xl:hidden shrink-0">
+    <div class="flex flex-1 justify-end shrink-0 items-center gap-2">
+      <div class="hidden xl:flex items-center gap-2">
+        <a
+          href={`${appBase}/signup`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="nav-sign-up inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm"
+        >
+          Sign Up
+        </a>
+        <a
+          href={`${appBase}/login`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="nav-sign-in inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm border-0"
+        >
+          Sign In
+        </a>
+      </div>
       <button
         type="button"
         id="mobile-nav-toggle"
@@ -103,7 +93,8 @@ const currentPath = Astro.url.pathname;
   class="fixed left-0 top-0 h-screen w-full max-w-[320px] sm:max-w-[360px] md:max-w-[400px] bg-[var(--glass-bg-hover)] backdrop-blur-xl border-r border-[var(--glass-border-hover)] shadow-2xl z-[var(--z-modal)] flex flex-col overflow-y-auto transition-transform duration-300 ease-[ease] -translate-x-full invisible pointer-events-none nav-drawer-panel"
 >
   <div id="mobile-nav-drawer-content" class="p-6 flex flex-col gap-2 flex-1">
-    <div class="w-full mb-2 flex gap-2">
+    <!-- Sign Up / Sign In: only in drawer when hidden from bar (below xl) -->
+    <div class="xl:hidden w-full mb-2 flex gap-2">
       <a
         href={`${appBase}/signup`}
         target="_blank"
@@ -121,9 +112,23 @@ const currentPath = Astro.url.pathname;
         Sign In
       </a>
     </div>
-    <div class="h-px bg-white/10 my-2" aria-hidden="true"></div>
+    <div class="xl:hidden h-px bg-white/10 my-2" aria-hidden="true"></div>
+    <!-- Informational content -->
     <div class="flex flex-col gap-2 w-full">
-      {navLinks.map((link) => (
+      {informationalNavLinks.map((link) => (
+        <a
+          href={link.href}
+          class="inline-flex items-center justify-center w-full px-4 py-2 rounded-full text-sm font-medium text-secondary bg-[var(--glass-bg-base)] border border-[var(--glass-border-base)] hover:text-[var(--color-orange-light)] hover:bg-[var(--glass-bg-hover)] transition-colors"
+        >
+          {link.name}
+        </a>
+      ))}
+    </div>
+    <!-- Separator: informational vs workout programming -->
+    <div class="h-px bg-white/10 my-2" aria-hidden="true"></div>
+    <!-- Workout programming content -->
+    <div class="flex flex-col gap-2 w-full">
+      {workoutNavLinks.map((link) => (
         <a
           href={link.href}
           class="inline-flex items-center justify-center w-full px-4 py-2 rounded-full text-sm font-medium text-secondary bg-[var(--glass-bg-base)] border border-[var(--glass-border-base)] hover:text-[var(--color-orange-light)] hover:bg-[var(--glass-bg-hover)] transition-colors"

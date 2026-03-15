@@ -1,6 +1,8 @@
 ---
-// Hero component - Pure Astro (static HTML, no JS)
+// Hero component - Pure Astro (static HTML + typewriter JS)
 // Direct auth: send users to app with auth modal open (no onboarding redirect)
+import '@fontsource/jetbrains-mono/500.css';
+
 const appBase = (import.meta.env.PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com').replace(/\/$/, '');
 const directAuthUrl = `${appBase}?signin=1`;
 ---
@@ -17,7 +19,7 @@ const directAuthUrl = `${appBase}?signin=1`;
       loading="eager"
       fetchpriority="high"
     />
-    <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-dark)] via-[var(--bg-dark)]/80 to-[var(--bg-dark)]/40"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-dark)]/70 via-[var(--bg-dark)]/40 to-[var(--bg-dark)]/20"></div>
   </div>
 
   <!-- Logo watermark (decorative) -->
@@ -27,10 +29,17 @@ const directAuthUrl = `${appBase}?signin=1`;
   
   <!-- Content -->
   <div class="hero-content">
+    <!-- H1: Full-width centered across hero (outside constrained container) -->
+    <header class="hero-h1-section" data-aos="fade-up">
+      <h1 class="hero-h1 text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-extrabold leading-tight gradient-text">
+        Stop Guessing.<br />
+        <span class="hero-h1-accent">Start Training.</span>
+      </h1>
+    </header>
     <div class="hero-content-inner container-custom">
-      <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
-      <!-- Trust Badges -->
-      <div class="flex flex-col items-center gap-3 mb-8">
+      <div class="hero-content-block max-w-4xl text-center md:text-left" data-aos="fade-up">
+      <!-- Trust Badges: horizontal inline -->
+      <div class="flex flex-row flex-wrap gap-2 justify-center md:justify-start mb-8">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--color-orange-light)]/10 border border-[var(--color-orange-light)]/20 text-[var(--color-orange-light)] text-sm font-medium">
           <span class="w-2 h-2 rounded-full bg-[var(--color-orange-light)] animate-pulse"></span>
           Vetted by U.S. Army Master Fitness Trainer.
@@ -41,26 +50,33 @@ const directAuthUrl = `${appBase}?signin=1`;
         </div>
       </div>
       
-      <!-- Headline -->
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-        Stop Guessing. <span class="text-white">Start Training.</span>
-        <br />
-        <span class="gradient-text">The Science-Based AI Workout Generator.</span>
-      </h1>
+      <!-- H2: Left-aligned -->
+      <h2 class="text-white text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-left mb-6">The Science-Based AI Workout Generator.</h2>
       
-      <!-- Subtitle -->
-      <p class="text-lg md:text-xl text-secondary max-w-2xl mx-auto mb-8">
-        Instantly build personalized <strong class="text-primary">Hypertrophy & Strength</strong> cycles tailored to
-        your equipment. Our <strong class="text-primary">Closed-Loop Engine</strong> eliminates algorithmic errors,
-        ensuring every rep is biomechanically valid and safe.
-      </p>
+      <!-- Subtitle: typewriter + engine proof -->
+      <div class="hero-subtitle max-w-4xl mb-8 space-y-4">
+        <p class="text-xl md:text-2xl lg:text-3xl text-white leading-tight font-medium">
+          Instantly build personalized
+          <span class="block mt-2 md:inline md:mt-0">
+            <span id="hero-typewriter" class="hero-typewriter-mono font-bold"></span><span class="hero-typewriter-cursor">&nbsp;</span>
+          </span>
+          <br class="hidden md:block" />
+          cycles tailored to your equipment.
+        </p>
+        <div class="hero-engine-text">
+          <p class="text-base md:text-lg text-tertiary leading-relaxed">
+            Our <span class="text-white font-semibold">Closed-Loop Engine</span> eliminates algorithmic errors,
+            ensuring every rep is biomechanically valid and safe.
+          </p>
+        </div>
+      </div>
       
-      <!-- CTAs: shared .cta-primary / .cta-secondary from design-system; primary = direct auth (app ?signin=1) -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+      <!-- CTAs: primary emphasized, secondary de-emphasized; primary = direct auth (app ?signin=1) -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mb-12">
         <a
           href={directAuthUrl}
           data-cta="hero-generate-workout"
-          class="cta-primary"
+          class="cta-primary text-lg py-4 px-8"
         >
           Generate Workout
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -68,31 +84,31 @@ const directAuthUrl = `${appBase}?signin=1`;
           </svg>
         </a>
         <a
-          href="#journey"
-          data-cta="hero-see-logic"
-          class="cta-secondary"
+          href="/programs"
+          data-cta="hero-choose-plan"
+          class="cta-secondary text-sm py-2 px-4"
         >
-          See the Logic
+          Choose Plan
         </a>
       </div>
       
-      <!-- Stats Grid -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-        <div class="text-center">
-          <p class="text-2xl md:text-3xl font-bold text-[var(--color-orange-light)]">8,000+</p>
-          <p class="text-sm text-tertiary">Athletes Optimized</p>
+      <!-- Stats: slim horizontal strip -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-xl hero-stats">
+        <div class="text-center md:text-left">
+          <p class="text-xl md:text-2xl font-bold text-[var(--color-orange-light)]">8,000+</p>
+          <p class="text-xs md:text-sm text-tertiary">Athletes Optimized</p>
         </div>
-        <div class="text-center">
-          <p class="text-2xl md:text-3xl font-bold text-[var(--color-orange-light)]">15k+</p>
-          <p class="text-sm text-tertiary">Plans Generated</p>
+        <div class="text-center md:text-left">
+          <p class="text-xl md:text-2xl font-bold text-[var(--color-orange-light)]">15k+</p>
+          <p class="text-xs md:text-sm text-tertiary">Plans Generated</p>
         </div>
-        <div class="text-center">
-          <p class="text-2xl md:text-3xl font-bold text-[var(--color-orange-light)]">4.9/5</p>
-          <p class="text-sm text-tertiary">TrustPilot Score</p>
+        <div class="text-center md:text-left">
+          <p class="text-xl md:text-2xl font-bold text-[var(--color-orange-light)]">4.9/5</p>
+          <p class="text-xs md:text-sm text-tertiary">TrustPilot Score</p>
         </div>
-        <div class="text-center">
-          <p class="text-2xl md:text-3xl font-bold text-[var(--color-orange-light)]">Zero</p>
-          <p class="text-sm text-tertiary">Hallucinations</p>
+        <div class="text-center md:text-left">
+          <p class="text-xl md:text-2xl font-bold text-[var(--color-orange-light)]">Zero</p>
+          <p class="text-xs md:text-sm text-tertiary">Hallucinations</p>
         </div>
       </div>
     </div>
@@ -165,9 +181,9 @@ const directAuthUrl = `${appBase}?signin=1`;
     background:
       linear-gradient(
         180deg,
-        rgba(15, 23, 42, 0.85) 0%,
-        rgba(15, 23, 42, 0.9) 50%,
-        rgba(15, 23, 42, 0.95) 100%
+        rgba(15, 23, 42, 0.45) 0%,
+        rgba(15, 23, 42, 0.5) 50%,
+        rgba(15, 23, 42, 0.55) 100%
       ),
       radial-gradient(circle at 0% 0%, rgba(255, 191, 0, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 100% 100%, rgba(255, 128, 0, 0.08) 0%, transparent 50%),
@@ -208,6 +224,10 @@ const directAuthUrl = `${appBase}?signin=1`;
     z-index: 0;
   }
 
+  .hero-bg img {
+    transform: scaleX(-1);
+  }
+
   .hero-watermark {
     position: absolute;
     bottom: 0;
@@ -230,6 +250,7 @@ const directAuthUrl = `${appBase}?signin=1`;
     z-index: 1;
     width: 100%;
     padding: var(--spacing-5xl) var(--spacing-lg);
+    padding-top: calc(var(--spacing-5xl) * 0.25); /* 25% of original — reduces header-to-badges margin by 75% */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -237,17 +258,70 @@ const directAuthUrl = `${appBase}?signin=1`;
     min-height: calc(100vh - var(--navbar-height));
   }
 
+  @media (min-width: 768px) {
+    .hero-content {
+      align-items: flex-start;
+    }
+  }
+
   @media (max-width: 968px) {
     .hero-content {
       padding: var(--spacing-4xl) var(--spacing-lg);
+      padding-top: calc(var(--spacing-4xl) * 0.25); /* 25% of original — reduces header-to-badges margin by 75% */
       min-height: auto;
     }
+  }
+
+  .hero-h1-section {
+    width: 100%;
+    align-self: stretch;
+    text-align: center;
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .hero-h1 {
+    margin: 0;
+  }
+
+  .hero-h1-accent {
+    font-size: 1.25em;
+    line-height: inherit;
   }
 
   .hero-content-inner {
     width: 100%;
     max-width: 1280px;
     margin: 0 auto;
+  }
+
+  .hero-stats {
+    padding-top: 0.5rem;
+  }
+
+  .hero-typewriter-mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    color: var(--color-orange-light);
+  }
+
+  .hero-typewriter-cursor {
+    display: inline-block;
+    width: 2px;
+    background-color: var(--color-orange-light);
+    margin-left: 2px;
+    animation: typewriter-blink 1s infinite;
+  }
+
+  @keyframes typewriter-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .hero-engine-text {
+    color: var(--text-tertiary);
+    border-left: 2px solid rgba(51, 65, 85, 0.8);
+    padding-left: 1rem;
+    margin-top: 0.5rem;
   }
 
   @keyframes pulse {
@@ -263,3 +337,58 @@ const directAuthUrl = `${appBase}?signin=1`;
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 </style>
+
+<script>
+  const trainingGoals = [
+    'Hypertrophy & Strength',
+    'Body Recomposition',
+    'Power & Performance',
+    'Functional Mobility',
+    'Fat Loss & Conditioning',
+  ];
+
+  let goalIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  let typeSpeed = 100;
+
+  function type() {
+    const typewriterEl = document.getElementById('hero-typewriter');
+    if (!typewriterEl) return;
+
+    const currentGoal = trainingGoals[goalIndex];
+
+    if (isDeleting) {
+      typewriterEl.textContent = currentGoal.substring(0, charIndex - 1);
+      charIndex--;
+      typeSpeed = 50;
+    } else {
+      typewriterEl.textContent = currentGoal.substring(0, charIndex + 1);
+      charIndex++;
+      typeSpeed = 100;
+    }
+
+    if (!isDeleting && charIndex === currentGoal.length) {
+      isDeleting = true;
+      typeSpeed = 2500;
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      goalIndex = (goalIndex + 1) % trainingGoals.length;
+      typeSpeed = 500;
+    }
+
+    setTimeout(type, typeSpeed);
+  }
+
+  function initTypewriter() {
+    if (document.getElementById('hero-typewriter')) {
+      setTimeout(type, 1000);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTypewriter);
+  } else {
+    initTypewriter();
+  }
+</script>

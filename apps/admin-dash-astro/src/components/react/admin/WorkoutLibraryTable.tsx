@@ -5,12 +5,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Trash2, Loader2, AlertCircle, Upload, EyeOff, Sparkles } from 'lucide-react';
+import { Edit, Trash2, Loader2, AlertCircle, Upload, EyeOff, Sparkles, Star } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   fetchWorkoutLibrary,
   deleteWorkout,
   updateWorkoutStatus,
 } from '@/lib/supabase/client/workout-persistence';
+import { supabase } from '@/lib/supabase/client';
 import type { WorkoutLibraryItem } from '@/types/ai-workout';
 import { getAllZones } from '@/lib/supabase/client/equipment';
 
@@ -26,6 +28,7 @@ const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onRegenerate 
   const [filter, setFilter] = useState<'all' | 'draft' | 'published'>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [featuredLoadingId, setFeaturedLoadingId] = useState<string | null>(null);
   const [zonesMap, setZonesMap] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
@@ -83,6 +86,39 @@ const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onRegenerate 
       setError(err instanceof Error ? err.message : 'Failed to unpublish workout');
     } finally {
       setPublishingId(null);
+    }
+  };
+
+  const handleFeaturedToggle = async (workout: WorkoutLibraryItem) => {
+    const next = !workout.featuredOnLanding;
+    if (next && workout.status !== 'published') {
+      toast.error('Publish the workout first to feature it on the homepage.');
+      return;
+    }
+    try {
+      setFeaturedLoadingId(workout.id);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const res = await fetch(`/api/admin/workouts/${workout.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        credentials: 'include',
+        body: JSON.stringify({ featured_on_landing: next }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? 'Failed to update');
+      }
+      toast.success(next ? 'Featured on homepage.' : 'Removed from homepage.');
+      await fetchWorkouts();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update');
+    } finally {
+      setFeaturedLoadingId(null);
     }
   };
 
@@ -219,6 +255,23 @@ const WorkoutLibraryTable: React.FC<WorkoutLibraryTableProps> = ({ onRegenerate 
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleFeaturedToggle(item)}
+                          disabled={
+                            featuredLoadingId === item.id ||
+                            (item.featuredOnLanding === false && item.status !== 'published')
+                          }
+                          className="rounded-lg p-2 text-white/60 hover:bg-white/10 hover:text-orange-light disabled:opacity-50"
+                          title={item.featuredOnLanding ? 'Remove from homepage' : 'Feature on homepage'}
+                        >
+                          {featuredLoadingId === item.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Star
+                              className={`h-4 w-4 ${item.featuredOnLanding ? 'fill-orange-light text-orange-light' : ''}`}
+                            />
+                          )}
+                        </button>
                         {item.status === 'published' ? (
                           <button
                             onClick={() => handleUnpublish(item.id)}

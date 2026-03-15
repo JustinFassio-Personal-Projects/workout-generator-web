@@ -1,6 +1,26 @@
 {
   "installCommand": "npm install",
   "buildCommand": "npm run build",
+  "headers": [
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=60, stale-while-revalidate=300"
+        }
+      ]
+    },
+    {
+      "source": "/explore",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=60, stale-while-revalidate=300"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/admin",
@@ -49,6 +69,14 @@
     {
       "source": "/challenges/:path*",
       "destination": "https://programs.aiworkoutgenerator.com/challenges/:path*"
+    },
+    {
+      "source": "/workouts",
+      "destination": "https://programs.aiworkoutgenerator.com/workouts"
+    },
+    {
+      "source": "/workouts/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/workouts/:path*"
     }
   ]
 }

@@ -8,6 +8,7 @@ import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import {
   fetchWorkoutDocument,
   updateWorkoutSet,
+  updateWorkoutFeatured,
   deleteWorkoutSet,
 } from '@/lib/supabase/admin/workout-sets';
 import type { WorkoutSetTemplate, WorkoutConfig } from '@/types/ai-workout';
@@ -68,6 +69,7 @@ export const PATCH: APIRoute = async ({ request, params, cookies }) => {
 
     let body: {
       status?: 'draft' | 'published';
+      featured_on_landing?: boolean;
       workoutSet?: WorkoutSetTemplate;
       workoutConfig?: WorkoutConfig;
     };
@@ -80,11 +82,40 @@ export const PATCH: APIRoute = async ({ request, params, cookies }) => {
       });
     }
 
-    await updateWorkoutSet(workoutId, {
-      status: body.status,
-      workoutSet: body.workoutSet,
-      workoutConfig: body.workoutConfig,
-    });
+    const hasFeatured = typeof body.featured_on_landing === 'boolean';
+    const hasOther =
+      body.status !== undefined ||
+      body.workoutSet !== undefined ||
+      body.workoutConfig !== undefined;
+    if (!hasFeatured && !hasOther) {
+      return new Response(
+        JSON.stringify({
+          error:
+            'Provide at least one field: status, featured_on_landing, workoutSet, or workoutConfig',
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    if (hasFeatured && body.featured_on_landing === true) {
+      const doc = await fetchWorkoutDocument(workoutId);
+      if (doc.status !== 'published') {
+        return new Response(
+          JSON.stringify({ error: 'Publish the workout first to feature it on the homepage.' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    if (hasOther) {
+      await updateWorkoutSet(workoutId, {
+        status: body.status,
+        featured_on_landing: body.featured_on_landing,
+        workoutSet: body.workoutSet,
+        workoutConfig: body.workoutConfig,
+      });
+    } else if (hasFeatured) {
+      await updateWorkoutFeatured(workoutId, body.featured_on_landing!);
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,

@@ -10,7 +10,10 @@ const zones = await getAllZonesServer();
 const zonesForClient = zones.map((z) => ({ id: z.id, name: z.name }));
 ---
 
-<BaseLayout title="Programs | AI Fitcopilot | AI-Powered Hypertrophy & Tactical Workout Programs.">
+<BaseLayout
+  title="Programs | AI Fitcopilot | AI-Powered Hypertrophy & Tactical Workout Programs."
+  description="Browse science-based training programs. Hypertrophy and tactical workout plans."
+>
   <div
     class="relative min-h-screen overflow-x-hidden text-white selection:bg-orange-light selection:text-black"
   >

@@ -69,6 +69,9 @@ export const GET: APIRoute = async () => {
     { path: '/reports', priority: 0.8, changefreq: 'weekly' as const },
     { path: '/deep-research', priority: 0.8, changefreq: 'weekly' as const },
     { path: '/videos', priority: 0.7, changefreq: 'weekly' as const },
+    { path: '/exercises', priority: 0.9, changefreq: 'weekly' as const },
+    { path: '/learn', priority: 0.9, changefreq: 'weekly' as const },
+    { path: '/explore', priority: 0.9, changefreq: 'weekly' as const },
   ]
 
   for (const page of staticPages) {

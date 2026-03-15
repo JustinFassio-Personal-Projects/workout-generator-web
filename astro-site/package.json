@@ -22,6 +22,7 @@
     "@astrojs/vercel": "^9.0.4",
     "@fontsource/cinzel": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/space-grotesk": "^5.2.10",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.93.3",

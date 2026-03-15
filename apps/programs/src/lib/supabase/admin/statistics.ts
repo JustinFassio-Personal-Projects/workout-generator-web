@@ -168,12 +168,43 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   });
 
   try {
-    const [users, programs, logs] = await Promise.all([
+    const [usersResult, programsResult, logsResult] = await Promise.allSettled([
       Promise.race([getAllUsersServer(), timeout]),
       Promise.race([getAllProgramsServer(), timeout]),
       Promise.race([getAllLogsServer(), timeout]),
     ]);
     clearTimeout(timeoutId);
+
+    const isTimeout = (r: PromiseSettledResult<unknown>) =>
+      r.status === 'rejected' && (r.reason as Error)?.message === 'STATS_TIMEOUT';
+    if ([usersResult, programsResult, logsResult].some(isTimeout)) {
+      throw new Error('STATS_TIMEOUT');
+    }
+
+    // Propagate any fetch failure so the API returns 5xx and the UI can show an error,
+    // instead of returning 200 with misleading empty stats (e.g. totalUsers: 0).
+    if (usersResult.status === 'rejected') {
+      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+        console.error('[getDashboardStats] getAllUsersServer failed:', usersResult.reason);
+      }
+      throw usersResult.reason;
+    }
+    if (programsResult.status === 'rejected') {
+      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+        console.error('[getDashboardStats] getAllProgramsServer failed:', programsResult.reason);
+      }
+      throw programsResult.reason;
+    }
+    if (logsResult.status === 'rejected') {
+      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+        console.error('[getDashboardStats] getAllLogsServer failed (workout_logs may be missing):', logsResult.reason);
+      }
+      throw logsResult.reason;
+    }
+
+    const users = usersResult.value;
+    const programs = programsResult.value;
+    const logs = logsResult.value;
 
     const growthRate = calculateGrowthRate(users);
     const recentLogs = logs.slice(0, 20);

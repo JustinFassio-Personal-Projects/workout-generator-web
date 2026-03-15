@@ -53,6 +53,18 @@ The **programs** app (`apps/programs`) provides the content admin (programs, wor
 2. **Vercel logs:** In the programs Vercel project, go to Deployments, select the deployment, then Functions or Runtime Logs. Reproduce the 500 and check the serverless function logs for the actual error.  
 3. **Env vars:** The app needs at least `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` in the programs project (Settings → Environment Variables). Add any missing variables for Production, then redeploy.
 
+**Programs app: 404 on profiles / user_programs / user_workout_logs**  
+The error `Could not find the table 'public.profiles' in the schema cache` means the Supabase project used by the programs app does not have the programs schema. Apply the missing tables:
+
+1. Open the **Supabase project** (the one whose URL is in `PUBLIC_SUPABASE_URL` for programs-admin) → **SQL Editor**.
+2. Run the one-time script **`apps/programs/docs/RUN_PROGRAMS_MISSING_TABLES.sql`** (creates `profiles`, `user_workout_logs`, `user_programs`, `workout_logs`, `warmup_config`, `generated_wods`, RLS, trigger, and backfills profiles from auth.users).
+3. Set your admin user to role `admin`:  
+   `UPDATE public.profiles SET role = 'admin' WHERE id = 'YOUR_USER_UUID';`  
+   (Get the UUID from Supabase → Authentication → Users.)
+4. Reload the programs-admin site and log in again.
+
+Alternatively, from the repo run all programs migrations: `cd apps/programs && npm run db:push` (requires Supabase CLI linked to the same project).
+
 ## nextjs-backend: "Site Not Found – This tenant site does not exist"
 
 If the nextjs-backend deployment URL (e.g. `nextjs-backend-xxx.vercel.app`) shows this error, the proxy was treating the hostname as a tenant domain. Ensure `proxy.ts` treats `*.vercel.app` and `app.aiworkoutgenerator.com` as platform domains (no tenant rewrite). After deploy, the homepage should load.

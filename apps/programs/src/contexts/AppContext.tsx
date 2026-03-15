@@ -121,6 +121,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       if (error) {
         console.error('Error fetching profile:', error);
+        // Fallback: set minimal user from session so admin dashboard can render (server already verified admin).
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (currentSession?.user) {
+          const u = currentSession.user;
+          const role = (u.app_metadata?.role as 'trainer' | 'client' | 'admin') ?? (u.user_metadata?.role as 'trainer' | 'client' | 'admin') ?? 'client';
+          setUser({
+            uid: u.id,
+            email: u.email ?? null,
+            displayName: u.user_metadata?.full_name ?? undefined,
+            role,
+            avatarUrl: u.user_metadata?.avatar_url ?? undefined,
+            isAdmin: role === 'admin',
+            createdAt: u.created_at ?? new Date().toISOString(),
+            purchasedIndex: null,
+          });
+        }
         return;
       }
 
@@ -138,6 +154,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     } catch (err) {
       console.error('Profile fetch failed', err);
+      // Fallback: set minimal user from session so UI (e.g. admin dashboard) can render.
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (currentSession?.user) {
+        const u = currentSession.user;
+        const role = (u.app_metadata?.role as 'trainer' | 'client' | 'admin') ?? (u.user_metadata?.role as 'trainer' | 'client' | 'admin') ?? 'client';
+        setUser({
+          uid: u.id,
+          email: u.email ?? null,
+          displayName: u.user_metadata?.full_name ?? undefined,
+          role,
+          avatarUrl: u.user_metadata?.avatar_url ?? undefined,
+          isAdmin: role === 'admin',
+          createdAt: u.created_at ?? new Date().toISOString(),
+          purchasedIndex: null,
+        });
+      }
     }
   };
 

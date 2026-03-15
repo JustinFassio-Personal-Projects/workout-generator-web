@@ -31,6 +31,9 @@ export default defineConfig({
     AstroPWA({
       manifest: false,
       workbox: {
+        // Disable navigation fallback so Workbox does not try to serve "/" from precache (SSR app).
+        // Fixes: "non-precached-url" error when opening / or /admin in production.
+        navigateFallback: null,
         globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         runtimeCaching: [

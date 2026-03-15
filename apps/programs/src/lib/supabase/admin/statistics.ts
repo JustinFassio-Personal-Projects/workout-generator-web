@@ -167,13 +167,47 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     timeoutId = setTimeout(() => reject(new Error('STATS_TIMEOUT')), STATS_TIMEOUT_MS);
   });
 
+  const emptyStats: DashboardStats = {
+    totalUsers: 0,
+    totalPrograms: 0,
+    totalWorkoutsLogged: 0,
+    growthRate: null,
+    recentActivity: [],
+  };
+
   try {
-    const [users, programs, logs] = await Promise.all([
+    const [usersResult, programsResult, logsResult] = await Promise.allSettled([
       Promise.race([getAllUsersServer(), timeout]),
       Promise.race([getAllProgramsServer(), timeout]),
       Promise.race([getAllLogsServer(), timeout]),
     ]);
     clearTimeout(timeoutId);
+
+    const isTimeout = (r: PromiseSettledResult<unknown>) =>
+      r.status === 'rejected' && (r.reason as Error)?.message === 'STATS_TIMEOUT';
+    if ([usersResult, programsResult, logsResult].some(isTimeout)) {
+      throw new Error('STATS_TIMEOUT');
+    }
+
+    const users = usersResult.status === 'fulfilled' ? usersResult.value : [];
+    const programs = programsResult.status === 'fulfilled' ? programsResult.value : [];
+    const logs = logsResult.status === 'fulfilled' ? logsResult.value : [];
+
+    if (usersResult.status === 'rejected') {
+      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+        console.error('[getDashboardStats] getAllUsersServer failed:', usersResult.reason);
+      }
+    }
+    if (programsResult.status === 'rejected') {
+      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+        console.error('[getDashboardStats] getAllProgramsServer failed:', programsResult.reason);
+      }
+    }
+    if (logsResult.status === 'rejected') {
+      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+        console.error('[getDashboardStats] getAllLogsServer failed (workout_logs may be missing):', logsResult.reason);
+      }
+    }
 
     const growthRate = calculateGrowthRate(users);
     const recentLogs = logs.slice(0, 20);

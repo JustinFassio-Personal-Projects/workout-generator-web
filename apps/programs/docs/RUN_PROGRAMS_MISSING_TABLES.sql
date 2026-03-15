@@ -71,7 +71,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- After running this script, set your admin user(s) to role 'admin' in the SQL Editor:
 --   UPDATE public.profiles SET role = 'admin' WHERE id = 'YOUR_USER_UUID';
--- (Get YOUR_USER_UUID from Authentication → Users in the Supabase dashboard, or from the 404 URL id=eq.xxx)
+-- (Get YOUR_USER_UUID from Authentication -> Users in the Supabase dashboard, or from the 404 URL id=eq.xxx)
 
 
 -- 2. user_workout_logs (for workout history / dashboard)

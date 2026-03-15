@@ -9,22 +9,22 @@ The **programs** app (programs-admin) uses **only** `public.profiles.role` for a
 ## How to update the current user to super admin
 
 1. Open your **Supabase** project (the one used by programs-admin) -> **SQL Editor**.
-2. Run (replace the UUID with your user’s id from **Authentication -> Users**):
+2. Run (replace `YOUR_USER_UUID` with your user’s id from **Authentication -> Users**):
 
 ```sql
 UPDATE public.profiles
 SET role = 'admin'
-WHERE id = 'd5c04a57-9724-45c9-9eb1-552806359b52';
+WHERE id = 'YOUR_USER_UUID';
 ```
 
-3. If that user has no row in `profiles` yet (e.g. created before the trigger existed), insert one then set role:
+3. If that user has no row in `profiles` yet (e.g. created before the trigger existed), insert one then set role (replace placeholders):
 
 ```sql
 INSERT INTO public.profiles (id, email, full_name, role)
 VALUES (
-  'd5c04a57-9724-45c9-9eb1-552806359b52',
-  'justin@aiworkoutgen.app',
-  'Justin Fassio',
+  'YOUR_USER_UUID',
+  'your@email.example',
+  'Your Name',
   'admin'
 )
 ON CONFLICT (id) DO UPDATE SET role = 'admin', email = EXCLUDED.email, full_name = EXCLUDED.full_name;

@@ -8,12 +8,13 @@ ALTER TABLE public.user_programs
 UPDATE public.user_programs SET source = 'self' WHERE source IS NULL;
 ALTER TABLE public.user_programs ALTER COLUMN source SET NOT NULL;
 
--- 2. Set this user as super admin (programs app uses only profiles.role; no admin_users table).
+-- 2. Set your user as super admin (programs app uses only profiles.role; no admin_users table).
+-- Replace YOUR_USER_UUID with your user id from Supabase -> Authentication -> Users.
 UPDATE public.profiles
 SET role = 'admin'
-WHERE id = 'd5c04a57-9724-45c9-9eb1-552806359b52';
+WHERE id = 'YOUR_USER_UUID';
 
--- If the user has no profile row yet (e.g. backfill missed them), uncomment and run instead:
+-- If the user has no profile row yet (e.g. backfill missed them), uncomment and run instead (replace placeholders):
 -- INSERT INTO public.profiles (id, email, full_name, role)
--- VALUES ('d5c04a57-9724-45c9-9eb1-552806359b52', 'justin@aiworkoutgen.app', 'Justin Fassio', 'admin')
+-- VALUES ('YOUR_USER_UUID', 'your@email.example', 'Your Name', 'admin')
 -- ON CONFLICT (id) DO UPDATE SET role = 'admin', email = EXCLUDED.email, full_name = EXCLUDED.full_name;

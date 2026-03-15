@@ -167,14 +167,6 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     timeoutId = setTimeout(() => reject(new Error('STATS_TIMEOUT')), STATS_TIMEOUT_MS);
   });
 
-  const emptyStats: DashboardStats = {
-    totalUsers: 0,
-    totalPrograms: 0,
-    totalWorkoutsLogged: 0,
-    growthRate: null,
-    recentActivity: [],
-  };
-
   try {
     const [usersResult, programsResult, logsResult] = await Promise.allSettled([
       Promise.race([getAllUsersServer(), timeout]),

@@ -8,8 +8,8 @@ The **programs** app (programs-admin) uses **only** `public.profiles.role` for a
 
 ## How to update the current user to super admin
 
-1. Open your **Supabase** project (the one used by programs-admin) → **SQL Editor**.
-2. Run (replace the UUID with your user’s id from **Authentication → Users**):
+1. Open your **Supabase** project (the one used by programs-admin) -> **SQL Editor**.
+2. Run (replace the UUID with your user’s id from **Authentication -> Users**):
 
 ```sql
 UPDATE public.profiles

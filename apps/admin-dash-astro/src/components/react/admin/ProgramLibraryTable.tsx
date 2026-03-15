@@ -8,6 +8,7 @@ import { Edit, Trash2, Loader2, Globe, GlobeLock, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { fetchPrograms, deleteProgram } from '@/lib/supabase/admin/programs';
 import type { ProgramLibraryItem } from '@/lib/supabase/admin/programs';
+import { supabase } from '@/lib/supabase/client';
 import { useAppContext } from '@/contexts/AppContext';
 import DeleteProgramModal from './DeleteProgramModal';
 
@@ -114,9 +115,15 @@ const ProgramLibraryTable: React.FC<ProgramLibraryTableProps> = ({ onEdit, onDel
     }
     try {
       setFeaturedLoadingId(program.id);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const res = await fetch(`/api/admin/programs/${program.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
         credentials: 'include',
         body: JSON.stringify({ featured_on_landing: next }),
       });

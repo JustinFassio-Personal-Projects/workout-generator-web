@@ -96,16 +96,8 @@ export const PATCH: APIRoute = async ({ request, params, cookies }) => {
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
-    if (hasFeatured && body.featured_on_landing === true) {
-      const doc = await fetchWorkoutDocument(workoutId);
-      if (doc.status !== 'published') {
-        return new Response(
-          JSON.stringify({ error: 'Publish the workout first to feature it on the homepage.' }),
-          { status: 400, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
+    // Rely on DB constraint (workout_sets_featured_requires_published) for featured-on-landing;
+    // avoid extra fetch and TOCTOU by catching CHECK violation and returning a clear error.
     if (hasOther) {
       await updateWorkoutSet(workoutId, {
         status: body.status,
@@ -114,7 +106,18 @@ export const PATCH: APIRoute = async ({ request, params, cookies }) => {
         workoutConfig: body.workoutConfig,
       });
     } else if (hasFeatured) {
-      await updateWorkoutFeatured(workoutId, body.featured_on_landing!);
+      try {
+        await updateWorkoutFeatured(workoutId, body.featured_on_landing!);
+      } catch (err: unknown) {
+        const code = err && typeof err === 'object' && 'code' in err ? (err as { code: string }).code : '';
+        if (code === '23514') {
+          return new Response(
+            JSON.stringify({ error: 'Publish the workout first to feature it on the homepage.' }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+        throw err;
+      }
     }
 
     return new Response(JSON.stringify({ ok: true }), {

@@ -48,6 +48,11 @@ The **programs** app (`apps/programs`) provides the content admin (programs, wor
 
 **Opening the Content Admin from the marketing site (astro-site):** Set `PUBLIC_PROGRAMS_ADMIN_URL` in the astro-site Vercel project (or local `.env`) to the programs app root (e.g. `https://programs.aiworkoutgenerator.com`). The astro-site footer then shows an **Admin** link under Support that goes to `{PUBLIC_PROGRAMS_ADMIN_URL}/admin`. If the variable is unset, the link is hidden. The main site’s `/admin` path is proxied to **admin-dash-astro** (content admin) via astro-site rewrites.
 
+**Programs app: 500 Internal Server Error on GET /**  
+1. **Monorepo build:** Ensure `apps/programs/vercel.json` exists with `installCommand` and `buildCommand` that run from the repo root (e.g. `cd ../.. && npm install` and `cd ../.. && npx turbo run build --filter=programs`). Without this, workspace packages may not resolve and the server can throw at runtime.  
+2. **Vercel logs:** In the programs Vercel project, go to Deployments, select the deployment, then Functions or Runtime Logs. Reproduce the 500 and check the serverless function logs for the actual error.  
+3. **Env vars:** The app needs at least `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` in the programs project (Settings → Environment Variables). Add any missing variables for Production, then redeploy.
+
 ## nextjs-backend: "Site Not Found – This tenant site does not exist"
 
 If the nextjs-backend deployment URL (e.g. `nextjs-backend-xxx.vercel.app`) shows this error, the proxy was treating the hostname as a tenant domain. Ensure `proxy.ts` treats `*.vercel.app` and `app.aiworkoutgenerator.com` as platform domains (no tenant rewrite). After deploy, the homepage should load.

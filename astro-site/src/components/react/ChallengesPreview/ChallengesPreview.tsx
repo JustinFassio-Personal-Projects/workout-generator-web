@@ -30,7 +30,7 @@ export function ChallengesPreview({ challenges }: ChallengesPreviewProps) {
         <div className={styles.grid}>
           {challenges.map((challenge) => (
             <article key={challenge.id} className={`glass-card overflow-hidden group ${styles.card}`}>
-              <a href={`/challenges/${challenge.id}`} className="block">
+              <a href={`/challenges/${challenge.id}`} className="block" data-cta="challenges-preview-card">
                 {challenge.hero_image_url && (
                   <div className={styles.imageWrapper}>
                     <img
@@ -56,7 +56,7 @@ export function ChallengesPreview({ challenges }: ChallengesPreviewProps) {
           ))}
         </div>
         <div className={styles.footer}>
-          <a href="/challenges" className={styles.ctaLink}>
+          <a href="/challenges" className={styles.ctaLink} data-cta="challenges-preview-view-all">
             View All Challenges
             <ArrowRight className={styles.ctaIcon} aria-hidden />
           </a>

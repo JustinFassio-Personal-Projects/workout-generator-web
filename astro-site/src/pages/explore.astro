@@ -1,0 +1,85 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Footer from '@/components/landing/Footer.astro';
+import { ProgramsPreview } from '@/components/react/ProgramsPreview/ProgramsPreview';
+import { ChallengesPreview } from '@/components/react/ChallengesPreview/ChallengesPreview';
+import { WorkoutsPreview } from '@/components/react/WorkoutsPreview/WorkoutsPreview';
+import { ExercisesLearnPreview } from '@/components/react/ExercisesLearnPreview/ExercisesLearnPreview';
+import { getFeaturedContent } from '@/lib/featured/queries';
+
+export const prerender = false;
+
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'https://aiworkoutgenerator.com';
+
+const content = await getFeaturedContent(Astro.cookies);
+---
+
+<BaseLayout
+  title="Explore | AI Workout Generator"
+  description="Explore programs, challenges, workouts, exercises, and the Learning Center. Science-based fitness content in one place."
+  canonicalUrl={`${baseUrl}/explore`}
+>
+  <main class="min-h-screen text-white">
+    <section class="section-padding border-b border-white/10">
+      <div class="container-custom text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">
+          Explore
+          <span class="bg-gradient-to-r from-[var(--color-orange-light)] to-[var(--color-orange-medium)] bg-clip-text text-transparent"> Content</span>
+        </h1>
+        <p class="text-xl text-secondary max-w-2xl mx-auto">
+          Programs, challenges, workouts, exercises, and the Learning Center—all in one place.
+        </p>
+      </div>
+    </section>
+
+    <!-- Programs (sectionOrder: programs first) -->
+    {content.programs.length > 0 ? (
+      <ProgramsPreview programs={content.programs} />
+    ) : (
+      <section class="section-padding border-b border-white/10">
+        <div class="container-custom text-center max-w-xl mx-auto">
+          <h2 class="text-2xl font-bold mb-2">Featured Programs</h2>
+          <p class="text-secondary mb-4">No featured programs yet.</p>
+          <a href="/programs" class="text-[var(--color-orange-light)] font-semibold hover:underline">
+            View all programs →
+          </a>
+        </div>
+      </section>
+    )}
+
+    <!-- Challenges -->
+    {content.challenges.length > 0 ? (
+      <ChallengesPreview challenges={content.challenges} />
+    ) : (
+      <section class="section-padding border-b border-white/10">
+        <div class="container-custom text-center max-w-xl mx-auto">
+          <h2 class="text-2xl font-bold mb-2">Featured Challenges</h2>
+          <p class="text-secondary mb-4">No featured challenges yet.</p>
+          <a href="/challenges" class="text-[var(--color-orange-light)] font-semibold hover:underline">
+            View all challenges →
+          </a>
+        </div>
+      </section>
+    )}
+
+    <!-- Workouts -->
+    {content.workouts.length > 0 ? (
+      <WorkoutsPreview workouts={content.workouts} />
+    ) : (
+      <section class="section-padding border-b border-white/10">
+        <div class="container-custom text-center max-w-xl mx-auto">
+          <h2 class="text-2xl font-bold mb-2">Featured Workouts</h2>
+          <p class="text-secondary mb-4">No featured workouts yet.</p>
+          <a href="/workouts" class="text-[var(--color-orange-light)] font-semibold hover:underline">
+            View all workouts →
+          </a>
+        </div>
+      </section>
+    )}
+
+    <!-- Exercises & Learn (static CTAs) -->
+    <ExercisesLearnPreview />
+
+    <Footer />
+  </main>
+</BaseLayout>

@@ -60,11 +60,21 @@ const pageTitle =
       ? `${preview.metadata.title} | AI Fitcopilot | AI-Powered Hypertrophy & Tactical Workout Programs.`
       : 'Not Found | AI Fitcopilot | AI-Powered Hypertrophy & Tactical Workout Programs.';
 
+const pageDescription =
+  showActiveView && fullProgram
+    ? fullProgram.description || `${fullProgram.title} — ${fullProgram.durationWeeks}-week training program`
+    : preview
+      ? preview.metadata.description || `${preview.metadata.title} — ${preview.metadata.durationWeeks}-week training program`
+      : undefined;
+
+const siteUrl = Astro.url.origin;
+const canonicalPageUrl = programId && !notFound ? `${siteUrl}/programs/${programId}` : undefined;
+
 const breadcrumbTitle =
   (showActiveView && fullProgram ? fullProgram.title : preview?.metadata.title) ?? 'Program';
 ---
 
-<BaseLayout title={pageTitle}>
+<BaseLayout title={pageTitle} description={pageDescription} canonicalUrl={canonicalPageUrl}>
   <div
     class="relative min-h-screen overflow-x-hidden text-white selection:bg-orange-light selection:text-black"
   >

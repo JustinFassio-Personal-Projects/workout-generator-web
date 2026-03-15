@@ -257,4 +257,5 @@ export interface WorkoutChainMetadata {
  */
 export interface WorkoutLibraryItem extends WorkoutMetadata {
   id: string;
+  featuredOnLanding?: boolean;
 }

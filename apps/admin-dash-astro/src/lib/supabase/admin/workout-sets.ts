@@ -38,6 +38,7 @@ type Row = {
   description: string | null;
   author_id: string;
   status: string;
+  featured_on_landing?: boolean;
   config: ConfigRow | null;
   chain_metadata: Record<string, unknown> | null;
   workouts: WorkoutInSet[];
@@ -76,6 +77,7 @@ function rowToLibraryItem(row: Row): WorkoutLibraryItem {
     updatedAt: new Date(row.updated_at),
     authorId: row.author_id,
     workoutCount: row.workout_count ?? (Array.isArray(row.workouts) ? row.workouts.length : 0),
+    featuredOnLanding: row.featured_on_landing ?? false,
   };
 }
 
@@ -89,7 +91,7 @@ export async function fetchWorkoutLibrary(): Promise<WorkoutLibraryItem[]> {
     const { data, error } = await supabase
       .from('workout_sets')
       .select(
-        'id, title, description, author_id, status, config, chain_metadata, workouts, workout_count, created_at, updated_at'
+        'id, title, description, author_id, status, featured_on_landing, config, chain_metadata, workouts, workout_count, created_at, updated_at'
       )
       .order('created_at', { ascending: false });
 
@@ -233,6 +235,7 @@ export async function updateWorkoutSet(
   workoutId: string,
   updates: {
     status?: 'draft' | 'published';
+    featured_on_landing?: boolean;
     workoutSet?: WorkoutSetTemplate;
     workoutConfig?: WorkoutConfig;
   }
@@ -242,6 +245,9 @@ export async function updateWorkoutSet(
 
   if (updates.status !== undefined) {
     updatePayload.status = updates.status;
+  }
+  if (typeof updates.featured_on_landing === 'boolean') {
+    updatePayload.featured_on_landing = updates.featured_on_landing;
   }
   if (updates.workoutSet) {
     const normalized = normalizeWorkoutSet(updates.workoutSet);
@@ -311,6 +317,18 @@ export async function updateWorkoutStatus(
   const { error } = await supabase
     .from('workout_sets')
     .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', workoutId);
+  if (error) throw error;
+}
+
+export async function updateWorkoutFeatured(
+  workoutId: string,
+  featuredOnLanding: boolean
+): Promise<void> {
+  const supabase = getSupabaseServer();
+  const { error } = await supabase
+    .from('workout_sets')
+    .update({ featured_on_landing: featuredOnLanding, updated_at: new Date().toISOString() })
     .eq('id', workoutId);
   if (error) throw error;
 }

@@ -59,9 +59,15 @@ const pageTitle = exercise
 const pageDescription = exercise
   ? `Learn the biomechanics of ${exercise.exerciseName}. Performance cues, common mistakes, and detailed analysis.`
   : 'Exercise not found';
+
+const siteUrl = Astro.url.origin;
+const canonicalPageUrl = slug ? `${siteUrl}/exercises/${slug}` : undefined;
+const ogImage = exercise?.imageUrl
+  ? (exercise.imageUrl.startsWith('http') ? exercise.imageUrl : `${siteUrl}${exercise.imageUrl.startsWith('/') ? '' : '/'}${exercise.imageUrl}`)
+  : undefined;
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
+<BaseLayout title={pageTitle} description={pageDescription} canonicalUrl={canonicalPageUrl} ogImage={ogImage}>
   <div
     class="relative min-h-screen overflow-x-hidden text-white selection:bg-orange-light selection:text-black"
   >

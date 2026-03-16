@@ -99,6 +99,10 @@
       "destination": "https://programs.aiworkoutgenerator.com/api/workouts/:path*"
     },
     {
+      "source": "/api/ai",
+      "destination": "https://programs.aiworkoutgenerator.com/api/ai"
+    },
+    {
       "source": "/api/ai/:path*",
       "destination": "https://programs.aiworkoutgenerator.com/api/ai/:path*"
     },

@@ -82,9 +82,9 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     .map(([date, count]) => ({ date, count }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  // Sign-ins by day: analytics_events account_login_complete
+  // Sign-ins by day: analytics_funnel_events account_login_complete
   const { data: loginRows } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('timestamp')
     .eq('event_name', 'account_login_complete')
     .gte('timestamp', fromIso)
@@ -103,7 +103,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
 
   // OAuth vs email from events (override or supplement auth): account_signup_complete / account_login_complete properties
   const { data: methodRows } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('properties')
     .in('event_name', ['account_signup_complete', 'account_login_complete'])
     .gte('timestamp', fromIso)
@@ -141,7 +141,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
 
   // Funnel firstAction: distinct user_id with timer_session_complete or hub_timer_launch_1
   const { data: keyEventRows } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('user_id')
     .in('event_name', ['timer_session_complete', 'hub_timer_launch_1'])
     .gte('timestamp', fromIso)
@@ -154,7 +154,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
 
   // TTFKA: users with account_signup_complete in range -> first key event timestamp
   const { data: signupEvents } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('user_id, timestamp')
     .eq('event_name', 'account_signup_complete')
     .gte('timestamp', fromIso)
@@ -172,7 +172,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
 
   // First key event per user for TTFKA; limit 10k may undercount if key events exceed that globally.
   const { data: firstKeyEvents } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('user_id, timestamp')
     .in('event_name', ['timer_session_complete', 'hub_timer_launch_1'])
     .not('user_id', 'is', null)

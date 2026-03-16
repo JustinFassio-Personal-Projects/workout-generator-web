@@ -1,4 +1,4 @@
--- Tighten analytics_events RLS to prevent user impersonation.
+-- Admin-dash-astro Analytics: tighten analytics_events RLS to prevent user impersonation.
 -- anon: can only insert anonymous events (user_id must be null).
 -- authenticated: user_id must be null or auth.uid() (no spoofing other users).
 

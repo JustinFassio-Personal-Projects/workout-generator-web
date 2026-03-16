@@ -1,5 +1,6 @@
--- Phase 6: Activation analytics events table for funnel tracking
--- Events: timer_session_complete, timer_save_click, account_land_handoff, etc.
+-- Admin-dash-astro Analytics: activation/funnel events table.
+-- Run in the Supabase project used by this app (see PUBLIC_SUPABASE_URL in .env).
+-- Events: timer_session_complete, timer_save_click, account_land_handoff, account_signup_complete, etc.
 
 CREATE TABLE IF NOT EXISTS public.analytics_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

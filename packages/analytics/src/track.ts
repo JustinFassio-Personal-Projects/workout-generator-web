@@ -37,7 +37,7 @@ export interface TrackEventOptions {
 }
 
 /**
- * Track a funnel event. Inserts into analytics_events via Supabase.
+ * Track a funnel event. Inserts into analytics_funnel_events via Supabase.
  * Fire-and-forget; errors are logged in dev only.
  */
 export async function trackEvent(
@@ -74,7 +74,7 @@ export async function trackEvent(
     app_id: options?.appId ?? null,
   };
 
-  const { error } = await supabase.from('analytics_events').insert(row);
+  const { error } = await supabase.from('analytics_funnel_events').insert(row);
   if (error && import.meta.env?.DEV) {
     console.warn('[analytics] trackEvent failed:', error);
   }

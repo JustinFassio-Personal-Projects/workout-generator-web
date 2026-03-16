@@ -31,6 +31,9 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     }
     if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
       console.error('[admin/analytics/acquisition] Error:', error);
+      if (error && typeof (error as { code?: string; details?: string }).code !== 'undefined') {
+        console.error('[admin/analytics/acquisition] Supabase error:', (error as { code?: string; details?: string; message?: string }).code, (error as { details?: string }).details, (error as { message?: string }).message);
+      }
     }
     return new Response(JSON.stringify({ error: 'Failed to fetch acquisition stats' }), {
       status: 500,

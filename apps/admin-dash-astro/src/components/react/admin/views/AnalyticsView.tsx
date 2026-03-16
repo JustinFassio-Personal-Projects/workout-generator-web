@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  *
- * Analytics dashboard shell (Phase 0). Overview from analytics_events; Phase 1 Acquisition section.
+ * Analytics dashboard shell (Phase 0). Overview from analytics_funnel_events; Phase 1 Acquisition section.
  */
 
 import React, { useState, useEffect } from 'react';

@@ -1,5 +1,5 @@
--- RPC for Phase 1 acquisition stats (avoids pulling large web_events into app).
--- Returns JSON: uniqueVisitorsByDay, topReferrers, utmBreakdown, topLandingPages, deviceBrowser, geo.
+-- Admin-dash-astro Analytics: RPC for acquisition stats (avoids pulling large web_events into app).
+-- Depends on public.web_events. Returns JSON: uniqueVisitorsByDay, topReferrers, utmBreakdown, topLandingPages, deviceBrowser, geo.
 
 CREATE OR REPLACE FUNCTION public.get_acquisition_stats(p_days int DEFAULT 30)
 RETURNS jsonb
@@ -88,3 +88,8 @@ BEGIN
   RETURN result;
 END;
 $$;
+
+-- Allow service_role and anon to call the RPC (admin API uses getSupabaseServer() which may use either key).
+GRANT EXECUTE ON FUNCTION public.get_acquisition_stats(int) TO service_role;
+GRANT EXECUTE ON FUNCTION public.get_acquisition_stats(int) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_acquisition_stats(int) TO anon;

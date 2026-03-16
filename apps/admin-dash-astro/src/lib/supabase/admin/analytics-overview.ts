@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  *
- * Analytics overview: total events and distinct users in a date range from analytics_events.
+ * Analytics overview: total events and distinct users in a date range from analytics_funnel_events.
  */
 
 import { getSupabaseServer } from '../server';
@@ -22,7 +22,7 @@ export async function getAnalyticsOverview(days: number): Promise<AnalyticsOverv
   const toIso = toDate.toISOString();
 
   const { count: totalEvents, error: countError } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('id', { count: 'exact', head: true })
     .gte('timestamp', fromIso)
     .lte('timestamp', toIso);
@@ -30,7 +30,7 @@ export async function getAnalyticsOverview(days: number): Promise<AnalyticsOverv
   if (countError) throw countError;
 
   const { data: userRows, error: userError } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('user_id')
     .gte('timestamp', fromIso)
     .lte('timestamp', toIso)

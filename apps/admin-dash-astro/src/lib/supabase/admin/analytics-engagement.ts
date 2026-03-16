@@ -46,7 +46,7 @@ export async function getEngagementStats(days: number): Promise<EngagementStats>
   const from7 = dateKey(sevenDaysAgo);
   const from30 = dateKey(thirtyDaysAgo);
 
-  // Distinct user_id per day from analytics_events and web_events (union per date)
+  // Distinct user_id per day from analytics_funnel_events and web_events (union per date)
   const dauByDayMap = new Map<string, Set<string>>();
 
   const addUserToDay = (dateStr: string, userId: string) => {
@@ -60,7 +60,7 @@ export async function getEngagementStats(days: number): Promise<EngagementStats>
   };
 
   const { data: aeRows } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('user_id, timestamp')
     .gte('timestamp', fromIso)
     .lte('timestamp', toIso)
@@ -143,13 +143,13 @@ export async function getEngagementStats(days: number): Promise<EngagementStats>
   const featureAdoption: EngagementStats['featureAdoption'] = [];
   for (const eventName of KEY_EVENTS) {
     const { count: count7 } = await supabase
-      .from('analytics_events')
+      .from('analytics_funnel_events')
       .select('*', { count: 'exact', head: true })
       .eq('event_name', eventName)
       .gte('timestamp', from7)
       .lte('timestamp', toIso);
     const { count: count30 } = await supabase
-      .from('analytics_events')
+      .from('analytics_funnel_events')
       .select('*', { count: 'exact', head: true })
       .eq('event_name', eventName)
       .gte('timestamp', from30)
@@ -163,7 +163,7 @@ export async function getEngagementStats(days: number): Promise<EngagementStats>
 
   // Power-user: count key events per user in range, then bucket
   const { data: keyEventRows } = await supabase
-    .from('analytics_events')
+    .from('analytics_funnel_events')
     .select('user_id')
     .in('event_name', [...KEY_EVENTS])
     .gte('timestamp', fromIso)

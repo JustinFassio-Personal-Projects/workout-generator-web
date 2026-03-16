@@ -1,4 +1,5 @@
--- Phase 6: Quality analytics — frontend error collection.
+-- Admin-dash-astro Analytics: quality — frontend error collection.
+-- Run in the Supabase project used by this app (see PUBLIC_SUPABASE_URL in .env).
 -- Clients report errors via POST; admin quality API uses service role.
 
 CREATE TABLE IF NOT EXISTS public.errors_frontend (

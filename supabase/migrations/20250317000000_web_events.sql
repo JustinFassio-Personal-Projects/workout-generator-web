@@ -1,4 +1,5 @@
--- Phase 1: Acquisition analytics — page views and traffic (web_events).
+-- Admin-dash-astro Analytics: acquisition — page views and traffic (web_events).
+-- Run in the Supabase project used by this app (see PUBLIC_SUPABASE_URL in .env).
 -- Used for unique visitors, referrers, UTM, landing pages, device/browser, geo.
 
 CREATE TABLE IF NOT EXISTS public.web_events (

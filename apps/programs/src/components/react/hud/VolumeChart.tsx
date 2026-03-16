@@ -85,7 +85,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ isPaid }) => {
               borderRadius: '8px',
             }}
             labelStyle={{ color: 'rgba(255,255,255,0.8)' }}
-            formatter={(value: number | undefined) => [`${value ?? 0} sets`, 'Sets']}
+            formatter={(value: unknown) => [`${Number(value ?? 0)} sets`, 'Sets']}
             labelFormatter={(label) => `Week ${label}`}
           />
           <Area

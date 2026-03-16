@@ -60,6 +60,8 @@ If the Workout Factory shows 404 or errors on `/rest/v1/workout_sets`, the `work
 
 Safe to run multiple times. Then refresh the Workout Factory page.
 
+If the Workout Library returns **500** with `column workout_sets.featured_on_landing does not exist`, run **`docs/RUN_FEATURED_LANDING.sql`** in the same project (it includes the `workout_sets.featured_on_landing` column and constraint). Then reload the schema cache if needed (Project Settings → API).
+
 ---
 
 ## RLS (workout_sets)

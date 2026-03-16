@@ -26,3 +26,10 @@ BEGIN
       FOR SELECT USING (status = 'published');
   END IF;
 END $$;
+
+-- 6. workout_sets (Workout Factory): add featured_on_landing so admin list and featured toggle work
+ALTER TABLE public.workout_sets ADD COLUMN IF NOT EXISTS featured_on_landing boolean DEFAULT false;
+UPDATE public.workout_sets SET featured_on_landing = false WHERE featured_on_landing = true AND (status IS DISTINCT FROM 'published');
+ALTER TABLE public.workout_sets DROP CONSTRAINT IF EXISTS workout_sets_featured_requires_published;
+ALTER TABLE public.workout_sets ADD CONSTRAINT workout_sets_featured_requires_published
+  CHECK (NOT featured_on_landing OR status = 'published');

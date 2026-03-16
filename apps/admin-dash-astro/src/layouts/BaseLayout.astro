@@ -1,6 +1,7 @@
 ---
 import '@workout-generator/design-system';
 import '../styles/global.css';
+import FrontendErrorMonitor from '../components/react/FrontendErrorMonitor';
 
 interface Props {
   title?: string;
@@ -16,6 +17,7 @@ const { title = 'Admin Dashboard' } = Astro.props;
     <meta name="theme-color" content="#0d0500" />
   </head>
   <body>
+    <FrontendErrorMonitor client:load />
     <slot />
   </body>
 </html>

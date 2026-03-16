@@ -16,6 +16,8 @@ export default defineConfig({
   site: 'https://aiworkoutgenerator.com',
   // Astro 5: "static" includes former hybrid behavior — routes with `prerender = false` are SSR; others are pre-rendered.
   output: 'static',
+  // Use a distinct asset path so we can proxy /_astro/* to the programs app (same host, broken assets otherwise).
+  build: { assets: 'marketing_astro' },
 
   integrations: [
     react(),

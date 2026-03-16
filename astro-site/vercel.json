@@ -77,6 +77,14 @@
     {
       "source": "/workouts/:path*",
       "destination": "https://programs.aiworkoutgenerator.com/workouts/:path*"
+    },
+    {
+      "source": "/_astro/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/_astro/:path*"
+    },
+    {
+      "source": "/site.webmanifest",
+      "destination": "https://programs.aiworkoutgenerator.com/site.webmanifest"
     }
   ]
 }

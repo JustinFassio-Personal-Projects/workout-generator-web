@@ -72,3 +72,62 @@ Manual production tests:
 1. Ensure admin-dash-astro and programs are deployed to Vercel with the expected project URLs.
 2. Update `astro-site/vercel.json` destination URLs if the deployment URLs differ.
 3. Confirm apex and www domains point to the astro-site project so rewrites apply.
+
+**If you see 404 DEPLOYMENT_NOT_FOUND on /exercises, /programs, etc.:** see [TROUBLESHOOTING_PROGRAMS_REWRITES.md](TROUBLESHOOTING_PROGRAMS_REWRITES.md) for step-by-step fix and optional temporary workaround.
+
+---
+
+## Maintaining aiworkoutgenerator.com public URLs (astro-site)
+
+Now that the main marketing site is **astro-site**, users should always see **aiworkoutgenerator.com** (or www) in the browser for these paths:
+
+- **aiworkoutgenerator.com/** — marketing homepage (astro-site)
+- **aiworkoutgenerator.com/exercises**, **/learn**, **/programs**, **/challenges**, **/workouts** — content (proxied to programs app)
+- **aiworkoutgenerator.com/admin** — content admin (proxied to admin-dash-astro)
+
+To keep these URLs working:
+
+### 1. Primary domain must be served by astro-site
+
+- In **Vercel → astro-site project → Settings → Domains**, ensure **both** are assigned to the **astro-site** project:
+  - `aiworkoutgenerator.com`
+  - `www.aiworkoutgenerator.com`
+- If either domain is assigned to another project (e.g. nextjs-backend), remove it there and add it to astro-site. Otherwise requests to aiworkoutgenerator.com/exercises hit the wrong project and rewrites never run.
+
+### 2. Rewrite destinations must resolve to live deployments
+
+`astro-site/vercel.json` does not change the URL the user sees; it only defines **where** astro-site fetches the response from:
+
+| User visits (stays in browser) | astro-site rewrites to (internal) |
+|---------------------------------|-----------------------------------|
+| aiworkoutgenerator.com/exercises | programs.aiworkoutgenerator.com/exercises |
+| aiworkoutgenerator.com/admin     | aiworkoutgenerator-admin.vercel.app/admin |
+
+So:
+
+- The **rewrite destination** (where astro-site fetches from) must be a live deployment. You can use either:
+  - The programs project’s default **\*.vercel.app** URL (e.g. `https://programs-xxx.vercel.app`) — no subdomain or DNS needed; or
+  - A custom subdomain **programs.aiworkoutgenerator.com** (add it in **Vercel → programs project → Settings → Domains** and complete DNS).
+- Ensure the programs project has at least one successful production deployment. If the destination URL isn’t live, the rewrite returns 404 DEPLOYMENT_NOT_FOUND.
+- **aiworkoutgenerator-admin.vercel.app** (or the admin-dash-astro project URL): ensure the admin project is deployed and that URL works; or add a custom domain (e.g. admin.aiworkoutgenerator.com) and point the rewrite to it if you prefer.
+
+### 3. Do not change the public URL
+
+- Keep links and marketing as **aiworkoutgenerator.com/exercises**, **/programs**, **/challenges**, **/learn**, **/workouts**, **/admin**. The rewrites in astro-site make those paths work; no code change is needed for the “main URL” to stay as aiworkoutgenerator.com.
+- Only change `vercel.json` **destinations** if you move the programs or admin app to a different Vercel project or domain (then update the destination URLs to match).
+
+### 4. Quick checklist
+
+| Check | Where |
+|-------|--------|
+| aiworkoutgenerator.com and www → astro-site project | Vercel → astro-site → Domains |
+| programs.aiworkoutgenerator.com → programs project, DNS done | Vercel → programs project → Domains |
+| Programs app builds and deploys | Vercel → programs project → Deployments |
+| Admin app builds and deploys | Vercel → admin-dash-astro project → Deployments |
+
+### 5. SEO: content must declare the main domain
+
+So that search engines see **aiworkoutgenerator.com** (not the rewrite destination) as the canonical URL:
+
+- In the **programs** Vercel project, set **Environment variable**: `PUBLIC_SITE_URL=https://aiworkoutgenerator.com` (Production, and Preview if you want).
+- The programs app uses this for `site` in Astro config, so sitemap, robots.txt, and canonical/OG URLs will use aiworkoutgenerator.com when the app is reached via the proxy.

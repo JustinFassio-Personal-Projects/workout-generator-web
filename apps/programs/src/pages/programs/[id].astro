@@ -67,7 +67,7 @@ const pageDescription =
       ? preview.metadata.description || `${preview.metadata.title} — ${preview.metadata.durationWeeks}-week training program`
       : undefined;
 
-const siteUrl = Astro.url.origin;
+const siteUrl = Astro.site?.href?.replace(/\/$/, '') || Astro.url.origin;
 const canonicalPageUrl = programId && !notFound ? `${siteUrl}/programs/${programId}` : undefined;
 
 const breadcrumbTitle =

@@ -65,7 +65,7 @@ const pageDescription =
         `${preview.metadata.title} — ${preview.metadata.durationWeeks}-week fitness challenge`
       : undefined;
 
-const siteUrl = Astro.url.origin;
+const siteUrl = Astro.site?.href?.replace(/\/$/, '') || Astro.url.origin;
 const canonicalPageUrl = challengeId ? `${siteUrl}/challenges/${challengeId}` : undefined;
 
 const ogImage =

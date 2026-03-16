@@ -60,7 +60,7 @@ const pageDescription = exercise
   ? `Learn the biomechanics of ${exercise.exerciseName}. Performance cues, common mistakes, and detailed analysis.`
   : 'Exercise not found';
 
-const siteUrl = Astro.url.origin;
+const siteUrl = Astro.site?.href?.replace(/\/$/, '') || Astro.url.origin;
 const canonicalPageUrl = slug ? `${siteUrl}/exercises/${slug}` : undefined;
 const ogImage = exercise?.imageUrl
   ? (exercise.imageUrl.startsWith('http') ? exercise.imageUrl : `${siteUrl}${exercise.imageUrl.startsWith('/') ? '' : '/'}${exercise.imageUrl}`)

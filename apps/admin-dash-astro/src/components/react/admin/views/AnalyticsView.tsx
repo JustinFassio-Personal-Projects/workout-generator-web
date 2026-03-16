@@ -652,11 +652,14 @@ const AnalyticsView: React.FC = () => {
                         outerRadius={60}
                         paddingAngle={2}
                         label={({ name, percent }) =>
-                          `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
+                          `${name ?? ''} ${((percent ?? 0) * 100).toFixed(0)}%`
                         }
                       >
-                        {[{ color: '#22c55e' }, { color: '#ffbf00' }].map((c, i) => (
-                          <Cell key={i} fill={c.color} />
+                        {[
+                          { name: 'OAuth', color: '#22c55e' },
+                          { name: 'Email', color: '#ffbf00' },
+                        ].map((entry) => (
+                          <Cell key={entry.name} fill={entry.color} />
                         ))}
                       </Pie>
                       <Tooltip

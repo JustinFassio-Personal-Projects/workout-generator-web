@@ -10,6 +10,7 @@ import { getSupabaseServer } from '@/lib/supabase/server';
 
 const MESSAGE_MAX_LENGTH = 2000;
 const STACK_MAX_LENGTH = 8000;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 interface LogErrorBody {
   message?: string;
@@ -30,7 +31,8 @@ export const POST: APIRoute = async ({ request }) => {
     const message = rawMessage.slice(0, MESSAGE_MAX_LENGTH);
     const stack = typeof body.stack === 'string' ? body.stack.slice(0, STACK_MAX_LENGTH) : null;
     const page = typeof body.page === 'string' ? body.page.slice(0, 500) : null;
-    const userId = body.user_id != null && typeof body.user_id === 'string' ? body.user_id : null;
+    const userId =
+      typeof body.user_id === 'string' && UUID_REGEX.test(body.user_id) ? body.user_id : null;
     const sessionId =
       body.session_id != null && typeof body.session_id === 'string'
         ? body.session_id.slice(0, 256)

@@ -1,8 +1,9 @@
 -- =============================================================================
 -- Run this in the Supabase project that your app uses (PUBLIC_SUPABASE_URL).
--- For admin-dash-astro that is: https://qbklyimfazrkutwqictw.supabase.co
+-- Doc reference only: for admin-dash-astro that project is qbklyimfazrkutwqictw
+-- (app at runtime uses env, no hardcoded URLs in code).
 --
--- In Supabase Dashboard: select project qbklyimfazrkutwqictw → SQL Editor → New query
+-- In Supabase Dashboard: select that project → SQL Editor → New query
 -- Paste this entire file and run it. Then: Project Settings → API → "Reload schema cache".
 -- =============================================================================
 

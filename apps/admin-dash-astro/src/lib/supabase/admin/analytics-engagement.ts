@@ -139,27 +139,33 @@ export async function getEngagementStats(days: number): Promise<EngagementStats>
   const avgSessionDurationMinutes = sessionCount > 0 ? totalDurationMs / 60000 / sessionCount : 0;
   const avgPagesPerSession = sessionCount > 0 ? totalPages / sessionCount : 0;
 
-  // Feature adoption: key events count in last 7d and last 30d
-  const featureAdoption: EngagementStats['featureAdoption'] = [];
-  for (const eventName of KEY_EVENTS) {
-    const { count: count7 } = await supabase
-      .from('analytics_funnel_events')
-      .select('*', { count: 'exact', head: true })
-      .eq('event_name', eventName)
-      .gte('timestamp', from7)
-      .lte('timestamp', toIso);
-    const { count: count30 } = await supabase
-      .from('analytics_funnel_events')
-      .select('*', { count: 'exact', head: true })
-      .eq('event_name', eventName)
-      .gte('timestamp', from30)
-      .lte('timestamp', toIso);
-    featureAdoption.push({
-      eventName,
-      count7d: count7 ?? 0,
-      count30d: count30 ?? 0,
-    });
+  // Feature adoption: key events count in last 7d and last 30d (one query then aggregate in JS to avoid N round-trips).
+  const { data: adoptionRows } = await supabase
+    .from('analytics_funnel_events')
+    .select('event_name, timestamp')
+    .in('event_name', [...KEY_EVENTS])
+    .gte('timestamp', from30)
+    .lte('timestamp', toIso)
+    .limit(50000);
+
+  const count7ByEvent = new Map<string, number>();
+  const count30ByEvent = new Map<string, number>();
+  for (const name of KEY_EVENTS) {
+    count7ByEvent.set(name, 0);
+    count30ByEvent.set(name, 0);
   }
+  for (const row of adoptionRows ?? []) {
+    const name = (row as { event_name: string }).event_name;
+    const ts = (row as { timestamp: string }).timestamp;
+    if (!KEY_EVENTS.includes(name as (typeof KEY_EVENTS)[number])) continue;
+    count30ByEvent.set(name, (count30ByEvent.get(name) ?? 0) + 1);
+    if (ts >= from7) count7ByEvent.set(name, (count7ByEvent.get(name) ?? 0) + 1);
+  }
+  const featureAdoption: EngagementStats['featureAdoption'] = KEY_EVENTS.map((eventName) => ({
+    eventName,
+    count7d: count7ByEvent.get(eventName) ?? 0,
+    count30d: count30ByEvent.get(eventName) ?? 0,
+  }));
 
   // Power-user: count key events per user in range, then bucket
   const { data: keyEventRows } = await supabase

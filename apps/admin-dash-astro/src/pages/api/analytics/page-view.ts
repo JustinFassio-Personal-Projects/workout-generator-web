@@ -8,6 +8,8 @@
 import type { APIRoute } from 'astro';
 import { getSupabaseServer } from '@/lib/supabase/server';
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 interface PageViewBody {
   path?: string;
   referrer?: string;
@@ -36,11 +38,13 @@ export const POST: APIRoute = async ({ request }) => {
     const ipCountry =
       request.headers.get('x-vercel-ip-country') ?? request.headers.get('cf-ipcountry') ?? null;
 
+    const userId =
+      typeof body.user_id === 'string' && UUID_REGEX.test(body.user_id) ? body.user_id : null;
     const supabase = getSupabaseServer();
     const { error } = await supabase.from('web_events').insert({
       event_name: 'page_view',
       session_id: body.session_id ?? null,
-      user_id: body.user_id ?? null,
+      user_id: userId,
       path,
       referrer: body.referrer ?? null,
       utm_source: body.utm_source ?? null,

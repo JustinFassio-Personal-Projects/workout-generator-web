@@ -89,7 +89,9 @@ BEGIN
 END;
 $$;
 
--- Allow service_role and anon to call the RPC (admin API uses getSupabaseServer() which may use either key).
+-- Admin API uses getSupabaseServer(); that client may use anon or service_role key depending on env.
+-- Grant to anon so server-side admin requests succeed when using PUBLIC_SUPABASE_ANON_KEY. RLS does not
+-- apply to this function (SECURITY DEFINER); actual access is gated by admin HTTP auth in the API.
 GRANT EXECUTE ON FUNCTION public.get_acquisition_stats(int) TO service_role;
 GRANT EXECUTE ON FUNCTION public.get_acquisition_stats(int) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_acquisition_stats(int) TO anon;

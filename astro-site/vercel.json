@@ -39,6 +39,78 @@
       "destination": "https://aiworkoutgenerator-admin.vercel.app/api/admin/:path*"
     },
     {
+      "source": "/api/programs",
+      "destination": "https://programs.aiworkoutgenerator.com/api/programs"
+    },
+    {
+      "source": "/api/programs/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/api/programs/:path*"
+    },
+    {
+      "source": "/api/challenges",
+      "destination": "https://programs.aiworkoutgenerator.com/api/challenges"
+    },
+    {
+      "source": "/api/challenges/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/api/challenges/:path*"
+    },
+    {
+      "source": "/api/warmup-config",
+      "destination": "https://programs.aiworkoutgenerator.com/api/warmup-config"
+    },
+    {
+      "source": "/api/chat",
+      "destination": "https://programs.aiworkoutgenerator.com/api/chat"
+    },
+    {
+      "source": "/api/personalized-exercise-image",
+      "destination": "https://programs.aiworkoutgenerator.com/api/personalized-exercise-image"
+    },
+    {
+      "source": "/api/workout-insight",
+      "destination": "https://programs.aiworkoutgenerator.com/api/workout-insight"
+    },
+    {
+      "source": "/api/load-reference-image",
+      "destination": "https://programs.aiworkoutgenerator.com/api/load-reference-image"
+    },
+    {
+      "source": "/api/generate-exercise-image",
+      "destination": "https://programs.aiworkoutgenerator.com/api/generate-exercise-image"
+    },
+    {
+      "source": "/api/generate-anatomical-image",
+      "destination": "https://programs.aiworkoutgenerator.com/api/generate-anatomical-image"
+    },
+    {
+      "source": "/api/wod",
+      "destination": "https://programs.aiworkoutgenerator.com/api/wod"
+    },
+    {
+      "source": "/api/wod/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/api/wod/:path*"
+    },
+    {
+      "source": "/api/workouts",
+      "destination": "https://programs.aiworkoutgenerator.com/api/workouts"
+    },
+    {
+      "source": "/api/workouts/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/api/workouts/:path*"
+    },
+    {
+      "source": "/api/ai/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/api/ai/:path*"
+    },
+    {
+      "source": "/api/trainer",
+      "destination": "https://programs.aiworkoutgenerator.com/api/trainer"
+    },
+    {
+      "source": "/api/trainer/:path*",
+      "destination": "https://programs.aiworkoutgenerator.com/api/trainer/:path*"
+    },
+    {
       "source": "/exercises",
       "destination": "https://programs.aiworkoutgenerator.com/exercises"
     },

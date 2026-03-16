@@ -40,6 +40,9 @@ const directAuthUrl = `${appBase}?signin=1`;
       <div class="hero-content-block max-w-4xl text-center md:text-left" data-aos="fade-up">
       <!-- Trust Badges: horizontal inline -->
       <div class="flex flex-row flex-wrap gap-2 justify-center md:justify-start mb-8">
+        <div class="hero-reassurance-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-[#0a0e1a] border border-[#4ade80]/40">
+          Same aiworkoutgenerator.com — new look.
+        </div>
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--color-orange-light)]/10 border border-[var(--color-orange-light)]/20 text-[var(--color-orange-light)] text-sm font-medium">
           <span class="w-2 h-2 rounded-full bg-[var(--color-orange-light)] animate-pulse"></span>
           Vetted by U.S. Army Master Fitness Trainer.
@@ -83,6 +86,7 @@ const directAuthUrl = `${appBase}?signin=1`;
             <path d="M8 5v14l11-7z" />
           </svg>
         </a>
+        <!-- Choose Plan not yet fully implemented
         <a
           href="/programs"
           data-cta="hero-choose-plan"
@@ -90,6 +94,7 @@ const directAuthUrl = `${appBase}?signin=1`;
         >
           Choose Plan
         </a>
+        -->
       </div>
       
       <!-- Stats: slim horizontal strip -->
@@ -167,6 +172,12 @@ const directAuthUrl = `${appBase}?signin=1`;
 </section>
 
 <style>
+  /* Bright green gradient from nextjs-backend landing (brand-green → lime) */
+  .hero-reassurance-badge {
+    background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+    box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.4);
+  }
+
   .hero-section {
     background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-gradient-end) 100%);
   }

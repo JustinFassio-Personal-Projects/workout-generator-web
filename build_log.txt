@@ -1,0 +1,89 @@
+• turbo 2.8.10
+• Packages in scope: ai-workout-generator-hub
+• Running build in 1 packages
+• Remote caching disabled
+ai-workout-generator-hub:build: cache miss, executing 24b3b302af3a849f
+ai-workout-generator-hub:build: npm warn config ignoring workspace config at /Users/justinfassio/Local Sites/Workout Generator/apps/aiworkoutgenerator-hub/.npmrc
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: > ai-workout-generator-hub@0.1.0 build
+ai-workout-generator-hub:build: > next build
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ai-workout-generator-hub:build:    ▲ Next.js 16.0.8 (Turbopack)
+ai-workout-generator-hub:build:    - Environments: .env.local
+ai-workout-generator-hub:build:    - Experiments (use with caution):
+ai-workout-generator-hub:build:      · clientTraceMetadata
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build:    Creating an optimized production build ...
+ai-workout-generator-hub:build: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ai-workout-generator-hub:build: Turbopack build encountered 3 warnings:
+ai-workout-generator-hub:build: ./node_modules/@genkit-ai/core/lib
+ai-workout-generator-hub:build: Package express can't be external
+ai-workout-generator-hub:build: The request express matches serverExternalPackages (or the default list).
+ai-workout-generator-hub:build: The package resolves to a different version when requested from the project directory (5.2.1) compared to the package requested from the importing module (4.22.1).
+ai-workout-generator-hub:build: Make sure to install the same version of the package in both locations.
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: ./node_modules/@opentelemetry/sdk-node/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+ai-workout-generator-hub:build: Package import-in-the-middle can't be external
+ai-workout-generator-hub:build: The request import-in-the-middle matches serverExternalPackages (or the default list).
+ai-workout-generator-hub:build: The package resolves to a different version when requested from the project directory (2.0.6) compared to the package requested from the importing module (1.15.0).
+ai-workout-generator-hub:build: Make sure to install the same version of the package in both locations.
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: ./node_modules/@opentelemetry/sdk-node/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+ai-workout-generator-hub:build: Package require-in-the-middle can't be external
+ai-workout-generator-hub:build: The request require-in-the-middle matches serverExternalPackages (or the default list).
+ai-workout-generator-hub:build: The package resolves to a different version when requested from the project directory (8.0.1) compared to the package requested from the importing module (7.5.2).
+ai-workout-generator-hub:build: Make sure to install the same version of the package in both locations.
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: > Build error occurred
+ai-workout-generator-hub:build: Error: Turbopack build failed with 1 errors:
+ai-workout-generator-hub:build: ./node_modules/@genkit-ai/core/node_modules/express/lib/view.js:81:14
+ai-workout-generator-hub:build: Module not found: Can't resolve (<dynamic> | 'undefined')
+ai-workout-generator-hub:build: [0m [90m 79 |[39m
+ai-workout-generator-hub:build:  [90m 80 |[39m     [90m// default engine export[39m
+ai-workout-generator-hub:build: [31m[1m>[22m[39m[90m 81 |[39m     [36mvar[39m fn [33m=[39m require(mod)[33m.[39m__express
+ai-workout-generator-hub:build:  [90m    |[39m              [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ai-workout-generator-hub:build:  [90m 82 |[39m
+ai-workout-generator-hub:build:  [90m 83 |[39m     [36mif[39m ([36mtypeof[39m fn [33m!==[39m [32m'function'[39m) {
+ai-workout-generator-hub:build:  [90m 84 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m'Module "'[39m [33m+[39m mod [33m+[39m [32m'" does not provide a view engine.'[39m)[0m
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: Import trace:
+ai-workout-generator-hub:build:   App Route:
+ai-workout-generator-hub:build:     ./node_modules/@genkit-ai/core/node_modules/express/lib/view.js
+ai-workout-generator-hub:build:     ./node_modules/@genkit-ai/core/node_modules/express/lib/application.js
+ai-workout-generator-hub:build:     ./node_modules/@genkit-ai/core/node_modules/express/lib/express.js
+ai-workout-generator-hub:build:     ./node_modules/@genkit-ai/core/node_modules/express/index.js
+ai-workout-generator-hub:build:     ./node_modules/@genkit-ai/core/lib/reflection.js
+ai-workout-generator-hub:build:     ./node_modules/@genkit-ai/core/lib/index.mjs
+ai-workout-generator-hub:build:     ./node_modules/@genkit-ai/ai/lib/model.mjs
+ai-workout-generator-hub:build:     ./node_modules/@genkit-ai/googleai/lib/index.mjs
+ai-workout-generator-hub:build:     ./apps/aiworkoutgenerator-hub/src/lib/genkit.ts
+ai-workout-generator-hub:build:     ./apps/aiworkoutgenerator-hub/src/lib/genkit/flows/interval-timer.ts
+ai-workout-generator-hub:build:     ./apps/aiworkoutgenerator-hub/src/app/api/workouts/ai-interval-timer/route.ts
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: https://nextjs.org/docs/messages/module-not-found
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build: 
+ai-workout-generator-hub:build:     at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+ai-workout-generator-hub:build: npm error Lifecycle script `build` failed with error:
+ai-workout-generator-hub:build: npm error code 1
+ai-workout-generator-hub:build: npm error path /Users/justinfassio/Local Sites/Workout Generator/apps/aiworkoutgenerator-hub
+ai-workout-generator-hub:build: npm error workspace ai-workout-generator-hub@0.1.0
+ai-workout-generator-hub:build: npm error location /Users/justinfassio/Local Sites/Workout Generator/apps/aiworkoutgenerator-hub
+ai-workout-generator-hub:build: npm error command failed
+ai-workout-generator-hub:build: npm error command sh -c next build
+ai-workout-generator-hub:build: ERROR: command finished with error: command (/Users/justinfassio/Local Sites/Workout Generator/apps/aiworkoutgenerator-hub) /usr/local/bin/npm run build exited (1)
+ai-workout-generator-hub#build: command (/Users/justinfassio/Local Sites/Workout Generator/apps/aiworkoutgenerator-hub) /usr/local/bin/npm run build exited (1)
+
+ Tasks:    0 successful, 1 total
+Cached:    0 cached, 1 total
+  Time:    40.595s 
+Failed:    ai-workout-generator-hub#build
+
+ ERROR  run failed: command  exited (1)

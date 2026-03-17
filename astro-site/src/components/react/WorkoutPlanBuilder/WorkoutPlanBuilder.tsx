@@ -79,14 +79,13 @@ export function WorkoutPlanBuilder({ skipIntro = false, preselect }: WorkoutPlan
     window.history.replaceState({}, '', url.toString())
   }, [])
 
-  // On popstate, restore form from URL (e.g. user clicked browser back)
+  // On popstate, restore form from URL (e.g. user clicked browser back).
+  // Always run mergeWithDefaults so a URL with no params (e.g. /onboard) resets form to defaults.
   useEffect(() => {
     const syncFromUrl = () => {
       const params = new URLSearchParams(window.location.search)
       const partial = parseOnboardingFromSearchParams(params)
-      if (Object.keys(partial).length > 0) {
-        setFormData(mergeWithDefaults(partial))
-      }
+      setFormData(mergeWithDefaults(partial))
     }
     window.addEventListener('popstate', syncFromUrl)
     return () => window.removeEventListener('popstate', syncFromUrl)

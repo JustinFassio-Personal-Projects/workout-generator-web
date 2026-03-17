@@ -1,10 +1,10 @@
 # SWOT: OnboardingWizard on astro-site
 
-**Context:** OnboardingWizard is the flow mounted at `/onboard` on astro-site. It is separate from WorkoutPlanBuilder (mounted at `/onboarding`). This document analyzes the OnboardingWizard component set and its role in the marketing → signup journey.
+**Context:** As of the WorkoutPlanBuilder roadmap, `/onboard` renders **WorkoutPlanBuilder** (not OnboardingWizard). This document analyzes the **OnboardingWizard** component set (astro-site-only). The Wizard remains in the codebase but is no longer the flow at `/onboard`; it is deprecated for that route.
 
 **Scope:** `astro-site/src/components/react/OnboardingWizard/` (no equivalent in programs; astro-site-only).
 
-**Reference:** See also [WORKOUT_PLAN_BUILDER_SWOT.md](./WORKOUT_PLAN_BUILDER_SWOT.md) for the parallel builder flow and route semantics.
+**Reference:** See [WORKOUT_PLAN_BUILDER_SWOT.md](./WORKOUT_PLAN_BUILDER_SWOT.md) for the current canonical onboarding flow and route semantics.
 
 ---
 
@@ -22,14 +22,15 @@
 
 ---
 
-## Entry points and data flow
+## Entry points and data flow (historical; /onboard now uses WorkoutPlanBuilder)
 
-- **Landing:** `OnboardingIntroSection.astro` renders `<OnboardingIntroScreen client:load standalone />`. “Generate Workout” / “Free Workout” → `window.location.href = '/onboard'`.
-- **/onboard page:** `onboard.astro` renders `<OnboardingWizard client:load preselect={preselect} />`. Supports `?preselect=dumbbells` (etc.) to pre-fill level and equipment via `getPreselectData`.
-- **Hero:** Does not link to OnboardingWizard; Hero “Generate Workout” uses `directAuthUrl` (app.aiworkoutgenerator.com?signin=1), so the main CTA bypasses both OnboardingWizard and WorkoutPlanBuilder.
-- **Other CTAs:** FAQ, equipment, blog, reports, deep-research, index CTA, etc. link to `/onboard`, so they lead to OnboardingWizard when followed.
+- **Landing:** `OnboardingIntroSection.astro` can render `<OnboardingIntroScreen client:load standalone />`; “Generate Workout” / “Free Workout” navigate to `/onboard`. *Note: `/onboard` now renders WorkoutPlanBuilder, not OnboardingWizard.*
+- **/onboard page (current):** `onboard.astro` renders **WorkoutPlanBuilder** with `preselect`. OnboardingWizard is no longer mounted here.
+- **When Wizard was at /onboard:** It supported `?preselect=dumbbells` (etc.) via `getPreselectData`. Same preselect support now exists on WorkoutPlanBuilder at `/onboard`.
+- **Hero (current):** Links to `/onboard` (WorkoutPlanBuilder). Does not link to OnboardingWizard.
+- **Other CTAs:** Link to `/onboard`, which now shows WorkoutPlanBuilder.
 
-**Outcome:** “Create account” builds signup URL with `buildSignupUrl(formData, tenantId)`, runs a 10-second loading sequence, then redirects to app signup with query params (goals, level, equipment, units, age, gender, source=website, etc.).
+**Wizard outcome (when used):** “Create account” builds signup URL with `buildSignupUrl(formData, tenantId)`, runs a 10-second loading sequence, then redirects to app signup with query params.
 
 ---
 
@@ -54,7 +55,7 @@
 | **No URL sync** | Form state is not reflected in the URL (no `onboardingToSearchParams` / `parseOnboardingFromSearchParams`). Users cannot share or bookmark a pre-filled wizard state; back/forward does not restore choices. |
 | **Fixed 10-second delay** | Redirect is delayed 10 seconds after “Create account” regardless of readiness; can feel slow or gimmicky. WorkoutPlanBuilder redirects immediately. |
 | **Duplicate step/preview logic** | StepOne, StepTwo, and PlanPreview duplicate concepts and data shape of WorkoutPlanBuilder with different UI (e.g. Wizard StepOne uses `equipmentAccess: string[]` and category chips; Builder StepOne uses `EquipmentAccess` and different controls). Two code paths to maintain. |
-| **Hero bypasses this flow** | The main Hero CTA goes to the app, not to /onboard, so most high-intent users never see OnboardingWizard unless they click other CTAs. |
+| **Hero bypasses this flow** | *(Historical.)* Hero now links to `/onboard` (WorkoutPlanBuilder). OnboardingWizard is no longer the primary flow. |
 | **Astro-site-only** | No counterpart in programs; programs use WorkoutPlanBuilder at /onboard. Migration and parity discussions must account for two different flows. |
 | **Intro not shown on /onboard** | When user lands on /onboard (e.g. from “Generate Workout” in OnboardingIntroSection), they see the wizard form directly; the animated intro is only on the landing section. So “intro” is one-off on homepage, not part of /onboard. |
 
@@ -76,27 +77,27 @@
 | **Two onboarding UIs** | Maintaining both OnboardingWizard and WorkoutPlanBuilder increases surface area, copy drift, and “which one is canonical?” confusion. |
 | **Long delay and drop-off** | A mandatory 10s wait before redirect may increase abandonment; users may close the tab or assume an error. |
 | **No shareable state** | Without URL sync, support and marketing cannot send “pre-filled plan” links; A/B tests or campaigns cannot deep-link specific configurations. |
-| **Divergence from programs** | Programs’ /onboard = WorkoutPlanBuilder. Astro-site’s /onboard = OnboardingWizard. Same path, different implementation; documentation and training must spell this out. |
+| **Divergence from programs** | *(Addressed.)* Astro-site’s /onboard now = WorkoutPlanBuilder (same as programs). OnboardingWizard is deprecated for this route. |
 
 ---
 
 ## Recommendations (short)
 
-1. **Decide canonical flow:** Choose either OnboardingWizard or WorkoutPlanBuilder as the single “build your plan” flow for astro-site, then route Hero and all CTAs to it; deprecate or redirect the other.
-2. **Improve Wizard UX:** Add URL sync for form state; shorten or make the loading delay configurable/optional.
+1. **Decide canonical flow:** *(Done.)* WorkoutPlanBuilder is the canonical flow at `/onboard`; OnboardingWizard is deprecated for that route.
+2. **Improve Wizard UX (if ever re-used):** Add URL sync for form state; shorten or make the loading delay configurable/optional.
 3. **Reduce duplication:** Share step components or validation logic between Wizard and Builder where possible, or consolidate to one flow.
-4. **Document and test:** Document that /onboard = OnboardingWizard and /onboarding = WorkoutPlanBuilder; add a smoke test that “Create account” redirects with expected query params.
+4. **Document and test:** `/onboard` = WorkoutPlanBuilder (see WORKOUT_PLAN_BUILDER_SWOT.md). Smoke test: Hero → /onboard → complete builder flow → redirect with params.
 
 ---
 
 ## File / route reference
 
-| Item | OnboardingWizard (astro-site) |
-|------|-------------------------------|
-| **Route** | `/onboard` (onboard.astro) |
-| **Landing entry** | OnboardingIntroSection → OnboardingIntroScreen (standalone) → navigate to /onboard |
-| **Hero** | Does not link here; links to app?signin=1 |
-| **Redirect** | `buildSignupUrl(formData, tenantId)` after ~10s loading |
-| **Analytics** | GA4 + PostHog on start, step, preview, create-account |
-| **Preselect** | `?preselect=dumbbells` (etc.) on /onboard |
-| **Programs equivalent** | None; programs use WorkoutPlanBuilder at /onboard |
+| Item | OnboardingWizard (astro-site) | Current /onboard (WorkoutPlanBuilder) |
+|------|-------------------------------|--------------------------------------|
+| **Route** | No longer mounted at /onboard | `/onboard` (onboard.astro) |
+| **Landing entry** | OnboardingIntroSection can show Wizard intro; /onboard now shows Builder | Hero and CTAs → /onboard → WorkoutPlanBuilder |
+| **Hero** | N/A | Links to /onboard (Builder) |
+| **Redirect** | `buildSignupUrl(formData, tenantId)` after ~10s loading | `buildSignupUrl(formData)` immediate |
+| **Analytics** | GA4 + PostHog | Page-view + funnel events → Supabase; admin Onboarding drop-off |
+| **Preselect** | Was supported when Wizard at /onboard | `?preselect=dumbbells` (etc.) on /onboard |
+| **Programs equivalent** | None | Programs use WorkoutPlanBuilder at /onboard (parity) |

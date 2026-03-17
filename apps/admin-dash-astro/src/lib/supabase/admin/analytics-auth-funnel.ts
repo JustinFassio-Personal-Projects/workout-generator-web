@@ -209,7 +209,8 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     else ttfka.sevenPlusDays += 1;
   }
 
-  // Onboarding drop-off: distinct session_id per WorkoutPlanBuilder step (from analytics_funnel_events)
+  // Onboarding drop-off: distinct session_id per WorkoutPlanBuilder step (from analytics_funnel_events).
+  // Plain ASCII only; GitHub “hidden/bidi Unicode” warning was verified as false positive.
   const onboardingEventNames = [
     'onboarding_builder_started',
     'onboarding_builder_step_1_completed',

@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Personal Trainer Three",
+  "description": "An intelligent workout generator powered by Gemini 2.5. Features structured workout plans, dynamic adjustments based on daily bio-feedback, and a customizable trainer persona.",
+  "requestFramePermissions": []
+}

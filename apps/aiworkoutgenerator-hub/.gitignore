@@ -1,0 +1,82 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.cursor/debug.log
+*.debug.log
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# backup files
+*.bak
+*.backup
+
+# firebase emulators
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+# Emulator export/import data: do not commit (auth, Firestore, storage state).
+# Generate locally via firebase emulators:export ./emulator-data. See docs/firebase-emulator-suite/PRESERVE_DATA_ON_RESTART.md.
+emulator-data/
+
+# firebase functions
+functions/node_modules/
+functions/lib/
+
+# test coverage
+coverage/
+.nyc_output/
+
+# terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# firebase service account keys
+*serviceAccount*.json
+*service-account*.json
+firebase-adminsdk-*.json
+
+# Development-generated images
+public/generated-images/
+
+# Sentry Config File
+.env.sentry-build-plugin

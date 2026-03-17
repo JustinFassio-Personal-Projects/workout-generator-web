@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Maverick Protocol: Workout Summary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      /* --- Chart Container Styling (Mandatory) --- */
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 300px;
+        max-height: 400px;
+      }
+      @media (min-width: 768px) {
+        .chart-container {
+          height: 350px;
+        }
+      }
+
+      /* --- Custom Utilities --- */
+      body {
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f5f5f4; /* Stone 100 - Warm Neutral */
+        color: #1c1917; /* Stone 900 */
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.05),
+          0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      }
+
+      /* Active State Styles */
+      .tab-active {
+        border-bottom: 2px solid #ea580c; /* Orange 600 */
+        color: #ea580c;
+        font-weight: 600;
+      }
+      .tab-inactive {
+        border-bottom: 2px solid transparent;
+        color: #78716c; /* Stone 500 */
+      }
+      .tab-inactive:hover {
+        color: #1c1917;
+      }
+
+      /* Safety Toggle Switch */
+      .toggle-checkbox:checked {
+        right: 0;
+        border-color: #10b981; /* Emerald 500 */
+      }
+      .toggle-checkbox:checked + .toggle-label {
+        background-color: #10b981;
+      }
+      .toggle-checkbox:checked + .toggle-label:before {
+        transform: translateX(100%);
+      }
+
+      .toggle-label {
+        width: 48px;
+        height: 24px;
+        background-color: #d1d5db;
+        border-radius: 9999px;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .toggle-label:before {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <!-- HEADER -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50">
+      <div
+        class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4"
+      >
+        <div>
+          <h1
+            class="text-2xl font-bold text-stone-800 tracking-tight flex items-center gap-2"
+          >
+            <span class="text-orange-600">⚡</span> Session Report
+            <span
+              class="text-sm font-normal text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full ml-2"
+              >Completed</span
+            >
+          </h1>
+          <p class="text-xs text-stone-500 mt-1">
+            Maverick Kettlebell Gauntlet • Jan 24, 2026
+          </p>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <!-- Safety Toggle -->
+          <div
+            class="flex items-center gap-3 bg-stone-50 px-4 py-2 rounded-lg border border-stone-200"
+          >
+            <span class="text-sm font-semibold text-stone-600" id="safety-label"
+              >Performance Mode</span
+            >
+            <div
+              class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
+            >
+              <input
+                type="checkbox"
+                name="toggle"
+                id="safety-toggle"
+                class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+              />
+              <label
+                for="safety-toggle"
+                class="toggle-label block overflow-hidden h-6 rounded-full bg-stone-300 cursor-pointer"
+              ></label>
+            </div>
+          </div>
+
+          <!-- Share Button -->
+          <button
+            onclick="shareSummary()"
+            class="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-stone-700 transition-colors flex items-center gap-2"
+          >
+            <span>📤</span> Share
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-5xl mx-auto w-full p-4 space-y-8">
+      <!-- INTRO -->
+      <section class="prose max-w-none">
+        <p class="text-stone-600 leading-relaxed">
+          Great job! You have successfully completed the
+          <strong>Maverick Kettlebell Gauntlet</strong>. Below is a summary of
+          your performance metrics, biomechanical load analysis, and the
+          exercise log for your records.
+        </p>
+      </section>
+
+      <!-- SECTION 1: SESSION STATS (Replaces Logic Flow) -->
+      <section class="glass-panel rounded-xl p-6 shadow-sm">
+        <div class="mb-6 border-b border-stone-100 pb-4">
+          <h2 class="text-lg font-bold text-stone-800 flex items-center gap-2">
+            <span>📊</span> Session Statistics
+          </h2>
+          <p class="text-sm text-stone-500 mt-1">
+            Key performance indicators from this session.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Stat 1 -->
+          <div
+            class="p-6 rounded-lg bg-stone-50 border border-stone-200 text-center"
+          >
+            <div
+              class="text-stone-400 text-xs font-bold uppercase tracking-wider mb-2"
+            >
+              Total Time
+            </div>
+            <div class="text-4xl font-bold text-stone-800">
+              45<span class="text-lg text-stone-500 font-normal">m</span>
+            </div>
+            <div class="text-emerald-600 text-xs mt-2 font-semibold">
+              On Target
+            </div>
+          </div>
+
+          <!-- Stat 2 -->
+          <div
+            class="p-6 rounded-lg bg-stone-50 border border-stone-200 text-center"
+          >
+            <div
+              class="text-stone-400 text-xs font-bold uppercase tracking-wider mb-2"
+            >
+              Volume Load
+            </div>
+            <div class="text-4xl font-bold text-stone-800" id="stat-volume">
+              8.4<span class="text-lg text-stone-500 font-normal">k</span>
+            </div>
+            <div class="text-stone-400 text-xs mt-2">Kg Moved</div>
+          </div>
+
+          <!-- Stat 3 -->
+          <div
+            class="p-6 rounded-lg bg-stone-50 border border-stone-200 text-center"
+          >
+            <div
+              class="text-stone-400 text-xs font-bold uppercase tracking-wider mb-2"
+            >
+              Strain Score
+            </div>
+            <div class="text-4xl font-bold text-orange-600" id="stat-strain">
+              9.2
+            </div>
+            <div class="text-stone-400 text-xs mt-2">High Intensity</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: DATA ANALYTICS (CHARTS) -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Intensity Chart -->
+        <div class="glass-panel rounded-xl p-6">
+          <div class="mb-4">
+            <h2 class="text-lg font-bold text-stone-800">
+              Heart Rate Analysis
+            </h2>
+            <p class="text-sm text-stone-500">
+              Actual heart rate response throughout the session.
+            </p>
+          </div>
+          <div class="chart-container">
+            <canvas id="intensityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Biomechanics Chart -->
+        <div class="glass-panel rounded-xl p-6">
+          <div class="mb-4">
+            <h2 class="text-lg font-bold text-stone-800">Muscle Fatigue</h2>
+            <p class="text-sm text-stone-500">
+              Cumulative load distribution across muscle groups.
+            </p>
+          </div>
+          <div class="chart-container">
+            <canvas id="muscleChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: THE PROTOCOL (INTERACTIVE LIST) -->
+      <section class="glass-panel rounded-xl overflow-hidden">
+        <div class="p-6 border-b border-stone-200 bg-stone-50">
+          <h2 class="text-lg font-bold text-stone-800">Completed Log</h2>
+          <p class="text-sm text-stone-500">
+            Review your sets, reps, and performance notes.
+          </p>
+
+          <div class="flex gap-6 mt-4 text-sm">
+            <button
+              onclick="filterPhase('warmup')"
+              id="tab-warmup"
+              class="tab-active pb-2 px-1 transition-colors"
+            >
+              Warmup
+            </button>
+            <button
+              onclick="filterPhase('main')"
+              id="tab-main"
+              class="tab-inactive pb-2 px-1 transition-colors"
+            >
+              Main Circuit
+            </button>
+            <button
+              onclick="filterPhase('finisher')"
+              id="tab-finisher"
+              class="tab-inactive pb-2 px-1 transition-colors"
+            >
+              Finisher
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-stone-200"
+        >
+          <!-- Exercise List -->
+          <div
+            class="col-span-1 bg-white h-96 overflow-y-auto"
+            id="exercise-list"
+          >
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Detail View -->
+          <div
+            class="col-span-2 bg-stone-50 p-6 flex flex-col justify-center h-96 relative"
+          >
+            <div id="detail-empty" class="text-center text-stone-400">
+              <span class="text-4xl block mb-2">✓</span>
+              Select an exercise to view history
+            </div>
+
+            <div id="detail-content" class="hidden h-full flex flex-col">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3
+                    class="text-2xl font-bold text-stone-800"
+                    id="detail-name"
+                  >
+                    Name
+                  </h3>
+                  <div class="flex gap-2 mt-1">
+                    <span
+                      class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded uppercase tracking-wide"
+                      >Completed</span
+                    >
+                    <span
+                      class="text-xs font-bold text-stone-500 bg-stone-200 px-2 py-1 rounded uppercase tracking-wide"
+                      id="detail-muscle"
+                      >Muscle</span
+                    >
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div
+                    class="text-3xl font-mono font-bold text-stone-900"
+                    id="detail-reps"
+                  >
+                    15
+                  </div>
+                  <div class="text-xs text-stone-500 uppercase">Reps / Set</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-4 mb-6">
+                <div
+                  class="bg-white p-3 rounded shadow-sm border border-stone-100 text-center"
+                >
+                  <div class="text-xs text-stone-400 uppercase">Sets Done</div>
+                  <div class="font-bold text-stone-700" id="detail-sets">4</div>
+                </div>
+                <div
+                  class="bg-white p-3 rounded shadow-sm border border-stone-100 text-center"
+                >
+                  <div class="text-xs text-stone-400 uppercase">Avg Rest</div>
+                  <div class="font-bold text-stone-700" id="detail-rest">
+                    60s
+                  </div>
+                </div>
+                <div
+                  class="bg-white p-3 rounded shadow-sm border border-stone-100 text-center"
+                >
+                  <div class="text-xs text-stone-400 uppercase">Tempo</div>
+                  <div class="font-bold text-stone-700" id="detail-tempo">
+                    2-0-2-0
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-white p-4 rounded-lg border border-stone-200 flex-1"
+              >
+                <h4 class="text-xs font-bold text-stone-400 uppercase mb-3">
+                  Performance Notes
+                </h4>
+                <ul class="space-y-2 text-sm text-stone-600" id="detail-cues">
+                  <!-- Cues converted to notes -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-white border-t border-stone-200 mt-12 py-8">
+      <div class="max-w-5xl mx-auto px-4 text-center">
+        <p class="text-sm text-stone-400">
+          © 2024 Maverick AI Fitness. Saved to History.
+        </p>
+      </div>
+    </footer>
+
+    <!-- LOGIC & DATA -->
+    <script>
+      // --- DATA STORE ---
+      const workoutData = {
+        warmup: [
+          {
+            id: "w1",
+            name: "Cat-Cow Flow",
+            muscle: "Spine",
+            sets: 2,
+            reps: "10",
+            rest: "0s",
+            tempo: "Slow",
+            cues: [
+              "Mobility improved from last session",
+              "Good spinal segmentation",
+            ],
+          },
+          {
+            id: "w2",
+            name: "Hip Circles",
+            muscle: "Hips",
+            sets: 2,
+            reps: "10/side",
+            rest: "0s",
+            tempo: "Control",
+            cues: ["Right side tighter than left", "Maintained stability"],
+          },
+          {
+            id: "w3",
+            name: "Glute Bridges",
+            muscle: "Glutes",
+            sets: 3,
+            reps: "15",
+            rest: "30s",
+            tempo: "2-0-2-1",
+            cues: ["Strong activation", "No lumbar compensation"],
+          },
+        ],
+        main: [
+          {
+            id: "m1",
+            name: "KB Swings",
+            muscle: "Posterior Chain",
+            sets: 4,
+            reps: "20",
+            rest: "60s",
+            tempo: "Explosive",
+            cues: [
+              "Power output high",
+              "Maintained hinge mechanics",
+              "HR peaked at 165",
+            ],
+          },
+          {
+            id: "m2",
+            name: "Goblet Squats",
+            muscle: "Quads",
+            sets: 4,
+            reps: "12",
+            rest: "60s",
+            tempo: "3-1-1-0",
+            cues: ["Depth achieved on all reps", "Knees tracking over toes"],
+          },
+          {
+            id: "m3",
+            name: "Arnold Press",
+            muscle: "Shoulders",
+            sets: 3,
+            reps: "10",
+            rest: "60s",
+            tempo: "2-1-2-0",
+            cues: ["Struggle on last 2 reps", "Form held"],
+          },
+        ],
+        finisher: [
+          {
+            id: "f1",
+            name: "Burpees",
+            muscle: "Full Body",
+            sets: 1,
+            reps: "45",
+            rest: "Done",
+            tempo: "Fast",
+            cues: ["Total burnout", "Max effort sustained"],
+          },
+        ],
+      };
+
+      let currentPhase = "main";
+      let safetyMode = false;
+      let charts = {};
+
+      // --- INIT ---
+      document.addEventListener("DOMContentLoaded", () => {
+        initCharts();
+        renderList(currentPhase);
+
+        // Safety Toggle Listener
+        document
+          .getElementById("safety-toggle")
+          .addEventListener("change", (e) => {
+            safetyMode = e.target.checked;
+            updateAppMode();
+          });
+      });
+
+      function shareSummary() {
+        alert("Summary URL copied to clipboard!");
+      }
+
+      function updateAppMode() {
+        const label = document.getElementById("safety-label");
+        const volumeStat = document.getElementById("stat-volume");
+        const strainStat = document.getElementById("stat-strain");
+
+        if (safetyMode) {
+          // SAFETY / MODIFIED MODE
+          label.innerText = "Safety Mode";
+          label.classList.replace("text-stone-600", "text-emerald-600");
+
+          // Update Stats
+          volumeStat.innerHTML =
+            '7.1<span class="text-lg text-stone-500 font-normal">k</span>';
+          strainStat.innerHTML = "7.8";
+          strainStat.classList.replace("text-orange-600", "text-emerald-600");
+          strainStat.nextElementSibling.innerText = "Moderate Intensity";
+
+          // Update Charts
+          charts.intensity.data.datasets[0].data = [
+            70, 100, 120, 125, 120, 130,
+          ];
+          charts.intensity.data.datasets[0].borderColor = "#10b981"; // Emerald
+          charts.intensity.data.datasets[0].backgroundColor =
+            "rgba(16, 185, 129, 0.1)";
+          charts.intensity.update();
+
+          // Update Data Store (Mocking a swap for summary view)
+          workoutData.main[0].name = "Goat Bag Swings";
+          workoutData.main[0].cues = [
+            "Slow tempo",
+            "Focus on hinge",
+            "Lower back protected",
+          ];
+        } else {
+          // PERFORMANCE MODE
+          label.innerText = "Performance Mode";
+          label.classList.replace("text-emerald-600", "text-stone-600");
+
+          // Update Stats
+          volumeStat.innerHTML =
+            '8.4<span class="text-lg text-stone-500 font-normal">k</span>';
+          strainStat.innerHTML = "9.2";
+          strainStat.classList.replace("text-emerald-600", "text-orange-600");
+          strainStat.nextElementSibling.innerText = "High Intensity";
+
+          // Revert Charts
+          charts.intensity.data.datasets[0].data = [
+            70, 115, 150, 165, 158, 185,
+          ];
+          charts.intensity.data.datasets[0].borderColor = "#ea580c";
+          charts.intensity.data.datasets[0].backgroundColor =
+            "rgba(234, 88, 12, 0.1)";
+          charts.intensity.update();
+
+          // Revert Data
+          workoutData.main[0].name = "KB Swings";
+          workoutData.main[0].cues = [
+            "Power output high",
+            "Maintained hinge mechanics",
+            "HR peaked at 165",
+          ];
+        }
+        // Refresh list if needed to show new exercise names
+        renderList(currentPhase);
+      }
+
+      // --- CHART JS IMPLEMENTATION ---
+      function initCharts() {
+        // 1. Intensity Line Chart
+        const ctxInt = document
+          .getElementById("intensityChart")
+          .getContext("2d");
+        charts.intensity = new Chart(ctxInt, {
+          type: "line",
+          data: {
+            labels: ["0m", "10m", "20m", "30m", "40m", "45m"],
+            datasets: [
+              {
+                label: "Actual Heart Rate",
+                data: [70, 115, 150, 165, 158, 185],
+                borderColor: "#ea580c", // Orange 600
+                backgroundColor: "rgba(234, 88, 12, 0.1)",
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: "#fff",
+                pointBorderColor: "#ea580c",
+                pointBorderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true, position: "bottom" } },
+            scales: {
+              y: {
+                beginAtZero: false,
+                min: 60,
+                max: 200,
+                grid: { color: "#f5f5f4" },
+              },
+              x: { grid: { display: false } },
+            },
+          },
+        });
+
+        // 2. Muscle Radar Chart
+        const ctxMus = document.getElementById("muscleChart").getContext("2d");
+        charts.muscle = new Chart(ctxMus, {
+          type: "radar",
+          data: {
+            labels: [
+              "Quads",
+              "Hamstrings",
+              "Glutes",
+              "Core",
+              "Shoulders",
+              "Arms",
+            ],
+            datasets: [
+              {
+                label: "Accumulated Fatigue",
+                data: [9, 8, 9, 7, 8, 6],
+                backgroundColor: "rgba(28, 25, 23, 0.2)", // Stone 900
+                borderColor: "#1c1917",
+                pointBackgroundColor: "#1c1917",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                angleLines: { color: "#e7e5e4" },
+                grid: { color: "#e7e5e4" },
+                pointLabels: {
+                  font: { size: 12, family: "sans-serif" },
+                  color: "#57534e",
+                },
+                suggestedMin: 0,
+                suggestedMax: 10,
+              },
+            },
+            plugins: { legend: { display: false } },
+          },
+        });
+      }
+
+      function filterPhase(phase) {
+        currentPhase = phase;
+
+        // Update Tabs
+        ["warmup", "main", "finisher"].forEach((p) => {
+          const tab = document.getElementById(`tab-${p}`);
+          if (p === phase) {
+            tab.classList.replace("tab-inactive", "tab-active");
+          } else {
+            tab.classList.replace("tab-active", "tab-inactive");
+          }
+        });
+
+        renderList(phase);
+      }
+
+      function renderList(phase) {
+        const list = document.getElementById("exercise-list");
+        list.innerHTML = "";
+
+        const exercises = workoutData[phase];
+
+        exercises.forEach((ex, index) => {
+          const el = document.createElement("button");
+          el.className =
+            "w-full text-left p-4 border-b border-stone-100 hover:bg-stone-50 transition-colors flex justify-between items-center group";
+          el.onclick = () => showDetail(ex);
+
+          el.innerHTML = `
+                    <div class="flex items-center gap-3">
+                         <span class="text-emerald-500 font-bold">✓</span>
+                        <div>
+                            <div class="font-bold text-stone-700 group-hover:text-orange-600 transition-colors">${ex.name}</div>
+                            <div class="text-xs text-stone-400">${ex.sets} Sets • ${ex.reps}</div>
+                        </div>
+                    </div>
+                    <span class="text-stone-300 group-hover:text-orange-400">➤</span>
+                `;
+          list.appendChild(el);
+        });
+
+        // Reset Detail View
+        document.getElementById("detail-empty").classList.remove("hidden");
+        document.getElementById("detail-content").classList.add("hidden");
+      }
+
+      function showDetail(ex) {
+        document.getElementById("detail-empty").classList.add("hidden");
+        const content = document.getElementById("detail-content");
+        content.classList.remove("hidden");
+        content.classList.add("fade-in"); // Add logic for simple css animation if desired
+
+        document.getElementById("detail-name").innerText = ex.name;
+        document.getElementById("detail-muscle").innerText = ex.muscle;
+        document.getElementById("detail-reps").innerText = ex.reps;
+        document.getElementById("detail-sets").innerText = ex.sets;
+        document.getElementById("detail-rest").innerText = ex.rest;
+        document.getElementById("detail-tempo").innerText = ex.tempo;
+
+        const cueList = document.getElementById("detail-cues");
+        cueList.innerHTML = ex.cues
+          .map(
+            (c) => `
+                <li class="flex items-start gap-2">
+                    <span class="text-stone-400 font-bold">•</span> ${c}
+                </li>
+            `
+          )
+          .join("");
+      }
+    </script>
+  </body>
+</html>

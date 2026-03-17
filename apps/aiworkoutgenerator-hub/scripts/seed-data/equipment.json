@@ -1,0 +1,12 @@
+[
+  { "id": "bodyweight", "name": "Bodyweight" },
+  { "id": "dumbbells", "name": "Dumbbells" },
+  { "id": "barbell", "name": "Barbell" },
+  { "id": "kettlebell", "name": "Kettlebell" },
+  { "id": "resistance_bands", "name": "Resistance Bands" },
+  { "id": "cable_machine", "name": "Cable Machine" },
+  { "id": "machines", "name": "Machines" },
+  { "id": "pull_up_bar", "name": "Pull-up Bar" },
+  { "id": "treadmill", "name": "Treadmill" },
+  { "id": "stationary_bike", "name": "Stationary Bike" }
+]

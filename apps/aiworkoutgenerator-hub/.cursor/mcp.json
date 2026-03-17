@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "sentry": {
+      "url": "https://mcp.sentry.dev/mcp/ai-workout-generator/javascript-nextjs"
+    }
+  }
+}

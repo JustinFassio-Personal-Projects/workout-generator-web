@@ -1,0 +1,403 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Admin check using Firebase Auth custom claims (set by Cloud Functions)
+    // SECURITY: Uses custom claims which users cannot modify, unlike Firestore documents
+    // Custom claims are set by admin app's onAdminUserCreated Cloud Function
+    function isAdmin() {
+      return isAuthenticated() &&
+             request.auth.token.role in ['super_admin', 'admin'];
+    }
+
+    // API rate limits (server-only via Admin SDK; clients must not read or write)
+    match /api_rate_limits/{doc} {
+      allow read, write: if false;
+    }
+    
+    // Users collection
+    // SECURITY: Users can read/update their own profile but CANNOT modify the 'role' field
+    // The 'role' field is managed by Cloud Functions and used for admin checks
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      
+      // Allow create without role field (normal user signup)
+      allow create: if isOwner(userId) &&
+                      !('role' in request.resource.data);
+      
+      // Allow update but prevent users from modifying their own role
+      allow update: if isOwner(userId) &&
+                      // Ensure role field is not being added or changed
+                      (!('role' in request.resource.data.diff(resource.data).affectedKeys()) ||
+                       request.resource.data.role == resource.data.role);
+      
+      // Only admins can delete user documents
+      allow delete: if isAdmin();
+    }
+
+    // User profiles (Phase 1 onboarding)
+    match /user_profiles/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update, delete: if isOwner(userId);
+    }
+
+    // Phase 3: User daily state (real-time context)
+    match /user_daily_state/{stateId} {
+      function isValidStateId() {
+        return stateId.matches(
+          '^' + request.auth.uid + '_[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+        );
+      }
+
+      // Allow read if document doesn't exist (`resource == null` in rules; client sees exists() === false) or if user owns it
+      allow read: if isAuthenticated() && isValidStateId() &&
+                    (resource == null || resource.data.user_id == request.auth.uid);
+
+      // Allow create/update if user_id matches authenticated user
+      allow create, update: if isAuthenticated() && isValidStateId() &&
+                              request.resource.data.user_id == request.auth.uid &&
+                              request.resource.data.user_id is string;
+
+      // Allow delete if document exists and user owns it
+      allow delete: if isAuthenticated() && isValidStateId() &&
+                      resource != null &&
+                      resource.data.user_id == request.auth.uid;
+    }
+    
+    // Reference data (readable to signed-in users)
+    match /workout_focuses/{id} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    match /equipment_items/{id} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    // AI Trainers (reference data - 6 trainer personas)
+    // Read: Any authenticated user can read trainer data
+    // Write: Only server-side (Admin SDK) or admins can modify
+    match /trainers/{trainerId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+      
+      // Trainer equipment sets (subcollection)
+      // Read: Any authenticated user can read equipment sets (for filtering equipment)
+      // Write: Only admins can modify (via Admin SDK in admin repo)
+      match /equipment_sets/{focusId} {
+        allow read: if isAuthenticated();
+        allow write: if false; // Admin repo writes via Admin SDK only
+      }
+    }
+    
+    // Workouts collection
+    match /workouts/{workoutId} {
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.userId == request.auth.uid;
+    }
+
+    // Trainer workouts (created by API server; client can update their own)
+    match /trainer_workouts/{workoutId} {
+      // Users can read their own workouts
+      allow read: if isAuthenticated() &&
+                    resource.data.user_id == request.auth.uid;
+      
+      // Public can read if visibility is 'public' (for sharing)
+      // Note: Unauthenticated users can access public workouts via this rule
+      allow read: if resource.data.visibility == 'public';
+      
+      // Users can update their own workouts (for tracking weights, sets, completion, etc.)
+      // but cannot modify server-controlled metadata (user_id, created_at)
+      // All tiers can update visibility fields for sharing (visibility, published_at, updated_at)
+      //
+      // Note on diff().unchangedKeys():
+      // - For update() operations, request.resource.data contains the MERGED document
+      //   (existing fields + updated fields), not just the fields being updated
+      // - This means user_id and created_at will be in unchangedKeys() for partial updates
+      //   that don't modify them, even if not explicitly included in the update call
+      // - API routes using Admin SDK bypass these rules entirely
+      allow update: if isAuthenticated() &&
+                      resource.data.user_id == request.auth.uid &&
+                      (
+                        // Allow visibility updates for sharing (all tiers)
+                        // SECURITY: Validate visibility is only 'public' or 'private'
+                        // Validate timestamp fields are proper types if present
+                        request.resource.data.diff(resource.data).affectedKeys()
+                          .hasOnly(['visibility', 'published_at', 'updated_at']) &&
+                        request.resource.data.visibility in ['public', 'private'] &&
+                        (
+                          !('published_at' in request.resource.data) ||
+                          request.resource.data.published_at == null ||
+                          request.resource.data.published_at is timestamp
+                        ) &&
+                        (
+                          !('updated_at' in request.resource.data) ||
+                          request.resource.data.updated_at is timestamp
+                        ) ||
+                        // Allow other updates but preserve user_id and created_at
+                        request.resource.data.diff(resource.data).unchangedKeys().hasAll(['user_id', 'created_at'])
+                      );
+      
+      // Create and delete are restricted to server-side operations
+      allow create, delete: if false;
+    }
+
+    // Master exercise images (admin-curated images for reuse)
+    // Read: Any authenticated user can read to check for existing master images
+    // Write: Only admin users (verified via custom claims) can create, update, or delete
+    match /master_exercise_images/{imageId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // User exercise image preferences (user-specific image selections)
+    // Read/Write: Users can only read/write their own preferences
+    // Document ID format: `${userId}_${normalizedExerciseName}`
+    match /user_exercise_image_preferences/{preferenceId} {
+      // Helper function to check if preferenceId belongs to the authenticated user
+      function isOwnPreference() {
+        return isAuthenticated() && preferenceId.matches('^' + request.auth.uid + '_.*');
+      }
+      
+      // Read: Allow only for own preferences.
+      // Users can probe for existence (resource == null) only when the ID belongs to them.
+      // This prevents enumeration attacks by requiring isOwnPreference() even for non-existent documents.
+      allow read: if isAuthenticated() &&
+                   (isOwnPreference() ||
+                    (resource != null && resource.data.userId == request.auth.uid));
+      
+      // Write/Update: Only if user owns the document (check ID first, then data)
+      allow update, delete: if isAuthenticated() &&
+                              resource != null &&
+                              (isOwnPreference() || resource.data.userId == request.auth.uid);
+      
+      // Create: User can create their own preference (must match ID format and userId field)
+      allow create: if isAuthenticated() &&
+                     isOwnPreference() &&
+                     request.resource.data.userId == request.auth.uid;
+    }
+
+    // App configuration (including image generation settings)
+    // Read: Any authenticated user can read app config
+    // Write: Only admin users (verified via custom claims) can modify
+    match /app_config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Certification messages (communication between users and trainers)
+    // Note: Messages include workout_owner_id for efficient security rule checks
+    // Read: Users can read messages for workouts they own, trainers/admins can read all
+    // Write: Users can send messages for their own workouts, trainers/admins can write to any
+    match /certification_messages/{messageId} {
+      // Trainers have trainer role in custom claims
+      // Note: Must check if 'role' exists before accessing it to avoid undefined errors
+      function isTrainerOrAdmin() {
+        return isAuthenticated() && 
+               'role' in request.auth.token &&
+               request.auth.token.role in ['trainer', 'admin', 'super_admin'];
+      }
+      
+      // Read: Users can read messages for workouts they own, trainers/admins can read all
+      // Enforces ownership at the security rule level to prevent enumeration attacks
+      // CRITICAL: For list queries, Firestore evaluates rules against ALL matching documents
+      // If ANY document causes a rule evaluation error, the entire query fails
+      // We must handle legacy messages that may be missing workout_owner_id defensively
+      function isMessageOwner() {
+        // Use short-circuit evaluation: check existence FIRST before any field access
+        // This prevents "undefined" errors on legacy messages during list queries
+        // Also handles case where document doesn't exist (resource.data is null)
+        // CRITICAL: Must check resource.data != null BEFORE using 'in' operator
+        // The 'in' operator throws an error if used on null
+        return resource.data != null
+               && resource.data.workout_owner_id != null
+               && resource.data.workout_owner_id is string
+               && resource.data.workout_owner_id.size() > 0
+               && resource.data.workout_owner_id == request.auth.uid;
+      }
+      
+      // Allow read if:
+      // 1. User is authenticated AND (message owner OR trainer/admin)
+      // 2. Trainers/admins can read ALL messages
+      // Query should filter by workout_owner_id to match these rules exactly
+      allow read: if isAuthenticated() && (
+        isMessageOwner() ||
+        isTrainerOrAdmin()
+      );
+      
+      // Create: User can create messages for their own workouts
+      // BULLETPROOF PATTERN: Enforce workout_owner_id as REQUIRED with validation
+      // All user/system messages MUST have workout_owner_id (non-null, string, non-empty, matches user)
+      // Trainers/admins can create any message (uses Admin SDK, bypasses rules)
+      allow create: if isAuthenticated() && (
+        // Trainer/admin bypass (uses Admin SDK)
+        isTrainerOrAdmin() ||
+        // User/system messages MUST have workout_owner_id with strict validation
+        (request.resource.data.workout_owner_id != null &&
+         request.resource.data.workout_owner_id is string &&
+         request.resource.data.workout_owner_id.size() > 0 &&
+         request.resource.data.workout_owner_id == request.auth.uid &&
+         // Validate sender type and handle user vs system messages separately
+         (// User messages: sender must be the authenticated user
+          (request.resource.data.sender_type == 'user' && 
+           'sender_id' in request.resource.data &&
+           request.resource.data.sender_id != null &&
+           request.resource.data.sender_id is string &&
+           request.resource.data.sender_id == request.auth.uid) ||
+          // System messages: sender_type must be 'system' (sender_id can be anything)
+          (request.resource.data.sender_type == 'system' &&
+           'sender_id' in request.resource.data)))
+      );
+      
+      // Update: Only for marking messages as read
+      // Restricted to workout owner or trainer/admin
+      // Enforce one-way transition: unread (null/missing) -> read (non-null)
+      // Use same helper function for consistency
+      allow update: if isAuthenticated() &&
+                      // New value must be non-null (marking as read)
+                      request.resource.data.read_at != null &&
+                      // Only allow if user owns the message or is trainer/admin
+                      // Note: We don't check other fields to avoid accessing potentially missing read_at
+                      // This is safe because updateDoc only updates the specified field
+                      (isMessageOwner() ||
+                       isTrainerOrAdmin());
+      
+      // Delete: Only admins
+      allow delete: if isAdmin();
+    }
+
+    // Liability Waivers (admin-managed waiver versions)
+    // Read: Any authenticated user can read waivers (needed to display active waiver)
+    // Write: Only admins can create/update/delete waivers
+    match /liability_waivers/{waiverId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // User Waiver Agreements (user consent records)
+    // Read: Users can read their own agreements, admins can read all
+    // Write: Server-side only via Admin SDK (via /api/waiver/agree API route)
+    // SECURITY: Client-side creation is denied to prevent bypassing server-side validation,
+    // checkbox validation, full-name rules, and audit trail (ip_address, user_agent, created_at).
+    // The Admin SDK (used in API routes) bypasses security rules, so server-side creation works.
+    match /user_waiver_agreements/{agreementId} {
+      // Users can read their own agreements, admins can read all
+      allow read: if isAuthenticated() && (
+        resource.data.user_id == request.auth.uid ||
+        isAdmin()
+      );
+      
+      // Creation is server-side only via Admin SDK (in /api/waiver/agree route)
+      // Client-side creation denied to prevent security bypass
+      allow create: if false;
+      
+      // Updates and deletes are restricted (agreements are immutable for legal reasons)
+      allow update, delete: if false;
+    }
+    
+    // Board (The Board content system)
+    // board_posts: read for authenticated users (write blocked - admin repo uses Admin SDK)
+    match /board_posts/{postId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Admin repo writes via Admin SDK only
+    }
+
+    // board_user_state: users can read/write their own doc only
+    match /board_user_state/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // board_events: read blocked (admin repo only), write blocked (server route only)
+    match /board_events/{eventId} {
+      allow read: if false; // Admin repo reads via Admin SDK only
+      allow write: if false; // Server route writes via Admin SDK only
+    }
+
+    // Workout summaries (session summaries with public sharing support)
+    // Read: Users can read their own summaries, public can read if visibility is 'public'
+    // Write: Users can create summaries (via service), and update visibility fields only
+    match /workout_summaries/{summaryId} {
+      // Authenticated users can read their own summaries
+      // For list queries, the query MUST filter by user_id: where("user_id", "==", request.auth.uid)
+      // Simplified rule pattern - matches trainer_workouts which works correctly
+      // In Firestore rules, accessing a non-existent field returns null (safe, won't throw error)
+      allow read: if isAuthenticated() &&
+                    resource != null &&
+                    resource.data != null &&
+                    resource.data.user_id == request.auth.uid;
+      
+      // Public documents can be read by anyone (for get operations on shared summaries)
+      // SECURITY: Intentionally using 'get' not 'read' to prevent unauthenticated list queries
+      // that could expose all public summaries. Direct document access via shared link is sufficient.
+      // If public profile list queries are needed later, add a constrained rule with user_id filter.
+      // CRITICAL: Check resource != null first to prevent evaluation errors on non-existent documents
+      allow get: if resource != null &&
+                    resource.data != null &&
+                    resource.data.visibility == 'public';
+      
+      // Allow create if user_id matches authenticated user
+      // Note: user_id must be a string and match the authenticated user
+      // All tiers have permission to create summaries for sharing
+      // CRITICAL: No tier restrictions - all authenticated users can create summaries
+      // Simplified rule to avoid emulator cache issues - checks in optimal order
+      allow create: if isAuthenticated() &&
+                      request.resource.data.user_id == request.auth.uid &&
+                      request.resource.data.user_id is string;
+      
+      // Allow owner to update visibility fields only (for sharing/unsharing)
+      // This allows users to publish/unpublish their summaries
+      // SECURITY: Validate visibility is only 'public' or 'private'
+      // Validate timestamp fields are proper types if present
+      allow update: if isAuthenticated() &&
+                      resource != null &&
+                      resource.data != null &&
+                      resource.data.user_id == request.auth.uid &&
+                      request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['visibility', 'published_at', 'public_slug', 'updated_at']) &&
+                      (
+                        !('visibility' in request.resource.data.diff(resource.data).affectedKeys()) ||
+                        request.resource.data.visibility in ['public', 'private']
+                      ) &&
+                      (
+                        !('published_at' in request.resource.data.diff(resource.data).affectedKeys()) ||
+                        request.resource.data.published_at == null ||
+                        request.resource.data.published_at is timestamp
+                      ) &&
+                      (
+                        !('updated_at' in request.resource.data.diff(resource.data).affectedKeys()) ||
+                        request.resource.data.updated_at is timestamp
+                      );
+      
+      // Deletes are restricted
+      allow delete: if false;
+    }
+
+    // User activity logs (client-side analytics; optional - failures are non-blocking)
+    // Create: Authenticated users can append logs with their own user_id only
+    match /user_activity_logs/{logId} {
+      allow create: if isAuthenticated() &&
+                      request.resource.data.user_id == request.auth.uid &&
+                      request.resource.data.user_id is string;
+      allow read, update, delete: if false;
+    }
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

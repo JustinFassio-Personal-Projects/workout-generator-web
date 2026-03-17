@@ -1,0 +1,74 @@
+[
+  {
+    "id": "strength",
+    "name": "Strength",
+    "description": "Build maximal strength with progressive overload and compound lifts.",
+    "icon": "dumbbell",
+    "color": "#2563EB",
+    "typical_duration": [30, 45, 60],
+    "difficulty_levels": ["beginner", "intermediate", "advanced"],
+    "equipment_required": true,
+    "is_active": true,
+    "display_order": 1
+  },
+  {
+    "id": "hypertrophy",
+    "name": "Hypertrophy",
+    "description": "Build muscle with volume-focused training and smart progression.",
+    "icon": "biceps",
+    "color": "#7C3AED",
+    "typical_duration": [30, 45, 60],
+    "difficulty_levels": ["beginner", "intermediate", "advanced"],
+    "equipment_required": true,
+    "is_active": true,
+    "display_order": 2
+  },
+  {
+    "id": "conditioning",
+    "name": "Conditioning",
+    "description": "Improve work capacity and overall fitness with mixed-modal training.",
+    "icon": "activity",
+    "color": "#059669",
+    "typical_duration": [20, 30, 45],
+    "difficulty_levels": ["beginner", "intermediate", "advanced"],
+    "equipment_required": false,
+    "is_active": true,
+    "display_order": 3
+  },
+  {
+    "id": "hiit",
+    "name": "HIIT",
+    "description": "Short, intense intervals to boost conditioning and burn calories.",
+    "icon": "zap",
+    "color": "#DC2626",
+    "typical_duration": [10, 15, 20, 30],
+    "difficulty_levels": ["beginner", "intermediate", "advanced"],
+    "equipment_required": false,
+    "is_active": true,
+    "display_order": 4
+  },
+  {
+    "id": "cardio",
+    "name": "Cardio",
+    "description": "Endurance-focused sessions for heart health and stamina.",
+    "icon": "heart",
+    "color": "#F97316",
+    "typical_duration": [20, 30, 45, 60],
+    "difficulty_levels": ["beginner", "intermediate", "advanced"],
+    "equipment_required": false,
+    "is_active": true,
+    "display_order": 5
+  },
+  {
+    "id": "mobility",
+    "name": "Mobility",
+    "description": "Improve range of motion, resilience, and recovery with mobility work.",
+    "icon": "move",
+    "color": "#0EA5E9",
+    "typical_duration": [10, 15, 20, 30],
+    "difficulty_levels": ["beginner", "intermediate", "advanced"],
+    "equipment_required": false,
+    "is_active": true,
+    "display_order": 6
+  }
+]

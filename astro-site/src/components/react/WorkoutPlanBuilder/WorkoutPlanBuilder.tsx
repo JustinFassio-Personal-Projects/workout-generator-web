@@ -45,6 +45,35 @@ function mergeWithDefaults(partial: Partial<WebsiteOnboardingData>): WebsiteOnbo
   return base
 }
 
+/** Value equality for form data so we can avoid setState when URL sync yields the same values (prevents unnecessary re-renders on popstate). */
+function isEqualFormData(a: WebsiteOnboardingData, b: WebsiteOnboardingData): boolean {
+  if (
+    a.fitness_level !== b.fitness_level ||
+    a.current_activity_level !== b.current_activity_level ||
+    a.gender !== b.gender ||
+    a.age !== b.age
+  )
+    return false
+  if (
+    a.fitness_goals.length !== b.fitness_goals.length ||
+    a.fitness_goals.some((g, i) => g !== b.fitness_goals[i])
+  )
+    return false
+  if (
+    a.equipment_access.length !== b.equipment_access.length ||
+    a.equipment_access.some((e, i) => e !== b.equipment_access[i])
+  )
+    return false
+  const pu = a.preferred_units
+  const pv = b.preferred_units
+  return (
+    pu.weight === pv.weight &&
+    pu.height === pv.height &&
+    pu.distance === pv.distance &&
+    pu.temperature === pv.temperature
+  )
+}
+
 export function WorkoutPlanBuilder({ skipIntro = false, preselect }: WorkoutPlanBuilderProps = {}) {
   const [showIntro, setShowIntro] = useState(() => !skipIntro)
   const [formData, setFormData] = useState<WebsiteOnboardingData>(() => {
@@ -81,11 +110,13 @@ export function WorkoutPlanBuilder({ skipIntro = false, preselect }: WorkoutPlan
 
   // On popstate, restore form from URL (e.g. user clicked browser back).
   // Always run mergeWithDefaults so a URL with no params (e.g. /onboard) resets form to defaults.
+  // Only update state when the merged result differs from current to avoid unnecessary re-renders.
   useEffect(() => {
     const syncFromUrl = () => {
       const params = new URLSearchParams(window.location.search)
       const partial = parseOnboardingFromSearchParams(params)
-      setFormData(mergeWithDefaults(partial))
+      const next = mergeWithDefaults(partial)
+      setFormData(prev => (isEqualFormData(prev, next) ? prev : next))
     }
     window.addEventListener('popstate', syncFromUrl)
     return () => window.removeEventListener('popstate', syncFromUrl)

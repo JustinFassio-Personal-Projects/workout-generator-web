@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { CreditCard, Lock, RefreshCw } from 'lucide-react'
 import type {
   WebsiteOnboardingData,
@@ -11,6 +11,7 @@ import type {
 } from '@/types/onboarding'
 import { DEFAULT_ONBOARDING_DATA } from '@/types/onboarding'
 import { buildSignupUrl } from '@/lib/buildSignupUrl'
+import { getPreselectData } from '@/lib/equipmentPreselect'
 import {
   parseOnboardingFromSearchParams,
   onboardingToSearchParams,
@@ -21,11 +22,14 @@ import { IntroScreen } from './IntroScreen'
 import { StepOne } from './StepOne'
 import { StepTwo } from './StepTwo'
 import { PlanPreview } from './PlanPreview'
+import { trackFunnelEvent } from '@/lib/analytics-funnel'
 
 type FormErrors = Record<string, string>
 
 export interface WorkoutPlanBuilderProps {
   skipIntro?: boolean
+  /** Preselect value from URL ?preselect= (e.g. dumbbells, kettlebells); pre-fills fitness level and equipment. */
+  preselect?: string | null
 }
 
 function mergeWithDefaults(partial: Partial<WebsiteOnboardingData>): WebsiteOnboardingData {
@@ -41,7 +45,7 @@ function mergeWithDefaults(partial: Partial<WebsiteOnboardingData>): WebsiteOnbo
   return base
 }
 
-export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProps = {}) {
+export function WorkoutPlanBuilder({ skipIntro = false, preselect }: WorkoutPlanBuilderProps = {}) {
   const [showIntro, setShowIntro] = useState(() => !skipIntro)
   const [formData, setFormData] = useState<WebsiteOnboardingData>(() => {
     if (typeof window === 'undefined') return DEFAULT_ONBOARDING_DATA
@@ -52,6 +56,19 @@ export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProp
   const [currentStep, setCurrentStep] = useState<1 | 2>(1)
   const [showPreview, setShowPreview] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
+  const hasSentStarted = useRef(false)
+
+  // Apply ?preselect= from URL (e.g. /onboard?preselect=dumbbells)
+  useEffect(() => {
+    if (preselect) {
+      const { fitnessLevel, categories } = getPreselectData(preselect)
+      setFormData(prev => ({
+        ...prev,
+        fitness_level: fitnessLevel,
+        equipment_access: categories,
+      }))
+    }
+  }, [preselect])
 
   // Sync form state to URL (replaceState so we don't flood history)
   const pushStateFromForm = useCallback((data: WebsiteOnboardingData) => {
@@ -106,21 +123,57 @@ export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProp
   }, [formData.age])
 
   const handleGoalsChange = useCallback(
-    (goals: FitnessGoal[]) => updateFormAndUrl(prev => ({ ...prev, fitness_goals: goals })),
-    [updateFormAndUrl]
+    (goals: FitnessGoal[]) => {
+      if (!hasSentStarted.current) {
+        hasSentStarted.current = true
+        trackFunnelEvent('onboarding_builder_started', {
+          path: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          source: 'workout_plan_builder',
+          preselect: preselect ?? undefined,
+        })
+      }
+      updateFormAndUrl(prev => ({ ...prev, fitness_goals: goals }))
+    },
+    [updateFormAndUrl, preselect]
   )
   const handleLevelChange = useCallback(
-    (level: FitnessLevel) => updateFormAndUrl(prev => ({ ...prev, fitness_level: level })),
-    [updateFormAndUrl]
+    (level: FitnessLevel) => {
+      if (!hasSentStarted.current) {
+        hasSentStarted.current = true
+        trackFunnelEvent('onboarding_builder_started', {
+          path: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          source: 'workout_plan_builder',
+          preselect: preselect ?? undefined,
+        })
+      }
+      updateFormAndUrl(prev => ({ ...prev, fitness_level: level }))
+    },
+    [updateFormAndUrl, preselect]
   )
   const handleEquipmentChange = useCallback(
-    (equipment: EquipmentAccess) =>
-      updateFormAndUrl(prev => ({ ...prev, equipment_access: equipmentAccessToArray(equipment) })),
-    [updateFormAndUrl]
+    (equipment: EquipmentAccess) => {
+      if (!hasSentStarted.current) {
+        hasSentStarted.current = true
+        trackFunnelEvent('onboarding_builder_started', {
+          path: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          source: 'workout_plan_builder',
+          preselect: preselect ?? undefined,
+        })
+      }
+      updateFormAndUrl(prev => ({ ...prev, equipment_access: equipmentAccessToArray(equipment) }))
+    },
+    [updateFormAndUrl, preselect]
   )
   const handleContinue = useCallback(() => {
-    if (validateStepOne()) setCurrentStep(2)
-  }, [validateStepOne])
+    if (validateStepOne()) {
+      trackFunnelEvent('onboarding_builder_step_1_completed', {
+        fitness_goals: formData.fitness_goals,
+        fitness_level: formData.fitness_level,
+        equipment_count: formData.equipment_access.length,
+      })
+      setCurrentStep(2)
+    }
+  }, [validateStepOne, formData.fitness_goals, formData.fitness_level, formData.equipment_access.length])
 
   const handleActivityChange = useCallback(
     (level: ActivityLevel) =>
@@ -148,13 +201,33 @@ export function WorkoutPlanBuilder({ skipIntro = false }: WorkoutPlanBuilderProp
     setErrors({})
   }, [])
   const handleSubmit = useCallback(() => {
-    if (validateStepTwo()) setShowPreview(true)
-  }, [validateStepTwo])
+    if (validateStepTwo()) {
+      trackFunnelEvent('onboarding_builder_step_2_completed', {
+        activity_level: formData.current_activity_level,
+        has_age: formData.age !== undefined && formData.age !== null,
+        has_gender: formData.gender !== undefined,
+      })
+      setShowPreview(true)
+      trackFunnelEvent('onboarding_builder_preview_shown', {
+        fitness_goals: formData.fitness_goals,
+        fitness_level: formData.fitness_level,
+        equipment_count: formData.equipment_access.length,
+        activity_level: formData.current_activity_level,
+      })
+    }
+  }, [validateStepTwo, formData.current_activity_level, formData.age, formData.gender, formData.fitness_goals, formData.fitness_level, formData.equipment_access.length])
   const handleEdit = useCallback(() => {
     setShowPreview(false)
     setCurrentStep(1)
   }, [])
   const handleCreateAccount = useCallback(() => {
+    trackFunnelEvent('onboarding_create_account_clicked', {
+      fitness_goals: formData.fitness_goals,
+      fitness_level: formData.fitness_level,
+      equipment_access: formData.equipment_access,
+      activity_level: formData.current_activity_level,
+      location: 'workout_plan_builder',
+    })
     const signupUrl = buildSignupUrl(formData)
     window.location.href = signupUrl
   }, [formData])

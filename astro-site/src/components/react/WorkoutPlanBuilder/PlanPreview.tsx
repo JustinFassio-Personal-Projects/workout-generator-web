@@ -66,6 +66,9 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
           <div>
             <span className="block text-sm text-white/60 font-medium">Equipment</span>
             <span className="text-white">{equipmentLabel}</span>
+            <p className="text-sm text-white/60 mt-1 m-0">
+              You can change or add specific equipment when you generate your plan.
+            </p>
           </div>
         </div>
       </div>

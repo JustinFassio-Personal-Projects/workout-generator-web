@@ -1,10 +1,7 @@
 ---
 // Hero component - Pure Astro (static HTML + typewriter JS)
-// Direct auth: send users to app with auth modal open (no onboarding redirect)
+// Primary CTA sends users to onboarding (WorkoutPlanBuilder) so they get goals/equipment context before signup.
 import '@fontsource/jetbrains-mono/500.css';
-
-const appBase = (import.meta.env.PUBLIC_APP_URL || 'https://app.aiworkoutgenerator.com').replace(/\/$/, '');
-const directAuthUrl = `${appBase}?signin=1`;
 ---
 
 <section id="hero" class="hero-section relative min-h-screen flex flex-col justify-center overflow-hidden">
@@ -74,10 +71,10 @@ const directAuthUrl = `${appBase}?signin=1`;
         </div>
       </div>
       
-      <!-- CTAs: primary emphasized, secondary de-emphasized; primary = direct auth (app ?signin=1) -->
+      <!-- CTAs: primary = onboarding (WorkoutPlanBuilder at /onboard) -->
       <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mb-12">
         <a
-          href={directAuthUrl}
+          href="/onboard"
           data-cta="hero-generate-workout"
           class="cta-primary text-lg py-4 px-8"
         >

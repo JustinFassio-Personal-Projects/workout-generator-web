@@ -6,6 +6,7 @@ import '@/styles/global.css';
 import '@/styles/globals.scss';
 import 'aos/dist/aos.css';
 import Navbar from '@/components/landing/Navbar.astro';
+import { PageViewTracker } from '@/components/analytics/PageViewTracker';
 
 // Import fonts (Space Grotesk + Syncopate are self-hosted via global.css; Cinzel for about page)
 import '@fontsource/cinzel/400.css';
@@ -225,6 +226,7 @@ const allStructuredData = [
     )}
     
     <!-- Page Content -->
+    <PageViewTracker client:load />
     <Navbar />
     
     <div id="main-content">

@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+set -e
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🚀 Running pre-push verification..."
+
+# Run type check only (build will run in CI/CD with proper env vars)
+npm run type-check
+
+echo "✅ Pre-push checks passed!"

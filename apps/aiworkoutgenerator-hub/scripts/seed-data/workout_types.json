@@ -1,0 +1,8 @@
+[
+  { "id": "strength", "name": "Strength" },
+  { "id": "hypertrophy", "name": "Hypertrophy" },
+  { "id": "conditioning", "name": "Conditioning" },
+  { "id": "hiit", "name": "HIIT" },
+  { "id": "cardio", "name": "Cardio" },
+  { "id": "mobility", "name": "Mobility" }
+]

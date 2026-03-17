@@ -1,0 +1,115 @@
+# Firebase App Hosting Configuration
+# This file configures environment variables and runtime settings for App Hosting
+#
+# IMPORTANT: Sensitive values are stored in Cloud Secret Manager
+# Create secrets using: firebase apphosting:secrets:set <secret-name>
+# See docs/FIREBASE_APP_HOSTING_ENV_VARS.md for setup instructions
+
+# Environment variables for Next.js app
+# NEXT_PUBLIC_* variables are available in both build and runtime environments
+#
+# NOTE: Do NOT configure NODE_ENV here. Firebase App Hosting's adapter
+# handles NODE_ENV correctly - development for npm install, production for next build.
+# Explicit configuration causes conflicts with Next.js build expectations.
+env:
+  # Firebase configuration - stored as secrets for security
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    secret: firebase-api-key
+
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    secret: firebase-auth-domain
+
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    secret: firebase-project-id
+
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    secret: firebase-storage-bucket
+
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    secret: firebase-messaging-sender-id
+
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    secret: firebase-app-id
+
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    secret: firebase-measurement-id
+
+  # PostHog Analytics configuration
+  - variable: NEXT_PUBLIC_POSTHOG_KEY
+    secret: posthog-key
+
+  - variable: NEXT_PUBLIC_POSTHOG_HOST
+    secret: posthog-host
+
+  # Google AI (Gemini) API key for workout generation
+  - variable: GOOGLE_AI_API_KEY
+    secret: google-ai-api-key
+
+  # Stripe configuration for subscription payments
+  # Get from Stripe Dashboard > Developers > API keys
+  - variable: STRIPE_SECRET_KEY
+    secret: stripe-secret-key
+
+  # Stripe Publishable Key (use pk_live_... for production; pk_test_ for non-production)
+  - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    secret: stripe-publishable-key
+
+  # Stripe Price IDs (get from Stripe Dashboard > Products > [Product] > Pricing)
+  - variable: STRIPE_BASIC_PRICE_ID
+    secret: stripe-basic-price-id
+
+  - variable: STRIPE_PRO_PRICE_ID
+    secret: stripe-pro-price-id
+
+  - variable: STRIPE_ELITE_PRICE_ID
+    secret: stripe-elite-price-id
+
+  - variable: STRIPE_COACH_PRICE_ID
+    secret: stripe-coach-price-id
+
+  - variable: STRIPE_COACH_PRO_PRICE_ID
+    secret: stripe-coach-pro-price-id
+
+  # Stripe Webhook Secret (optional, for webhook signature verification)
+  # Get from Stripe Dashboard > Developers > Webhooks > [Your webhook] > Signing secret
+  - variable: STRIPE_WEBHOOK_SECRET
+    secret: stripe-webhook-secret
+
+  # Support Ticket Cloud Function URL
+  # URL for the support ticket creation Cloud Function
+  - variable: FIREBASE_CLOUD_FUNCTION_URL
+    secret: firebase-cloud-function-url
+
+  # Firebase Service Account Key (JSON string)
+  # Required for server-side Firebase Admin SDK operations (e.g., querying master_exercise_images)
+  # Get from: Firebase Console > Project Settings > Service Accounts > Generate New Private Key
+  - variable: FIREBASE_SERVICE_ACCOUNT_KEY
+    secret: firebase-service-account-key
+
+  # Sentry Error Tracking (optional - graceful degradation if not configured)
+  # Get DSN from: Sentry > Settings > Projects > [Your Project] > Client Keys (DSN)
+  - variable: NEXT_PUBLIC_SENTRY_DSN
+    secret: sentry-dsn
+
+  # Sentry Auth Token (only needed at build time for source map uploads)
+  # Set the secret: firebase apphosting:secrets:set sentry-auth-token
+  # Get token from: Sentry > Settings > Auth Tokens (scopes: org:read, project:read, project:write)
+  - variable: SENTRY_AUTH_TOKEN
+    secret: sentry-auth-token
+    availability:
+      - BUILD
+
+  # Sentry organization slug (set secret: firebase apphosting:secrets:set sentry-org)
+  - variable: SENTRY_ORG
+    secret: sentry-org
+
+  # Sentry project slug (set secret: firebase apphosting:secrets:set sentry-project)
+  - variable: SENTRY_PROJECT
+    secret: sentry-project
+
+  # Sentry API base URL (required for US org; set secret to https://us.sentry.io)
+  # firebase apphosting:secrets:set sentry-url then paste https://us.sentry.io
+  - variable: SENTRY_URL
+    secret: sentry-url
+    availability:
+      - BUILD

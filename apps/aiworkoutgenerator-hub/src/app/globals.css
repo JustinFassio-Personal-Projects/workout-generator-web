@@ -1,0 +1,389 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Breathe Animation - defined at root level */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+/* Orange Pulse Glow Animation - defined at root level
+ * Note: Uses box-shadow which can impact performance on lower-end devices.
+ * Consider limiting concurrent animated elements if performance issues arise.
+ */
+@keyframes pulse-orange-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 8px rgba(251, 146, 60, 0.3),
+      0 0 12px rgba(251, 146, 60, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 12px rgba(251, 146, 60, 0.5),
+      0 0 18px rgba(251, 146, 60, 0.3);
+  }
+}
+
+/* Gold Pulse Glow Animation - defined at root level
+ * Note: Uses box-shadow which can impact performance on lower-end devices.
+ * Consider limiting concurrent animated elements if performance issues arise.
+ */
+@keyframes pulse-gold-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 8px rgba(234, 179, 8, 0.3),
+      0 0 12px rgba(234, 179, 8, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 12px rgba(234, 179, 8, 0.5),
+      0 0 18px rgba(234, 179, 8, 0.3);
+  }
+}
+
+/* Gold Breathe Glow Animation - slower, more subtle breathing effect
+ * Note: Uses box-shadow which can impact performance on lower-end devices.
+ * Consider limiting concurrent animated elements if performance issues arise.
+ */
+@keyframes breathe-gold-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 6px rgba(234, 179, 8, 0.25),
+      0 0 10px rgba(234, 179, 8, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 10px rgba(234, 179, 8, 0.4),
+      0 0 16px rgba(234, 179, 8, 0.25);
+  }
+}
+
+/* Orange Breathe Glow Animation - same structure as breathe-gold-glow, orange-400
+ * Note: Uses box-shadow which can impact performance on lower-end devices.
+ */
+@keyframes breathe-orange-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 6px rgba(251, 146, 60, 0.25),
+      0 0 10px rgba(251, 146, 60, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 10px rgba(251, 146, 60, 0.4),
+      0 0 16px rgba(251, 146, 60, 0.25);
+  }
+}
+
+/* Gold Breathe Text Glow Animation - creates a breathing gold glow around readable text
+ * Uses text-shadow for a subtle pulsing glow effect
+ */
+@keyframes breathe-gold-text-border {
+  0%,
+  100% {
+    text-shadow:
+      0 0 4px rgba(234, 179, 8, 0.4),
+      0 0 8px rgba(234, 179, 8, 0.3),
+      0 0 12px rgba(234, 179, 8, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 6px rgba(234, 179, 8, 0.6),
+      0 0 12px rgba(234, 179, 8, 0.4),
+      0 0 18px rgba(234, 179, 8, 0.3);
+  }
+}
+
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-complementary: hsl(var(--complementary));
+  --color-complementary-foreground: hsl(var(--complementary-foreground));
+
+  --color-tertiary: hsl(var(--tertiary));
+  --color-tertiary-foreground: hsl(var(--tertiary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  @keyframes gradient-x {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  --animate-gradient-x: gradient-x 3s ease infinite;
+
+  /* Safety-First Mode Colors */
+  --color-safety-bg: oklch(98% 0.02 190); /* Very soft teal */
+  --color-safety-text: oklch(20% 0.05 190); /* Dark teal-grey */
+  --color-safety-accent: oklch(60% 0.15 170); /* Calming green */
+
+  /* Standard Mode Colors */
+  --color-standard-bg: oklch(15% 0.05 260); /* Deep navy/black */
+  --color-standard-text: oklch(98% 0 0); /* White */
+  --color-standard-accent: oklch(65% 0.2 30); /* Energetic Orange */
+
+  /* Animation custom properties */
+  --animate-breathe: breathe 4s infinite ease-in-out;
+  --animate-pulse-orange-glow: pulse-orange-glow 2s ease-in-out infinite;
+  --animate-pulse-gold-glow: pulse-gold-glow 2s ease-in-out infinite;
+  --animate-breathe-gold-glow: breathe-gold-glow 4s infinite ease-in-out;
+  --animate-breathe-orange-glow: breathe-orange-glow 4s infinite ease-in-out;
+  --animate-breathe-gold-text-border: breathe-gold-text-border 4s infinite
+    ease-in-out;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 82.7 77.9% 55.5%;
+    --primary-foreground: 210 40% 98%;
+    --complementary: 262.7 77.9% 55.5%;
+    --complementary-foreground: 210 40% 98%;
+    --tertiary: 24.4 82.2% 50%;
+    --tertiary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 262.7 77.9% 55.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 82.7 77.9% 55.5%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 82.7 77.9% 55.5%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --complementary: 262.7 77.9% 55.5%;
+    --complementary-foreground: 210 40% 98%;
+    --tertiary: 24.4 82.2% 50%;
+    --tertiary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 262.7 77.9% 55.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 82.7 77.9% 55.5%;
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= --theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+  @media (width >= --theme(--breakpoint-md)) {
+    max-width: --theme(--breakpoint-md);
+  }
+  @media (width >= --theme(--breakpoint-lg)) {
+    max-width: --theme(--breakpoint-lg);
+  }
+  @media (width >= --theme(--breakpoint-xl)) {
+    max-width: --theme(--breakpoint-xl);
+  }
+  @media (width >= --theme(--breakpoint-2xl)) {
+    max-width: --theme(--breakpoint-2xl);
+  }
+}
+
+@utility brand-grid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    hsl(var(--border) / 0.15) 1px,
+    transparent 0
+  );
+  background-size: 40px 40px;
+}
+
+@utility brand-spotlight {
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      hsl(var(--primary) / 0.45) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at 50% 35%,
+      hsl(var(--complementary) / 0.5) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 15% 30%,
+      hsl(var(--complementary) / 0.35) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 85% 30%,
+      hsl(var(--tertiary) / 0.25) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      hsl(var(--primary) / 0.15) 0%,
+      transparent 80%
+    );
+}
+
+@utility border-glow {
+  box-shadow: 0 0 20px 2px hsl(var(--primary) / 0.1);
+  border-color: hsl(var(--primary) / 0.2);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Safety-First Mode Theme Override */
+  body.theme-safety {
+    --background: 98% 0.02 190; /* Very soft teal */
+    --foreground: 20% 0.05 190; /* Dark teal-grey */
+    --card: 98% 0.02 190;
+    --card-foreground: 20% 0.05 190;
+    --primary: 60% 0.15 170; /* Calming green */
+    --primary-foreground: 98% 0.02 190;
+    --muted: 95% 0.01 190;
+    --muted-foreground: 40% 0.03 190;
+    --border: 90% 0.01 190;
+  }
+
+  /* Hide scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Breathe animation utility */
+  .animate-breathe {
+    animation: breathe 4s infinite ease-in-out;
+  }
+
+  /* Pulse orange glow animation utility */
+  .animate-pulse-orange-glow {
+    animation: var(--animate-pulse-orange-glow);
+  }
+
+  /* Pulse gold glow animation utility */
+  .animate-pulse-gold-glow {
+    animation: var(--animate-pulse-gold-glow);
+  }
+
+  /* Breathe gold glow animation utility */
+  .animate-breathe-gold-glow {
+    animation: var(--animate-breathe-gold-glow);
+  }
+
+  /* Breathe orange glow animation utility */
+  .animate-breathe-orange-glow {
+    animation: var(--animate-breathe-orange-glow);
+  }
+
+  /* Breathe gold border animation utility - for containers */
+  .animate-breathe-gold-border {
+    animation: var(--animate-breathe-gold-glow);
+  }
+
+  /* Breathe gold text glow animation utility */
+  .animate-breathe-gold-text-border {
+    animation: var(--animate-breathe-gold-text-border);
+    color: rgb(234, 179, 8); /* Gold text color for readability */
+    font-weight: 700; /* Ensure text stands out */
+  }
+
+  /* Respect user's motion preferences - disable animations for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .firebaseui-container {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+  }
+  /* ... keeping your existing firebase overrides ... */
+}

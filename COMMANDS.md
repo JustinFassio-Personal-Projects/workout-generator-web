@@ -2,7 +2,7 @@
 
 From the **repository root** unless otherwise noted. Requires Node.js 18+ and npm.
 
-**Important:** `npm run dev:nextjs`, `npm run dev:admin`, `npm run dev:admin-astro`, and `npm run dev:programs` exist only on the **root** `package.json`. Run them from the repo root, not from `astro-site` or inside an app.
+**Important:** `npm run dev:nextjs`, `npm run dev:admin`, `npm run dev:admin-astro`, `npm run dev:programs`, and `npm run dev:hub` exist only on the **root** `package.json`. Run them from the repo root, not from `astro-site` or inside an app.
 
 ---
 
@@ -65,6 +65,7 @@ The shared UI package is built automatically when you build an app that depends 
 | `npm run dev:admin-astro` | Start only **admin-dash-astro** (Astro admin on port **3009**). |
 | `npm run dev:nextjs` | Start only **main-web** (Next.js on port **3007**). |
 | `npm run dev:programs` | Start only **programs** (Astro on port **3006**). |
+| `npm run dev:hub` | Start only **aiworkoutgenerator-hub** (Next.js on port **3000**). |
 
 Or from the app directory:
 
@@ -73,7 +74,10 @@ cd apps/admin-dash       && npm run dev   # → http://localhost:3008
 cd apps/admin-dash-astro && npm run dev   # → http://localhost:3009
 cd apps/main-web         && npm run dev   # → http://localhost:3007
 cd apps/programs         && npm run dev   # → http://localhost:3006
+cd apps/aiworkoutgenerator-hub && npm run dev   # → http://localhost:3000
 ```
+
+**aiworkoutgenerator-hub:** Before first run, copy `apps/aiworkoutgenerator-hub/.env.example` to `apps/aiworkoutgenerator-hub/.env.local` and set at least the Firebase `NEXT_PUBLIC_FIREBASE_*` variables. Optional: `GOOGLE_AI_API_KEY` (Genkit/Gemini), Stripe, PostHog, Sentry. See `apps/aiworkoutgenerator-hub/README.md` and `.env.example`.
 
 ---
 
@@ -113,3 +117,4 @@ npm run preview # preview production build
 | **admin-dash-astro** | 3009 | `npm run dev:admin-astro` | `cd apps/admin-dash-astro && npm run dev` |
 | **main-web** | 3007 | `npm run dev:nextjs` | `cd apps/main-web && npm run dev` |
 | **programs** | 3006 | `npm run dev:programs` | `cd apps/programs && npm run dev` |
+| **aiworkoutgenerator-hub** | 3000 | `npm run dev:hub` | `cd apps/aiworkoutgenerator-hub && npm run dev` |

@@ -1,9 +1,9 @@
 ---
-// Onboarding wizard with animated intro: goals, equipment, profile, then loading sequence and redirect to signup.
+// Onboarding: WorkoutPlanBuilder (goals, equipment, profile, then redirect to app signup with params).
 // Query param ?preselect=dumbbells (or kettlebells, barbell, etc.) pre-fills fitness level and equipment.
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Footer from '@/components/landing/Footer.astro';
-import { OnboardingWizard } from '@/components/react/OnboardingWizard/OnboardingWizard';
+import { WorkoutPlanBuilder } from '@/components/react/WorkoutPlanBuilder/WorkoutPlanBuilder';
 
 const preselect = Astro.url.searchParams.get('preselect');
 ---
@@ -14,7 +14,7 @@ const preselect = Astro.url.searchParams.get('preselect');
 >
   <main class="min-h-screen flex flex-col">
     <div class="flex-1">
-      <OnboardingWizard client:load preselect={preselect} />
+      <WorkoutPlanBuilder client:load skipIntro preselect={preselect} />
     </div>
     <Footer />
   </main>

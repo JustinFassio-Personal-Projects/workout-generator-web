@@ -103,6 +103,9 @@ export function StepOne({
           What equipment do you have access to?{' '}
           <span className="text-[var(--color-accent)]">*</span>
         </label>
+        <p className="text-sm text-white/60 mb-2">
+          This is a quick overview—you can refine exact equipment later in the app.
+        </p>
         <select
           id="builder-equipment"
           className={inputBase}

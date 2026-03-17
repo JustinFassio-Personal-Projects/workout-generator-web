@@ -209,6 +209,45 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     else ttfka.sevenPlusDays += 1;
   }
 
+  // Onboarding drop-off: distinct session_id per WorkoutPlanBuilder step (from analytics_funnel_events).
+  // Plain ASCII only; GitHub “hidden/bidi Unicode” warning was verified as false positive.
+  const onboardingEventNames = [
+    'onboarding_builder_started',
+    'onboarding_builder_step_1_completed',
+    'onboarding_builder_step_2_completed',
+    'onboarding_builder_preview_shown',
+    'onboarding_create_account_clicked',
+  ] as const;
+  const stepLabels: Record<(typeof onboardingEventNames)[number], string> = {
+    onboarding_builder_started: 'Started',
+    onboarding_builder_step_1_completed: 'Step 1',
+    onboarding_builder_step_2_completed: 'Step 2',
+    onboarding_builder_preview_shown: 'Preview',
+    onboarding_create_account_clicked: 'Create account',
+  };
+  const stepCounts: number[] = [];
+  for (const eventName of onboardingEventNames) {
+    const { data: rows } = await supabase
+      .from('analytics_funnel_events')
+      .select('session_id')
+      .eq('event_name', eventName)
+      .gte('timestamp', fromIso)
+      .lte('timestamp', toIso)
+      .not('session_id', 'is', null);
+    const sessionIds = new Set(
+      (rows ?? []).map((r) => (r as { session_id: string }).session_id).filter(Boolean)
+    );
+    stepCounts.push(sessionIds.size);
+  }
+  const onboardingDropOff: { step: string; completed: number; dropped: number }[] = [];
+  let prev = 0;
+  onboardingEventNames.forEach((name, i) => {
+    const completed = stepCounts[i] ?? 0;
+    const dropped = Math.max(0, prev - completed);
+    onboardingDropOff.push({ step: stepLabels[name], completed, dropped });
+    prev = completed;
+  });
+
   return {
     signUpsByDay,
     signInsByDay,
@@ -220,5 +259,6 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     },
     oauthVsEmail: { oauth: oauthCount, email: emailCount },
     ttfkaDistribution: ttfka,
+    onboardingDropOff,
   };
 }

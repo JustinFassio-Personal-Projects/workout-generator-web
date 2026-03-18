@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import type { ExerciseConfig } from '@/features/TutorialLab/types/tutorial';
+import { callVertexAIGemini } from '@/lib/vertex-ai-client';
 
 // NOTE: This must only be used server-side to protect the API key
 const apiKey = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
@@ -302,11 +303,14 @@ Rules:
  * Generates user-friendly, plain-language exercise instructions (markdown).
  * Used as the main content on the public exercise page when present.
  */
+/**
+ * Generates user-friendly instructions using Vertex AI Gemini (same credentials as Program/Challenge/Workout Factory).
+ * No GEMINI_API_KEY required.
+ */
 export async function generateUserFriendlyInstructions(
   exerciseName: string,
   biomechanics?: ParsedBiomechanicsContext | null
 ): Promise<string> {
-  requireGeminiApiKey();
   const chain = biomechanics?.biomechanicalChain?.trim() || 'Not specified';
   const pivots = biomechanics?.pivotPoints?.trim() || 'Not specified';
   const stabilization = biomechanics?.stabilizationNeeds?.trim() || 'Not specified';
@@ -319,7 +323,7 @@ export async function generateUserFriendlyInstructions(
       ? biomechanics!.performanceCues!.join('; ')
       : 'None specified';
 
-  const prompt = `Write user-friendly instructions for the exercise: "${exerciseName}".
+  const userPrompt = `Write user-friendly instructions for the exercise: "${exerciseName}".
 
 Use this technical context only to keep the instructions accurate; translate everything into simple language:
 - Movement / chain: ${chain}
@@ -331,23 +335,13 @@ Use this technical context only to keep the instructions accurate; translate eve
 Output only the Markdown. Start with a short 1–2 sentence intro, then a "How to do it" section with numbered steps, then optional "Tips" or "What to avoid" if relevant.`;
 
   try {
-    const response = await withRetry(
-      () =>
-        client.models.generateContent({
-          model: 'gemini-2.0-flash',
-          config: {
-            systemInstruction: USER_INSTRUCTIONS_SYSTEM_PROMPT,
-            responseMimeType: 'text/plain',
-          },
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        }),
-      '[generateUserFriendlyInstructions]'
-    );
-
-    const candidate = response.candidates?.[0];
-    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
-    let markdown = (textPart?.text || '').trim();
-    // Strip markdown code fences if the model wrapped output
+    let markdown = await callVertexAIGemini({
+      systemInstruction: USER_INSTRUCTIONS_SYSTEM_PROMPT,
+      userPrompt,
+      model: 'gemini-1.5-flash',
+      responseMimeType: 'text/plain',
+      logPrefix: '[generateUserFriendlyInstructions]',
+    });
     markdown = markdown.replace(/^```markdown\n?|\n?```$/g, '').trim();
     return markdown;
   } catch (error) {
@@ -509,6 +503,10 @@ Output: Return ONLY the raw HTML string. Do not include markdown code blocks.
  * Generates Deep Dive HTML for an exercise. Used by admin generate-page API.
  * Model aligned with programs app for consistent output.
  */
+/**
+ * Generates Deep Dive HTML using Vertex AI Gemini (same credentials as Program/Challenge/Workout Factory).
+ * No GEMINI_API_KEY required.
+ */
 export async function generateExerciseHtml(
   exerciseName: string,
   imageUrl: string,
@@ -520,8 +518,7 @@ export async function generateExerciseHtml(
   /** URL for the "Go Back" button (default: /exercises). */
   backLinkHref: string = '/exercises'
 ): Promise<string> {
-  requireGeminiApiKey();
-  const prompt = `
+  const userPrompt = `
 Generate a Deep Dive HTML page for the exercise: "${exerciseName}".
 The first heading must be a single <h1> containing the exercise name.
 
@@ -537,22 +534,14 @@ Include a "Go Back" button that links to "${backLinkHref}".
 `;
 
   try {
-    const response = await withRetry(
-      () =>
-        client.models.generateContent({
-          model: 'gemini-3-pro-preview',
-          config: {
-            systemInstruction: DEEP_DIVE_SYSTEM_PROMPT,
-            responseMimeType: 'text/plain',
-          },
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        }),
-      '[generateExerciseHtml]'
-    );
-
-    const candidate = response.candidates?.[0];
-    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
-    let html = (textPart?.text || '').trim();
+    let html = await callVertexAIGemini({
+      systemInstruction: DEEP_DIVE_SYSTEM_PROMPT,
+      userPrompt,
+      model: 'gemini-1.5-pro',
+      maxOutputTokens: 8192,
+      responseMimeType: 'text/plain',
+      logPrefix: '[generateExerciseHtml]',
+    });
 
     // Extract HTML document or strip markdown fences (handles ```html, ```XML, ```, etc.)
     const htmlMatch = html.match(/<html[\s\S]*<\/html\s*>/i);

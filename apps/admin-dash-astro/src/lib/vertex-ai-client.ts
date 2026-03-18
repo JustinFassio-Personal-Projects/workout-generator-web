@@ -12,6 +12,18 @@ const MAX_ERROR_LOG_LENGTH = 500;
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
+/** Extract a plain string from getVertexAICredentials error Response for throwing. */
+async function credentialErrorToMessage(response: Response): Promise<string> {
+  const text = await response.text();
+  try {
+    const j = JSON.parse(text) as { error?: string };
+    if (j && typeof j.error === 'string' && j.error.trim()) return j.error.trim();
+  } catch {
+    // use raw text below
+  }
+  return text.trim() || 'Vertex AI credentials failed';
+}
+
 export type VertexAICredentials =
   | { projectId: string; region: string; accessToken: string }
   | { error: Response };
@@ -203,15 +215,19 @@ export async function callVertexAI(options: VertexAICallOptions): Promise<string
     }
 
     const isRetryable = response.status === 429 || response.status === 503;
+    const totalAttempts = maxRetries + 1;
     if (isRetryable && retries < maxRetries) {
       const delay = baseDelay * Math.pow(2, retries);
       const reason = response.status === 429 ? 'Rate limited' : 'Service unavailable';
       console.warn(
-        `${logPrefix} ${reason} (${response.status}). Retrying in ${delay}ms (attempt ${retries + 1}/${maxRetries})`
+        `${logPrefix} ${reason} (${response.status}). Attempt ${retries + 1}/${totalAttempts} failed; retrying in ${delay}ms`
       );
       await new Promise((resolve) => setTimeout(resolve, delay));
       retries++;
       continue;
+    }
+    if (isRetryable && retries >= maxRetries) {
+      console.warn(`${logPrefix} Attempt ${totalAttempts}/${totalAttempts} failed (${response.status}).`);
     }
 
     const errorText = await response.text();
@@ -243,4 +259,101 @@ export async function callVertexAI(options: VertexAICallOptions): Promise<string
     return (apiData as { content: string }).content;
   }
   throw new Error(`Unexpected API response format. Body: ${rawBody.substring(0, MAX_ERROR_LOG_LENGTH)}`);
+}
+
+/**
+ * Vertex AI Gemini generateContent (same credentials as Program/Challenge/Workout Factory).
+ * Use for Deep Dive and User Instructions so they don't require GEMINI_API_KEY.
+ * Retries on 429 (rate limit) and 503 (service unavailable) with exponential backoff.
+ */
+export interface VertexGeminiOptions {
+  systemInstruction: string;
+  userPrompt: string;
+  model?: string;
+  maxOutputTokens?: number;
+  temperature?: number;
+  responseMimeType?: string;
+  logPrefix?: string;
+}
+
+export async function callVertexAIGemini(options: VertexGeminiOptions): Promise<string> {
+  const creds = await getVertexAICredentials(options.logPrefix ?? '[vertex-gemini]');
+  if ('error' in creds) {
+    const msg = await credentialErrorToMessage(creds.error);
+    throw new Error(msg);
+  }
+  const { projectId, region, accessToken } = creds;
+  const logPrefix = options.logPrefix ?? '[vertex-gemini]';
+  const model = options.model ?? 'gemini-1.5-flash';
+  const baseUrl =
+    region === 'global'
+      ? `https://us-central1-aiplatform.googleapis.com`
+      : `https://${region}-aiplatform.googleapis.com`;
+  const location = region === 'global' ? 'us-central1' : region;
+  const endpoint = `${baseUrl}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
+
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: options.userPrompt }] }],
+    systemInstruction: { parts: [{ text: options.systemInstruction }] },
+    generationConfig: {
+      maxOutputTokens: options.maxOutputTokens ?? 8192,
+      temperature: options.temperature ?? 0.5,
+      ...(options.responseMimeType && { responseMimeType: options.responseMimeType }),
+    },
+  };
+
+  let response: Response | undefined;
+  let retries = 0;
+  const maxRetries = 3;
+  const baseDelay = 2000;
+
+  while (retries <= maxRetries) {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) break;
+
+    const errText = await response.text();
+    if (response.status === 403) {
+      throw new Error(
+        `Vertex AI Gemini 403. Ensure the service account has Vertex AI User in project ${projectId}. ${errText.substring(0, 200)}`
+      );
+    }
+
+    const isRetryable = response.status === 429 || response.status === 503;
+    const totalAttempts = maxRetries + 1;
+    if (isRetryable && retries < maxRetries) {
+      const delay = baseDelay * Math.pow(2, retries);
+      const reason = response.status === 429 ? 'Rate limited' : 'Service unavailable';
+      console.warn(
+        `${logPrefix} ${reason} (${response.status}). Attempt ${retries + 1}/${totalAttempts} failed; retrying in ${delay}ms`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      retries++;
+      continue;
+    }
+    if (isRetryable && retries >= maxRetries) {
+      console.warn(`${logPrefix} Attempt ${totalAttempts}/${totalAttempts} failed (${response.status}).`);
+    }
+    throw new Error(`Vertex AI Gemini error: ${response.status} - ${errText.substring(0, MAX_ERROR_LOG_LENGTH)}`);
+  }
+
+  if (!response || !response.ok) {
+    throw new Error('Vertex AI Gemini failed after retries');
+  }
+
+  const data = (await response.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  };
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (typeof text !== 'string') {
+    throw new Error(`Vertex AI Gemini unexpected response: ${JSON.stringify(data).substring(0, 300)}`);
+  }
+  return text.trim();
 }

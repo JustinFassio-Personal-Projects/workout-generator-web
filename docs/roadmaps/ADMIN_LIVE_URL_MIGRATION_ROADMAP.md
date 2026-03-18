@@ -49,6 +49,8 @@ Ensure Production (and Preview if desired) has at least:
 
 See `apps/admin-dash-astro/README.md` and `.env.example` in that app.
 
+**Deployment Protection:** If aiworkoutgenerator.com rewrites `/api/admin/*` to this project, disable **Vercel Deployment Protection** for Production on this project. Otherwise proxied requests (e.g. Generate Deep Dive, Generate User Instructions) get 403 before reaching your API.
+
 ### 1.3 Verify direct URL
 
 - Open `https://<admin-dash-astro-url>/admin` (e.g. `https://aiworkoutgenerator-admin.vercel.app/admin` or your new project URL).

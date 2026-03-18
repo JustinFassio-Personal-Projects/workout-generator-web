@@ -38,33 +38,33 @@ export async function getVertexAICredentials(
   const credentialsJson =
     typeof process !== 'undefined' ? process.env?.GOOGLE_APPLICATION_CREDENTIALS_JSON : undefined;
 
-  // When using a service account key, use its project_id so we always call Vertex in the project that owns the key (avoids 403 from GOOGLE_PROJECT_ID mismatch on Vercel).
-  let projectId = envProjectId ?? undefined;
-  let parsedKey: { client_email: string; private_key: string; project_id?: string } | undefined;
-  if (credentialsJson) {
-    parsedKey = parseServiceAccountJson(credentialsJson, logPrefix);
-    if (typeof parsedKey.project_id === 'string' && parsedKey.project_id) {
-      projectId = parsedKey.project_id;
-    }
-  }
-  if (!projectId) {
-    return {
-      error: new Response(
-        JSON.stringify({
-          error:
-            'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID not set. Add one to .env / Vercel env for AI generation.',
-        }),
-        { status: 500, headers: JSON_HEADERS }
-      ),
-    };
-  }
-
   const region =
     import.meta.env.GOOGLE_LOCATION ||
     (typeof process !== 'undefined' && process.env?.GOOGLE_LOCATION) ||
     'global';
 
   try {
+    // When using a service account key, parse it inside try so invalid JSON is caught and we return a graceful error.
+    let projectId = envProjectId ?? undefined;
+    let parsedKey: { client_email: string; private_key: string; project_id?: string } | undefined;
+    if (credentialsJson) {
+      parsedKey = parseServiceAccountJson(credentialsJson, logPrefix);
+      if (typeof parsedKey.project_id === 'string' && parsedKey.project_id) {
+        projectId = parsedKey.project_id;
+      }
+    }
+    if (!projectId) {
+      return {
+        error: new Response(
+          JSON.stringify({
+            error:
+              'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID not set. Add one to .env / Vercel env for AI generation.',
+          }),
+          { status: 500, headers: JSON_HEADERS }
+        ),
+      };
+    }
+
     const { GoogleAuth } = await import('google-auth-library');
     const auth = parsedKey
       ? new GoogleAuth({

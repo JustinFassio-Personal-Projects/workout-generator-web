@@ -30,6 +30,8 @@ Optional: **SUPABASE_SERVICE_ROLE_KEY** for API routes that need to bypass RLS (
 
 **403 Permission denied (`aiplatform.endpoints.predict`):** The identity does not have permission to call Vertex AI in the project set in `GOOGLE_PROJECT_ID`. Fix: (1) In Cloud Console → that project → IAM → add the service account (from your key `client_email`) with role **Vertex AI User** (`roles/aiplatform.user`); enable Vertex AI API. (2) Or set `GOOGLE_PROJECT_ID` to the `project_id` inside your service account JSON (the project that owns the key) and ensure Vertex AI is enabled there.
 
+**403 on Generate Deep Dive / Generate User Instructions in production:** If `/api/admin/exercises/[id]/generate-page` or `generate-instructions` return 403 in production but work locally, the cause is usually **Vercel Deployment Protection** on the admin project. When aiworkoutgenerator.com rewrites `/api/admin/*` to this app, Vercel treats the proxied request as unauthenticated and returns 403 before your API runs. **Fix:** In the admin-dash-astro Vercel project → **Settings → Deployment Protection** → disable protection for **Production** (or use “Protection Bypass for Automation” and pass the bypass secret from the requesting app; the app’s own auth remains Supabase + `admin_users`).
+
 ## Adding features from programs
 
 Copy in small steps:

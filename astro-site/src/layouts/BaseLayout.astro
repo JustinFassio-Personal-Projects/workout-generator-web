@@ -226,7 +226,7 @@ const allStructuredData = [
       </noscript>
     )}
     
-    <!-- Page Content -->
+    <!-- Page views: PageViewTracker → web_events (admin-dash-astro); Vercel Analytics → Vercel dashboard. One event per load to each = accurate counts in both. -->
     <PageViewTracker client:load />
     <Navbar />
     

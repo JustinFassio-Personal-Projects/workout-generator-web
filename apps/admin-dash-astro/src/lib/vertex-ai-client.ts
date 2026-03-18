@@ -71,10 +71,15 @@ export async function getVertexAICredentials(
     return { projectId, region, accessToken: tokenResponse.token };
   } catch (err) {
     console.error(`${logPrefix} Auth error:`, err);
-    const hint =
-      typeof process !== 'undefined' && process.env?.GOOGLE_APPLICATION_CREDENTIALS_JSON
-        ? 'Check GOOGLE_APPLICATION_CREDENTIALS_JSON is valid JSON and the service account has Vertex AI permissions.'
-        : 'On Vercel/production set GOOGLE_APPLICATION_CREDENTIALS_JSON (service account JSON). Locally run: gcloud auth application-default login';
+    const isVercel =
+      typeof process !== 'undefined' && process.env?.VERCEL === '1';
+    const hasCredsJson =
+      typeof process !== 'undefined' && !!process.env?.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+    const hint = hasCredsJson
+      ? 'Check GOOGLE_APPLICATION_CREDENTIALS_JSON is valid JSON and the service account has Vertex AI permissions.'
+      : isVercel
+        ? 'AI generation on Vercel requires a service account. In the Vercel project, set GOOGLE_APPLICATION_CREDENTIALS_JSON to the full service account key JSON (same GCP project as GOOGLE_PROJECT_ID).'
+        : 'Run: gcloud auth application-default login';
     return {
       error: new Response(
         JSON.stringify({

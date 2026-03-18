@@ -12,6 +12,18 @@ const MAX_ERROR_LOG_LENGTH = 500;
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
+/** Extract a plain string from getVertexAICredentials error Response for throwing. */
+async function credentialErrorToMessage(response: Response): Promise<string> {
+  const text = await response.text();
+  try {
+    const j = JSON.parse(text) as { error?: string };
+    if (j && typeof j.error === 'string' && j.error.trim()) return j.error.trim();
+  } catch {
+    // use raw text below
+  }
+  return text.trim() || 'Vertex AI credentials failed';
+}
+
 export type VertexAICredentials =
   | { projectId: string; region: string; accessToken: string }
   | { error: Response };
@@ -203,15 +215,19 @@ export async function callVertexAI(options: VertexAICallOptions): Promise<string
     }
 
     const isRetryable = response.status === 429 || response.status === 503;
+    const totalAttempts = maxRetries + 1;
     if (isRetryable && retries < maxRetries) {
       const delay = baseDelay * Math.pow(2, retries);
       const reason = response.status === 429 ? 'Rate limited' : 'Service unavailable';
       console.warn(
-        `${logPrefix} ${reason} (${response.status}). Retrying in ${delay}ms (attempt ${retries + 1}/${maxRetries})`
+        `${logPrefix} ${reason} (${response.status}). Attempt ${retries + 1}/${totalAttempts} failed; retrying in ${delay}ms`
       );
       await new Promise((resolve) => setTimeout(resolve, delay));
       retries++;
       continue;
+    }
+    if (isRetryable && retries >= maxRetries) {
+      console.warn(`${logPrefix} Attempt ${totalAttempts}/${totalAttempts} failed (${response.status}).`);
     }
 
     const errorText = await response.text();
@@ -262,7 +278,10 @@ export interface VertexGeminiOptions {
 
 export async function callVertexAIGemini(options: VertexGeminiOptions): Promise<string> {
   const creds = await getVertexAICredentials(options.logPrefix ?? '[vertex-gemini]');
-  if ('error' in creds) throw new Error('Vertex AI credentials failed');
+  if ('error' in creds) {
+    const msg = await credentialErrorToMessage(creds.error);
+    throw new Error(msg);
+  }
   const { projectId, region, accessToken } = creds;
   const logPrefix = options.logPrefix ?? '[vertex-gemini]';
   const model = options.model ?? 'gemini-1.5-flash';
@@ -308,17 +327,20 @@ export async function callVertexAIGemini(options: VertexGeminiOptions): Promise<
     }
 
     const isRetryable = response.status === 429 || response.status === 503;
+    const totalAttempts = maxRetries + 1;
     if (isRetryable && retries < maxRetries) {
       const delay = baseDelay * Math.pow(2, retries);
       const reason = response.status === 429 ? 'Rate limited' : 'Service unavailable';
       console.warn(
-        `${logPrefix} ${reason} (${response.status}). Retrying in ${delay}ms (attempt ${retries + 1}/${maxRetries})`
+        `${logPrefix} ${reason} (${response.status}). Attempt ${retries + 1}/${totalAttempts} failed; retrying in ${delay}ms`
       );
       await new Promise((resolve) => setTimeout(resolve, delay));
       retries++;
       continue;
     }
-
+    if (isRetryable && retries >= maxRetries) {
+      console.warn(`${logPrefix} Attempt ${totalAttempts}/${totalAttempts} failed (${response.status}).`);
+    }
     throw new Error(`Vertex AI Gemini error: ${response.status} - ${errText.substring(0, MAX_ERROR_LOG_LENGTH)}`);
   }
 

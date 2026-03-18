@@ -14,6 +14,20 @@ Astro-based admin dashboard. Scaffolded so you can **copy features one at a time
 4. Run from root: `npm run dev:admin-astro` or from this dir: `npm run dev`.
 5. Open http://localhost:3009 → redirects to login. Sign in with the same admin email/password as admin-dash.
 
+## Vercel deployment
+
+In the Vercel project → **Settings → Environment Variables**, set at least:
+
+- **PUBLIC_SUPABASE_URL** — Supabase project URL (same as programs).
+- **PUBLIC_SUPABASE_ANON_KEY** — Supabase anon/public key.
+
+Optional: **SUPABASE_SERVICE_ROLE_KEY** for API routes that need to bypass RLS (e.g. admin users list). Without these, the login page may load but sign-in and admin API calls will fail.
+
+**AI (program generation):** To use “Generate with AI” (Vertex AI) on Vercel, set:
+
+- **GOOGLE_PROJECT_ID** (or **PUBLIC_FIREBASE_PROJECT_ID**) — Your GCP project ID.
+- **GOOGLE_APPLICATION_CREDENTIALS_JSON** — The **entire** service account key JSON as a single line (paste the contents of the key file). The service account needs Vertex AI User (or equivalent) so it can call the Vertex AI API. Locally you can omit this and use `gcloud auth application-default login` instead.
+
 ## Adding features from programs
 
 Copy in small steps:

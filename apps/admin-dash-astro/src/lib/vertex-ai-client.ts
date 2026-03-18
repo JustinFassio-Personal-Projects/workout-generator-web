@@ -17,46 +17,88 @@ export type VertexAICredentials =
 /**
  * Resolves project ID, region, and access token for Vertex AI.
  * Use in API routes: if ('error' in creds) return creds.error; then use creds.projectId, etc.
+ *
+ * Auth (in order):
+ * 1. GOOGLE_APPLICATION_CREDENTIALS_JSON — full service account JSON string (for Vercel/production).
+ * 2. Application Default Credentials (for local: gcloud auth application-default login).
+ *
  * @param logPrefix - Optional prefix for auth error logs (e.g. '[generate-scaffold]').
  */
 export async function getVertexAICredentials(
   logPrefix = '[vertex-ai]'
 ): Promise<VertexAICredentials> {
   const projectId =
-    import.meta.env.GOOGLE_PROJECT_ID || import.meta.env.PUBLIC_FIREBASE_PROJECT_ID;
+    import.meta.env.GOOGLE_PROJECT_ID ||
+    import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ||
+    (typeof process !== 'undefined' && process.env?.GOOGLE_PROJECT_ID) ||
+    (typeof process !== 'undefined' && process.env?.PUBLIC_FIREBASE_PROJECT_ID);
   if (!projectId) {
     return {
       error: new Response(
         JSON.stringify({
           error:
-            'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID not set. Add one to .env for AI generation.',
+            'GOOGLE_PROJECT_ID or PUBLIC_FIREBASE_PROJECT_ID not set. Add one to .env / Vercel env for AI generation.',
         }),
         { status: 500, headers: JSON_HEADERS }
       ),
     };
   }
 
-  const region = import.meta.env.GOOGLE_LOCATION || 'global';
+  const region =
+    import.meta.env.GOOGLE_LOCATION ||
+    (typeof process !== 'undefined' && process.env?.GOOGLE_LOCATION) ||
+    'global';
+
   try {
     const { GoogleAuth } = await import('google-auth-library');
-    const auth = new GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-      projectId,
-    });
+    const credentialsJson =
+      typeof process !== 'undefined' ? process.env?.GOOGLE_APPLICATION_CREDENTIALS_JSON : undefined;
+
+    const auth = credentialsJson
+      ? new GoogleAuth({
+          credentials: parseServiceAccountJson(credentialsJson, logPrefix),
+          scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+          projectId,
+        })
+      : new GoogleAuth({
+          scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+          projectId,
+        });
+
     const client = await auth.getClient();
     const tokenResponse = await client.getAccessToken();
     if (!tokenResponse.token) throw new Error('Failed to get access token');
     return { projectId, region, accessToken: tokenResponse.token };
   } catch (err) {
     console.error(`${logPrefix} Auth error:`, err);
+    const hint =
+      typeof process !== 'undefined' && process.env?.GOOGLE_APPLICATION_CREDENTIALS_JSON
+        ? 'Check GOOGLE_APPLICATION_CREDENTIALS_JSON is valid JSON and the service account has Vertex AI permissions.'
+        : 'On Vercel/production set GOOGLE_APPLICATION_CREDENTIALS_JSON (service account JSON). Locally run: gcloud auth application-default login';
     return {
       error: new Response(
         JSON.stringify({
-          error: 'Authentication failed. Run: gcloud auth application-default login',
+          error: `Authentication failed. ${hint}`,
         }),
         { status: 500, headers: JSON_HEADERS }
       ),
     };
+  }
+}
+
+function parseServiceAccountJson(
+  json: string,
+  logPrefix: string
+): { client_email: string; private_key: string } {
+  try {
+    const key = JSON.parse(json) as Record<string, unknown>;
+    if (!key || typeof key.client_email !== 'string' || typeof key.private_key !== 'string') {
+      throw new Error('Missing client_email or private_key in service account JSON');
+    }
+    return { client_email: key.client_email, private_key: key.private_key };
+  } catch (e) {
+    console.error(`${logPrefix} Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON:`, e);
+    throw e;
   }
 }
 

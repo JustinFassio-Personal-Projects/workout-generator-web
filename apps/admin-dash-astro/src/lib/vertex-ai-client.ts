@@ -244,3 +244,68 @@ export async function callVertexAI(options: VertexAICallOptions): Promise<string
   }
   throw new Error(`Unexpected API response format. Body: ${rawBody.substring(0, MAX_ERROR_LOG_LENGTH)}`);
 }
+
+/**
+ * Vertex AI Gemini generateContent (same credentials as Program/Challenge/Workout Factory).
+ * Use for Deep Dive and User Instructions so they don't require GEMINI_API_KEY.
+ */
+export interface VertexGeminiOptions {
+  systemInstruction: string;
+  userPrompt: string;
+  model?: string;
+  maxOutputTokens?: number;
+  temperature?: number;
+  responseMimeType?: string;
+  logPrefix?: string;
+}
+
+export async function callVertexAIGemini(options: VertexGeminiOptions): Promise<string> {
+  const creds = await getVertexAICredentials(options.logPrefix ?? '[vertex-gemini]');
+  if ('error' in creds) throw new Error('Vertex AI credentials failed');
+  const { projectId, region, accessToken } = creds;
+  const model = options.model ?? 'gemini-1.5-flash';
+  const baseUrl =
+    region === 'global'
+      ? `https://us-central1-aiplatform.googleapis.com`
+      : `https://${region}-aiplatform.googleapis.com`;
+  const location = region === 'global' ? 'us-central1' : region;
+  const endpoint = `${baseUrl}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
+
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: options.userPrompt }] }],
+    systemInstruction: { parts: [{ text: options.systemInstruction }] },
+    generationConfig: {
+      maxOutputTokens: options.maxOutputTokens ?? 8192,
+      temperature: options.temperature ?? 0.5,
+      ...(options.responseMimeType && { responseMimeType: options.responseMimeType }),
+    },
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    if (response.status === 403) {
+      throw new Error(
+        `Vertex AI Gemini 403. Ensure the service account has Vertex AI User in project ${projectId}. ${errText.substring(0, 200)}`
+      );
+    }
+    throw new Error(`Vertex AI Gemini error: ${response.status} - ${errText.substring(0, MAX_ERROR_LOG_LENGTH)}`);
+  }
+
+  const data = (await response.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  };
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (typeof text !== 'string') {
+    throw new Error(`Vertex AI Gemini unexpected response: ${JSON.stringify(data).substring(0, 300)}`);
+  }
+  return text.trim();
+}

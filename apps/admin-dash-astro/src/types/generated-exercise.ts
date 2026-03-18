@@ -70,6 +70,21 @@ export type CreateExerciseImageInput = Omit<ExerciseImage, 'id' | 'createdAt'> &
   createdAt?: TimestampLike;
 };
 
+/** Role of a muscle in the exercise (for Muscle Engagement Visualization). */
+export type MuscleRole = 'primary' | 'secondary' | 'stabilizer';
+
+/** Single muscle entry in the engagement map. */
+export interface MuscleEngagementItem {
+  id: string;
+  role: MuscleRole;
+}
+
+/** Structured muscle engagement for Deep Dive diagram. */
+export interface MuscleEngagementMap {
+  view: 'anterior' | 'posterior' | 'both';
+  muscles: MuscleEngagementItem[];
+}
+
 /**
  * Full generated exercise document structure.
  * Used for the Exercise Details page with the "Iceberg Method" layout.
@@ -113,6 +128,10 @@ export interface GeneratedExercise {
   /** Reason for rejection (if applicable) */
   rejectionReason?: string;
   deepDiveHtmlContent?: string;
+  /** Structured muscle engagement for the Deep Dive diagram (view + muscle IDs and roles). */
+  muscleEngagementMap?: MuscleEngagementMap;
+  /** URL of AI-generated anatomical muscle diagram image (Supabase storage). */
+  muscleDiagramImageUrl?: string;
   /** AI-generated plain-language instructions for the public page (markdown). */
   userFriendlyInstructions?: string;
   /** Tutorial Lab: phases and success criteria for camera-based tutorial (stored per exercise). */

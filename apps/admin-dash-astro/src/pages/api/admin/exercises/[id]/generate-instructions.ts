@@ -73,11 +73,17 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
+    const message = error instanceof Error ? error.message : String(error);
     console.error('[generate-instructions] Error:', message);
-    return new Response(JSON.stringify({ error: 'Failed to generate instructions' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const isDev = import.meta.env.DEV;
+    return new Response(
+      JSON.stringify({
+        error: isDev ? message : 'Failed to generate instructions',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 };

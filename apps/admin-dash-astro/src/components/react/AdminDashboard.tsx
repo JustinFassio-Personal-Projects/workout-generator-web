@@ -26,6 +26,7 @@ import DeepResearchEditor from './admin/DeepResearchEditor';
 import ComingSoon from './admin/ComingSoon';
 import ManageExercises from './admin/views/ManageExercises';
 import AdminExerciseDetail from './admin/AdminExerciseDetail';
+import AdminDeepDiveView from './admin/AdminDeepDiveView';
 import ExerciseImageGenerator from '@/components/ExerciseImageGenerator';
 import TutorialLabView from '@/features/TutorialLab/components/TutorialLabView';
 import AnalyticsView from './admin/views/AnalyticsView';
@@ -106,6 +107,7 @@ const AdminDashboard: React.FC = () => {
             <Route path="analytics" element={<AnalyticsView />} />
             <Route path="users" element={<ManageUsers />} />
             <Route path="zones" element={<ManageZones />} />
+            <Route path="exercises/:slug/deep-dive" element={<AdminDeepDiveView />} />
             <Route path="exercises/:slug" element={<AdminExerciseDetail />} />
             <Route path="exercises" element={<ManageExercises />} />
             <Route path="exercise-image-gen" element={<ExerciseImageGenerator />} />

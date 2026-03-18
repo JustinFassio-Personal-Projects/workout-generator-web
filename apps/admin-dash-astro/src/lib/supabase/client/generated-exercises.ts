@@ -45,6 +45,8 @@ interface GeneratedExerciseRow {
   rejected_by: string | null;
   rejection_reason: string | null;
   deep_dive_html_content: string | null;
+  muscle_engagement_map: { view: string; muscles: { id: string; role: string }[] } | null;
+  muscle_diagram_image_url: string | null;
   user_friendly_instructions: string | null;
   suitable_blocks: unknown[] | null;
   main_workout_type: string | null;
@@ -80,6 +82,8 @@ function mapRowToExercise(row: GeneratedExerciseRow): GeneratedExercise {
     rejectedBy: row.rejected_by ?? undefined,
     rejectionReason: row.rejection_reason ?? undefined,
     deepDiveHtmlContent: row.deep_dive_html_content ?? undefined,
+    muscleEngagementMap: (row.muscle_engagement_map ?? undefined) as GeneratedExercise['muscleEngagementMap'],
+    muscleDiagramImageUrl: row.muscle_diagram_image_url ?? undefined,
     userFriendlyInstructions: row.user_friendly_instructions ?? undefined,
     suitableBlocks: (row.suitable_blocks ?? []) as GeneratedExercise['suitableBlocks'],
     mainWorkoutType: (row.main_workout_type ?? undefined) as GeneratedExercise['mainWorkoutType'],

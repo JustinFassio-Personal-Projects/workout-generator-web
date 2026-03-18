@@ -3,7 +3,7 @@
  * Displays full stored data: image, biomechanics (cues, mistakes, chain, pivot, stabilization), sources.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -73,6 +73,18 @@ const AdminExerciseDetail: React.FC = () => {
   const [userInstructionsOpen, setUserInstructionsOpen] = useState(false);
   const [showDeepDiveEditor, setShowDeepDiveEditor] = useState(false);
   const [isGeneratingDeepDive, setIsGeneratingDeepDive] = useState(false);
+
+  /** Headers for admin API calls: JSON + Bearer token so auth works when cookies are not sent. */
+  const getAuthHeaders = useCallback(async (): Promise<Record<string, string>> => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (session?.access_token) {
+      headers.Authorization = `Bearer ${session.access_token}`;
+    }
+    return headers;
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -153,9 +165,11 @@ const AdminExerciseDetail: React.FC = () => {
     if (!exercise || isGeneratingDeepDive) return;
     setIsGeneratingDeepDive(true);
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`/api/admin/exercises/${exercise.id}/generate-page`, {
         method: 'POST',
         credentials: 'include',
+        headers,
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -174,15 +188,18 @@ const AdminExerciseDetail: React.FC = () => {
 
   const handleUpdateDeepDive = async (html: string) => {
     if (!exercise) return;
+    const headers = await getAuthHeaders();
     const res = await fetch(`/api/admin/exercises/${exercise.id}/update-deep-dive`, {
       method: 'POST',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ deepDiveHtmlContent: html }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error ?? 'Failed to update');
-    setExercise((prev) => (prev ? { ...prev, deepDiveHtmlContent: html } : null));
+    setExercise((prev) =>
+      prev ? { ...prev, deepDiveHtmlContent: html } : null
+    );
     setShowDeepDiveEditor(false);
   };
 
@@ -190,9 +207,11 @@ const AdminExerciseDetail: React.FC = () => {
     if (!exercise || isGeneratingInstructions) return;
     setIsGeneratingInstructions(true);
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`/api/admin/exercises/${exercise.id}/generate-instructions`, {
         method: 'POST',
         credentials: 'include',
+        headers,
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -455,6 +474,18 @@ const AdminExerciseDetail: React.FC = () => {
               </pre>
             </div>
           )}
+        </div>
+      )}
+
+      {exercise.deepDiveHtmlContent && (
+        <div className="mt-1">
+          <Link
+            to={`/exercises/${exercise.slug}/deep-dive`}
+            className="inline-flex items-center gap-2 text-sm text-blue-300 transition-colors hover:text-blue-200"
+          >
+            <BookOpen className="h-4 w-4" />
+            View Deep Dive Page
+          </Link>
         </div>
       )}
 

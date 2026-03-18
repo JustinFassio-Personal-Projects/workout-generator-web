@@ -44,6 +44,7 @@ if (deepDiveHtmlContent) {
     complexityLevel: exercise.complexityLevel,
     nonce,
     sources: exercise.sources ?? [],
+    muscleDiagramImageUrl: exercise.muscleDiagramImageUrl ?? undefined,
   };
   const prepared = prepareDeepDiveDocument(withNormalizedMath, metaInput);
   // Restrict script to trusted CDNs; allow inline JSON-LD script via nonce

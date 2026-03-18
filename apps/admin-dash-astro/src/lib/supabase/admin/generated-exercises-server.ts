@@ -6,7 +6,7 @@
  * (generate-page, update-deep-dive).
  */
 
-import type { GeneratedExercise } from '@/types/generated-exercise';
+import type { GeneratedExercise, MuscleEngagementMap } from '@/types/generated-exercise';
 import { getSupabaseServer } from '../server';
 
 function toIso(v: string | null | undefined): string {
@@ -42,6 +42,8 @@ function mapRowToExercise(row: Record<string, unknown>): GeneratedExercise {
     rejectedBy: row.rejected_by as string | undefined,
     rejectionReason: row.rejection_reason as string | undefined,
     deepDiveHtmlContent: row.deep_dive_html_content as string | undefined,
+    muscleEngagementMap: row.muscle_engagement_map as MuscleEngagementMap | undefined,
+    muscleDiagramImageUrl: row.muscle_diagram_image_url as string | undefined,
     suitableBlocks: row.suitable_blocks as GeneratedExercise['suitableBlocks'],
     mainWorkoutType: row.main_workout_type as GeneratedExercise['mainWorkoutType'],
     videoUrl: row.video_url as string | undefined,
@@ -89,6 +91,54 @@ export async function updateGeneratedExerciseDeepDive(
   if (error) {
     if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
       console.error('[updateGeneratedExerciseDeepDive]', error);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Update muscle engagement map for an exercise.
+ */
+export async function updateGeneratedExerciseMuscleMap(
+  id: string,
+  muscleEngagementMap: MuscleEngagementMap
+): Promise<void> {
+  const supabase = getSupabaseServer();
+  const { error } = await supabase
+    .from('generated_exercises')
+    .update({
+      muscle_engagement_map: muscleEngagementMap as unknown as Record<string, unknown>,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+
+  if (error) {
+    if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+      console.error('[updateGeneratedExerciseMuscleMap]', error);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Update muscle diagram image URL for an exercise (AI-generated anatomical image).
+ */
+export async function updateGeneratedExerciseMuscleDiagramImage(
+  id: string,
+  muscleDiagramImageUrl: string
+): Promise<void> {
+  const supabase = getSupabaseServer();
+  const { error } = await supabase
+    .from('generated_exercises')
+    .update({
+      muscle_diagram_image_url: muscleDiagramImageUrl,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+
+  if (error) {
+    if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+      console.error('[updateGeneratedExerciseMuscleDiagramImage]', error);
     }
     throw error;
   }

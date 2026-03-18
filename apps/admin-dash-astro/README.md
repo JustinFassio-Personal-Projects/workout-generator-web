@@ -23,10 +23,12 @@ In the Vercel project → **Settings → Environment Variables**, set at least:
 
 Optional: **SUPABASE_SERVICE_ROLE_KEY** for API routes that need to bypass RLS (e.g. admin users list). Without these, the login page may load but sign-in and admin API calls will fail.
 
-**AI (program generation):** To use “Generate with AI” (Vertex AI) on Vercel, set:
+**AI (Program Factory, Challenge Factory, Workout Factory):** All use the same Vertex AI config. To use “Generate with AI” (Vertex AI) on Vercel, set:
 
-- **GOOGLE_PROJECT_ID** (or **PUBLIC_FIREBASE_PROJECT_ID**) — Your GCP project ID.
-- **GOOGLE_APPLICATION_CREDENTIALS_JSON** — The **entire** service account key JSON as a single line (paste the contents of the key file). The service account needs Vertex AI User (or equivalent) so it can call the Vertex AI API. Locally you can omit this and use `gcloud auth application-default login` instead.
+- **GOOGLE_PROJECT_ID** (or **PUBLIC_FIREBASE_PROJECT_ID**) — GCP project ID. When **GOOGLE_APPLICATION_CREDENTIALS_JSON** is set, the key’s `project_id` is used automatically so Program Factory, Challenge Factory, and Workout Factory all use the same project and permissions.
+- **GOOGLE_APPLICATION_CREDENTIALS_JSON** — The **entire** service account key JSON as a single line. Use one key with Vertex AI User in that project for all AI features. Locally you can omit this and use `gcloud auth application-default login` instead.
+
+**403 Permission denied (`aiplatform.endpoints.predict`):** The identity does not have permission to call Vertex AI in the project set in `GOOGLE_PROJECT_ID`. Fix: (1) In Cloud Console → that project → IAM → add the service account (from your key `client_email`) with role **Vertex AI User** (`roles/aiplatform.user`); enable Vertex AI API. (2) Or set `GOOGLE_PROJECT_ID` to the `project_id` inside your service account JSON (the project that owns the key) and ensure Vertex AI is enabled there.
 
 ## Adding features from programs
 

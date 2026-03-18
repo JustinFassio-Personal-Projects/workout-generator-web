@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Shared Vertex AI / OpenAPI chat client for DeepSeek v3.2.
+ * Used by Program Factory, Challenge Factory, and Workout Factory (and all /api/ai/* routes).
+ * Single config: GOOGLE_PROJECT_ID + GOOGLE_APPLICATION_CREDENTIALS_JSON (or ADC). When a service account key is set, project_id from the key is used so all factories share the same project and permissions.
  * Provides timeout and retry for consistent reliability across endpoints.
  */
 
@@ -27,11 +29,24 @@ export type VertexAICredentials =
 export async function getVertexAICredentials(
   logPrefix = '[vertex-ai]'
 ): Promise<VertexAICredentials> {
-  const projectId =
+  const envProjectId =
     import.meta.env.GOOGLE_PROJECT_ID ||
     import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ||
     (typeof process !== 'undefined' && process.env?.GOOGLE_PROJECT_ID) ||
     (typeof process !== 'undefined' && process.env?.PUBLIC_FIREBASE_PROJECT_ID);
+
+  const credentialsJson =
+    typeof process !== 'undefined' ? process.env?.GOOGLE_APPLICATION_CREDENTIALS_JSON : undefined;
+
+  // When using a service account key, use its project_id so we always call Vertex in the project that owns the key (avoids 403 from GOOGLE_PROJECT_ID mismatch on Vercel).
+  let projectId = envProjectId ?? undefined;
+  let parsedKey: { client_email: string; private_key: string; project_id?: string } | undefined;
+  if (credentialsJson) {
+    parsedKey = parseServiceAccountJson(credentialsJson, logPrefix);
+    if (typeof parsedKey.project_id === 'string' && parsedKey.project_id) {
+      projectId = parsedKey.project_id;
+    }
+  }
   if (!projectId) {
     return {
       error: new Response(
@@ -51,12 +66,9 @@ export async function getVertexAICredentials(
 
   try {
     const { GoogleAuth } = await import('google-auth-library');
-    const credentialsJson =
-      typeof process !== 'undefined' ? process.env?.GOOGLE_APPLICATION_CREDENTIALS_JSON : undefined;
-
-    const auth = credentialsJson
+    const auth = parsedKey
       ? new GoogleAuth({
-          credentials: parseServiceAccountJson(credentialsJson, logPrefix),
+          credentials: { client_email: parsedKey.client_email, private_key: parsedKey.private_key },
           scopes: ['https://www.googleapis.com/auth/cloud-platform'],
           projectId,
         })
@@ -94,13 +106,15 @@ export async function getVertexAICredentials(
 function parseServiceAccountJson(
   json: string,
   logPrefix: string
-): { client_email: string; private_key: string } {
+): { client_email: string; private_key: string; project_id?: string } {
   try {
     const key = JSON.parse(json) as Record<string, unknown>;
     if (!key || typeof key.client_email !== 'string' || typeof key.private_key !== 'string') {
       throw new Error('Missing client_email or private_key in service account JSON');
     }
-    return { client_email: key.client_email, private_key: key.private_key };
+    const project_id =
+      typeof key.project_id === 'string' && key.project_id ? key.project_id : undefined;
+    return { client_email: key.client_email, private_key: key.private_key, project_id };
   } catch (e) {
     console.error(`${logPrefix} Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON:`, e);
     throw e;
@@ -171,6 +185,22 @@ export async function callVertexAI(options: VertexAICallOptions): Promise<string
     }
 
     if (response.ok) break;
+
+    if (response.status === 403) {
+      const errorText = await response.text();
+      let hint =
+        'The service account or user does not have permission to call Vertex AI in this project. ';
+      try {
+        const errJson = JSON.parse(errorText) as { error?: { message?: string } };
+        if (errJson?.error?.message?.includes('aiplatform.endpoints.predict')) {
+          hint +=
+            'Grant the service account (from GOOGLE_APPLICATION_CREDENTIALS_JSON) the role "Vertex AI User" (roles/aiplatform.user) on the GCP project matching GOOGLE_PROJECT_ID. Or set GOOGLE_PROJECT_ID to the project where that service account already has Vertex AI access.';
+        }
+      } catch {
+        // use default hint
+      }
+      throw new Error(`AI API error: 403 - ${hint}`);
+    }
 
     const isRetryable = response.status === 429 || response.status === 503;
     if (isRetryable && retries < maxRetries) {

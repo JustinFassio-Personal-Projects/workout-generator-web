@@ -7,6 +7,7 @@ import '@/styles/globals.scss';
 import 'aos/dist/aos.css';
 import Navbar from '@/components/landing/Navbar.astro';
 import { PageViewTracker } from '@/components/analytics/PageViewTracker';
+import Analytics from '@vercel/analytics/astro';
 
 // Import fonts (Space Grotesk + Syncopate are self-hosted via global.css; Cinzel for about page)
 import '@fontsource/cinzel/400.css';
@@ -235,6 +236,8 @@ const allStructuredData = [
     
     <slot name="footer" />
     <slot name="fab" />
+
+    <Analytics />
 
     <!-- AOS (Animate On Scroll) - matches Next.js init -->
     <script>

@@ -29,22 +29,28 @@ export async function getAnalyticsOverview(days: number): Promise<AnalyticsOverv
 
   if (countError) throw countError;
 
-  const { data: userRows, error: userError } = await supabase
+  // Count distinct visitors (same logic as Acquisition): coalesce(user_id, session_id).
+  // Overview previously only counted user_id, so anonymous sessions showed 0. Align with Acquisition.
+  const { data: visitorRows, error: visitorError } = await supabase
     .from('analytics_funnel_events')
-    .select('user_id')
+    .select('user_id, session_id')
     .gte('timestamp', fromIso)
     .lte('timestamp', toIso)
-    .not('user_id', 'is', null)
     .limit(50000);
 
-  if (userError) throw userError;
+  if (visitorError) throw visitorError;
 
-  const distinctUserIds = new Set((userRows ?? []).map((r) => r.user_id as string).filter(Boolean));
+  const distinctVisitorKeys = new Set(
+    (visitorRows ?? []).map((r) => {
+      const row = r as { user_id?: string | null; session_id?: string | null };
+      return row.user_id ?? row.session_id ?? '';
+    }).filter((k) => k.length > 0)
+  );
 
   return {
     from: fromIso,
     to: toIso,
     totalEvents: totalEvents ?? 0,
-    distinctUsers: distinctUserIds.size,
+    distinctUsers: distinctVisitorKeys.size,
   };
 }

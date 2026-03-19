@@ -13,6 +13,7 @@ import { Loader2 } from "lucide-react";
 import { getErrorCode, getErrorMessage } from "@/lib/auth-helpers";
 import { ProfileService } from "@/services/profile/ProfileService";
 import { hasPhaseAData } from "@/lib/phaseAStorage";
+import { trackAccountSignupComplete } from "@/lib/websiteAnalyticsSession";
 
 /**
  * Google Sign-In button component with redirect flow
@@ -36,6 +37,10 @@ export function GoogleSignInButton() {
         const result = await getRedirectResult(auth);
         if (result) {
           // User successfully signed in via redirect
+          // Attribute new OAuth signups to website builder session (Option A)
+          if (result.additionalUserInfo?.isNewUser) {
+            trackAccountSignupComplete({ method: "oauth" });
+          }
           // Check if user has completed onboarding
           const profile = await ProfileService.getUserProfile(result.user.uid);
           const hasCompletedOnboarding =

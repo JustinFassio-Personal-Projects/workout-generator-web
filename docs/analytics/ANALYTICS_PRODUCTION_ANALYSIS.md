@@ -73,6 +73,22 @@ Env:
 - **astro-site**: `PUBLIC_ANALYTICS_CORS_ORIGIN` (optional, comma-separated) for allowed origins; default includes `https://app.aiworkoutgenerator.com` and `http://localhost:3000`.
 - **Hub**: `NEXT_PUBLIC_MARKETING_SITE_URL` (optional) for the marketing site base URL used for the track-event POST; default `https://aiworkoutgenerator.com`. In local dev the hub uses `http://localhost:4321` when running on localhost.
 
+## Troubleshooting: "Account created" shows 0 in Onboarding drop-off
+
+The Onboarding drop-off counts `account_signup_complete` events from `analytics_funnel_events` (distinct `session_id`). For signups to appear, **all** must be true:
+
+1. **User came from the builder** – They clicked "Create account" in PlanPreview on the marketing site, which redirects to hub `/signup?wg_session_id=...`. Direct signups (e.g. from a "Sign up" link) have no `wg_session_id` and won't be attributed.
+
+2. **`wg_session_id` is stored** – The hub signup page stores it from the URL on mount. A fix ensures it's stored even when Phase A params fail validation.
+
+3. **`trackAccountSignupComplete` is called** – After successful signup (email or OAuth), the hub POSTs to the marketing site's `/api/analytics/track-event`.
+
+4. **CORS and URL** – Hub (e.g. app.aiworkoutgenerator.com) must be in `PUBLIC_ANALYTICS_CORS_ORIGIN` on astro-site. Hub must have `NEXT_PUBLIC_MARKETING_SITE_URL` set correctly (default: https://aiworkoutgenerator.com).
+
+5. **Same Supabase project** – astro-site and admin-dash must use the same Supabase project so events written by track-event are visible in the admin.
+
+**Quick check**: In the browser on the hub signup page (after clicking "Create account" from the builder), open DevTools → Application → Local Storage. You should see `wg_website_session_id`. If it's missing, the URL may not include `wg_session_id` (verify astro-site WorkoutPlanBuilder passes it) or the storage logic failed. After signup, in Network tab, look for a POST to `https://aiworkoutgenerator.com/api/analytics/track-event` (or your marketing URL) – it should return 204.
+
 ## References
 
 - astro-site: `src/lib/supabase/server.ts` (`getSupabaseForAnalytics`), `src/pages/api/analytics/page-view.ts`, `src/pages/api/analytics/track-event.ts`, `src/components/analytics/PageViewTracker.tsx`

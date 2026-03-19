@@ -43,14 +43,36 @@ interface AuthFunnelStats {
   signInsByDay: { date: string; count: number }[];
   funnel: { visit: number; signUp: number; emailConfirmed: number; firstAction: number };
   oauthVsEmail: { oauth: number; email: number };
-  ttfkaDistribution: {
-    sameDay: number;
-    oneToTwoDays: number;
-    threeToSevenDays: number;
-    sevenPlusDays: number;
+  ttfkaDistributionMarketing: {
+    under15m: number;
+    '15mTo1h': number;
+    '1hTo24h': number;
+    '1dTo7d': number;
+    '7dPlus': number;
     never: number;
   };
+  ttfkaDistributionHub?: {
+    under15m: number;
+    '15mTo1h': number;
+    '1hTo24h': number;
+    '1dTo7d': number;
+    '7dPlus': number;
+    never: number;
+  };
+  ttfkaHubWarnings?: string[];
   onboardingDropOff?: { step: string; completed: number; dropped: number }[];
+  handoff?: {
+    firebaseSignups: number;
+    attributedSignups: number;
+    signUpsByDay?: { date: string; count: number }[];
+  } | null;
+}
+
+interface FeatureAdoptionRow {
+  eventName: string;
+  count7d: number;
+  count30d: number;
+  displayLabel?: string;
 }
 
 interface EngagementStats {
@@ -62,8 +84,12 @@ interface EngagementStats {
   sessionCount: number;
   avgSessionDurationMinutes: number;
   avgPagesPerSession: number;
-  featureAdoption: { eventName: string; count7d: number; count30d: number }[];
+  featureAdoptionMarketing?: FeatureAdoptionRow[];
+  featureAdoptionHub?: FeatureAdoptionRow[];
   powerUserDistribution: { bucket: string; count: number }[];
+  /** Hub: Firestore user_activity_logs; otherwise Supabase funnel/web_events */
+  activeUsersSource?: 'hub_firestore' | 'supabase';
+  engagementHubWarnings?: string[];
 }
 
 interface MonetizationStats {
@@ -89,6 +115,50 @@ interface QualityStats {
   totalErrors: number;
   topErrors: { message: string; count: number }[];
   errorsByDay: { date: string; count: number }[];
+}
+
+interface RetentionCohortRow {
+  label: string;
+  start: string;
+  end: string;
+  size: number;
+  retained: number[];
+  rates: number[];
+}
+
+interface RetentionCohortsStats {
+  enabled?: boolean;
+  granularity: string;
+  activeDefinition?: 'session' | 'workout';
+  cohorts: RetentionCohortRow[];
+  source: string;
+  kpis?: { label: string; rate: number }[];
+  warnings?: string[];
+}
+
+interface MonetizationCandidateRow {
+  uid: string;
+  displayName?: string;
+  signupAt: string;
+  lastActivityAt: string;
+  signupAgeDays: number;
+  signals: {
+    workoutEvents: number;
+    sessionEvents: number;
+    distinctDays: number;
+    totalActiveDays: number;
+  };
+  reasons: string[];
+}
+
+interface MonetizationCandidatesStats {
+  enabled?: boolean;
+  segment: 'new' | 'return';
+  generatedAt: string;
+  candidates: MonetizationCandidateRow[];
+  source: string;
+  totalActiveLookbackDays?: number;
+  warnings?: string[];
 }
 
 function formatDate(iso: string): string {
@@ -132,6 +202,17 @@ const AnalyticsView: React.FC = () => {
   const [quality, setQuality] = useState<QualityStats | null>(null);
   const [qualityLoading, setQualityLoading] = useState(true);
   const [qualityError, setQualityError] = useState<string | null>(null);
+  const [retention, setRetention] = useState<RetentionCohortsStats | null>(null);
+  const [retentionLoading, setRetentionLoading] = useState(true);
+  const [retentionError, setRetentionError] = useState<string | null>(null);
+  const [retentionGranularity, setRetentionGranularity] = useState<'week' | 'day'>('week');
+  const [retentionActiveDefinition, setRetentionActiveDefinition] = useState<
+    'session' | 'workout'
+  >('session');
+  const [candidates, setCandidates] = useState<MonetizationCandidatesStats | null>(null);
+  const [candidatesLoading, setCandidatesLoading] = useState(true);
+  const [candidatesError, setCandidatesError] = useState<string | null>(null);
+  const [candidatesSegment, setCandidatesSegment] = useState<'new' | 'return'>('new');
   const [days, setDays] = useState(30);
 
   useEffect(() => {
@@ -273,6 +354,64 @@ const AnalyticsView: React.FC = () => {
     };
     fetchQuality();
   }, [days]);
+
+  useEffect(() => {
+    const fetchRetention = async () => {
+      try {
+        setRetentionLoading(true);
+        setRetentionError(null);
+        const baseParams =
+          retentionGranularity === 'week'
+            ? 'cohortWeeks=12&periods=13&granularity=week'
+            : 'cohortDays=30&periods=31&granularity=day';
+        const params = `${baseParams}&activeDefinition=${retentionActiveDefinition}`;
+        const res = await fetch(
+          `/api/admin/analytics/retention-cohorts?${params}`,
+          { credentials: 'include' }
+        );
+        const data = (await res.json()) as RetentionCohortsStats | { error?: string };
+        if (!res.ok) {
+          throw new Error((data as { error?: string }).error ?? 'Failed to load');
+        }
+        setRetention(data as RetentionCohortsStats);
+      } catch (err) {
+        setRetentionError(
+          err instanceof Error ? err.message : 'Failed to load retention cohort stats'
+        );
+        setRetention(null);
+      } finally {
+        setRetentionLoading(false);
+      }
+    };
+    fetchRetention();
+  }, [retentionGranularity, retentionActiveDefinition]);
+
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        setCandidatesLoading(true);
+        setCandidatesError(null);
+        const params = `segment=${candidatesSegment}&windowDays=14&recentDays=7&limit=50&totalActiveLookbackDays=365`;
+        const res = await fetch(
+          `/api/admin/analytics/monetization-candidates?${params}`,
+          { credentials: 'include' }
+        );
+        const data = (await res.json()) as MonetizationCandidatesStats | { error?: string };
+        if (!res.ok) {
+          throw new Error((data as { error?: string }).error ?? 'Failed to load');
+        }
+        setCandidates(data as MonetizationCandidatesStats);
+      } catch (err) {
+        setCandidatesError(
+          err instanceof Error ? err.message : 'Failed to load monetization candidates'
+        );
+        setCandidates(null);
+      } finally {
+        setCandidatesLoading(false);
+      }
+    };
+    fetchCandidates();
+  }, [candidatesSegment]);
 
   return (
     <div className="space-y-8">
@@ -681,50 +820,71 @@ const AnalyticsView: React.FC = () => {
               )}
             </div>
 
-            {/* TTFKA */}
+            {/* TTFKA: Hub (Firestore) + Marketing & timer (Supabase) */}
             <div>
               <h3 className="mb-2 text-sm font-medium text-white/70">Time to first key action</h3>
-              <div className="overflow-hidden rounded border border-white/10">
-                <table className="w-full text-sm">
-                  <thead className="bg-black/30">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-white/80">Bucket</th>
-                      <th className="px-3 py-2 text-right text-white/80">Users</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    <tr>
-                      <td className="px-3 py-2 text-white/80">Same day</td>
-                      <td className="px-3 py-2 text-right text-white/70">
-                        {authFunnel.ttfkaDistribution.sameDay.toLocaleString()}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 text-white/80">1–2 days</td>
-                      <td className="px-3 py-2 text-right text-white/70">
-                        {authFunnel.ttfkaDistribution.oneToTwoDays.toLocaleString()}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 text-white/80">3–7 days</td>
-                      <td className="px-3 py-2 text-right text-white/70">
-                        {authFunnel.ttfkaDistribution.threeToSevenDays.toLocaleString()}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 text-white/80">7+ days</td>
-                      <td className="px-3 py-2 text-right text-white/70">
-                        {authFunnel.ttfkaDistribution.sevenPlusDays.toLocaleString()}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 text-white/80">Never</td>
-                      <td className="px-3 py-2 text-right text-white/70">
-                        {authFunnel.ttfkaDistribution.never.toLocaleString()}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              {authFunnel.ttfkaHubWarnings && authFunnel.ttfkaHubWarnings.length > 0 && (
+                <div className="mb-3 rounded border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
+                  {authFunnel.ttfkaHubWarnings.map((w, i) => (
+                    <p key={i}>{w}</p>
+                  ))}
+                </div>
+              )}
+              {authFunnel.ttfkaDistributionHub && (
+                <div className="mb-6">
+                  <h4 className="mb-2 text-xs font-medium text-white/60">
+                    Hub (Firestore)
+                  </h4>
+                  <p className="mb-2 text-xs text-white/50">
+                    Signup = Auth creation; first key = workout:* or profile:onboarding_complete from{' '}
+                    <code className="rounded bg-white/10 px-1">user_activity_logs</code>.
+                  </p>
+                  <div className="overflow-hidden rounded border border-white/10">
+                    <table className="w-full text-sm">
+                      <thead className="bg-black/30">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-white/80">Bucket</th>
+                          <th className="px-3 py-2 text-right text-white/80">Users</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        <tr><td className="px-3 py-2 text-white/80">&lt; 15 minutes</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionHub.under15m.toLocaleString()}</td></tr>
+                        <tr><td className="px-3 py-2 text-white/80">15 min – 1 hour</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionHub['15mTo1h'].toLocaleString()}</td></tr>
+                        <tr><td className="px-3 py-2 text-white/80">1 – 24 hours</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionHub['1hTo24h'].toLocaleString()}</td></tr>
+                        <tr><td className="px-3 py-2 text-white/80">1 – 7 days</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionHub['1dTo7d'].toLocaleString()}</td></tr>
+                        <tr><td className="px-3 py-2 text-white/80">7+ days</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionHub['7dPlus'].toLocaleString()}</td></tr>
+                        <tr><td className="px-3 py-2 text-white/80">Never</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionHub.never.toLocaleString()}</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              <div>
+                <h4 className="mb-2 text-xs font-medium text-white/60">
+                  Marketing &amp; timer (Supabase)
+                </h4>
+                <p className="mb-2 text-xs text-white/50">
+                  Signup = <code className="rounded bg-white/10 px-1">account_signup_complete</code>; first key = timer_session_complete or hub_timer_launch_1 from{' '}
+                  <code className="rounded bg-white/10 px-1">analytics_funnel_events</code>.
+                </p>
+                <div className="overflow-hidden rounded border border-white/10">
+                  <table className="w-full text-sm">
+                    <thead className="bg-black/30">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-white/80">Bucket</th>
+                        <th className="px-3 py-2 text-right text-white/80">Users</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      <tr><td className="px-3 py-2 text-white/80">&lt; 15 minutes</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionMarketing.under15m.toLocaleString()}</td></tr>
+                      <tr><td className="px-3 py-2 text-white/80">15 min – 1 hour</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionMarketing['15mTo1h'].toLocaleString()}</td></tr>
+                      <tr><td className="px-3 py-2 text-white/80">1 – 24 hours</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionMarketing['1hTo24h'].toLocaleString()}</td></tr>
+                      <tr><td className="px-3 py-2 text-white/80">1 – 7 days</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionMarketing['1dTo7d'].toLocaleString()}</td></tr>
+                      <tr><td className="px-3 py-2 text-white/80">7+ days</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionMarketing['7dPlus'].toLocaleString()}</td></tr>
+                      <tr><td className="px-3 py-2 text-white/80">Never</td><td className="px-3 py-2 text-right text-white/70">{authFunnel.ttfkaDistributionMarketing.never.toLocaleString()}</td></tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
@@ -758,6 +918,31 @@ const AnalyticsView: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Handoff: Website → Hub (when Firebase configured) */}
+            {authFunnel.handoff != null && (
+              <div>
+                <h3 className="mb-2 text-sm font-medium text-white/70">Handoff: Website → Hub</h3>
+                <div className="overflow-hidden rounded border border-white/10">
+                  <table className="w-full text-sm">
+                    <tbody className="divide-y divide-white/5">
+                      <tr>
+                        <td className="px-3 py-2 text-white/80">Accounts created (Firebase)</td>
+                        <td className="px-3 py-2 text-right text-white/70">
+                          {authFunnel.handoff.firebaseSignups.toLocaleString()}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-3 py-2 text-white/80">Attributed to builder</td>
+                        <td className="px-3 py-2 text-right text-white/70">
+                          {authFunnel.handoff.attributedSignups.toLocaleString()}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
         {!authFunnelLoading && !authFunnelError && !authFunnel && (
@@ -772,10 +957,23 @@ const AnalyticsView: React.FC = () => {
         {engagementError && <p className="text-red-400">{engagementError}</p>}
         {!engagementLoading && !engagementError && engagement && (
           <div className="space-y-8">
+            {engagement.engagementHubWarnings && engagement.engagementHubWarnings.length > 0 && (
+              <div className="rounded border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
+                {engagement.engagementHubWarnings.map((w, i) => (
+                  <p key={i}>{w}</p>
+                ))}
+              </div>
+            )}
             {/* DAU over time */}
             {engagement.dauByDay.length > 0 && (
               <div>
                 <h3 className="mb-2 text-sm font-medium text-white/70">DAU over time</h3>
+                {engagement.activeUsersSource === 'hub_firestore' && (
+                  <p className="mb-2 text-xs text-white/50">
+                    Distinct hub users (Firebase UID) with ≥1 activity log per UTC day — same source as
+                    Retention &amp; cohorts.
+                  </p>
+                )}
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
@@ -808,10 +1006,29 @@ const AnalyticsView: React.FC = () => {
                 </div>
               </div>
             )}
+            {engagement.activeUsersSource === 'hub_firestore' &&
+              engagement.dauByDay.length === 0 && (
+                <p className="text-sm text-white/60">
+                  No hub activity logs in this date range. DAU/WAU/MAU use Firestore{' '}
+                  <code className="rounded bg-white/10 px-1">user_activity_logs</code>.
+                </p>
+              )}
 
             {/* DAU / WAU / MAU / Stickiness cards */}
             <div>
               <h3 className="mb-2 text-sm font-medium text-white/70">Active users</h3>
+              {engagement.activeUsersSource === 'hub_firestore' ? (
+                <p className="mb-2 text-xs text-white/50">
+                  DAU = distinct users on the latest day with any log; WAU / MAU = distinct users active
+                  on ≥1 day in the last 7 / 30 UTC days; stickiness = WAU ÷ MAU.
+                </p>
+              ) : (
+                <p className="mb-2 text-xs text-white/50">
+                  From Supabase (funnel + web_events). Configure{' '}
+                  <code className="rounded bg-white/10 px-1">FIREBASE_SERVICE_ACCOUNT_KEY</code> to use
+                  hub activity logs instead.
+                </p>
+              )}
               <div className="flex flex-wrap gap-4">
                 <div className="rounded-lg border border-white/10 bg-black/30 px-4 py-3">
                   <p className="text-xs text-white/50">DAU</p>
@@ -859,35 +1076,97 @@ const AnalyticsView: React.FC = () => {
               </div>
             </div>
 
-            {/* Feature adoption */}
+            {/* Feature adoption: Hub (Firestore) + Marketing & timer (Supabase) */}
             <div>
               <h3 className="mb-2 text-sm font-medium text-white/70">Feature adoption</h3>
-              <div className="overflow-hidden rounded border border-white/10">
-                <table className="w-full text-sm">
-                  <thead className="bg-black/30">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-white/80">Event</th>
-                      <th className="px-3 py-2 text-right text-white/80">Last 7 days</th>
-                      <th className="px-3 py-2 text-right text-white/80">Last 30 days</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {engagement.featureAdoption.map((row, i) => (
-                      <tr key={i}>
-                        <td className="px-3 py-2 font-mono text-xs text-white/80">
-                          {row.eventName}
-                        </td>
-                        <td className="px-3 py-2 text-right text-white/70">
-                          {row.count7d.toLocaleString()}
-                        </td>
-                        <td className="px-3 py-2 text-right text-white/70">
-                          {row.count30d.toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+
+              {engagement.featureAdoptionHub && engagement.featureAdoptionHub.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="mb-2 text-xs font-medium text-white/60">
+                    Hub activity (Firestore)
+                  </h4>
+                  {engagement.activeUsersSource === 'hub_firestore' &&
+                    engagement.featureAdoptionHub.every(
+                      (r) => r.count7d === 0 && r.count30d === 0
+                    ) && (
+                      <p className="mb-2 text-xs text-white/50">
+                        No hub activity logs in range. Data from{' '}
+                        <code className="rounded bg-white/10 px-1">user_activity_logs</code>.
+                      </p>
+                    )}
+                  <div className="overflow-hidden rounded border border-white/10">
+                    <table className="w-full text-sm">
+                      <thead className="bg-black/30">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-white/80">Action</th>
+                          <th className="px-3 py-2 text-right text-white/80">Last 7 days</th>
+                          <th className="px-3 py-2 text-right text-white/80">Last 30 days</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {engagement.featureAdoptionHub.map((row, i) => (
+                          <tr key={i}>
+                            <td className="px-3 py-2 text-white/80">
+                              {row.displayLabel ?? row.eventName}
+                            </td>
+                            <td className="px-3 py-2 text-right text-white/70">
+                              {row.count7d.toLocaleString()}
+                            </td>
+                            <td className="px-3 py-2 text-right text-white/70">
+                              {row.count30d.toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {engagement.featureAdoptionMarketing &&
+                engagement.featureAdoptionMarketing.length > 0 && (
+                  <div>
+                    <h4 className="mb-2 text-xs font-medium text-white/60">
+                      Marketing &amp; timer (Supabase)
+                    </h4>
+                    <p className="mb-2 text-xs text-white/50">
+                      Builder handoff, timer funnel events from{' '}
+                      <code className="rounded bg-white/10 px-1">analytics_funnel_events</code>.
+                    </p>
+                    <div className="overflow-hidden rounded border border-white/10">
+                      <table className="w-full text-sm">
+                        <thead className="bg-black/30">
+                          <tr>
+                            <th className="px-3 py-2 text-left text-white/80">Event</th>
+                            <th className="px-3 py-2 text-right text-white/80">Last 7 days</th>
+                            <th className="px-3 py-2 text-right text-white/80">Last 30 days</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {engagement.featureAdoptionMarketing.map((row, i) => (
+                            <tr key={i}>
+                              <td className="px-3 py-2 font-mono text-xs text-white/80">
+                                {row.eventName}
+                              </td>
+                              <td className="px-3 py-2 text-right text-white/70">
+                                {row.count7d.toLocaleString()}
+                              </td>
+                              <td className="px-3 py-2 text-right text-white/70">
+                                {row.count30d.toLocaleString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+              {(!engagement.featureAdoptionHub || engagement.featureAdoptionHub.length === 0) &&
+                (!engagement.featureAdoptionMarketing ||
+                  engagement.featureAdoptionMarketing.length === 0) && (
+                  <p className="text-white/50">No feature adoption data</p>
+                )}
             </div>
 
             {/* Power-user distribution */}
@@ -929,8 +1208,334 @@ const AnalyticsView: React.FC = () => {
         )}
       </div>
 
-      {/* Placeholder sections for future phases */}
-      <PlaceholderSection title="Retention & cohorts" />
+      {/* Retention & cohorts (Firebase: hub activity logs + Auth signup week/day) */}
+      <div className="rounded-lg border border-white/10 bg-black/20 p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="font-heading text-xl font-bold">Retention & cohorts</h2>
+            <p className="mt-1 text-sm text-white/60">
+              Data from Firebase (hub activity logs + Auth signup).{' '}
+              {retentionActiveDefinition === 'session'
+                ? 'Session = app:open, app:session_start'
+                : 'Workout = any workout:* event (generate, open, start, complete, save, share)'}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-white/60">Active definition:</span>
+              <select
+                value={retentionActiveDefinition}
+                onChange={(e) =>
+                  setRetentionActiveDefinition(e.target.value as 'session' | 'workout')
+                }
+                disabled={retentionLoading}
+                className="rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-sm text-white disabled:opacity-50"
+              >
+                <option value="session">Session (opens)</option>
+                <option value="workout">Workout (engagement)</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-white/60">Granularity:</span>
+              <select
+                value={retentionGranularity}
+                onChange={(e) => setRetentionGranularity(e.target.value as 'week' | 'day')}
+                disabled={retentionLoading}
+                className="rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-sm text-white disabled:opacity-50"
+              >
+                <option value="week">Week</option>
+                <option value="day">Day</option>
+              </select>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (!retention?.cohorts?.length || retentionLoading) return;
+                const prefix =
+                  retention.granularity === 'day' ? 'D' : 'W';
+                const periodCount = retention.cohorts[0]?.rates?.length ?? 0;
+                const headerCols = ['Cohort', 'Size'];
+                for (let i = 0; i < periodCount; i++) {
+                  headerCols.push(`${prefix}${i} %`);
+                }
+                const rows = retention.cohorts.map((c) => {
+                  const cells = [c.label, String(c.size)];
+                  for (let i = 0; i < periodCount; i++) {
+                    const pct =
+                      c.rates[i] != null
+                        ? (c.rates[i] * 100).toFixed(1)
+                        : '';
+                    cells.push(pct);
+                  }
+                  return cells;
+                });
+                const escape = (s: string) =>
+                  /[,"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+                const csv =
+                  headerCols.map(escape).join(',') +
+                  '\n' +
+                  rows.map((r) => r.map(escape).join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `retention-cohorts-${retention.granularity}-${retention.activeDefinition ?? 'session'}-${new Date().toISOString().slice(0, 10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              disabled={!retention?.cohorts?.length || retentionLoading}
+              className="rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Export CSV
+            </button>
+          </div>
+        </div>
+        {retentionLoading && <p className="text-white/60">Loading…</p>}
+        {retentionError && <p className="text-red-400">{retentionError}</p>}
+        {!retentionLoading && !retentionError && retention?.enabled === false && (
+          <p className="text-white/60">
+            Firebase not configured. Set <code className="rounded bg-white/10 px-1">FIREBASE_SERVICE_ACCOUNT_KEY</code> and
+            ensure the service account has Cloud Datastore User to read <code className="rounded bg-white/10 px-1">user_activity_logs</code>.
+          </p>
+        )}
+        {!retentionLoading && !retentionError && retention?.enabled !== false && retention?.cohorts && (
+          <div className="space-y-4">
+            {retention.warnings && retention.warnings.length > 0 && (
+              <div className="rounded border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
+                {retention.warnings.map((w, i) => (
+                  <p key={i}>{w}</p>
+                ))}
+              </div>
+            )}
+            {retention.kpis && retention.kpis.length > 0 && (
+              <div className="flex flex-wrap gap-4">
+                {retention.kpis.map((kpi) => (
+                  <div
+                    key={kpi.label}
+                    className="rounded-lg border border-white/10 bg-black/30 px-4 py-2"
+                  >
+                    <span className="text-xs text-white/50">{kpi.label}</span>
+                    <span className="ml-2 text-lg font-semibold text-white/90">
+                      {Math.round(kpi.rate * 100)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {retention.cohorts.length === 0 ? (
+              <p className="text-white/60">No activity logs in range. Ensure hub logging is enabled.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[400px] text-sm">
+                  <thead className="bg-black/30">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-white/80">Cohort</th>
+                      <th className="px-3 py-2 text-right text-white/80">Size</th>
+                      {retention.cohorts[0]?.retained.map((_, i) => (
+                        <th key={i} className="px-2 py-2 text-center text-white/80">
+                          {retention.granularity === 'day' ? `D${i}` : `W${i}`}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {retention.cohorts.map((row) => (
+                      <tr key={row.label}>
+                        <td className="px-3 py-2 text-white/80">{row.label}</td>
+                        <td className="px-3 py-2 text-right text-white/70">
+                          {row.size.toLocaleString()}
+                        </td>
+                        {row.rates.map((rate, i) => {
+                          const pct = Math.round(rate * 100);
+                          const hue = 120 * rate;
+                          return (
+                            <td
+                              key={i}
+                              className="px-2 py-2 text-center"
+                              title={`${row.retained[i]} of ${row.size}`}
+                              style={{
+                                backgroundColor: `hsla(${hue}, 40%, 18%, 0.8)`,
+                              }}
+                            >
+                              <span className="text-white/90">{pct}%</span>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Monetization candidates (high-intent UIDs for outreach lookup) */}
+      <div className="rounded-lg border border-white/10 bg-black/20 p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="font-heading text-xl font-bold">Monetization candidates</h2>
+            <p className="mt-1 text-sm text-white/60">
+              Firebase UIDs for high-intent, pre-paid users. Look up names in your admin app.{' '}
+              <span className="text-white/50">
+                Total active = distinct calendar days with any hub activity log in the last{' '}
+                {candidates?.totalActiveLookbackDays ?? 365} days (not login sessions).
+              </span>
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-white/60">Segment:</span>
+              <select
+                value={candidatesSegment}
+                onChange={(e) => setCandidatesSegment(e.target.value as 'new' | 'return')}
+                disabled={candidatesLoading}
+                className="rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-sm text-white disabled:opacity-50"
+              >
+                <option value="new">New signups (power users)</option>
+                <option value="return">Return / reactivation</option>
+              </select>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (!candidates?.candidates?.length || candidatesLoading) return;
+                const headerCols = [
+                  'Name',
+                  'UID',
+                  'Signup age (days)',
+                  'Last active',
+                  'Total active (days)',
+                  'Reasons',
+                  'Workout events',
+                  'Segment distinct days',
+                ];
+                const rows = candidates.candidates.map((c) => [
+                  c.displayName ?? '',
+                  c.uid,
+                  String(c.signupAgeDays),
+                  c.lastActivityAt ? new Date(c.lastActivityAt).toISOString().slice(0, 10) : '',
+                  String(c.signals.totalActiveDays ?? 0),
+                  c.reasons.join('; '),
+                  String(c.signals.workoutEvents),
+                  String(c.signals.distinctDays),
+                ]);
+                const escape = (s: string) =>
+                  /[,"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+                const csv =
+                  headerCols.map(escape).join(',') +
+                  '\n' +
+                  rows.map((r) => r.map(escape).join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `monetization-candidates-${candidates.segment}-${new Date().toISOString().slice(0, 10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              disabled={!candidates?.candidates?.length || candidatesLoading}
+              className="rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Export CSV
+            </button>
+          </div>
+        </div>
+        {candidatesLoading && <p className="text-white/60">Loading…</p>}
+        {candidatesError && <p className="text-red-400">{candidatesError}</p>}
+        {!candidatesLoading && !candidatesError && candidates?.enabled === false && (
+          <p className="text-white/60">
+            Firebase not configured. Set <code className="rounded bg-white/10 px-1">FIREBASE_SERVICE_ACCOUNT_KEY</code> to enable.
+          </p>
+        )}
+        {!candidatesLoading && !candidatesError && candidates?.enabled !== false && (
+          <div className="space-y-4">
+            {candidates?.warnings && candidates.warnings.length > 0 && (
+              <div className="rounded border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
+                {candidates.warnings.map((w, i) => (
+                  <p key={i}>{w}</p>
+                ))}
+              </div>
+            )}
+            {!candidates?.candidates?.length ? (
+              <p className="text-white/60">No candidates in range. Ensure hub activity logging is enabled.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[400px] text-sm">
+                  <thead className="bg-black/30">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-white/80">Name</th>
+                      <th className="px-3 py-2 text-left text-white/80">UID</th>
+                      <th className="px-3 py-2 text-right text-white/80">Signup age</th>
+                      <th className="px-3 py-2 text-right text-white/80">Last active</th>
+                      <th
+                        className="px-3 py-2 text-right text-white/80"
+                        title="Distinct calendar days with any activity log (lookback window), not logins"
+                      >
+                        Total active
+                      </th>
+                      <th className="px-3 py-2 text-right text-white/80">Workout</th>
+                      <th
+                        className="px-3 py-2 text-right text-white/80"
+                        title="Distinct days with any activity in the segment window (new/return), not total lookback"
+                      >
+                        Seg. days
+                      </th>
+                      <th className="px-3 py-2 text-left text-white/80">Reasons</th>
+                      <th className="px-2 py-2 text-center text-white/80">Copy</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {candidates.candidates.map((row) => (
+                      <tr key={row.uid}>
+                        <td className="px-3 py-2 text-white/80">
+                          {row.displayName ?? '—'}
+                        </td>
+                        <td className="px-3 py-2 font-mono text-xs text-white/80" title={row.uid}>
+                          {row.uid.length > 20 ? row.uid.slice(0, 20) + '…' : row.uid}
+                        </td>
+                        <td className="px-3 py-2 text-right text-white/70">{row.signupAgeDays}d</td>
+                        <td className="px-3 py-2 text-right text-white/70">
+                          {row.lastActivityAt ? new Date(row.lastActivityAt).toLocaleDateString() : '—'}
+                        </td>
+                        <td className="px-3 py-2 text-right text-white/70">
+                          {row.signals.totalActiveDays ?? 0}
+                        </td>
+                        <td className="px-3 py-2 text-right text-white/70">{row.signals.workoutEvents}</td>
+                        <td className="px-3 py-2 text-right text-white/70">{row.signals.distinctDays}</td>
+                        <td className="px-3 py-2 text-white/70">
+                          <span className="flex flex-wrap gap-1">
+                            {row.reasons.map((r, i) => (
+                              <span
+                                key={i}
+                                className="rounded bg-white/10 px-1.5 py-0.5 text-xs"
+                              >
+                                {r}
+                              </span>
+                            ))}
+                          </span>
+                        </td>
+                        <td className="px-2 py-2 text-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              void navigator.clipboard.writeText(row.uid);
+                            }}
+                            className="rounded border border-white/20 px-2 py-1 text-xs text-white/80 hover:bg-white/10"
+                          >
+                            Copy
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Monetization (Phase 5) */}
       <div className="rounded-lg border border-white/10 bg-black/20 p-6">

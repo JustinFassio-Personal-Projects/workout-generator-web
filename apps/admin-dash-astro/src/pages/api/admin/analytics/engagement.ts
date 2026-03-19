@@ -8,6 +8,8 @@
 import type { APIRoute } from 'astro';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { getEngagementStats } from '@/lib/supabase/admin/analytics-engagement';
+import { isFirebaseConfigured } from '@/lib/firebase/admin';
+import { getHubActiveUsersFromFirestore } from '@/lib/firebase/engagement-hub';
 
 export const GET: APIRoute = async ({ request, cookies, url }) => {
   try {
@@ -18,7 +20,40 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     );
     const stats = await getEngagementStats(days);
 
-    return new Response(JSON.stringify(stats), {
+    let payload: Record<string, unknown> = {
+      ...stats,
+      activeUsersSource: 'supabase' as const,
+    };
+
+    if (isFirebaseConfigured()) {
+      const hub = await getHubActiveUsersFromFirestore(days);
+      if (hub) {
+        payload = {
+          ...payload,
+          featureAdoptionHub: hub.featureAdoptionHub,
+        };
+        if (!hub.warnings?.length) {
+          payload = {
+            ...stats,
+            dauByDay: hub.dauByDay,
+            dau: hub.dau,
+            wau: hub.wau,
+            mau: hub.mau,
+            stickiness: hub.stickiness,
+            activeUsersSource: 'hub_firestore' as const,
+            featureAdoptionHub: hub.featureAdoptionHub,
+            featureAdoptionMarketing: stats.featureAdoptionMarketing,
+          };
+        } else {
+          payload = {
+            ...payload,
+            engagementHubWarnings: hub.warnings,
+          };
+        }
+      }
+    }
+
+    return new Response(JSON.stringify(payload), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

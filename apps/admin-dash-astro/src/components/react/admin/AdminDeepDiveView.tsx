@@ -4,9 +4,10 @@
  * injected inside the page (after the Muscle Map heading).
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
 import { getGeneratedExerciseBySlug } from '@/lib/supabase/client/generated-exercises';
 import type { GeneratedExercise } from '@/types/generated-exercise';
 
@@ -17,6 +18,13 @@ const AdminDeepDiveView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isGeneratingMuscleImage, setIsGeneratingMuscleImage] = useState(false);
+
+  const getAuthHeaders = useCallback(async (): Promise<Record<string, string>> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+    return headers;
+  }, []);
 
   useEffect(() => {
     if (!slug) {
@@ -55,7 +63,13 @@ const AdminDeepDiveView: React.FC = () => {
       return;
     }
     let cancelled = false;
-    fetch(`/api/admin/exercises/${exercise.id}/deep-dive-html`, { credentials: 'include' })
+    getAuthHeaders()
+      .then((headers) =>
+        fetch(`/api/admin/exercises/${exercise.id}/deep-dive-html`, {
+          credentials: 'include',
+          headers,
+        })
+      )
       .then((res) => (res.ok ? res.text() : null))
       .then((html) => {
         if (!cancelled && html) setPreparedHtml(html);
@@ -64,7 +78,7 @@ const AdminDeepDiveView: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [exercise?.id, exercise?.deepDiveHtmlContent, exercise?.muscleDiagramImageUrl]);
+  }, [exercise?.id, exercise?.deepDiveHtmlContent, exercise?.muscleDiagramImageUrl, getAuthHeaders]);
 
   if (loading) {
     return (
@@ -121,9 +135,11 @@ const AdminDeepDiveView: React.FC = () => {
               if (!exercise?.id || isGeneratingMuscleImage) return;
               setIsGeneratingMuscleImage(true);
               try {
+                const headers = await getAuthHeaders();
                 const res = await fetch(`/api/admin/exercises/${exercise.id}/generate-muscle-image`, {
                   method: 'POST',
                   credentials: 'include',
+                  headers,
                 });
                 if (!res.ok) throw new Error(await res.text() || 'Failed to generate image');
                 const data = await res.json();

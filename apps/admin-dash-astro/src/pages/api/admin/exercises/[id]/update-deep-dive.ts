@@ -40,10 +40,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
-    const { deepDiveHtmlContent, muscleEngagementMap } = body as {
-      deepDiveHtmlContent?: unknown;
-      muscleEngagementMap?: unknown;
-    };
+    const { deepDiveHtmlContent } = body as { deepDiveHtmlContent?: unknown };
 
     if (typeof deepDiveHtmlContent !== 'string') {
       return new Response(

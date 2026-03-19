@@ -11,7 +11,10 @@ export function injectMuscleDiagramImage(
   imageUrl: string | null | undefined
 ): string {
   if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) return html;
-  const escaped = imageUrl.trim().replace(/"/g, '&quot;');
+  const trimmed = imageUrl.trim();
+  // Only allow http(s) or relative URLs to prevent script injection (e.g. javascript:)
+  if (!/^(https?:|\/)/i.test(trimmed)) return html;
+  const escaped = trimmed.replace(/"/g, '&quot;');
   const diagramHtml = `<figure class="muscle-engagement-diagram flex flex-col gap-4 my-6" role="img"><img src="${escaped}" alt="Muscles engaged" style="max-width:min(100%,280px);" /></figure>`;
 
   const muscleMapH2 = /(<h2[^>]*>\s*Muscle\s+Map\s*<\/h2>)/i;

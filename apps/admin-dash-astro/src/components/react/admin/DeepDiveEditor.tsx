@@ -67,11 +67,6 @@ const DeepDiveEditor: React.FC<DeepDiveEditorProps> = ({
   const [isUpdatingImages, setIsUpdatingImages] = useState(false);
   /** When set, show confirmation modal for promoting this image to primary */
   const [promoteConfirmImage, setPromoteConfirmImage] = useState<ExerciseImage | null>(null);
-  const [muscleMap, setMuscleMap] = useState<MuscleEngagementMap>(() => ({
-    view: exercise.muscleEngagementMap?.view ?? 'anterior',
-    muscles: [...(exercise.muscleEngagementMap?.muscles ?? [])],
-  }));
-  const [muscleMapOpen, setMuscleMapOpen] = useState(false);
 
   const fetchImages = async () => {
     setLoadingImages(true);
@@ -199,7 +194,7 @@ const DeepDiveEditor: React.FC<DeepDiveEditorProps> = ({
         image.imageUrl
       );
       setHtmlContent(updatedHtml);
-      await onSave(updatedHtml, muscleMap.muscles.length > 0 ? muscleMap : undefined);
+      await onSave(updatedHtml);
       toast.success('Image promoted to Primary and HTML updated');
       toast.info('Please refresh the main admin view to see changes there.');
     } else {

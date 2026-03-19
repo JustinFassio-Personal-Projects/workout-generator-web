@@ -36,7 +36,7 @@ Result: **0 unique visitors** (no production page views in that project), **11 e
 ## Auth Funnel: “Visit 1, Sign up 0”
 
 - **Visit** = distinct `session_id` or `user_id` in **`web_events`** in the date range → that “1” is the local test session.
-- **Sign up** / **Email confirmed** = from Supabase Auth `listUsers` and/or **`analytics_funnel_events`** (`account_signup_complete`). The hub app does **not** currently send `account_signup_complete` to this pipeline, so sign-ups from the app never show there. The “3 signups” you saw are in Auth (e.g. Firebase) but not in **`analytics_funnel_events`**.
+- **Sign up** / **Email confirmed** = from Supabase Auth `listUsers` and/or **`analytics_funnel_events`** (`account_signup_complete`). **With Option A implemented**, the hub now sends `account_signup_complete` when users complete signup after clicking Create account from the builder, so those signups appear in the onboarding drop-off. The main "Conversion funnel" (Visit → Sign up → Email confirmed) still uses Supabase Auth `listUsers`; if your app uses Firebase Auth, those counts remain separate. The “3 signups” in Firebase will show in the **Onboarding drop-off** "Account created" step once users complete the builder → signup flow.
 
 ## Checklist: Fix Production Tracking
 

@@ -9,6 +9,18 @@ import { getSupabaseForAnalytics } from '@/lib/supabase/server';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+/** session_id from getOrCreateSessionId (base36 timestamp + random); reject abuse on unauthenticated endpoint */
+const SESSION_ID_MAX_LENGTH = 64;
+const SESSION_ID_REGEX = /^[a-zA-Z0-9_-]+$/;
+
+function normalizeSessionId(raw: string | null | undefined): string | null {
+  if (raw == null || typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed.length > SESSION_ID_MAX_LENGTH) return null;
+  if (!SESSION_ID_REGEX.test(trimmed)) return null;
+  return trimmed;
+}
+
 const FUNNEL_EVENT_WHITELIST = new Set([
   'onboarding_builder_started',
   'onboarding_builder_step_1_completed',
@@ -69,6 +81,7 @@ export const POST: APIRoute = async ({ request }) => {
     // RLS allows anon insert only when user_id IS NULL; hub sends session_id only for attribution
     const userId =
       typeof body.user_id === 'string' && UUID_REGEX.test(body.user_id) ? body.user_id : null;
+    const sessionId = normalizeSessionId(body.session_id);
     const properties =
       body.properties && typeof body.properties === 'object' ? body.properties : {};
 
@@ -76,7 +89,7 @@ export const POST: APIRoute = async ({ request }) => {
     const { error } = await supabase.from('analytics_funnel_events').insert({
       event_name: eventName,
       user_id: userId,
-      session_id: body.session_id ?? null,
+      session_id: sessionId,
       timestamp: new Date().toISOString(),
       properties,
       app_id: body.app_id ?? null,

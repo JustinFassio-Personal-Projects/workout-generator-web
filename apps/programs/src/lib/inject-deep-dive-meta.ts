@@ -27,6 +27,8 @@ export interface DeepDiveMetaInput {
   backHref?: string;
   /** Optional; label for the left nav back link (default EXERCISE_LABELS.backLink). */
   backLinkLabel?: string;
+  /** Optional; when set, the anatomical muscle diagram image is injected into the document. */
+  muscleDiagramImageUrl?: string | null;
 }
 
 /** Escape text for use in HTML attribute values (e.g. meta content, href). Safe for double-quoted attributes. */

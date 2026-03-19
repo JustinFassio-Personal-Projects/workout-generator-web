@@ -284,7 +284,7 @@ export async function callVertexAIGemini(options: VertexGeminiOptions): Promise<
   }
   const { projectId, region, accessToken } = creds;
   const logPrefix = options.logPrefix ?? '[vertex-gemini]';
-  const model = options.model ?? 'gemini-1.5-flash';
+  const model = options.model ?? 'gemini-2.0-flash-001';
   const baseUrl =
     region === 'global'
       ? `https://us-central1-aiplatform.googleapis.com`

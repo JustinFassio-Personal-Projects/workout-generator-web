@@ -13,6 +13,7 @@ import {
   escapeHtmlAttribute,
   type DeepDiveMetaInput,
 } from '@/lib/inject-deep-dive-meta';
+import { injectMuscleDiagramImage } from '@/lib/muscle-diagram-html';
 import { filterRealSources } from '@/lib/parse-biomechanics';
 import { ALLOWED_SCRIPT_ORIGINS } from '@/lib/sanitize-deep-dive-html';
 import type { ExerciseSource } from '@/types/generated-exercise';
@@ -182,9 +183,10 @@ export function prepareDeepDiveDocument(html: string, input: DeepDiveMetaInput):
     input.backHref,
     input.backLinkLabel
   );
+  const withMuscleDiagram = injectMuscleDiagramImage(withCloseBar, input.muscleDiagramImageUrl);
 
-  const headOpenMatch = withCloseBar.match(/<head\s[^>]*>/i) ?? withCloseBar.match(/<head\s*>/i);
-  const headCloseMatch = withCloseBar.match(/<\/head\s*>/i);
+  const headOpenMatch = withMuscleDiagram.match(/<head\s[^>]*>/i) ?? withMuscleDiagram.match(/<head\s*>/i);
+  const headCloseMatch = withMuscleDiagram.match(/<\/head\s*>/i);
 
   // Edge case: no proper head — fall back to inject-style behavior (append our block before </head> or create minimal head)
   if (!headOpenMatch || !headCloseMatch) {
@@ -192,14 +194,14 @@ export function prepareDeepDiveDocument(html: string, input: DeepDiveMetaInput):
     const newHeadContent = ESSENTIAL_HEAD + '\n  ' + seoBlock;
     let edgeResult: string;
     if (headCloseMatch) {
-      edgeResult = withCloseBar.replace(/(<\/head\s*>)/i, newHeadContent + '\n$1');
+      edgeResult = withMuscleDiagram.replace(/(<\/head\s*>)/i, newHeadContent + '\n$1');
     } else {
-      const doctypeMatch = withCloseBar.match(/^(\s*<!DOCTYPE[^>]*>\s*)/i);
+      const doctypeMatch = withMuscleDiagram.match(/^(\s*<!DOCTYPE[^>]*>\s*)/i);
       if (doctypeMatch) {
-        const afterDoctype = withCloseBar.slice(doctypeMatch[1].length);
+        const afterDoctype = withMuscleDiagram.slice(doctypeMatch[1].length);
         edgeResult = doctypeMatch[1] + '<head>\n  ' + newHeadContent + '\n</head>\n' + afterDoctype;
       } else {
-        edgeResult = '<head>\n  ' + newHeadContent + '\n</head>\n' + withCloseBar;
+        edgeResult = '<head>\n  ' + newHeadContent + '\n</head>\n' + withMuscleDiagram;
       }
     }
     return injectDeepDiveSourcesSection(
@@ -209,16 +211,16 @@ export function prepareDeepDiveDocument(html: string, input: DeepDiveMetaInput):
     );
   }
 
-  const headOpenEnd = withCloseBar.indexOf(headOpenMatch[0]) + headOpenMatch[0].length;
-  const headCloseStart = withCloseBar.indexOf(headCloseMatch[0]);
-  const innerHead = withCloseBar.slice(headOpenEnd, headCloseStart);
+  const headOpenEnd = withMuscleDiagram.indexOf(headOpenMatch[0]) + headOpenMatch[0].length;
+  const headCloseStart = withMuscleDiagram.indexOf(headCloseMatch[0]);
+  const innerHead = withMuscleDiagram.slice(headOpenEnd, headCloseStart);
   const preserved = preserveAllowedHeadTags(innerHead);
   const seoBlock = buildDeepDiveHeadContent(input);
   const newHeadContent = ESSENTIAL_HEAD + '\n  ' + seoBlock + preserved;
 
-  const headOpenStart = withCloseBar.indexOf(headOpenMatch[0]);
-  const beforeHead = withCloseBar.slice(0, headOpenStart);
-  const afterHead = withCloseBar.slice(headCloseStart + headCloseMatch[0].length);
+  const headOpenStart = withMuscleDiagram.indexOf(headOpenMatch[0]);
+  const beforeHead = withMuscleDiagram.slice(0, headOpenStart);
+  const afterHead = withMuscleDiagram.slice(headCloseStart + headCloseMatch[0].length);
   const afterHeadWithSources = injectDeepDiveSourcesSection(
     afterHead,
     input.slug,

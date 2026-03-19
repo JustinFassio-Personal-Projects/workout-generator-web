@@ -1,6 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 import type { ExerciseConfig } from '@/features/TutorialLab/types/tutorial';
-import { callVertexAIGemini } from '@/lib/vertex-ai-client';
+import type { MuscleEngagementMap, MuscleEngagementItem, MuscleRole } from '@/types/generated-exercise';
+import { getVertexAICredentials, callVertexAI } from '@/lib/vertex-ai-client';
+import { MUSCLE_IDS, isValidMuscleId, MUSCLE_DISPLAY_NAMES } from '@/lib/muscle-map/constants';
 
 // NOTE: This must only be used server-side to protect the API key
 const apiKey = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
@@ -280,6 +282,33 @@ export async function generateInfographicImage(
   }
 }
 
+/**
+ * Generates an anatomical illustration of the body with the given muscles emphasized.
+ * Uses the same image model as Exercise Image Generator (generateInfographicImage).
+ * Requires GEMINI_API_KEY.
+ */
+export async function generateAnatomicalMuscleImage(
+  exerciseName: string,
+  muscleEngagementMap: MuscleEngagementMap
+): Promise<string> {
+  requireGeminiApiKey();
+  const { muscles, view } = muscleEngagementMap;
+  if (!muscles?.length) {
+    throw new Error('muscleEngagementMap.muscles is required and must not be empty');
+  }
+  const primary = muscles.filter((m) => m.role === 'primary').map((m) => MUSCLE_DISPLAY_NAMES[m.id] ?? m.id);
+  const secondary = muscles.filter((m) => m.role === 'secondary').map((m) => MUSCLE_DISPLAY_NAMES[m.id] ?? m.id);
+  const stabilizer = muscles.filter((m) => m.role === 'stabilizer').map((m) => MUSCLE_DISPLAY_NAMES[m.id] ?? m.id);
+  const viewHint =
+    view === 'posterior'
+      ? 'Show a rear (posterior) view of the body.'
+      : view === 'both'
+        ? 'Show anterior and posterior views if possible, or the view that best shows the listed muscles.'
+        : 'Show a front (anterior) view of the body.';
+  const prompt = `Anatomical illustration of a human body for the exercise "${exerciseName}". Transparent musculature style, educational medical diagram. ${viewHint} Clearly emphasize and highlight these muscles: Primary movers: ${primary.join(', ') || 'none'}. Secondary: ${secondary.join(', ') || 'none'}. Stabilizers: ${stabilizer.join(', ') || 'none'}. Clean, professional medical/anatomy illustration, suitable for a fitness learning page. Single image.`;
+  return generateInfographicImage(prompt);
+}
+
 /** Biomechanics context for user-friendly instruction generation */
 export interface ParsedBiomechanicsContext {
   biomechanicalChain?: string;
@@ -304,7 +333,7 @@ Rules:
  * Used as the main content on the public exercise page when present.
  */
 /**
- * Generates user-friendly instructions using Vertex AI Gemini (same credentials as Program/Challenge/Workout Factory).
+ * Generates user-friendly instructions using Vertex AI (same endpoint and model as Program/Challenge/Workout Factory).
  * No GEMINI_API_KEY required.
  */
 export async function generateUserFriendlyInstructions(
@@ -335,11 +364,19 @@ Use this technical context only to keep the instructions accurate; translate eve
 Output only the Markdown. Start with a short 1–2 sentence intro, then a "How to do it" section with numbered steps, then optional "Tips" or "What to avoid" if relevant.`;
 
   try {
-    let markdown = await callVertexAIGemini({
-      systemInstruction: USER_INSTRUCTIONS_SYSTEM_PROMPT,
+    const creds = await getVertexAICredentials('[generateUserFriendlyInstructions]');
+    if ('error' in creds) {
+      const text = await creds.error.text();
+      throw new Error(text || 'Vertex AI credentials failed');
+    }
+    const { projectId, region, accessToken } = creds;
+    let markdown = await callVertexAI({
+      systemPrompt: USER_INSTRUCTIONS_SYSTEM_PROMPT,
       userPrompt,
-      model: 'gemini-1.5-flash',
-      responseMimeType: 'text/plain',
+      accessToken,
+      projectId,
+      region,
+      maxTokens: 4096,
       logPrefix: '[generateUserFriendlyInstructions]',
     });
     markdown = markdown.replace(/^```markdown\n?|\n?```$/g, '').trim();
@@ -385,12 +422,12 @@ MediaPipe Pose Landmark indices (0-32): 0=nose, 11/12=left/right shoulder, 13/14
 /**
  * Generates a Tutorial Lab ExerciseConfig from exercise name and context (biomechanics, user instructions).
  * Used to seed a camera-based tutorial for an approved exercise.
+ * Uses same Vertex AI endpoint and model as Program/Challenge/Workout Factory.
  */
 export async function generateTutorialConfig(
   exerciseName: string,
   context: TutorialConfigContext
 ): Promise<ExerciseConfig> {
-  requireGeminiApiKey();
   const chain = context.biomechanics?.biomechanicalChain?.trim() || 'Not specified';
   const pivots = context.biomechanics?.pivotPoints?.trim() || 'Not specified';
   const stabilization = context.biomechanics?.stabilizationNeeds?.trim() || 'Not specified';
@@ -404,7 +441,7 @@ export async function generateTutorialConfig(
       : 'None specified';
   const userInstructions = (context.userFriendlyInstructions ?? '').slice(0, 800);
 
-  const prompt = `Generate a tutorial config for the exercise: "${exerciseName}".
+  const userPrompt = `Generate a tutorial config for the exercise: "${exerciseName}".
 
 Technical context (use to choose phases and angles):
 - Movement / chain: ${chain}
@@ -418,23 +455,26 @@ Create 3-6 phases (e.g. Setup, Descent/Movement, Hold/Check, Return, Complete). 
 Output only the JSON object, no other text.`;
 
   try {
-    const response = await withRetry(
-      () =>
-        client.models.generateContent({
-          model: 'gemini-2.0-flash',
-          config: {
-            systemInstruction: TUTORIAL_CONFIG_SYSTEM_PROMPT,
-            responseMimeType: 'application/json',
-          },
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        }),
-      '[generateTutorialConfig]'
-    );
-
-    const candidate = response.candidates?.[0];
-    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
-    const raw = (textPart?.text || '').trim();
-    const parsed = JSON.parse(raw) as ExerciseConfig;
+    const creds = await getVertexAICredentials('[generateTutorialConfig]');
+    if ('error' in creds) {
+      const text = await creds.error.text();
+      throw new Error(text || 'Vertex AI credentials failed');
+    }
+    const { projectId, region, accessToken } = creds;
+    const raw = (
+      await callVertexAI({
+        systemPrompt: TUTORIAL_CONFIG_SYSTEM_PROMPT,
+        userPrompt,
+        accessToken,
+        projectId,
+        region,
+        maxTokens: 2048,
+        logPrefix: '[generateTutorialConfig]',
+      })
+    ).trim();
+    // Strip markdown code fence if present
+    const cleanedRaw = raw.replace(/^```[\w-]*\s*\n?|\n?```\s*$/g, '').trim();
+    const parsed = JSON.parse(cleanedRaw) as ExerciseConfig;
     if (!parsed.phases || !Array.isArray(parsed.phases)) {
       throw new Error('Invalid config: missing phases array');
     }
@@ -475,6 +515,82 @@ Output only the JSON object, no other text.`;
   }
 }
 
+const MUSCLE_ENGAGEMENT_SYSTEM_PROMPT = `You are an expert strength coach. Output valid JSON only: a muscle engagement map for an exercise.
+
+Allowed muscle IDs (use exactly these strings, no others): ${MUSCLE_IDS.join(', ')}
+
+Output format:
+{
+  "view": "anterior" | "posterior" | "both",
+  "muscles": [ { "id": "<muscle_id>", "role": "primary" | "secondary" | "stabilizer" }, ... ]
+}
+
+Rules:
+- "view": Use "anterior" when the exercise primarily involves front-of-body muscles (chest, anterior delts, abs, quads). Use "posterior" for back, glutes, hamstrings, rear delts. Use "both" when the exercise meaningfully engages both.
+- "muscles": List 3–12 muscles that are engaged. Use only IDs from the allowed list. Classify each as primary (main movers), secondary (assistors), or stabilizer.
+- Output only the JSON object. No markdown, no code fence, no explanation.`;
+
+/**
+ * Generates structured muscle engagement map for the Deep Dive diagram.
+ * Used by generate-page API; output is validated and stored in muscle_engagement_map.
+ */
+export async function generateMuscleEngagementMap(
+  exerciseName: string,
+  biomechanics?: {
+    biomechanicalChain: string;
+    pivotPoints: string;
+    stabilizationNeeds: string;
+  }
+): Promise<MuscleEngagementMap> {
+  const chain = biomechanics?.biomechanicalChain?.trim() || 'Not specified';
+  const pivots = biomechanics?.pivotPoints?.trim() || 'N/A';
+  const stabilization = biomechanics?.stabilizationNeeds?.trim() || 'N/A';
+  const userPrompt = `Exercise: "${exerciseName}".
+Context: Chain: ${chain}. Pivots: ${pivots}. Stabilization: ${stabilization}.
+Output the muscle engagement JSON (view + muscles array with id and role).`;
+
+  try {
+    const creds = await getVertexAICredentials('[generateMuscleEngagementMap]');
+    if ('error' in creds) {
+      const text = await creds.error.text();
+      throw new Error(text || 'Vertex AI credentials failed');
+    }
+    const { projectId, region, accessToken } = creds;
+    let raw = await callVertexAI({
+      systemPrompt: MUSCLE_ENGAGEMENT_SYSTEM_PROMPT,
+      userPrompt,
+      accessToken,
+      projectId,
+      region,
+      maxTokens: 1024,
+      logPrefix: '[generateMuscleEngagementMap]',
+    });
+    raw = raw.replace(/^```[\w-]*\s*\n?|\n?```\s*$/g, '').trim();
+    const firstBrace = raw.indexOf('{');
+    const lastBrace = raw.lastIndexOf('}');
+    const jsonStr = firstBrace >= 0 && lastBrace > firstBrace ? raw.slice(firstBrace, lastBrace + 1) : raw;
+    let parsed: { view?: string; muscles?: { id?: string; role?: string }[] };
+    try {
+      parsed = JSON.parse(jsonStr) as { view?: string; muscles?: { id?: string; role?: string }[] };
+    } catch (parseErr) {
+      const msg = parseErr instanceof Error ? parseErr.message : String(parseErr);
+      throw new Error(`Muscle map JSON parse failed: ${msg}. Raw length: ${raw.length}`);
+    }
+    const view = parsed.view === 'posterior' ? 'posterior' : parsed.view === 'both' ? 'both' : 'anterior';
+    const roles: MuscleRole[] = ['primary', 'secondary', 'stabilizer'];
+    const muscles: MuscleEngagementItem[] = (parsed.muscles ?? [])
+      .filter((m) => m.id && typeof m.id === 'string' && isValidMuscleId(m.id))
+      .filter((m) => m.role && roles.includes(m.role as MuscleRole))
+      .map((m) => ({ id: m.id!, role: m.role as MuscleRole }))
+      .slice(0, 20);
+    return { view, muscles };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in generateMuscleEngagementMap:', message);
+    throw error;
+  }
+}
+
 const DEEP_DIVE_SYSTEM_PROMPT = `
 You are an Elite Strength Coach and Web Developer. Your goal is to output a single, beautiful, responsive HTML5 file (with embedded Tailwind CSS via CDN) that serves as the 'Ultimate Guide' for a specific exercise.
 
@@ -482,7 +598,7 @@ Structure:
 1. One <h1> — the exercise name as the main page title (no other <h1> on the page).
 2. Hero Section (use the provided image URL)
 3. Biomechanics (Deep dive: Moment arms, Force vectors, Kinetic chain)
-4. Muscle Map (Description of primary/secondary movers and stabilizers)
+4. Muscle Map — include only a short text description of primary movers, secondary movers, and stabilizers. Do NOT include a Muscle Engagement Visualization diagram or any SVG drawing. The muscle diagram is rendered by the application. You may add one short line such as: "Muscles engaged are shown in the diagram above."
 5. Execution Protocol — use an <h2> or <h3> titled exactly "Execution Protocol" and a single <ol> with one <li> per step (numbered execution steps). This section is used by the Daily Warm-Up timer.
 6. Common Mistakes table
 
@@ -501,10 +617,10 @@ Output: Return ONLY the raw HTML string. Do not include markdown code blocks.
 
 /**
  * Generates Deep Dive HTML for an exercise. Used by admin generate-page API.
- * Model aligned with programs app for consistent output.
+ * Uses same Vertex AI endpoint and model as Program/Challenge/Workout Factory.
  */
 /**
- * Generates Deep Dive HTML using Vertex AI Gemini (same credentials as Program/Challenge/Workout Factory).
+ * Generates Deep Dive HTML using Vertex AI (same endpoint and model as Program/Challenge/Workout Factory).
  * No GEMINI_API_KEY required.
  */
 export async function generateExerciseHtml(
@@ -531,15 +647,23 @@ Biomechanics Context:
 
 Ensure the HTML is fully self-contained with Tailwind CSS (via CDN) and uses a high-contrast, clean typography design (Inter/Roboto).
 Include a "Go Back" button that links to "${backLinkHref}".
+Do not include any SVG or diagram in the Muscle Map section; the muscle diagram is rendered by the application.
 `;
 
   try {
-    let html = await callVertexAIGemini({
-      systemInstruction: DEEP_DIVE_SYSTEM_PROMPT,
+    const creds = await getVertexAICredentials('[generateExerciseHtml]');
+    if ('error' in creds) {
+      const text = await creds.error.text();
+      throw new Error(text || 'Vertex AI credentials failed');
+    }
+    const { projectId, region, accessToken } = creds;
+    let html = await callVertexAI({
+      systemPrompt: DEEP_DIVE_SYSTEM_PROMPT,
       userPrompt,
-      model: 'gemini-1.5-pro',
-      maxOutputTokens: 8192,
-      responseMimeType: 'text/plain',
+      accessToken,
+      projectId,
+      region,
+      maxTokens: 8192,
       logPrefix: '[generateExerciseHtml]',
     });
 
@@ -567,12 +691,12 @@ const PERFORMANCE_SUMMARY_SYSTEM_PROMPT = `You are a friendly coach. Given an ex
 /**
  * Generates a post-tutorial performance summary (how to improve form).
  * Used when the user completes a Tutorial Lab session.
+ * Uses same Vertex AI endpoint and model as Program/Challenge/Workout Factory.
  */
 export async function generatePerformanceSummary(
   exerciseName: string,
   biomechanics?: ParsedBiomechanicsContext | null
 ): Promise<string> {
-  requireGeminiApiKey();
   const chain = biomechanics?.biomechanicalChain?.trim() || 'Not specified';
   const pivots = biomechanics?.pivotPoints?.trim() || 'Not specified';
   const stabilization = biomechanics?.stabilizationNeeds?.trim() || 'Not specified';
@@ -585,7 +709,7 @@ export async function generatePerformanceSummary(
       ? biomechanics!.performanceCues!.join('; ')
       : 'None specified';
 
-  const prompt = `Write a short "How to improve your ${exerciseName}" guide for someone who just completed a camera-based tutorial.
+  const userPrompt = `Write a short "How to improve your ${exerciseName}" guide for someone who just completed a camera-based tutorial.
 
 Context:
 - Movement / chain: ${chain}
@@ -597,22 +721,21 @@ Context:
 Output only the Markdown. Start with a brief intro (1 sentence), then 3–5 actionable tips.`;
 
   try {
-    const response = await withRetry(
-      () =>
-        client.models.generateContent({
-          model: 'gemini-2.0-flash',
-          config: {
-            systemInstruction: PERFORMANCE_SUMMARY_SYSTEM_PROMPT,
-            responseMimeType: 'text/plain',
-          },
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        }),
-      '[generatePerformanceSummary]'
-    );
-
-    const candidate = response.candidates?.[0];
-    const textPart = candidate?.content?.parts?.find((p: { text?: string }) => p.text);
-    let markdown = (textPart?.text || '').trim();
+    const creds = await getVertexAICredentials('[generatePerformanceSummary]');
+    if ('error' in creds) {
+      const text = await creds.error.text();
+      throw new Error(text || 'Vertex AI credentials failed');
+    }
+    const { projectId, region, accessToken } = creds;
+    let markdown = await callVertexAI({
+      systemPrompt: PERFORMANCE_SUMMARY_SYSTEM_PROMPT,
+      userPrompt,
+      accessToken,
+      projectId,
+      region,
+      maxTokens: 2048,
+      logPrefix: '[generatePerformanceSummary]',
+    });
     markdown = markdown.replace(/^```markdown\n?|\n?```$/g, '').trim();
     return markdown || `## Tips for ${exerciseName}\n\nPractice regularly and focus on the cues from the tutorial.`;
   } catch (error) {

@@ -26,6 +26,8 @@ Use this list to copy and migrate the **Admin Analytics** tab into another Astro
 | `apps/app/src/pages/api/admin/analytics/acquisition.ts` | Acquisition: visitors, referrers, UTM, landing pages, device/browser, geo |
 | `apps/app/src/pages/api/admin/analytics/auth-funnel.ts` | Auth funnel: sign-ins/sign-ups by day, funnel, OAuth vs email, TTFKA |
 | `apps/app/src/pages/api/admin/analytics/engagement.ts` | Engagement: DAU/WAU/MAU, stickiness, sessions, feature adoption, power-user distribution |
+| `apps/app/src/pages/api/admin/analytics/retention-cohorts.ts` | Retention cohorts: weekly/daily matrix from Firebase Auth + Firestore user_activity_logs; supports `activeDefinition` (session \| workout). See [RETENTION_COHORTS_ROLLUPS.md](./RETENTION_COHORTS_ROLLUPS.md) for optional rollup design. |
+| `apps/app/src/pages/api/admin/analytics/monetization-candidates.ts` | Monetization candidates: high-intent Firebase UIDs for outreach lookup. See [MONETIZATION_CANDIDATES.md](./MONETIZATION_CANDIDATES.md). |
 | `apps/app/src/pages/api/admin/analytics/monetization.ts` | Monetization: paid by plan, trial conversion, TTFC, MRR/ARPU/LTV |
 | `apps/app/src/pages/api/admin/analytics/quality.ts` | Quality: frontend errors by page, top errors, time series |
 
@@ -45,7 +47,18 @@ Use this list to copy and migrate the **Admin Analytics** tab into another Astro
 **Dependencies of these lib files (must exist in target project):**
 
 - `apps/app/src/lib/supabase/server.ts` — `getSupabaseServer()`
-- `apps/app/src/lib/supabase/admin/auth.ts` — `verifyAdminRequest()` (used by all 6 API routes)
+- `apps/app/src/lib/supabase/admin/auth.ts` — `verifyAdminRequest()` (used by all 8 API routes)
+
+**Firebase (Retention & cohorts, Monetization candidates):**
+
+| File | Purpose |
+|------|---------|
+| `apps/app/src/lib/firebase/admin.ts` | Firebase Admin init; `getFirebaseAuth()`, `getFirebaseFirestore()` |
+| `apps/app/src/lib/firebase/retention-cohorts.ts` | Retention cohort matrix from Auth + Firestore `user_activity_logs` |
+| `apps/app/src/lib/firebase/monetization-candidates.ts` | Monetization candidates: high-intent UIDs from activity + Auth |
+| `apps/app/src/lib/firebase/engagement-hub.ts` | Engagement DAU/WAU/MAU/stickiness and feature adoption from `user_activity_logs` when Firebase configured; merged in `engagement` API. See [ENGAGEMENT_FEATURE_ADOPTION.md](./ENGAGEMENT_FEATURE_ADOPTION.md). |
+| `apps/app/src/lib/firebase/ttfka-hub.ts` | TTFKA (time to first key action) from Auth creation + Firestore `user_activity_logs` when Firebase configured; merged in `auth-funnel` API. See [TTFKA_DATA_STREAMS.md](./TTFKA_DATA_STREAMS.md). |
+| `apps/app/docs/FIRESTORE_INDEXES_RETENTION.md` | Firestore index docs; Console link for deployers |
 
 ---
 
@@ -131,7 +144,7 @@ If you don’t need the Quality tab, you can omit these; the Quality API and Ana
 ## 9. Checklist summary
 
 - [ ] Copy **AnalyticsView** and add **analytics** route + nav item in AdminDashboard and navigation.
-- [ ] Copy all **6 API routes** under `pages/api/admin/analytics/`.
+- [ ] Copy all **8 API routes** under `pages/api/admin/analytics/` (includes retention-cohorts and monetization-candidates).
 - [ ] Copy all **6 analytics lib files** under `lib/supabase/admin/analytics-*.ts`.
 - [ ] Ensure **server.ts** and **admin/auth.ts** exist and are used by the analytics APIs.
 - [ ] Apply or verify **Supabase migrations** (in order): 20260317 (analytics_funnel_events), 20250317 (web_events + get_acquisition_stats RPC), 20250318 (errors_frontend + RLS tighten); ensure profiles + user_programs exist for monetization.

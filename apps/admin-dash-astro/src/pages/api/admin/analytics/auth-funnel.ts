@@ -8,6 +8,8 @@
 import type { APIRoute } from 'astro';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { getAuthFunnelStats } from '@/lib/supabase/admin/analytics-auth-funnel';
+import { isFirebaseConfigured } from '@/lib/firebase/admin';
+import { getTtfkaHub } from '@/lib/firebase/ttfka-hub';
 
 export const GET: APIRoute = async ({ request, cookies, url }) => {
   try {
@@ -15,8 +17,25 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     const daysParam = url.searchParams.get('days');
     const days = Math.min(90, Math.max(1, parseInt(daysParam ?? '30', 10) || 30));
     const stats = await getAuthFunnelStats(days);
+    let payload: Record<string, unknown> = { ...stats };
 
-    return new Response(JSON.stringify(stats), {
+    if (isFirebaseConfigured()) {
+      const ttfkaHub = await getTtfkaHub(days);
+      if (ttfkaHub) {
+        payload = {
+          ...payload,
+          ttfkaDistributionHub: ttfkaHub.ttfkaDistributionHub,
+        };
+        if (ttfkaHub.warnings?.length) {
+          payload = {
+            ...payload,
+            ttfkaHubWarnings: ttfkaHub.warnings,
+          };
+        }
+      }
+    }
+
+    return new Response(JSON.stringify(payload), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

@@ -33,9 +33,9 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
   return (
     <div className="flex flex-col gap-6">
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-white m-0 mb-1">Your plan is ready.</h3>
+        <h3 className="text-2xl font-bold text-white m-0 mb-1">Your Profile Is Ready</h3>
         <p className="text-white/80 m-0 text-base">
-          Here&apos;s a summary of your personalized workout profile.
+          Create your account to complete your profile and generate your personalized workout plan.
         </p>
       </div>
 
@@ -79,7 +79,7 @@ export function PlanPreview({ data, onEdit, onCreateAccount }: PlanPreviewProps)
           onClick={onCreateAccount}
           className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[var(--color-accent)] text-[var(--bg-dark)] font-semibold hover:bg-[var(--color-accent-light)] transition-colors"
         >
-          Create account to generate workout
+          Create account to continue
           <ArrowRight className="w-5 h-5" />
         </button>
         <button

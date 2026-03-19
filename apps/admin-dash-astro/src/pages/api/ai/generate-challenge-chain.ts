@@ -308,10 +308,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // ========================================================================
     // COMBINE RESULTS
     // ========================================================================
+    const difficulty =
+      persona.demographics.experienceLevel === 'any'
+        ? 'intermediate'
+        : persona.demographics.experienceLevel;
     const challenge: ChallengeTemplate = normalizeProgramSchedule({
       title: persona.title || architect.program_name,
       description: persona.description || architect.rationale,
-      difficulty: persona.demographics.experienceLevel,
+      difficulty,
       durationWeeks,
       theme: persona.theme,
       tagline: persona.theme ? `${persona.theme} — ${durationWeeks} Week Challenge` : undefined,

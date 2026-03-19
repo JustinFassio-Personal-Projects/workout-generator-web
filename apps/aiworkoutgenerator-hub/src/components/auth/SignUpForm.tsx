@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import { getErrorCode, getErrorMessage } from "@/lib/auth-helpers";
 import { hasPhaseAData } from "@/lib/phaseAStorage";
+import { trackAccountSignupComplete } from "@/lib/websiteAnalyticsSession";
 
 /**
  * Sign up form component for creating new accounts with email/password
@@ -40,6 +41,9 @@ export function SignUpForm() {
 
       // Update display name
       await updateProfile(userCredential.user, { displayName });
+
+      // Attribute signup to website builder session for admin funnel (Option A)
+      trackAccountSignupComplete({ method: "email" });
 
       // Check if user has Phase A data from website handoff
       // If so, redirect to Phase B wizard; otherwise standard onboarding

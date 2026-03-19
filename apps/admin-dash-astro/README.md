@@ -32,6 +32,15 @@ Optional: **SUPABASE_SERVICE_ROLE_KEY** for API routes that need to bypass RLS (
 
 **Deep Dive and User Instructions** use the same Vertex AI credentials as the factories (no GEMINI_API_KEY). Generate Deep Dive and Generate User Instructions use the same Vertex credentials (no GEMINI_API_KEY). If `/api/admin/exercises/[id]/generate-page` or `generate-instructions` return 403 in production but work locally, the cause is usually **Vercel Deployment Protection** on the admin project. When aiworkoutgenerator.com rewrites `/api/admin/*` to this app, Vercel treats the proxied request as unauthenticated and returns 403 before your API runs. **Fix:** In the admin-dash-astro Vercel project → **Settings → Deployment Protection** → disable protection for **Production** (or use “Protection Bypass for Automation” and pass the bypass secret from the requesting app; the app’s own auth remains Supabase + `admin_users`).
 
+**Firebase Auth (Handoff / hub signup counts):** Optional. For "Handoff: Website → Hub" in Analytics → Auth & Onboarding, set:
+
+- **FIREBASE_SERVICE_ACCOUNT_KEY** — Full JSON service account key from hub project (Firebase Console → Project Settings → Service Accounts → Generate new private key). Omit to hide the Handoff section; admin works without it.
+- **FIREBASE_PROJECT_ID** — Optional. Defaults to `project_id` in the JSON; set explicitly if needed (e.g. `ai-workout-generator-hub`).
+- **Retention & cohorts** (Analytics): Service account needs **Cloud Datastore User** (or Firebase Admin) to read `user_activity_logs`.
+- **Engagement → Active users** (DAU/WAU/MAU/stickiness): When Firebase is configured, these metrics use the same Firestore `user_activity_logs` (distinct hub users per UTC day). Without Firebase, they use Supabase funnel + `web_events` (often zero for hub-only users).
+- **Engagement → Feature adoption:** Two streams: **Hub activity** (Firestore `user_activity_logs`) when Firebase is configured, plus **Marketing & timer** (Supabase `analytics_funnel_events`). See [docs/ENGAGEMENT_FEATURE_ADOPTION.md](docs/ENGAGEMENT_FEATURE_ADOPTION.md).
+- **Auth & onboarding → Time to first key action:** Two streams with sub-day buckets (<15m, 15m–1h, 1–24h, 1–7d, 7+d, never): **Hub** (Auth creation → first workout/profile action in Firestore) and **Marketing & timer** (Supabase). See [docs/TTFKA_DATA_STREAMS.md](docs/TTFKA_DATA_STREAMS.md).
+
 ## Adding features from programs
 
 Copy in small steps:

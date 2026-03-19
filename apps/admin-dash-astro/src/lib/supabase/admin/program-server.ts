@@ -13,6 +13,7 @@ import type {
   ProgramConfig,
   ProgramMetadata,
   ProgramTemplateScaffold,
+  ProgramSchedule,
   WeekDocument,
   PromptChainMetadata,
 } from '@/types/ai-program';

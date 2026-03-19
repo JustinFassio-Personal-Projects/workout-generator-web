@@ -5,6 +5,11 @@
  * Auth and onboarding funnel: sign-ins/sign-ups by day, funnel counts, OAuth vs email, TTFKA.
  */
 
+import type { FirebaseSignupStats } from '@/lib/firebase/admin';
+import {
+  isFirebaseConfigured,
+  listUsersForDateRange,
+} from '@/lib/firebase/admin';
 import { getSupabaseServer } from '../server';
 
 export interface AuthFunnelStats {
@@ -17,14 +22,21 @@ export interface AuthFunnelStats {
     firstAction: number;
   };
   oauthVsEmail: { oauth: number; email: number };
-  ttfkaDistribution: {
-    sameDay: number;
-    oneToTwoDays: number;
-    threeToSevenDays: number;
-    sevenPlusDays: number;
+  /** Time-to-first-key-action buckets (ms-based). Marketing/builder stream: anchor=account_signup_complete, key=first timer_session_complete|hub_timer_launch_1. */
+  ttfkaDistributionMarketing: {
+    under15m: number;
+    '15mTo1h': number;
+    '1hTo24h': number;
+    '1dTo7d': number;
+    '7dPlus': number;
     never: number;
   };
   onboardingDropOff?: { step: string; completed: number; dropped: number }[];
+  handoff?: {
+    firebaseSignups: number;
+    attributedSignups: number;
+    signUpsByDay?: { date: string; count: number }[];
+  } | null;
 }
 
 function dateKey(d: Date): string {
@@ -78,7 +90,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     page += 1;
   }
 
-  const signUpsByDay = Array.from(signUpsByDayMap.entries())
+  let signUpsByDay = Array.from(signUpsByDayMap.entries())
     .map(([date, count]) => ({ date, count }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
@@ -120,6 +132,19 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
   if (oauthFromEvents > 0 || emailFromEvents > 0) {
     oauthCount = oauthFromEvents;
     emailCount = emailFromEvents;
+  }
+
+  // Firebase override: hub uses Firebase Auth; when configured, use it for signups (source of truth)
+  let firebaseStats: FirebaseSignupStats | null = null;
+  if (isFirebaseConfigured()) {
+    firebaseStats = await listUsersForDateRange(days);
+    if (firebaseStats && firebaseStats.totalCount > 0) {
+      signUpsByDay = firebaseStats.signUpsByDay;
+      funnelSignUp = firebaseStats.totalCount;
+      funnelEmailConfirmed = firebaseStats.emailVerifiedCount;
+      oauthCount = firebaseStats.oauthCount;
+      emailCount = firebaseStats.emailCount;
+    }
   }
 
   // Funnel visit: distinct visitors from web_events in range
@@ -188,25 +213,32 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     }
   }
 
-  const ttfka = {
-    sameDay: 0,
-    oneToTwoDays: 0,
-    threeToSevenDays: 0,
-    sevenPlusDays: 0,
+  const MS_15M = 15 * 60 * 1000;
+  const MS_1H = 60 * 60 * 1000;
+  const MS_24H = 24 * MS_1H;
+  const MS_7D = 7 * MS_24H;
+
+  const ttfkaDistributionMarketing = {
+    under15m: 0,
+    '15mTo1h': 0,
+    '1hTo24h': 0,
+    '1dTo7d': 0,
+    '7dPlus': 0,
     never: 0,
   };
-  const dayMs = 24 * 60 * 60 * 1000;
+
   for (const [uid, signupTs] of signupByUser) {
     const firstTs = firstKeyByUser.get(uid);
     if (firstTs == null) {
-      ttfka.never += 1;
+      ttfkaDistributionMarketing.never += 1;
       continue;
     }
-    const deltaDays = (firstTs - signupTs) / dayMs;
-    if (deltaDays < 1) ttfka.sameDay += 1;
-    else if (deltaDays <= 2) ttfka.oneToTwoDays += 1;
-    else if (deltaDays <= 7) ttfka.threeToSevenDays += 1;
-    else ttfka.sevenPlusDays += 1;
+    const deltaMs = firstTs - signupTs;
+    if (deltaMs < MS_15M) ttfkaDistributionMarketing.under15m += 1;
+    else if (deltaMs < MS_1H) ttfkaDistributionMarketing['15mTo1h'] += 1;
+    else if (deltaMs < MS_24H) ttfkaDistributionMarketing['1hTo24h'] += 1;
+    else if (deltaMs < MS_7D) ttfkaDistributionMarketing['1dTo7d'] += 1;
+    else ttfkaDistributionMarketing['7dPlus'] += 1;
   }
 
   // Onboarding drop-off: distinct session_id per WorkoutPlanBuilder step (from analytics_funnel_events).
@@ -217,6 +249,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     'onboarding_builder_step_2_completed',
     'onboarding_builder_preview_shown',
     'onboarding_create_account_clicked',
+    'account_signup_complete',
   ] as const;
   const stepLabels: Record<(typeof onboardingEventNames)[number], string> = {
     onboarding_builder_started: 'Started',
@@ -224,6 +257,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     onboarding_builder_step_2_completed: 'Step 2',
     onboarding_builder_preview_shown: 'Preview',
     onboarding_create_account_clicked: 'Create account',
+    account_signup_complete: 'Account created',
   };
   const stepCounts: number[] = [];
   for (const eventName of onboardingEventNames) {
@@ -248,6 +282,25 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     prev = completed;
   });
 
+  const handoff = isFirebaseConfigured()
+    ? {
+        firebaseSignups: firebaseStats?.totalCount ?? 0,
+        attributedSignups: stepCounts[5] ?? 0,
+        signUpsByDay: firebaseStats?.signUpsByDay ?? [],
+      }
+    : null;
+
+  // When Handoff is configured, "Account created" row uses Handoff data for continuity
+  if (handoff != null && onboardingDropOff.length > 0) {
+    const createAccountClicked = stepCounts[4] ?? 0;
+    const accountCreatedIdx = onboardingDropOff.length - 1;
+    onboardingDropOff[accountCreatedIdx] = {
+      step: stepLabels.account_signup_complete,
+      completed: handoff.firebaseSignups,
+      dropped: Math.max(0, createAccountClicked - handoff.firebaseSignups),
+    };
+  }
+
   return {
     signUpsByDay,
     signInsByDay,
@@ -258,7 +311,8 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
       firstAction: firstActionUsers.size,
     },
     oauthVsEmail: { oauth: oauthCount, email: emailCount },
-    ttfkaDistribution: ttfka,
+    ttfkaDistributionMarketing,
     onboardingDropOff,
+    handoff,
   };
 }

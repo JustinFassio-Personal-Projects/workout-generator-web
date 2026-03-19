@@ -8,8 +8,13 @@ const SIGNUP_BASE_URL = `${APP_BASE}/signup`
 /**
  * Builds the signup URL with query parameters from the onboarding data.
  * Parameters match the aiworkoutgen.app expected format.
+ * Pass sessionId to link hub signup to website analytics session (Option A).
  */
-export function buildSignupUrl(data: WebsiteOnboardingData, tenantId?: string): string {
+export function buildSignupUrl(
+  data: WebsiteOnboardingData,
+  tenantId?: string,
+  sessionId?: string | null
+): string {
   const params = new URLSearchParams()
 
   params.set('fitness_level', data.fitness_level)
@@ -31,6 +36,7 @@ export function buildSignupUrl(data: WebsiteOnboardingData, tenantId?: string): 
   params.set('mode', 'signup')
   params.set('view', 'signup')
   if (tenantId) params.set('tenant_id', tenantId)
+  if (sessionId) params.set('wg_session_id', sessionId)
 
   return `${SIGNUP_BASE_URL}?${params.toString()}`
 }

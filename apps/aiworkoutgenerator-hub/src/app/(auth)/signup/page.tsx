@@ -10,6 +10,7 @@ import {
   hasPhaseAData,
   getPhaseAData,
 } from "@/lib/phaseAStorage";
+import { setWebsiteSessionId } from "@/lib/websiteAnalyticsSession";
 import {
   Card,
   CardContent,
@@ -32,6 +33,11 @@ function SignupContent() {
   // Parse and store URL params on mount (side effect only, no state update)
   useEffect(() => {
     if (hasProcessedParams.current) return;
+
+    // Always store wg_session_id when present (for analytics attribution). Do this regardless
+    // of Phase A parsing so account_signup_complete can be attributed even if other params fail.
+    const wgSessionId = searchParams.get("wg_session_id");
+    if (wgSessionId) setWebsiteSessionId(wgSessionId);
 
     if (hasSignupParams(searchParams)) {
       const parsed = parseSignupParams(searchParams);

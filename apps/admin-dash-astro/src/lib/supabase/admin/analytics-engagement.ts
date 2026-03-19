@@ -25,7 +25,7 @@ export interface EngagementStats {
   sessionCount: number;
   avgSessionDurationMinutes: number;
   avgPagesPerSession: number;
-  featureAdoption: { eventName: string; count7d: number; count30d: number }[];
+  featureAdoptionMarketing: { eventName: string; count7d: number; count30d: number }[];
   powerUserDistribution: { bucket: string; count: number }[];
 }
 
@@ -161,7 +161,7 @@ export async function getEngagementStats(days: number): Promise<EngagementStats>
     count30ByEvent.set(name, (count30ByEvent.get(name) ?? 0) + 1);
     if (ts >= from7) count7ByEvent.set(name, (count7ByEvent.get(name) ?? 0) + 1);
   }
-  const featureAdoption: EngagementStats['featureAdoption'] = KEY_EVENTS.map((eventName) => ({
+  const featureAdoptionMarketing: EngagementStats['featureAdoptionMarketing'] = KEY_EVENTS.map((eventName) => ({
     eventName,
     count7d: count7ByEvent.get(eventName) ?? 0,
     count30d: count30ByEvent.get(eventName) ?? 0,
@@ -206,7 +206,7 @@ export async function getEngagementStats(days: number): Promise<EngagementStats>
     sessionCount,
     avgSessionDurationMinutes,
     avgPagesPerSession,
-    featureAdoption,
+    featureAdoptionMarketing,
     powerUserDistribution,
   };
 }

@@ -217,6 +217,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     'onboarding_builder_step_2_completed',
     'onboarding_builder_preview_shown',
     'onboarding_create_account_clicked',
+    'account_signup_complete',
   ] as const;
   const stepLabels: Record<(typeof onboardingEventNames)[number], string> = {
     onboarding_builder_started: 'Started',
@@ -224,6 +225,7 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
     onboarding_builder_step_2_completed: 'Step 2',
     onboarding_builder_preview_shown: 'Preview',
     onboarding_create_account_clicked: 'Create account',
+    account_signup_complete: 'Account created',
   };
   const stepCounts: number[] = [];
   for (const eventName of onboardingEventNames) {

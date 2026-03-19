@@ -10,6 +10,7 @@ import {
   hasPhaseAData,
   getPhaseAData,
 } from "@/lib/phaseAStorage";
+import { setWebsiteSessionId } from "@/lib/websiteAnalyticsSession";
 import {
   Card,
   CardContent,
@@ -37,6 +38,8 @@ function SignupContent() {
       const parsed = parseSignupParams(searchParams);
       if (parsed) {
         storePhaseAData(parsed.data, parsed.source);
+        const wgSessionId = searchParams.get("wg_session_id");
+        if (wgSessionId) setWebsiteSessionId(wgSessionId);
         hasProcessedParams.current = true;
       }
     }

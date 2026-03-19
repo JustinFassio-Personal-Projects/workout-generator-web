@@ -23,6 +23,7 @@ import { StepOne } from './StepOne'
 import { StepTwo } from './StepTwo'
 import { PlanPreview } from './PlanPreview'
 import { trackFunnelEvent } from '@/lib/analytics-funnel'
+import { getOrCreateSessionId } from '@/lib/analytics-session'
 
 type FormErrors = Record<string, string>
 
@@ -258,7 +259,8 @@ export function WorkoutPlanBuilder({ skipIntro = false, preselect }: WorkoutPlan
       activity_level: formData.current_activity_level,
       location: 'workout_plan_builder',
     })
-    const signupUrl = buildSignupUrl(formData)
+    const sessionId = typeof window !== 'undefined' ? getOrCreateSessionId() : undefined
+    const signupUrl = buildSignupUrl(formData, undefined, sessionId)
     window.location.href = signupUrl
   }, [formData])
 

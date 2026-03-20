@@ -187,6 +187,15 @@ firebase apphosting:secrets:grantaccess --backend aiworkoutgenerator-hub \
 
 Replace `aiworkoutgenerator-hub` with your backend ID if different (`firebase apphosting:backends:list`). If you add a new secret to `apphosting.yaml`, add its name to the list in `scripts/grant-apphosting-secrets-access.sh` and run again, then redeploy.
 
+## Secrets audit (avoid drift)
+
+To avoid **secret drift** (missing or misnamed secrets causing build/runtime failures):
+
+1. **Inventory:** Every `secret:` in `apphosting.yaml` must exist in Cloud Secret Manager. Cross-reference with `scripts/grant-apphosting-secrets-access.sh`.
+2. **When adding a secret:** Update both `apphosting.yaml` and the SECRETS list in `grant-apphosting-secrets-access.sh`, then run the script.
+3. **Periodic check:** After changing `apphosting.yaml`, run `./scripts/grant-apphosting-secrets-access.sh` to ensure all referenced secrets have backend access.
+4. **Keep docs in sync:** Update this doc and [DEPLOY_COMMANDS.md](./DEPLOY_COMMANDS.md) when adding env vars.
+
 ## Additional Environment Variables
 
 For other environment variables (Stripe, Google AI, etc.), follow the same pattern:

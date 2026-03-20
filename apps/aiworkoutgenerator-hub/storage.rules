@@ -1,0 +1,30 @@
+rules_version = '2';
+// Firebase Storage rules for gs://ai-workout-generator-hub.firebasestorage.app
+// Bucket folders: exercises/, trainer-banners/, trainer-profiles/, exercise-images/
+service firebase.storage {
+  match /b/{bucket}/o {
+    // exercises/ - master/curated exercise images (admin-managed)
+    match /exercises/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.token.role in ['admin', 'super_admin'];
+    }
+    // exercise-images/ - user workout images + AI-generated (client upload + API)
+    match /exercise-images/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    // trainer-banners/ - trainer banner images (admin-managed)
+    match /trainer-banners/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.token.role in ['admin', 'super_admin'];
+    }
+    // trainer-profiles/ - trainer profile images (admin-managed)
+    match /trainer-profiles/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.token.role in ['admin', 'super_admin'];
+    }
+  }
+}

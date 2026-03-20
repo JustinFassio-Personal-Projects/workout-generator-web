@@ -1,5 +1,15 @@
 {
   "mcpServers": {
+    "firebase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firebase-tools@latest",
+        "experimental:mcp",
+        "--dir",
+        "apps/aiworkoutgenerator-hub"
+      ]
+    },
     "sentry": {
       "url": "https://mcp.sentry.dev/mcp/ai-workout-generator/javascript-nextjs"
     }

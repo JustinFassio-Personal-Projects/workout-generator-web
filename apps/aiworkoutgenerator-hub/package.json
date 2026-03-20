@@ -24,6 +24,8 @@
     "verify:all": "npm run lint && npm run format:check && npm run type-check && npm run test:run && npm run security:scan && npm run build",
     "verify:deploy": "npm run verify:all && npm run test:emulator",
     "firebase:emulators": "firebase emulators:start",
+    "firebase:deploy-firestore": "firebase deploy --only firestore",
+    "firebase:deploy-storage": "firebase deploy --only storage",
     "seed:firestore:prod": "tsx scripts/seed-firestore-schema.ts --project ai-workout-generator-hub --confirm-production",
     "seed:firestore:prod:dry": "tsx scripts/seed-firestore-schema.ts --project ai-workout-generator-hub --dry-run",
     "seed:firestore:emulator": "tsx scripts/seed-firestore-schema.ts --project ai-workout-generator-hub --emulator",

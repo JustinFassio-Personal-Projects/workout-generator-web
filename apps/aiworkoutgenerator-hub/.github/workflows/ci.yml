@@ -1,4 +1,6 @@
-name: CI/CD Pipeline
+# DEPRECATED for monorepo: GitHub does not run workflows under apps/*/.github/workflows/.
+# Use repo root: .github/workflows/ci-hub.yml
+name: CI/CD Pipeline [deprecated — use root workflow]
 
 on:
   pull_request:

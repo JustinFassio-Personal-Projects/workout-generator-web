@@ -6,6 +6,7 @@ import { getAuthInstance } from "@/lib/firebase";
 import {
   signInWithRedirect,
   getRedirectResult,
+  getAdditionalUserInfo,
   GoogleAuthProvider,
 } from "firebase/auth";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,8 @@ export function GoogleSignInButton() {
         if (result) {
           // User successfully signed in via redirect
           // Attribute new OAuth signups to website builder session (Option A)
-          if (result.additionalUserInfo?.isNewUser) {
+          const additionalInfo = getAdditionalUserInfo(result);
+          if (additionalInfo?.isNewUser) {
             trackAccountSignupComplete({ method: "oauth" });
           }
           // Check if user has completed onboarding

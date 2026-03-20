@@ -383,11 +383,7 @@ export { auth, db };
 
 // Initialize Analytics only in browser environment and if measurementId is provided (from env or FIREBASE_WEBAPP_CONFIG)
 let analytics: Analytics | null = null;
-if (
-  typeof window !== "undefined" &&
-  firebaseConfig.measurementId &&
-  app
-) {
+if (typeof window !== "undefined" && firebaseConfig.measurementId && app) {
   try {
     analytics = getAnalytics(app);
   } catch (error) {

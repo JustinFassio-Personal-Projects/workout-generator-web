@@ -37,17 +37,26 @@ export function clearWebsiteSessionId(): void {
  * Marketing site base URL for analytics API (track-event). Hub POSTs account_signup_complete here.
  */
 function getMarketingSiteBaseUrl(): string {
-  if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1")
+  ) {
     return "http://localhost:4321";
   }
-  return process.env.NEXT_PUBLIC_MARKETING_SITE_URL || "https://aiworkoutgenerator.com";
+  return (
+    process.env.NEXT_PUBLIC_MARKETING_SITE_URL ||
+    "https://aiworkoutgenerator.com"
+  );
 }
 
 /**
  * Fire-and-forget: send account_signup_complete to marketing site analytics so the session is
  * attributed in the admin Auth & onboarding funnel. Call after successful signup (email or OAuth).
  */
-export function trackAccountSignupComplete(options: { method: "email" | "oauth" }): void {
+export function trackAccountSignupComplete(options: {
+  method: "email" | "oauth";
+}): void {
   const sessionId = getWebsiteSessionId();
   if (!sessionId) return;
 

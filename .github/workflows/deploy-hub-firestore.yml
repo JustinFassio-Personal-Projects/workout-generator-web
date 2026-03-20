@@ -1,10 +1,17 @@
-# DEPRECATED for monorepo: GitHub does not run workflows under apps/*/.github/workflows/.
-# Use repo root: .github/workflows/deploy-hub-firestore.yml
-name: Deploy Firestore (rules + indexes) [deprecated — use root workflow]
+# Deploy Firestore rules, indexes, and Storage rules for aiworkoutgenerator-hub.
+# Runs from monorepo root; uses Workload Identity (no FIREBASE_SERVICE_ACCOUNT JSON).
+# Replaces apps/aiworkoutgenerator-hub/.github/workflows/deploy-firestore.yml (GitHub ignores nested .github).
+
+name: Deploy hub — Firestore + Storage
 
 on:
   push:
     branches: [main]
+    paths:
+      - "apps/aiworkoutgenerator-hub/firestore.rules"
+      - "apps/aiworkoutgenerator-hub/firestore.indexes.json"
+      - "apps/aiworkoutgenerator-hub/storage.rules"
+      - "apps/aiworkoutgenerator-hub/firebase.json"
   workflow_dispatch: {}
 
 permissions:
@@ -12,15 +19,14 @@ permissions:
   id-token: write
 
 concurrency:
-  group: firestore-deploy-${{ github.ref }}
+  group: hub-firestore-deploy-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  deploy_firestore:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Pinned to full SHA (supply chain security: avoid mutable tag compromise)
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
@@ -33,12 +39,19 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+          cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
+      - name: Install dependencies (monorepo)
         run: npm ci
 
       - name: Deploy Firestore rules
         run: npx firebase deploy --only firestore:rules --project ai-workout-generator-hub
+        working-directory: apps/aiworkoutgenerator-hub
 
       - name: Deploy Firestore indexes
         run: npx firebase deploy --only firestore:indexes --project ai-workout-generator-hub
+        working-directory: apps/aiworkoutgenerator-hub
+
+      - name: Deploy Storage rules
+        run: npx firebase deploy --only storage --project ai-workout-generator-hub
+        working-directory: apps/aiworkoutgenerator-hub

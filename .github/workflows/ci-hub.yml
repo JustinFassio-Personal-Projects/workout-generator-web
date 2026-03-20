@@ -19,16 +19,15 @@ on:
       - "turbo.json"
   workflow_dispatch: {}
 
+# No id-token: CI only runs lint/test/build; no GCP API calls. WIF auth lives in deploy-hub-firestore.yml.
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write
 
     defaults:
       run:
@@ -39,11 +38,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
-
-      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
-        with:
-          workload_identity_provider: projects/363110423518/locations/global/workloadIdentityPools/github-actions/providers/github
-          service_account: github-deployer@ai-workout-generator-hub.iam.gserviceaccount.com
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -86,8 +80,8 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
           NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
 
-      - name: Commit root package-lock.json if updated (PR only)
-        if: github.event_name == 'pull_request' && success()
+      - name: Commit root package-lock.json if updated (PR only, same-repo)
+        if: github.event_name == 'pull_request' && success() && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: .
         run: |
           git config user.name "github-actions[bot]"

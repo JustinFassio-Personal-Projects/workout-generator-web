@@ -84,7 +84,7 @@ Use this when the canonical app lives at **`apps/aiworkoutgenerator-hub`** in **
 
 ## 7. Post-migration smoke tests
 
-- [ ] Local: `pnpm install` (from monorepo root per your workflow), then build/run the hub from `apps/aiworkoutgenerator-hub`.
+- [ ] Local: from the monorepo root run `npm ci` (or `npm install` for local development), then build/run the hub from `apps/aiworkoutgenerator-hub`.
 - [ ] Sign-in (e.g. Google) on production URL; confirm **auth handler** / **authorized domains** / **OAuth client** origins.
 - [ ] Firestore reads/writes for a test user (rules still apply).
 - [ ] App Hosting rollout finished after secret changes (hard refresh / private window).

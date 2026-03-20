@@ -32,4 +32,4 @@ Pool config reference: [WORKLOAD_IDENTITY_FEDERATION_CONFIG.json](./WORKLOAD_IDE
 
 - **No classic Hosting:** `firebase.json` has no hosting block. App Hosting serves production.
 - **Rules deploy reminder:** Local changes to Firestore or Storage rules are **not** auto-deployed. Run `firebase deploy --only firestore` or `--only storage` after edits.
-- **Package scripts:** Use `pnpm firebase:deploy-firestore` or `pnpm firebase:deploy-storage` for convenience.
+- **Package scripts:** Use `npm run firebase:deploy-firestore` or `npm run firebase:deploy-storage` for convenience.

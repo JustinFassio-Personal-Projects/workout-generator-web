@@ -47,7 +47,7 @@
 |------|------|------------|
 | **Accidental classic Hosting deploy** | ~~Running `firebase deploy` without `--only` could attempt Hosting deploy~~ | **Mitigated:** Hosting removed from `firebase.json`. See [DEPLOY_COMMANDS.md](./DEPLOY_COMMANDS.md) — use `--only` for firestore, storage, functions. |
 | **Secret drift** | Many secrets in `apphosting.yaml`; missing/misnamed = build failure | **Mitigated:** [FIREBASE_APP_HOSTING_ENV_VARS.md](./FIREBASE_APP_HOSTING_ENV_VARS.md) — "Secrets audit" section; keep `grant-apphosting-secrets-access.sh` in sync when adding secrets. |
-| **Rules/indexes sync** | Local rules not auto-deployed; easy to forget | **Mitigated:** [DEPLOY_COMMANDS.md](./DEPLOY_COMMANDS.md) + `pnpm firebase:deploy-firestore` / `firebase:deploy-storage` scripts. Deploy after editing rules. |
+| **Rules/indexes sync** | Local rules not auto-deployed; easy to forget | **Mitigated:** [DEPLOY_COMMANDS.md](./DEPLOY_COMMANDS.md) + `npm run firebase:deploy-firestore` / `firebase:deploy-storage` scripts. Deploy after editing rules. |
 | **Monorepo App Hosting rootDirectory** | `rootDirectory: /` fails when repo is monorepo | **Mitigated:** [MIGRATION_STANDALONE_TO_MONOREPO_CHECKLIST.md](./MIGRATION_STANDALONE_TO_MONOREPO_CHECKLIST.md) §5 — set root to `apps/aiworkoutgenerator-hub` in Firebase Console. |
 
 ---

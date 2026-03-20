@@ -7,7 +7,7 @@
         "firebase-tools@latest",
         "experimental:mcp",
         "--dir",
-        "apps/aiworkoutgenerator-hub"
+        "."
       ]
     },
     "sentry": {

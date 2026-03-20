@@ -1,5 +1,7 @@
 # Firebase App Hosting Environment Variables
 
+**Deployment context:** **`aiworkoutgenerator-hub`** (this Next.js app) is hosted on **[Firebase App Hosting](https://firebase.google.com/docs/app-hosting)** in project **`ai-workout-generator-hub`**. Production users reach it at the custom domain **`app.aiworkoutgenerator.com`** (see backend URL below for the default `*.hosted.app` URL). All hub env vars for production flow through **`apphosting.yaml`** → **Cloud Secret Manager** (`firebase apphosting:secrets:set`).
+
 ## Security Notice
 
 **⚠️ IMPORTANT:** Firebase configuration values are stored in Cloud Secret Manager, NOT in this repository. While these are `NEXT_PUBLIC_*` variables (public values exposed in client-side code), we use Cloud Secret Manager for configuration management consistency and to keep the repository clean.
@@ -36,7 +38,7 @@ Replace the placeholder values with your actual Firebase configuration:
 # Set Firebase API Key
 echo -n "<YOUR_FIREBASE_API_KEY>" | firebase apphosting:secrets:set firebase-api-key --data-file - --force
 
-# Set Firebase Auth Domain
+# Set Firebase Auth Domain (production hub: app.aiworkoutgenerator.com)
 echo -n "<YOUR_FIREBASE_AUTH_DOMAIN>" | firebase apphosting:secrets:set firebase-auth-domain --data-file - --force
 
 # Set Firebase Project ID
@@ -72,13 +74,16 @@ env:
   # ... etc
 ```
 
-### Step 4: Deploy
+### Step 4: Deploy (Firebase App Hosting)
 
 Once secrets are created and `apphosting.yaml` is configured:
 
 1. Commit the `apphosting.yaml` file (it only contains secret references, not actual values)
-2. Push to your main branch
-3. App Hosting will automatically use the secrets during build and runtime
+2. Push to the branch your **App Hosting** backend is connected to (often `main`)
+3. **Firebase App Hosting** builds and deploys automatically; secrets are injected at **build** and **runtime**
+4. After changing OAuth-related secrets (especially **`firebase-auth-domain`**), wait for the rollout to finish, then hard-refresh or test in a private window on **`https://app.aiworkoutgenerator.com`**
+
+You can also trigger or monitor rollouts in [Firebase Console](https://console.firebase.google.com) → your project → **App Hosting** → **aiworkoutgenerator-hub**.
 
 ## Backend Information
 
@@ -112,12 +117,40 @@ To find your values, go to [Firebase Console](https://console.firebase.google.co
 The format of the values:
 
 - `NEXT_PUBLIC_FIREBASE_API_KEY`: Starts with `AIza...` (public API key)
-- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`: `{project-id}.firebaseapp.com`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`: Production hub: **`app.aiworkoutgenerator.com`**. Local/emulator: override (e.g. `{project-id}.firebaseapp.com`). If unset, the app defaults `authDomain` to `app.aiworkoutgenerator.com`.
 - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`: Your Firebase project ID
 - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`: `{project-id}.firebasestorage.app`
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`: Numeric ID
 - `NEXT_PUBLIC_FIREBASE_APP_ID`: Format `1:{numeric-id}:web:{app-id}`
 - `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`: Format `G-{id}` (optional, for Analytics)
+
+**On Firebase App Hosting (production):** Use the secrets already mapped in **`apphosting.yaml`** (`firebase-api-key`, **`firebase-auth-domain`**, etc.). Set the auth domain secret explicitly:
+
+```bash
+echo -n "app.aiworkoutgenerator.com" | firebase apphosting:secrets:set firebase-auth-domain --data-file - --force
+```
+
+Then push to your connected branch so **App Hosting** rebuilds. That sets **`NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`** during the hosted build (see `apphosting.yaml`).
+
+**Optional JSON (`FIREBASE_WEBAPP_CONFIG`):** Supported in code and **`next.config.ts`** for local builds or if you add a matching env entry to **`apphosting.yaml`**. It is **not** defined in `apphosting.yaml` today; production hub config uses **per-field** secrets. If you use JSON locally, prefer **`authDomain`: `app.aiworkoutgenerator.com`**. **`NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`** (secret `firebase-auth-domain` on App Hosting) **always wins** over JSON `authDomain` when set — avoids stale `*.firebaseapp.com` in JSON and the cross-origin iframe error (`Blocked a frame … app.aiworkoutgenerator.com … firebaseapp.com`).
+
+**Google OAuth (project `ai-workout-generator-hub`):** Firebase uses the auto-created **Web application** OAuth client in Google Cloud (not a random new client).
+
+| Field | Value |
+|--------|--------|
+| **Console name** | Web client (auto created by Google Service) |
+| **Type** | Web application |
+| **Client ID** | `363110423518-e4v4g1sse7ki8fek7ja7smanfk7rilqc.apps.googleusercontent.com` |
+
+1. [Google Cloud Console](https://console.cloud.google.com) → project **ai-workout-generator-hub** → **APIs & services** → **Credentials** → open that **OAuth 2.0 Client ID** → **Authorized JavaScript origins** → include **`https://app.aiworkoutgenerator.com`** → **Authorized redirect URIs** → add **`https://app.aiworkoutgenerator.com/__/auth/handler`** (keep existing `*.firebaseapp.com` entries if Firebase added them).
+2. [Firebase Console](https://console.firebase.google.com) → **Authentication** → **Settings** → **Authorized domains** → include **`app.aiworkoutgenerator.com`**.
+3. Redeploy **App Hosting** after env/auth changes as above.
+
+OAuth web **client IDs** are public in the browser; do not commit **client secrets** (this client type typically has no secret for SPAs).
+
+**Verify `authDomain` without sharing secrets:** Local dev: console shows `[Firebase] authDomain in use: …`. Production: confirm secret **`firebase-auth-domain`** is `app.aiworkoutgenerator.com`, wait for App Hosting rollout, then confirm Google sign-in uses **`https://app.aiworkoutgenerator.com/__/auth/handler`**. **`monitoring` 403** is usually Sentry tunnel/ad-blockers, not Firebase Auth.
+
+**Do not paste** `FIREBASE_WEBAPP_CONFIG` or service account JSON into chat; redact `apiKey` if you need help reviewing shape.
 
 ## Important Notes
 

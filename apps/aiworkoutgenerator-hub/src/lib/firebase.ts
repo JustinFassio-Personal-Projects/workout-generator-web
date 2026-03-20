@@ -66,7 +66,7 @@ function resolveAuthDomain(): string {
   const envAd = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN?.trim();
   if (envAd && !isPlaceholder(envAd)) return envAd;
   const jsonAd = _web?.authDomain?.trim();
-  if (jsonAd) return jsonAd;
+  if (jsonAd && !isPlaceholder(jsonAd)) return jsonAd;
   return DEFAULT_AUTH_DOMAIN;
 }
 
@@ -100,7 +100,10 @@ export const isFirebaseConfigValid =
   !!firebaseConfig.appId &&
   !isPlaceholder(firebaseConfig.apiKey) &&
   !isPlaceholder(firebaseConfig.projectId) &&
-  !isPlaceholder(firebaseConfig.authDomain);
+  !isPlaceholder(firebaseConfig.authDomain) &&
+  !isPlaceholder(firebaseConfig.storageBucket) &&
+  !isPlaceholder(firebaseConfig.messagingSenderId) &&
+  !isPlaceholder(firebaseConfig.appId);
 
 // Validate Firebase configuration by checking actual config values
 // This is more reliable than checking process.env directly, especially in client bundles

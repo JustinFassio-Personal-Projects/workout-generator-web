@@ -8,7 +8,8 @@ const appDir = path.resolve(process.cwd());
 loadEnvConfig(appDir);
 
 const nextConfig: NextConfig = {
-  // Inlines at build time (e.g. local or App Hosting if you add FIREBASE_WEBAPP_CONFIG to apphosting.yaml)
+  // Inlines at build time (e.g. local or App Hosting if you add FIREBASE_WEBAPP_CONFIG to apphosting.yaml).
+  // Must contain ONLY public web-app config (apiKey, authDomain, projectId, etc.) — inlined into client bundle. Never put secrets here.
   env: {
     FIREBASE_WEBAPP_CONFIG: process.env.FIREBASE_WEBAPP_CONFIG ?? "",
   },

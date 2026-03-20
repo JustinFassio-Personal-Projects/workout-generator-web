@@ -381,11 +381,11 @@ export function getFirestoreInstance(): Firestore {
 // Export auth and db directly for backward compatibility, but they may be null during SSR
 export { auth, db };
 
-// Initialize Analytics only in browser environment and if measurementId is provided
+// Initialize Analytics only in browser environment and if measurementId is provided (from env or FIREBASE_WEBAPP_CONFIG)
 let analytics: Analytics | null = null;
 if (
   typeof window !== "undefined" &&
-  process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID &&
+  firebaseConfig.measurementId &&
   app
 ) {
   try {

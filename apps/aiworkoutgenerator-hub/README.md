@@ -10,7 +10,7 @@ This project is an AI-powered workout and nutrition generator. It's built with t
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/)
 - **Database:** [Cloud Firestore](https://firebase.google.com/docs/firestore)
 - **Authentication:** [Firebase Authentication](https://firebase.google.com/docs/auth)
-- **Deployment:** [Firebase Hosting](https://firebase.google.com/docs/hosting)
+- **Deployment:** [Firebase App Hosting](https://firebase.google.com/docs/app-hosting) (`aiworkoutgenerator-hub` backend; production custom domain `app.aiworkoutgenerator.com`). Env/secrets: `apphosting.yaml` + [docs/FIREBASE_APP_HOSTING_ENV_VARS.md](docs/FIREBASE_APP_HOSTING_ENV_VARS.md).
 
 ### Prerequisites
 

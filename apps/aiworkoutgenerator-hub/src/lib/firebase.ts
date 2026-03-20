@@ -1,5 +1,5 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApp } from "firebase/app";
+import { initializeApp, getApp, type FirebaseOptions } from "firebase/app";
 import {
   initializeAppCheck,
   getToken,
@@ -17,22 +17,33 @@ import { getEnvAwareErrorMessage } from "@/lib/utils";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY as string,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN as string,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET as string,
-  messagingSenderId: process.env
-    .NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID as string,
-  ...(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID && {
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-  }),
-};
+/** Hub production hostname; OAuth + signInWithRedirect expect this when unset. */
+const DEFAULT_AUTH_DOMAIN = "app.aiworkoutgenerator.com";
 
-// Placeholder values from .env.example — if these are present, Firebase is not configured
+type WebAppConfigJson = Partial<{
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId: string;
+}>;
+
+function parseFirebaseWebAppConfigJson(): WebAppConfigJson | null {
+  const raw =
+    process.env.NEXT_PUBLIC_FIREBASE_WEBAPP_CONFIG?.trim() ||
+    process.env.FIREBASE_WEBAPP_CONFIG?.trim();
+  if (!raw) return null;
+  try {
+    const o = JSON.parse(raw) as WebAppConfigJson;
+    return o && typeof o === "object" ? o : null;
+  } catch {
+    return null;
+  }
+}
+
+// Placeholder values from .env.example — if these are present, treat as unset
 const FIREBASE_PLACEHOLDERS = [
   "your_api_key_here",
   "your-project-id",
@@ -42,11 +53,45 @@ const FIREBASE_PLACEHOLDERS = [
   "your_app_id",
 ];
 
-// Exact match only — avoid treating real project IDs like "my-company-your-project-id" as placeholder
 function isPlaceholder(value: string | undefined): boolean {
   if (!value || typeof value !== "string") return true;
   const v = value.trim();
   return !v || FIREBASE_PLACEHOLDERS.some((p) => v === p);
+}
+
+const _web = parseFirebaseWebAppConfigJson();
+
+/** Env authDomain wins over JSON so stale FIREBASE_WEBAPP_CONFIG cannot force *.firebaseapp.com on app.aiworkoutgenerator.com (cross-origin iframe / popup). */
+function resolveAuthDomain(): string {
+  const envAd = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN?.trim();
+  if (envAd && !isPlaceholder(envAd)) return envAd;
+  const jsonAd = _web?.authDomain?.trim();
+  if (jsonAd && !isPlaceholder(jsonAd)) return jsonAd;
+  return DEFAULT_AUTH_DOMAIN;
+}
+
+const rawMeasurementId =
+  _web?.measurementId ?? process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
+const resolvedMeasurementId =
+  typeof rawMeasurementId === "string" && rawMeasurementId.trim() !== ""
+    ? rawMeasurementId.trim()
+    : undefined;
+
+const firebaseConfig: FirebaseOptions = {
+  apiKey: (_web?.apiKey ?? process.env.NEXT_PUBLIC_FIREBASE_API_KEY) as string,
+  authDomain: resolveAuthDomain(),
+  projectId: (_web?.projectId ??
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) as string,
+  storageBucket: (_web?.storageBucket ??
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET) as string,
+  messagingSenderId: (_web?.messagingSenderId ??
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID) as string,
+  appId: (_web?.appId ?? process.env.NEXT_PUBLIC_FIREBASE_APP_ID) as string,
+  ...(resolvedMeasurementId ? { measurementId: resolvedMeasurementId } : {}),
+};
+
+if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
+  console.info("[Firebase] authDomain in use:", firebaseConfig.authDomain);
 }
 
 // True when config is missing or still has .env.example placeholders (avoids connecting and getting auth/network-request-failed)
@@ -59,7 +104,10 @@ export const isFirebaseConfigValid =
   !!firebaseConfig.appId &&
   !isPlaceholder(firebaseConfig.apiKey) &&
   !isPlaceholder(firebaseConfig.projectId) &&
-  !isPlaceholder(firebaseConfig.authDomain);
+  !isPlaceholder(firebaseConfig.authDomain) &&
+  !isPlaceholder(firebaseConfig.storageBucket) &&
+  !isPlaceholder(firebaseConfig.messagingSenderId) &&
+  !isPlaceholder(firebaseConfig.appId);
 
 // Validate Firebase configuration by checking actual config values
 // This is more reliable than checking process.env directly, especially in client bundles
@@ -333,11 +381,11 @@ export function getFirestoreInstance(): Firestore {
 // Export auth and db directly for backward compatibility, but they may be null during SSR
 export { auth, db };
 
-// Initialize Analytics only in browser environment and if measurementId is provided
+// Initialize Analytics only in browser environment and if measurementId is provided (from env or FIREBASE_WEBAPP_CONFIG)
 let analytics: Analytics | null = null;
 if (
   typeof window !== "undefined" &&
-  process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID &&
+  firebaseConfig.measurementId &&
   app
 ) {
   try {

@@ -70,6 +70,13 @@ function resolveAuthDomain(): string {
   return DEFAULT_AUTH_DOMAIN;
 }
 
+const rawMeasurementId =
+  _web?.measurementId ?? process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
+const resolvedMeasurementId =
+  typeof rawMeasurementId === "string" && rawMeasurementId.trim() !== ""
+    ? rawMeasurementId.trim()
+    : undefined;
+
 const firebaseConfig: FirebaseOptions = {
   apiKey: (_web?.apiKey ?? process.env.NEXT_PUBLIC_FIREBASE_API_KEY) as string,
   authDomain: resolveAuthDomain(),
@@ -80,10 +87,7 @@ const firebaseConfig: FirebaseOptions = {
   messagingSenderId: (_web?.messagingSenderId ??
     process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID) as string,
   appId: (_web?.appId ?? process.env.NEXT_PUBLIC_FIREBASE_APP_ID) as string,
-  ...((_web?.measurementId ?? process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID) && {
-    measurementId:
-      _web?.measurementId ?? process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-  }),
+  ...(resolvedMeasurementId ? { measurementId: resolvedMeasurementId } : {}),
 };
 
 if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {

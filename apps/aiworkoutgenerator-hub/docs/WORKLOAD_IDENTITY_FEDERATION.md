@@ -17,3 +17,15 @@ Reference for the Workload Identity pool used by GitHub Actions to deploy Firest
 
 - The `credential_source.file` value (`assertion.sub`) in the config is the pool/provider attribute mapping. GitHub Actions receives the OIDC token from `ACTIONS_ID_TOKEN_REQUEST_URL`; this JSON describes how Google validates and maps it.
 - If you rename or fork the GitHub repo, update the **Workload Identity provider** attribute conditions in Google Cloud to allow the new org/repo.
+
+## Troubleshooting: "The given credential is rejected by the attribute condition"
+
+This error means the WIF pool's attribute conditions do not allow the current GitHub repo. The pool may have been set up for a standalone repo (e.g. `aiworkoutgenerator-hub`) before the monorepo migration.
+
+**Fix:** Cloud Console → IAM & Admin → Workload Identity Federation → pool `github-actions` → provider `github` → edit **Attribute conditions**. Add or update to allow:
+
+```
+assertion.repository == 'JustinFassio-Personal-Projects/workout-generator-web'
+```
+
+Adjust org and repo name if your monorepo differs. Save and re-run the failed workflow.

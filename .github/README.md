@@ -11,6 +11,8 @@ Workflows must live under **`.github/workflows/` at the repository root**. Neste
 
 **Auth:** OIDC to `github-deployer@ai-workout-generator-hub.iam.gserviceaccount.com`. If you renamed or forked the GitHub repo, update the **Workload Identity provider** attribute conditions in Google Cloud so the monorepo is allowed.
 
+**If CI fails with "The given credential is rejected by the attribute condition":** The WIF pool was configured for a different repo. In Cloud Console → IAM & Admin → Workload Identity Federation → `github-actions` pool → `github` provider, add an attribute condition allowing `assertion.repository == 'JustinFassio-Personal-Projects/workout-generator-web'` (adjust org/repo as needed).
+
 **WIF config:** Reference copy of the Workload Identity Federation pool config is at `apps/aiworkoutgenerator-hub/docs/WORKLOAD_IDENTITY_FEDERATION_CONFIG.json`. GitHub Actions uses `google-github-actions/auth` and does not need this file at runtime; it is kept for setup reference and debugging.
 
 See also: `apps/aiworkoutgenerator-hub/docs/DEPLOY_COMMANDS.md`.

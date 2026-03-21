@@ -16,10 +16,10 @@ import { authenticatedFetch } from "@/lib/authenticated-fetch";
  */
 export async function ensureUserDocument(user: User): Promise<void> {
   try {
-    // authenticatedFetch uses auth.currentUser; at this point it should match the passed user
     const response = await authenticatedFetch("/api/users/ensure", {
       method: "POST",
       body: JSON.stringify({}),
+      user,
     });
 
     if (!response.ok) {

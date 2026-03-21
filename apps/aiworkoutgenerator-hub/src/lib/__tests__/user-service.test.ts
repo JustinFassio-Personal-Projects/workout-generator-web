@@ -40,6 +40,7 @@ describe("ensureUserDocument", () => {
     expect(mockAuthenticatedFetch).toHaveBeenCalledWith("/api/users/ensure", {
       method: "POST",
       body: JSON.stringify({}),
+      user: mockUser,
     });
   });
 
@@ -56,6 +57,7 @@ describe("ensureUserDocument", () => {
     expect(mockAuthenticatedFetch).toHaveBeenCalledWith("/api/users/ensure", {
       method: "POST",
       body: JSON.stringify({}),
+      user: userWithoutDisplayName,
     });
   });
 
@@ -88,7 +90,9 @@ describe("ensureUserDocument", () => {
       .spyOn(console, "warn")
       .mockImplementation(() => {});
 
-    mockAuthenticatedFetch.mockRejectedValue(new Error("User not authenticated"));
+    mockAuthenticatedFetch.mockRejectedValue(
+      new Error("User not authenticated")
+    );
 
     await expect(ensureUserDocument(mockUser)).resolves.toBeUndefined();
 

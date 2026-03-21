@@ -223,8 +223,10 @@ export function useWorkoutHistory(
           isMappingImagesRef.current = true;
           try {
             // Map images in parallel for all workouts
-            const workoutsWithImages =
-              await mapWorkoutImagesBatch(displayWorkouts, user);
+            const workoutsWithImages = await mapWorkoutImagesBatch(
+              displayWorkouts,
+              user
+            );
             setState((prev) => ({
               ...prev,
               workouts: workoutsWithImages,

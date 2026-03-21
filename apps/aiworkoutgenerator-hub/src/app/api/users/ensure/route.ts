@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb, verifyIdToken } from "@/lib/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
+import { extractBearerToken } from "@/lib/api-utils";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
@@ -17,15 +18,13 @@ export async function POST(request: NextRequest) {
   const appCheckResult = await requireAppCheck(request);
   if (!appCheckResult.ok) return appCheckResult.response;
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const idToken = extractBearerToken(request);
+    if (!idToken) {
       return NextResponse.json(
         { error: "Missing or invalid authorization header" },
         { status: 401 }
       );
     }
-
-    const idToken = authHeader.substring(7);
     const decodedToken = await verifyIdToken(idToken);
     const userId = decodedToken.uid;
 

@@ -4,18 +4,30 @@ import { adminDb, getUserClaims } from "@/lib/firebase-admin";
 import type { SubscriptionTier } from "@/lib/subscription-constants";
 
 /**
- * Extract Bearer token from Authorization header.
- * Used across API routes for authentication.
+ * Header used as fallback when Authorization is stripped by proxies (e.g. Firebase App Hosting).
+ * Some proxies strip Authorization; X-ID-Token is typically forwarded.
+ */
+export const ID_TOKEN_HEADER = "X-ID-Token";
+
+/**
+ * Extract Bearer token from Authorization header, with X-ID-Token fallback.
+ * Firebase App Hosting may strip the Authorization header when proxying to Cloud Run.
+ * When that happens, the client sends the token in X-ID-Token; we check both.
  *
  * @param request - Next.js request object
  * @returns The token string or null if not found
  */
 export function extractBearerToken(request: NextRequest): string | null {
   const authHeader = request.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
+  if (authHeader?.startsWith("Bearer ")) {
+    return authHeader.slice(7);
   }
-  return authHeader.slice(7);
+  // Fallback: proxy may have stripped Authorization (Firebase App Hosting / Cloud Run)
+  const idTokenHeader = request.headers.get(ID_TOKEN_HEADER);
+  if (idTokenHeader?.trim()) {
+    return idTokenHeader.trim();
+  }
+  return null;
 }
 
 /**

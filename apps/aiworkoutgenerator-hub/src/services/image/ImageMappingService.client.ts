@@ -107,15 +107,9 @@ export async function mapWorkoutImages(
         const errorMessage =
           errorData.error || `API returned ${response.status}`;
 
-        // Use warn for auth failures (expected in some flows); error for unexpected
+        // Auth errors: throw without logging here; catch block logs once (avoids duplicate - Copilot review)
         const isAuthError = response.status === 401 || response.status === 403;
-        if (isAuthError) {
-          console.warn(
-            `[Image Mapping Client] Auth error (${response.status}):`,
-            errorMessage,
-            { workoutId: workout.id }
-          );
-        } else {
+        if (!isAuthError) {
           console.error(
             `[Image Mapping Client] API error (${response.status}):`,
             errorMessage,
@@ -176,10 +170,11 @@ export async function mapWorkoutImages(
         return workout;
       }
 
-      // Auth errors: warn (token expired, invalid) - graceful degradation
+      // Auth errors: warn (token expired, invalid, App Check) - graceful degradation (Copilot: include all requireAppCheck messages)
       if (
         errorMessage.includes("Invalid or expired token") ||
-        errorMessage.includes("Invalid App Check")
+        errorMessage.includes("Missing App Check token") ||
+        errorMessage.includes("Invalid App Check token")
       ) {
         console.warn(
           "[Image Mapping Client] Auth failed, using workout without mapped images:",

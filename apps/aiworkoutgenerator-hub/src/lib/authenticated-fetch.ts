@@ -32,17 +32,27 @@ export async function authenticatedFetch(
 ): Promise<Response> {
   const { headers = {}, forceTokenRefresh = false, ...fetchOptions } = options;
 
+  // Strip security-critical keys from caller headers so they cannot override auth (Copilot review)
+  const { Authorization: _a, "X-Firebase-AppCheck": _ac, ...safeCallerHeaders } =
+    headers as Record<string, string>;
+
   const token = await getIdToken(forceTokenRefresh);
   if (!token) {
     throw new Error("User not authenticated");
   }
 
   const appCheckHeaders = await getAppCheckHeaders();
+  const contentType =
+    safeCallerHeaders["Content-Type"] ??
+    (typeof fetchOptions.body === "string"
+      ? "application/json"
+      : undefined);
+
   const requestHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...safeCallerHeaders,
     Authorization: `Bearer ${token}`,
     ...appCheckHeaders,
-    ...headers,
+    ...(contentType ? { "Content-Type": contentType } : {}),
   };
 
   const response = await fetch(url, {
@@ -54,11 +64,20 @@ export async function authenticatedFetch(
   if (response.status === 401 && !forceTokenRefresh) {
     const freshToken = await getIdToken(true);
     if (freshToken) {
+      // Consume original response body before retry to avoid resource leaks (Copilot review)
+      try {
+        if (response.body && typeof response.body.cancel === "function") {
+          await response.body.cancel();
+        }
+      } catch {
+        /* ignore */
+      }
+      const retryAppCheck = await getAppCheckHeaders();
       const retryHeaders: Record<string, string> = {
-        "Content-Type": "application/json",
+        ...safeCallerHeaders,
         Authorization: `Bearer ${freshToken}`,
-        ...(await getAppCheckHeaders()),
-        ...headers,
+        ...retryAppCheck,
+        ...(contentType ? { "Content-Type": contentType } : {}),
       };
       return fetch(url, {
         ...fetchOptions,

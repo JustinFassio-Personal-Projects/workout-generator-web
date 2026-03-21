@@ -73,7 +73,7 @@ Sentry uses `tunnelRoute: "/monitoring"` to proxy events through your domain and
 
 ### Mitigations
 
-- **Option A:** Remove `tunnelRoute` from `next.config.ts` — events go directly to Sentry. Ad-blockers may block them, but 403s from the tunnel stop.
+- **Option A (recommended if 403 persists):** Set `SENTRY_DISABLE_TUNNEL=1` in App Hosting environment variables. This disables the tunnel; events go directly to Sentry. Ad-blockers may block them for some users, but 403s stop. Add in Firebase Console → App Hosting → [Backend] → Environment variables.
 - **Option B:** Keep the tunnel and verify Sentry config (DSN, `SENTRY_AUTH_TOKEN` for builds, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_URL` for US org).
 - **Option C:** Add Sentry to `ignoreErrors` for `/monitoring` 403 if it’s too noisy (Sentry still works for users without ad-blockers).
 

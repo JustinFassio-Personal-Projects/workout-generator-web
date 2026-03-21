@@ -224,7 +224,7 @@ export function useWorkoutHistory(
           try {
             // Map images in parallel for all workouts
             const workoutsWithImages =
-              await mapWorkoutImagesBatch(displayWorkouts);
+              await mapWorkoutImagesBatch(displayWorkouts, user);
             setState((prev) => ({
               ...prev,
               workouts: workoutsWithImages,
@@ -315,7 +315,7 @@ export function useWorkoutHistory(
         // Prevent concurrent mapping calls
         isMappingImagesRef.current = true;
         try {
-          workoutsToAdd = await mapWorkoutImagesBatch(result.workouts);
+          workoutsToAdd = await mapWorkoutImagesBatch(result.workouts, user);
         } catch (mappingError) {
           // If image mapping fails, still add workouts without images
           console.error("Error mapping workout images:", mappingError);
@@ -409,7 +409,7 @@ export function useRecentWorkouts(count: number = 3) {
 
         // Map images from master_exercise_images
         try {
-          const workoutsWithImages = await mapWorkoutImagesBatch(data);
+          const workoutsWithImages = await mapWorkoutImagesBatch(data, user);
           setWorkouts(workoutsWithImages);
         } catch (err) {
           // If mapping fails, still return workouts without images

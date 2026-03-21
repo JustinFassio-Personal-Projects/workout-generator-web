@@ -92,7 +92,7 @@ export function useTrainerWorkout(workoutId: string) {
           }
 
           try {
-            const workoutWithImages = await mapWorkoutImages(workout);
+            const workoutWithImages = await mapWorkoutImages(workout, user);
 
             // Only update state if this is still the latest request and component is mounted
             if (

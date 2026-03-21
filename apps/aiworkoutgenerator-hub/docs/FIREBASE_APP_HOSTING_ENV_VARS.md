@@ -88,9 +88,18 @@ You can also trigger or monitor rollouts in [Firebase Console](https://console.f
 ## Backend Information
 
 - **Backend Name:** aiworkoutgenerator-hub
-- **Repository:** aiworkoutgen-aiworkoutgenerator-hub
 - **URL:** https://aiworkoutgenerator-hub--ai-workout-generator-hub.asia-southeast1.hosted.app
 - **Primary Region:** asia-southeast1
+
+**Monorepo:** After cutover, the Git connection should point at **`workout-generator-web`** with **root directory** `apps/aiworkoutgenerator-hub`. Verify anytime:
+
+```bash
+firebase apphosting:backends:list --project ai-workout-generator-hub -j
+```
+
+Check `codebase.rootDirectory` and the linked repository in the JSON. See [MIGRATION_STANDALONE_TO_MONOREPO_CHECKLIST.md](./MIGRATION_STANDALONE_TO_MONOREPO_CHECKLIST.md) §5.
+
+- **Repository (pre–monorepo example):** `aiworkoutgen-aiworkoutgenerator-hub` — replace with monorepo when §5 is complete.
 
 ## Standard Environment Variables
 
@@ -172,7 +181,7 @@ After updating, redeploy your app for changes to take effect.
 
 ## Grant access to all App Hosting secrets
 
-After creating secrets (or if the build fails with "Error resolving secret version" / "Permission denied"), the App Hosting backend must be granted access to each secret. Run once to grant access to every secret referenced in `apphosting.yaml`:
+After creating secrets (or if the build fails with "Error resolving secret version" / "Permission denied"), the App Hosting backend must be granted access to each secret. Run once to grant access to every secret referenced in `apphosting.yaml`. If the build fails with **"failed to write env var KEY-----"** (private key in the raw log), a secret’s **name** was set to the key content instead of a short ID — see [BUILD_ERROR_ENV_VAR_NAME_IS_KEY.md](./BUILD_ERROR_ENV_VAR_NAME_IS_KEY.md).
 
 ```bash
 ./scripts/grant-apphosting-secrets-access.sh

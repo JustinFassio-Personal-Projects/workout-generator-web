@@ -40,10 +40,11 @@ export async function authenticatedFetch(
     ...fetchOptions
   } = options;
 
-  // Strip security-critical keys from caller headers so they cannot override auth (Copilot review)
+  // Strip security-critical keys from caller headers so they cannot override auth
   const {
     Authorization: _a,
     "X-Firebase-AppCheck": _ac,
+    "X-ID-Token": _id,
     ...safeCallerHeaders
   } = headers as Record<string, string>;
 
@@ -63,6 +64,8 @@ export async function authenticatedFetch(
   const requestHeaders: Record<string, string> = {
     ...safeCallerHeaders,
     Authorization: `Bearer ${token}`,
+    // Fallback for proxies that strip Authorization (Firebase App Hosting → Cloud Run)
+    "X-ID-Token": token,
     ...appCheckHeaders,
     ...(contentType ? { "Content-Type": contentType } : {}),
   };
@@ -88,6 +91,7 @@ export async function authenticatedFetch(
       const retryHeaders: Record<string, string> = {
         ...safeCallerHeaders,
         Authorization: `Bearer ${freshToken}`,
+        "X-ID-Token": freshToken,
         ...retryAppCheck,
         ...(contentType ? { "Content-Type": contentType } : {}),
       };

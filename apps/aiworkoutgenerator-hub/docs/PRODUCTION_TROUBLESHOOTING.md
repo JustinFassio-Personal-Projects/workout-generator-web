@@ -79,11 +79,13 @@ Sentry uses `tunnelRoute: "/monitoring"` to proxy events through your domain and
 
 ---
 
-## 4. Callers now using authenticatedFetch
+## 4. Authorization header stripped by proxy (401 on API routes)
 
-The following now use `authenticatedFetch`, which provides:
-- Bearer token + App Check headers
-- Retry on 401 with token refresh
+**Symptom:** All auth-protected API routes return 401 in production; Firestore works; local dev works.
+
+**Cause:** Firebase App Hosting (and some proxies) may strip the `Authorization` header when forwarding to Cloud Run. The backend receives the request without a token.
+
+**Fix (implemented):** The client sends the token in both `Authorization: Bearer <token>` and `X-ID-Token: <token>`. The server's `extractBearerToken()` checks `X-ID-Token` when `Authorization` is missing. This works around the proxy stripping.
 
 | Caller | Endpoint |
 |--------|----------|

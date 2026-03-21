@@ -3,6 +3,7 @@ import admin from "firebase-admin";
 import type { ServiceAccount } from "firebase-admin";
 import { mapImagesToWorkoutObjectWithDb } from "@/lib/image-mapping-admin";
 import { verifyIdToken } from "@/lib/firebase-admin";
+import { extractBearerToken } from "@/lib/api-utils";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
@@ -115,16 +116,14 @@ export async function POST(request: NextRequest) {
   const appCheckResult = await requireAppCheck(request);
   if (!appCheckResult.ok) return appCheckResult.response;
   try {
-    // Verify authentication
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // Verify authentication (extractBearerToken checks Authorization + X-ID-Token fallback for proxies)
+    const idToken = extractBearerToken(request);
+    if (!idToken) {
       return NextResponse.json(
         { error: "Missing or invalid authorization header" },
         { status: 401 }
       );
     }
-
-    const idToken = authHeader.substring(7);
     try {
       await verifyIdToken(idToken);
     } catch (verifyError) {

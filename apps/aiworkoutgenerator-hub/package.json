@@ -18,6 +18,8 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:emulator": "firebase emulators:exec --only auth,firestore 'vitest run'",
+    "test:smoke": "playwright test tests/smoke.spec.ts",
+    "test:smoke:ui": "playwright test tests/smoke.spec.ts --ui",
     "test:critical": "vitest run -t \"@critical\"",
     "security:scan": "node scripts/security-scan.js",
     "verify:quick": "npm run type-check && npm run build",
@@ -89,6 +91,7 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

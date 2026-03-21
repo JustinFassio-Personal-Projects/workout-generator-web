@@ -10,6 +10,7 @@
     "dev:admin-astro": "turbo run dev --filter=admin-dash-astro",
     "dev:programs": "turbo run dev --filter=programs",
     "dev:hub": "turbo run dev --filter=ai-workout-generator-hub",
+    "test:smoke": "npm run test:smoke -w ai-workout-generator-hub",
     "env:pull": "vercel env pull .env.local"
   },
   "devDependencies": {

@@ -62,10 +62,51 @@ Use this when the canonical app lives at **`apps/aiworkoutgenerator-hub`** in **
 
 ## 5. Cutover: domains and traffic
 
-- [ ] **App Hosting rootDirectory (monorepo):** In Firebase Console → **App Hosting** → **aiworkoutgenerator-hub** → **Settings** → Codebase / Git connection, set **Root directory** to `apps/aiworkoutgenerator-hub`. If it is `/` (repo root), the build will fail when the backend is connected to the monorepo. Reconnect the backend to the **workout-generator-web** repo and set root to `apps/aiworkoutgenerator-hub`.
-- [ ] **Hub (Firebase App Hosting):** After deploy, confirm **`https://app.aiworkoutgenerator.com`** (and OAuth redirect / authorized domains) still match [FIREBASE_APP_HOSTING_ENV_VARS.md](./FIREBASE_APP_HOSTING_ENV_VARS.md) guidance.
-- [ ] **DNS / SSL:** Custom domain and **CAA** records remain valid for wherever production is served (App Hosting vs Vercel).
-- [ ] **Optional Vercel subdomain:** If production for this product is on Vercel instead, map the production domain to the **new** Vercel project and verify build output.
+### 5a. Verify current App Hosting config (CLI)
+
+From `apps/aiworkoutgenerator-hub` (or any directory with Firebase project context):
+
+```bash
+firebase apphosting:backends:list --project ai-workout-generator-hub -j
+```
+
+In the JSON for backend **`aiworkoutgenerator-hub`**, check `codebase`:
+
+| Field | Before monorepo (typical) | After cutover (target) |
+|-------|---------------------------|-------------------------|
+| `repository` / Git link | Standalone hub repo (e.g. `aiworkoutgen-aiworkoutgenerator-hub`) | Monorepo: **`JustinFassio-Personal-Projects/workout-generator-web`** (or your org/repo) |
+| `rootDirectory` | `"/"` | **`apps/aiworkoutgenerator-hub`** (no leading slash in Console is fine; API may show `/` or path) |
+
+If `rootDirectory` stays **`/`** while the connected repo is the monorepo, the build will look for `package.json` at the repo root and **fail**.
+
+### 5b. App Hosting: reconnect repo + root directory (Console)
+
+Do this **after** `main` (or your production branch) contains the monorepo layout with `apps/aiworkoutgenerator-hub/`.
+
+1. [Firebase Console](https://console.firebase.google.com/) → project **`ai-workout-generator-hub`** → **App Hosting** → backend **`aiworkoutgenerator-hub`**.
+2. Open **Settings** (or **Manage** / **Codebase** — UI label may vary) for the GitHub connection.
+3. **Connect** or **Edit** the repository to **`JustinFassio-Personal-Projects/workout-generator-web`** (install/update the GitHub app if prompted).
+4. Set **Root directory** to **`apps/aiworkoutgenerator-hub`**.
+5. Confirm the **branch** matches production (usually **`main`**).
+6. Save; App Hosting will trigger a new rollout. Watch **Rollouts** for success.
+
+Re-run the CLI in **§5a** and confirm `rootDirectory` reflects the app subfolder.
+
+### 5c. Hub URL, Auth, OAuth
+
+- [ ] Open **`https://app.aiworkoutgenerator.com`** after rollout completes (hard refresh / private window).
+- [ ] **Authorized domains:** Firebase Console → **Authentication** → **Settings** → **Authorized domains** includes **`app.aiworkoutgenerator.com`** (and `localhost` for local dev).
+- [ ] **OAuth / Google sign-in:** [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **Credentials** → your **OAuth 2.0 Client ID** (Web) → **Authorized JavaScript origins** and **Authorized redirect URIs** include `https://app.aiworkoutgenerator.com` and Firebase auth handler URLs as in [FIREBASE_APP_HOSTING_ENV_VARS.md](./FIREBASE_APP_HOSTING_ENV_VARS.md).
+- [ ] **Secret `firebase-auth-domain`:** should be **`app.aiworkoutgenerator.com`** (verify: `gcloud secrets versions access latest --secret=firebase-auth-domain --project=ai-workout-generator-hub`).
+
+### 5d. DNS / SSL / CAA
+
+- [ ] Custom domain **`app.aiworkoutgenerator.com`** still points at App Hosting (Firebase Console → App Hosting → Domains shows healthy / `CERT_ACTIVE`).
+- [ ] If SSL was stuck on CAA, follow [CAA_RECORDS_SSL_FIX.md](./CAA_RECORDS_SSL_FIX.md) and re-check with [Dig CAA](https://toolbox.googleapps.com/apps/dig/#CAA/).
+
+### 5e. Hub on Vercel (optional)
+
+- [x] **N/A for production hub** — hub is **Firebase App Hosting** only. Skip mapping `app.aiworkoutgenerator.com` to Vercel. *If you ever add a Vercel preview for the hub,* set project root to `apps/aiworkoutgenerator-hub`.
 
 ### Analytics
 

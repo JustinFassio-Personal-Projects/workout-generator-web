@@ -64,6 +64,10 @@ functions/lib/
 coverage/
 .nyc_output/
 
+# Playwright (generated on each test run)
+playwright-report/
+test-results/
+
 # terraform
 .terraform/
 *.tfstate

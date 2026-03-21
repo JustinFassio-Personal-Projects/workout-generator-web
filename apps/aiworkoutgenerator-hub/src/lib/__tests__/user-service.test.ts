@@ -2,13 +2,21 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ensureUserDocument } from "@/lib/user-service";
 import type { User } from "firebase/auth";
 
-// Mock fetch API
-global.fetch = vi.fn();
-
-// Mock maskIdentifier
-vi.mock("@/lib/utils", () => ({
-  maskIdentifier: vi.fn((id: string) => id),
+const { mockAuthenticatedFetch } = vi.hoisted(() => ({
+  mockAuthenticatedFetch: vi.fn(),
 }));
+vi.mock("@/lib/authenticated-fetch", () => ({
+  authenticatedFetch: (...args: unknown[]) => mockAuthenticatedFetch(...args),
+}));
+
+// Mock maskIdentifier (partial mock - keep other utils exports)
+vi.mock("@/lib/utils", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/utils")>();
+  return {
+    ...actual,
+    maskIdentifier: vi.fn((id: string) => id),
+  };
+});
 
 describe("ensureUserDocument", () => {
   const mockUser: User = {
@@ -16,12 +24,11 @@ describe("ensureUserDocument", () => {
     email: "test@example.com",
     displayName: "Test User",
     photoURL: "https://example.com/photo.jpg",
-    getIdToken: vi.fn().mockResolvedValue("mocked-token"),
   } as unknown as User;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(global.fetch).mockResolvedValue({
+    mockAuthenticatedFetch.mockResolvedValue({
       ok: true,
       json: vi.fn().mockResolvedValue({ success: true, action: "created" }),
     } as unknown as Response);
@@ -30,37 +37,27 @@ describe("ensureUserDocument", () => {
   it("should create user document when it does not exist", async () => {
     await ensureUserDocument(mockUser);
 
-    // Verify getIdToken was called
-    expect(mockUser.getIdToken).toHaveBeenCalledWith(true);
-
-    // Verify fetch was called with correct parameters
-    expect(global.fetch).toHaveBeenCalledWith("/api/users/ensure", {
+    expect(mockAuthenticatedFetch).toHaveBeenCalledWith("/api/users/ensure", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer mocked-token",
-      },
+      body: JSON.stringify({}),
+      user: mockUser,
     });
   });
 
-  it("should call API route with correct token", async () => {
+  it("should call API route with correct parameters", async () => {
     const userWithoutDisplayName: User = {
       uid: "test-uid-2",
       email: "john.doe@example.com",
       displayName: null,
       photoURL: null,
-      getIdToken: vi.fn().mockResolvedValue("test-token-2"),
     } as unknown as User;
 
     await ensureUserDocument(userWithoutDisplayName);
 
-    expect(userWithoutDisplayName.getIdToken).toHaveBeenCalledWith(true);
-    expect(global.fetch).toHaveBeenCalledWith("/api/users/ensure", {
+    expect(mockAuthenticatedFetch).toHaveBeenCalledWith("/api/users/ensure", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer test-token-2",
-      },
+      body: JSON.stringify({}),
+      user: userWithoutDisplayName,
     });
   });
 
@@ -70,49 +67,39 @@ describe("ensureUserDocument", () => {
       email: null,
       displayName: null,
       photoURL: null,
-      getIdToken: vi.fn().mockResolvedValue("test-token-3"),
     } as unknown as User;
 
     await ensureUserDocument(userWithoutEmail);
 
-    expect(userWithoutEmail.getIdToken).toHaveBeenCalledWith(true);
-    expect(global.fetch).toHaveBeenCalled();
+    expect(mockAuthenticatedFetch).toHaveBeenCalled();
   });
 
   it("should handle existing documents (API returns updated action)", async () => {
-    vi.mocked(global.fetch).mockResolvedValue({
+    mockAuthenticatedFetch.mockResolvedValue({
       ok: true,
       json: vi.fn().mockResolvedValue({ success: true, action: "updated" }),
     } as unknown as Response);
 
     await ensureUserDocument(mockUser);
 
-    expect(mockUser.getIdToken).toHaveBeenCalledWith(true);
-    expect(global.fetch).toHaveBeenCalled();
+    expect(mockAuthenticatedFetch).toHaveBeenCalled();
   });
 
-  it("should handle getIdToken errors gracefully without throwing", async () => {
+  it("should handle authenticatedFetch errors gracefully without throwing", async () => {
     const consoleWarnSpy = vi
       .spyOn(console, "warn")
       .mockImplementation(() => {});
 
-    const userWithTokenError: User = {
-      ...mockUser,
-      getIdToken: vi.fn().mockResolvedValue(null),
-    } as unknown as User;
-
-    // Should not throw
-    await expect(
-      ensureUserDocument(userWithTokenError)
-    ).resolves.toBeUndefined();
-
-    // Verify warning was logged
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Could not get ID token")
+    mockAuthenticatedFetch.mockRejectedValue(
+      new Error("User not authenticated")
     );
 
-    // Verify fetch was NOT called when token is null
-    expect(global.fetch).not.toHaveBeenCalled();
+    await expect(ensureUserDocument(mockUser)).resolves.toBeUndefined();
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to ensure users document"),
+      expect.any(Error)
+    );
 
     consoleWarnSpy.mockRestore();
   });
@@ -122,17 +109,14 @@ describe("ensureUserDocument", () => {
       .spyOn(console, "warn")
       .mockImplementation(() => {});
 
-    // Mock fetch to return error response
-    vi.mocked(global.fetch).mockResolvedValue({
+    mockAuthenticatedFetch.mockResolvedValue({
       ok: false,
       status: 500,
       json: vi.fn().mockResolvedValue({ error: "Internal server error" }),
     } as unknown as Response);
 
-    // Should not throw
     await expect(ensureUserDocument(mockUser)).resolves.toBeUndefined();
 
-    // Verify error was logged
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       expect.stringContaining("Failed to ensure users document"),
       expect.any(Error)
@@ -146,13 +130,10 @@ describe("ensureUserDocument", () => {
       .spyOn(console, "warn")
       .mockImplementation(() => {});
 
-    // Mock fetch to throw a network error
-    vi.mocked(global.fetch).mockRejectedValue(new Error("Network error"));
+    mockAuthenticatedFetch.mockRejectedValue(new Error("Network error"));
 
-    // Should not throw
     await expect(ensureUserDocument(mockUser)).resolves.toBeUndefined();
 
-    // Verify error was logged
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       expect.stringContaining("Failed to ensure users document"),
       expect.any(Error)

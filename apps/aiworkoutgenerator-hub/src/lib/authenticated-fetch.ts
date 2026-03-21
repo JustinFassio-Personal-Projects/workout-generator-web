@@ -9,6 +9,7 @@
  * Use for API routes that require Firebase Auth.
  */
 
+import type { User } from "firebase/auth";
 import { getIdToken } from "@/lib/auth";
 import { getAppCheckHeaders } from "@/lib/firebase";
 
@@ -17,20 +18,27 @@ export type AuthenticatedFetchOptions = Omit<RequestInit, "headers"> & {
   headers?: Record<string, string>;
   /** If true, force token refresh before the request (e.g., after 401 retry) */
   forceTokenRefresh?: boolean;
+  /** When provided, use this user's token instead of auth.currentUser (avoids timing mismatches) */
+  user?: User;
 };
 
 /**
  * Fetch with authentication headers. Retries once on 401 with a fresh token.
  *
  * @param url - Request URL
- * @param options - Fetch options plus optional forceTokenRefresh
+ * @param options - Fetch options plus optional forceTokenRefresh and user
  * @returns Response (caller should check response.ok)
  */
 export async function authenticatedFetch(
   url: string,
   options: AuthenticatedFetchOptions = {}
 ): Promise<Response> {
-  const { headers = {}, forceTokenRefresh = false, ...fetchOptions } = options;
+  const {
+    headers = {},
+    forceTokenRefresh = false,
+    user: explicitUser,
+    ...fetchOptions
+  } = options;
 
   // Strip security-critical keys from caller headers so they cannot override auth (Copilot review)
   const {
@@ -39,7 +47,10 @@ export async function authenticatedFetch(
     ...safeCallerHeaders
   } = headers as Record<string, string>;
 
-  const token = await getIdToken(forceTokenRefresh);
+  const getToken = async (force: boolean) =>
+    explicitUser ? explicitUser.getIdToken(force) : getIdToken(force);
+
+  const token = await getToken(forceTokenRefresh);
   if (!token) {
     throw new Error("User not authenticated");
   }
@@ -63,7 +74,7 @@ export async function authenticatedFetch(
 
   // Retry once on 401 with a fresh token (handles expired tokens)
   if (response.status === 401 && !forceTokenRefresh) {
-    const freshToken = await getIdToken(true);
+    const freshToken = await getToken(true);
     if (freshToken) {
       // Consume original response body before retry to avoid resource leaks (Copilot review)
       try {

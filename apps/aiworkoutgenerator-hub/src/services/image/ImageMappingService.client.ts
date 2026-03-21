@@ -5,11 +5,14 @@
  * Features:
  * - Request deduplication to prevent duplicate API calls for the same workout
  * - Graceful error handling with fallback to original workout
+ * - Token refresh retry on 401 (handles expired tokens)
+ * - App Check headers when enabled
+ * - Skip API call when unauthenticated (return workout as-is, no error)
  */
 
 import type { TrainerWorkout } from "@/types/firestore";
 import { restoreTimestamps } from "@/lib/restore-timestamps";
-import { getIdToken } from "@/lib/auth";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 
 // Track in-flight requests to prevent duplicate API calls for the same workout
 const inFlightRequests = new Map<string, Promise<TrainerWorkout>>();
@@ -92,18 +95,8 @@ export async function mapWorkoutImages(
   // Create new request and track it
   const requestPromise = (async () => {
     try {
-      // Get authentication token for API call
-      const token = await getIdToken();
-      if (!token) {
-        throw new Error("User not authenticated");
-      }
-
-      const response = await fetch("/api/workouts/map-images", {
+      const response = await authenticatedFetch("/api/workouts/map-images", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ workout }),
       });
 
@@ -113,10 +106,16 @@ export async function mapWorkoutImages(
           .catch(() => ({ error: "Unknown error" }));
         const errorMessage =
           errorData.error || `API returned ${response.status}`;
-        console.error(
-          `[Image Mapping Client] API error (${response.status}):`,
-          errorMessage
-        );
+
+        // Auth errors: throw without logging here; catch block logs once (avoids duplicate - Copilot review)
+        const isAuthError = response.status === 401 || response.status === 403;
+        if (!isAuthError) {
+          console.error(
+            `[Image Mapping Client] API error (${response.status}):`,
+            errorMessage,
+            { workoutId: workout.id }
+          );
+        }
         throw new Error(errorMessage);
       }
 
@@ -165,12 +164,32 @@ export async function mapWorkoutImages(
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
+
+      // User not authenticated: return workout silently (expected when not signed in)
+      if (errorMessage === "User not authenticated") {
+        return workout;
+      }
+
+      // Auth errors: warn (token expired, invalid, App Check) - graceful degradation (Copilot: include all requireAppCheck messages)
+      if (
+        errorMessage.includes("Invalid or expired token") ||
+        errorMessage.includes("Missing App Check token") ||
+        errorMessage.includes("Invalid App Check token")
+      ) {
+        console.warn(
+          "[Image Mapping Client] Auth failed, using workout without mapped images:",
+          errorMessage,
+          { workoutId: workout.id }
+        );
+        return workout;
+      }
+
+      // Other errors: log as error
       console.error(
         "[Image Mapping Client] Error mapping workout images:",
         errorMessage,
         { workoutId: workout.id }
       );
-      // Return original workout if mapping fails (graceful degradation)
       return workout;
     } finally {
       // Remove from in-flight requests

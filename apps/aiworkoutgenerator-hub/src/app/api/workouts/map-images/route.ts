@@ -127,7 +127,25 @@ export async function POST(request: NextRequest) {
     const idToken = authHeader.substring(7);
     try {
       await verifyIdToken(idToken);
-    } catch {
+    } catch (verifyError) {
+      const errMsg =
+        verifyError instanceof Error
+          ? verifyError.message
+          : String(verifyError);
+      logger.warn(
+        "[Image Mapping API] Token verification failed",
+        verifyError,
+        {
+          route: "/api/workouts/map-images",
+          operation: "verify_token",
+          hint:
+            errMsg.includes("project") ||
+            errMsg.includes("audience") ||
+            errMsg.includes("issuer")
+              ? "Project/audience mismatch: ensure FIREBASE_SERVICE_ACCOUNT_KEY matches NEXT_PUBLIC_FIREBASE_PROJECT_ID"
+              : undefined,
+        }
+      );
       return NextResponse.json(
         { error: "Invalid or expired token" },
         { status: 401 }

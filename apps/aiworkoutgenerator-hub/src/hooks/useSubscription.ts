@@ -182,7 +182,7 @@ export function useSubscription() {
     try {
       const response = await authenticatedFetch(
         `/api/users/workout-counts?tier=${effectiveTierForCounting}`,
-        { method: "GET" }
+        { method: "GET", user }
       );
 
       if (!response.ok) {

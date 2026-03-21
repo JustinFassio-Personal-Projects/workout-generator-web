@@ -48,9 +48,7 @@ export async function authenticatedFetch(
   } = headers as Record<string, string>;
 
   const getToken = async (force: boolean) =>
-    explicitUser
-      ? explicitUser.getIdToken(force)
-      : getIdToken(force);
+    explicitUser ? explicitUser.getIdToken(force) : getIdToken(force);
 
   const token = await getToken(forceTokenRefresh);
   if (!token) {

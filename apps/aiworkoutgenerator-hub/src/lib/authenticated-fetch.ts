@@ -33,8 +33,11 @@ export async function authenticatedFetch(
   const { headers = {}, forceTokenRefresh = false, ...fetchOptions } = options;
 
   // Strip security-critical keys from caller headers so they cannot override auth (Copilot review)
-  const { Authorization: _a, "X-Firebase-AppCheck": _ac, ...safeCallerHeaders } =
-    headers as Record<string, string>;
+  const {
+    Authorization: _a,
+    "X-Firebase-AppCheck": _ac,
+    ...safeCallerHeaders
+  } = headers as Record<string, string>;
 
   const token = await getIdToken(forceTokenRefresh);
   if (!token) {
@@ -44,9 +47,7 @@ export async function authenticatedFetch(
   const appCheckHeaders = await getAppCheckHeaders();
   const contentType =
     safeCallerHeaders["Content-Type"] ??
-    (typeof fetchOptions.body === "string"
-      ? "application/json"
-      : undefined);
+    (typeof fetchOptions.body === "string" ? "application/json" : undefined);
 
   const requestHeaders: Record<string, string> = {
     ...safeCallerHeaders,

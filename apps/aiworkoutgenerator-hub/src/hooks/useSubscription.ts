@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { User } from "firebase/auth";
 import { useUser, getIdToken } from "@/lib/auth";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import {
   WORKOUT_LIMITS,
   type SubscriptionTier,
@@ -179,23 +180,9 @@ export function useSubscription() {
 
     setCountLoading(true);
     try {
-      // Get ID token for API authentication
-      const idToken = await user.getIdToken(true);
-      if (!idToken) {
-        console.warn("Could not get ID token, skipping workout count fetch");
-        setCountLoading(false);
-        return;
-      }
-
-      // Use API route that uses Admin SDK (bypasses security rules)
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `/api/users/workout-counts?tier=${effectiveTierForCounting}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
+        { method: "GET" }
       );
 
       if (!response.ok) {

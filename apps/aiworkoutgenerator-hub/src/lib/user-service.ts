@@ -1,5 +1,6 @@
 import type { User } from "firebase/auth";
 import { maskIdentifier } from "@/lib/utils";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 
 /**
  * Ensure a user document exists in the `users` collection.
@@ -8,27 +9,17 @@ import { maskIdentifier } from "@/lib/utils";
  * Uses an API route with Admin SDK to bypass Firestore security rules,
  * which is necessary in the emulator where auth context propagation can be delayed.
  *
+ * Uses authenticatedFetch for Bearer + App Check headers and 401 retry with token refresh.
+ *
  * @param user - Firebase Auth user object
  * @returns Promise that resolves when the operation completes (or fails silently)
  */
 export async function ensureUserDocument(user: User): Promise<void> {
   try {
-    // Get ID token for API authentication
-    const idToken = await user.getIdToken(true);
-    if (!idToken) {
-      console.warn(
-        `⚠️ Could not get ID token for user ${maskIdentifier(user.uid)}, skipping user document creation`
-      );
-      return;
-    }
-
-    // Call API route that uses Admin SDK (bypasses security rules)
-    const response = await fetch("/api/users/ensure", {
+    // authenticatedFetch uses auth.currentUser; at this point it should match the passed user
+    const response = await authenticatedFetch("/api/users/ensure", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`,
-      },
+      body: JSON.stringify({}),
     });
 
     if (!response.ok) {

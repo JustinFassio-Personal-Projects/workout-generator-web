@@ -16,9 +16,9 @@ test.describe("Smoke tests", () => {
     const response = await page.goto("/login", { waitUntil: "domcontentloaded" });
     expect(response?.status(), "Login page should return 200").toBe(200);
     await expect(
-      page.getByRole("heading", { name: /Welcome to AI Workout Generator/i }).or(
-        page.getByRole("tab", { name: /Sign In/i })
-      )
+      page.getByRole("heading", { name: /Welcome to AI Workout Generator/i })
+        .or(page.getByRole("tab", { name: /Sign In/i }))
+        .first()
     ).toBeVisible({ timeout: 15_000 });
   });
 

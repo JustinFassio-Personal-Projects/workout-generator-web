@@ -10,6 +10,7 @@
  * - Skip API call when unauthenticated (return workout as-is, no error)
  */
 
+import type { User } from "firebase/auth";
 import type { TrainerWorkout } from "@/types/firestore";
 import { restoreTimestamps } from "@/lib/restore-timestamps";
 import { authenticatedFetch } from "@/lib/authenticated-fetch";
@@ -74,10 +75,12 @@ function getWorkoutCacheKey(workout: TrainerWorkout): string {
  * for the same workout.
  *
  * @param workout - The workout object to map images to
+ * @param user - Optional Firebase user; when provided, uses this user's token to avoid auth.currentUser timing mismatches
  * @returns The workout object with mapped images
  */
 export async function mapWorkoutImages(
-  workout: TrainerWorkout
+  workout: TrainerWorkout,
+  user?: User
 ): Promise<TrainerWorkout> {
   const cacheKey = getWorkoutCacheKey(workout);
 
@@ -98,6 +101,7 @@ export async function mapWorkoutImages(
       const response = await authenticatedFetch("/api/workouts/map-images", {
         method: "POST",
         body: JSON.stringify({ workout }),
+        user,
       });
 
       if (!response.ok) {
@@ -208,10 +212,12 @@ export async function mapWorkoutImages(
  * Uses Promise.allSettled to handle partial failures gracefully.
  *
  * @param workouts - Array of workout objects to map images to
+ * @param user - Optional Firebase user; when provided, uses this user's token to avoid auth.currentUser timing mismatches
  * @returns Array of workout objects with mapped images
  */
 export async function mapWorkoutImagesBatch(
-  workouts: TrainerWorkout[]
+  workouts: TrainerWorkout[],
+  user?: User
 ): Promise<TrainerWorkout[]> {
   if (workouts.length === 0) {
     return [];
@@ -220,7 +226,7 @@ export async function mapWorkoutImagesBatch(
   // Map images in parallel using Promise.allSettled
   // This allows us to continue even if some workouts fail
   const results = await Promise.allSettled(
-    workouts.map((workout) => mapWorkoutImages(workout))
+    workouts.map((workout) => mapWorkoutImages(workout, user))
   );
 
   // Process results and log any failures

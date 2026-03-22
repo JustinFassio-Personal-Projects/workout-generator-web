@@ -180,10 +180,13 @@ export function useSubscription() {
 
     setCountLoading(true);
     try {
-      const response = await authenticatedFetch(
-        `/api/users/workout-counts?tier=${effectiveTierForCounting}`,
-        { method: "GET", user }
-      );
+      // POST + JSON body carries _firebaseIdToken when App Hosting strips auth headers (GET has no body).
+      const response = await authenticatedFetch("/api/users/workout-counts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: effectiveTierForCounting }),
+        user,
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

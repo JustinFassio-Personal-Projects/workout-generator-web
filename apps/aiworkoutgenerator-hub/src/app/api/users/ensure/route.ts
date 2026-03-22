@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb, verifyIdToken } from "@/lib/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { extractBearerToken } from "@/lib/api-utils";
+import { resolveIdToken } from "@/lib/api-utils";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
@@ -17,8 +17,14 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   const appCheckResult = await requireAppCheck(request);
   if (!appCheckResult.ok) return appCheckResult.response;
+  let body: Record<string, unknown> = {};
   try {
-    const idToken = extractBearerToken(request);
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    /* empty */
+  }
+  try {
+    const idToken = resolveIdToken(request, body);
     if (!idToken) {
       return NextResponse.json(
         { error: "Missing or invalid authorization header" },
@@ -63,6 +69,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, action: "created" });
   } catch (error) {
+    const authErrorCode =
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      typeof (error as { code: unknown }).code === "string"
+        ? ((error as { code: string }).code as string)
+        : undefined;
+    const isAuthError =
+      typeof authErrorCode === "string" && authErrorCode.startsWith("auth/");
+    if (isAuthError) {
+      return NextResponse.json(
+        { error: "Authentication failed" },
+        { status: 401 }
+      );
+    }
+
     captureApiError(error, {
       endpoint: "users_ensure",
       operation: "ensure_user_document",

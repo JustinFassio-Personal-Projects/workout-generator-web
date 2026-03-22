@@ -10,7 +10,7 @@
 | Error | Endpoint | Likely Cause | Fix |
 |-------|----------|--------------|-----|
 | **401 Unauthorized** | `POST /api/workouts/map-images` | Token verification fails (project mismatch or expired) | Verify project alignment (see below) |
-| **500 Internal Server Error** | `GET /api/users/workout-counts` | Same as above, or Firestore/Admin init failure | Verify project alignment; check App Hosting logs |
+| **500 Internal Server Error** | `POST /api/users/workout-counts` (or legacy `GET`) | Same as above, or Firestore/Admin init failure | Verify project alignment; check App Hosting logs |
 | **500 Internal Server Error** | `POST /api/users/ensure` | Same as above | Same as above |
 | **403 Forbidden** | `POST /monitoring` (Sentry tunnel) | Tunnel rewrite not supported or Sentry ingest rejecting | See Sentry section below |
 
@@ -73,7 +73,7 @@ Sentry uses `tunnelRoute: "/monitoring"` to proxy events through your domain and
 
 ### Mitigations
 
-- **Option A (recommended if 403 persists):** Set `SENTRY_DISABLE_TUNNEL=1` in App Hosting environment variables. This disables the tunnel; events go directly to Sentry. Ad-blockers may block them for some users, but 403s stop. Add in Firebase Console → App Hosting → [Backend] → Environment variables.
+- **Option A (recommended if 403 persists):** `apphosting.yaml` sets `SENTRY_DISABLE_TUNNEL=1` so builds disable the tunnel; events go directly to Sentry. Ad-blockers may block them for some users, but 403s on `/monitoring` stop. You can also set this manually in Firebase Console → App Hosting → [Backend] → Environment variables.
 - **Option B:** Keep the tunnel and verify Sentry config (DSN, `SENTRY_AUTH_TOKEN` for builds, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_URL` for US org).
 - **Option C:** Add Sentry to `ignoreErrors` for `/monitoring` 403 if it’s too noisy (Sentry still works for users without ad-blockers).
 
@@ -85,13 +85,17 @@ Sentry uses `tunnelRoute: "/monitoring"` to proxy events through your domain and
 
 **Cause:** Firebase App Hosting (and some proxies) may strip the `Authorization` header when forwarding to Cloud Run. The backend receives the request without a token.
 
-**Fix (implemented):** The client sends the token in both `Authorization: Bearer <token>` and `X-ID-Token: <token>`. The server's `extractBearerToken()` checks `X-ID-Token` when `Authorization` is missing. This works around the proxy stripping.
+**Fix (implemented):**
+
+1. **Headers:** `Authorization`, `X-ID-Token`, and `X-Firebase-ID-Token` (`extractBearerToken()` checks all).
+2. **JSON body (last resort):** `authenticatedFetch` adds `_firebaseIdToken` to JSON bodies on non-GET requests. Routes use `resolveIdToken(request, parsedBody)` so the token still works if **all** auth headers are stripped.
+3. **Workout counts:** Client uses **`POST /api/users/workout-counts`** with `{ tier }` so the token can ride in the body (GET has no body).
 
 | Caller | Endpoint |
 |--------|----------|
 | `ImageMappingService.client` | `POST /api/workouts/map-images` |
 | `user-service.ensureUserDocument` | `POST /api/users/ensure` |
-| `useSubscription.refreshWorkoutCount` | `GET /api/users/workout-counts` |
+| `useSubscription.refreshWorkoutCount` | `POST /api/users/workout-counts` (`GET` still supported) |
 
 ---
 

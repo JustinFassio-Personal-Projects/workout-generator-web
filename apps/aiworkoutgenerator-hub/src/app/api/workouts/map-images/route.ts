@@ -3,7 +3,7 @@ import admin from "firebase-admin";
 import type { ServiceAccount } from "firebase-admin";
 import { mapImagesToWorkoutObjectWithDb } from "@/lib/image-mapping-admin";
 import { verifyIdToken } from "@/lib/firebase-admin";
-import { extractBearerToken } from "@/lib/api-utils";
+import { resolveIdToken } from "@/lib/api-utils";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
@@ -115,9 +115,18 @@ function getProductionDb(): admin.firestore.Firestore {
 export async function POST(request: NextRequest) {
   const appCheckResult = await requireAppCheck(request);
   if (!appCheckResult.ok) return appCheckResult.response;
+
+  let parsedBody: Record<string, unknown>;
   try {
-    // Verify authentication (extractBearerToken checks Authorization + X-ID-Token fallback for proxies)
-    const idToken = extractBearerToken(request);
+    const raw = await request.text();
+    parsedBody = JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  try {
+    // Headers + JSON _firebaseIdToken (proxies may strip all auth headers on App Hosting)
+    const idToken = resolveIdToken(request, parsedBody);
     if (!idToken) {
       return NextResponse.json(
         { error: "Missing or invalid authorization header" },
@@ -151,10 +160,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const { workout } = body;
-
-    if (!workout || !workout.sections) {
+    const workout = parsedBody.workout;
+    if (
+      !workout ||
+      typeof workout !== "object" ||
+      !Array.isArray((workout as Record<string, unknown>).sections)
+    ) {
       return NextResponse.json(
         { error: "Invalid workout object. Must include 'sections' array." },
         { status: 400 }

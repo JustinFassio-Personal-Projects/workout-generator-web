@@ -30,7 +30,10 @@ export async function getActiveWaiver(
     return await getActiveWaiverOrThrow();
   } catch (error) {
     options?.onError?.(error);
-    console.error("[WAIVER] Failed to get active waiver (returning null):", error);
+    console.error(
+      "[WAIVER] Failed to get active waiver (returning null):",
+      error
+    );
     return null;
   }
 }
@@ -53,7 +56,10 @@ async function getActiveWaiverOrThrow(): Promise<LiabilityWaiver | null> {
   } catch (queryError) {
     // Fallback: Query without orderBy if index doesn't exist yet
     // Also catches PERMISSION_DENIED from initial query—fallback will throw too, outer catch returns null
-    console.warn("Waiver query index may not exist or Firestore error, using fallback:", queryError);
+    console.warn(
+      "Waiver query index may not exist or Firestore error, using fallback:",
+      queryError
+    );
     const allActiveWaivers = await adminDb
       .collection("liability_waivers")
       .where("is_active", "==", true)

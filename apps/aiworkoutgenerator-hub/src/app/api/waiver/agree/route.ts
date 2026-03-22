@@ -9,10 +9,15 @@ import {
   calculateVersionHash,
   getClientIp,
 } from "@/lib/api-utils";
+import { DEFAULT_WAIVER_TEXT } from "@/lib/waiver/default-waiver-text";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
 import type { WaiverAgreementRequest } from "@/types/waiver";
+
+/** Version and hash for the built-in fallback waiver (shown when API fetch fails). */
+const FALLBACK_WAIVER_VERSION = "1.0.0";
+const FALLBACK_WAIVER_HASH = calculateVersionHash(DEFAULT_WAIVER_TEXT);
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -112,7 +117,38 @@ export async function POST(request: NextRequest) {
       .limit(1)
       .get();
 
-    if (waiverVersionQuery.empty) {
+    let waiver: LiabilityWaiver;
+
+    if (!waiverVersionQuery.empty) {
+      const waiverDoc = waiverVersionQuery.docs[0];
+      const waiverData = waiverDoc.data() as LiabilityWaiver;
+      // Ensure id is not duplicated (waiverData may already have id from data())
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id: _unused, ...waiverDataWithoutId } = waiverData;
+      waiver = {
+        id: waiverDoc.id,
+        ...waiverDataWithoutId,
+      } as LiabilityWaiver;
+    } else if (
+      input.waiver_version === FALLBACK_WAIVER_VERSION &&
+      input.waiver_version_hash === FALLBACK_WAIVER_HASH
+    ) {
+      // Fallback waiver: shown when /api/waiver/active fails (e.g. network, Firestore down).
+      // User agreed to DEFAULT_WAIVER_TEXT; accept and record the agreement.
+      // The waiver doc may not exist in Firestore, but the agreement is the legal record.
+      waiver = {
+        id: "fallback",
+        version: FALLBACK_WAIVER_VERSION,
+        version_hash: FALLBACK_WAIVER_HASH,
+        title: "Liability Waiver and Terms of Service",
+        content: DEFAULT_WAIVER_TEXT,
+        is_active: true,
+        created_by: "system",
+        created_at: { seconds: Math.floor(Date.now() / 1000) } as LiabilityWaiver["created_at"],
+        updated_at: { seconds: Math.floor(Date.now() / 1000) } as LiabilityWaiver["updated_at"],
+        effective_date: { seconds: Math.floor(Date.now() / 1000) } as LiabilityWaiver["effective_date"],
+      };
+    } else {
       return NextResponse.json(
         {
           error: "Invalid waiver version",
@@ -121,16 +157,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const waiverDoc = waiverVersionQuery.docs[0];
-    const waiverData = waiverDoc.data() as LiabilityWaiver;
-    // Ensure id is not duplicated (waiverData may already have id from data())
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id: _unused, ...waiverDataWithoutId } = waiverData;
-    const waiver = {
-      id: waiverDoc.id,
-      ...waiverDataWithoutId,
-    } as LiabilityWaiver;
 
     // 4. Validate the version hash matches the actual waiver content
     // This ensures the user agreed to the exact content we have on record

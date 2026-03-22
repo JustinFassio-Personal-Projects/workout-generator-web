@@ -1,11 +1,16 @@
 import * as Sentry from "@sentry/nextjs";
 
-// Sentry is optional - only initialize when DSN is set to avoid 403 on /monitoring and ERR_CONNECTION_REFUSED to Spotlight (8969).
+// Sentry is optional - only initialize when DSN is set to avoid 403 on ingest and ERR_CONNECTION_REFUSED to Spotlight (8969).
+// Set NEXT_PUBLIC_DISABLE_SENTRY=1 to disable client Sentry (e.g. hotfix for 403 ingest noise) without clearing the DSN secret.
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN?.trim();
+const disableSentry =
+  process.env.NEXT_PUBLIC_DISABLE_SENTRY === "true" ||
+  process.env.NEXT_PUBLIC_DISABLE_SENTRY === "1";
 const isProduction = process.env.NODE_ENV === "production";
 const isDevelopment = process.env.NODE_ENV === "development";
 const spotlightEnabled = process.env.NEXT_PUBLIC_SENTRY_SPOTLIGHT === "true";
-const shouldInit = !!dsn && (isProduction || isDevelopment);
+const shouldInit =
+  !!dsn && !disableSentry && (isProduction || isDevelopment);
 
 if (shouldInit) {
   Sentry.init({

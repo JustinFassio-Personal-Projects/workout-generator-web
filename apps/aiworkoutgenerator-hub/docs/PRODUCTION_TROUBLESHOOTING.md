@@ -63,19 +63,19 @@ When `POST /api/workouts/map-images` returns 401, the client falls back to the w
 
 ---
 
-## 3. Sentry /monitoring 403
+## 3. Sentry 403 (ingest /monitoring)
 
-Sentry uses `tunnelRoute: "/monitoring"` to proxy events through your domain and avoid ad-blockers. A 403 on `POST /monitoring` can mean:
+Sentry may return 403 when sending events (tunnel or direct to `ingest.us.sentry.io`). This does **not** block onboarding but adds console noise.
 
-1. **Hosting platform:** Firebase App Hosting / Cloud Run may not support the Next.js rewrite that Sentry adds for the tunnel.
-2. **Sentry ingest:** Invalid DSN or auth can cause Sentry to reject the forwarded request (403).
-3. **Ad-blockers:** Some extensions block `/monitoring`; this is expected for a subset of users.
+### Quick disable (hotfix for 403)
 
-### Mitigations
+- **Option A:** In Firebase Console → App Hosting → [Backend] → Environment variables, set `NEXT_PUBLIC_DISABLE_SENTRY=1`. Redeploy. Client Sentry will not initialize; 403s stop.
+- **Option B:** Unset or blank `NEXT_PUBLIC_SENTRY_DSN` (or remove the `sentry-dsn` secret mapping). Same effect—client won't init.
 
-- **Option A (recommended if 403 persists):** `apphosting.yaml` sets `SENTRY_DISABLE_TUNNEL=1` so builds disable the tunnel; events go directly to Sentry. Ad-blockers may block them for some users, but 403s on `/monitoring` stop. You can also set this manually in Firebase Console → App Hosting → [Backend] → Environment variables.
-- **Option B:** Keep the tunnel and verify Sentry config (DSN, `SENTRY_AUTH_TOKEN` for builds, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_URL` for US org).
-- **Option C:** Add Sentry to `ignoreErrors` for `/monitoring` 403 if it’s too noisy (Sentry still works for users without ad-blockers).
+### Fix Sentry (proper)
+
+- In Sentry project settings, allow `app.aiworkoutgenerator.com` in allowed domains / CORS.
+- `apphosting.yaml` sets `SENTRY_DISABLE_TUNNEL=1` so events go directly to Sentry; if direct ingest returns 403, fix DSN / project settings in Sentry.
 
 ---
 
@@ -115,7 +115,88 @@ After deploying, trigger a fresh build so the new code and env vars take effect.
 
 ---
 
-## 6. Quick verification checklist
+## 6. Pulling App Hosting / Cloud Run logs for 500s
+
+When `POST /api/users/ensure` or `POST /api/users/workout-counts` returns 500, use these commands to capture the exact error (PERMISSION_DENIED, credential, etc.):
+
+```bash
+# Replace PROJECT_ID with your Firebase/GCP project ID
+export PROJECT_ID="your-firebase-project-id"
+
+# Last 1 hour, filter by ERROR severity and ensure route
+gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name=~".*" AND (textPayload=~"ensure" OR jsonPayload.message=~"ensure") AND severity>=ERROR' \
+  --project=$PROJECT_ID --limit=50 --format=json
+
+# Alternative: search for errorCode in structured logs (ensure route logs errorCode, errorMessage)
+gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/api/users/ensure" AND severity>=ERROR' \
+  --project=$PROJECT_ID --limit=20 --format="table(timestamp,jsonPayload.errorCode,jsonPayload.errorMessage)"
+
+# Workout-counts route
+gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/api/users/workout-counts" AND severity>=ERROR' \
+  --project=$PROJECT_ID --limit=20 --format="table(timestamp,jsonPayload.errorCode,jsonPayload.errorMessage)"
+```
+
+**Firebase App Hosting:** Logs are written by the underlying Cloud Run service. In Firebase Console → App Hosting → your backend → Logs, filter by severity ERROR or search for `ensure` / `workout-counts` / `errorCode` / `PERMISSION_DENIED`.
+
+---
+
+## 7. Firestore IAM fix (500 with PERMISSION_DENIED)
+
+When Cloud Run logs show `errorCode: "7"` or `PERMISSION_DENIED` for ensure/workout-counts, the service account lacks Firestore access.
+
+### App Hosting / Next.js (ensure, workout-counts, map-images)
+
+The Next.js app uses `FIREBASE_SERVICE_ACCOUNT_KEY` (firebase-admin). The **client_email** in that JSON is the identity. Grant it Firestore access:
+
+```bash
+# 1. Get the service account email from your key (or Firebase Console → Project Settings → Service Accounts)
+# It looks like: firebase-adminsdk-xxxxx@PROJECT_ID.iam.gserviceaccount.com
+
+# 2. Grant Cloud Datastore User role
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:SERVICE_ACCOUNT_EMAIL" \
+  --role="roles/datastore.user"
+
+# Example:
+# gcloud projects add-iam-policy-binding my-firebase-project \
+#   --member="serviceAccount:firebase-adminsdk-abc12@my-firebase-project.iam.gserviceaccount.com" \
+#   --role="roles/datastore.user"
+```
+
+### Cloud Functions (onUserCreated)
+
+The Functions runtime uses the default App Engine service account (`PROJECT_ID@appspot.gserviceaccount.com`). If `onUserCreated` fails with PERMISSION_DENIED:
+
+```bash
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:PROJECT_ID@appspot.gserviceaccount.com" \
+  --role="roles/datastore.user"
+```
+
+After applying, no redeploy is needed for IAM changes—they take effect within minutes.
+
+---
+
+## 8. Deploy verification (body token + resolveIdToken)
+
+Confirm production includes the auth-transfer fixes:
+
+1. **Code presence** (already in repo):
+   - `authenticated-fetch.ts`: merges `_firebaseIdToken` into JSON bodies on non-GET
+   - `ensure/route.ts`, `workout-counts/route.ts`: use `resolveIdToken(request, body)` and parse body before resolve
+   - `user-service.ts`: `POST /api/users/ensure` with `body: JSON.stringify({})`
+   - `useSubscription.ts`: `POST /api/users/workout-counts` with `body: JSON.stringify({ tier })`
+
+2. **Network tab check** (production):
+   - After sign-in, inspect `POST https://app.aiworkoutgenerator.com/api/users/ensure` → Request payload should include `_firebaseIdToken` (or auth headers if proxy forwards them)
+   - On pages that call workout-counts: `POST /api/users/workout-counts` with JSON body `{ tier, _firebaseIdToken? }`
+   - **500** with that shape = server-side (IAM, credential, Firestore), not missing client deploy
+
+3. **Trigger a full rebuild** after any code or env change so Next.js output includes the latest routes.
+
+---
+
+## 9. Quick verification checklist
 
 - [ ] `NEXT_PUBLIC_FIREBASE_PROJECT_ID` and service account `project_id` match
 - [ ] `firebase-service-account-key` secret exists and is valid

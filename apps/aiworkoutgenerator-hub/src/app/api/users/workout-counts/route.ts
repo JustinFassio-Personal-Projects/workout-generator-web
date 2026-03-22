@@ -108,9 +108,13 @@ async function workoutCountsHandler(
       endpoint: "workout_counts",
       operation: "fetch_workout_counts",
     });
+    // Log structured error for Cloud Run / App Hosting logs (diagnose 500: PERMISSION_DENIED, credential, etc.)
+    const err = error as { code?: string; message?: string } | null;
     logger.error("Error fetching workout counts", error, {
       route: "/api/users/workout-counts",
       operation: "fetch_workout_counts",
+      errorCode: err?.code ?? "unknown",
+      errorMessage: err?.message ?? String(error),
     });
 
     const errorMessage =

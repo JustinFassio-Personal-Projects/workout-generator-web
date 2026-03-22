@@ -36,14 +36,21 @@ if command -v gcloud &>/dev/null; then
   fi
 
   echo ""
-  echo "1b. Service account project_id:"
+  echo "1b. Service account (Firebase Admin SDK identity—this one needs Firestore IAM):"
   SA_JSON=$(gcloud secrets versions access latest --secret=firebase-service-account-key --project="$PROJECT" 2>/dev/null || true)
   if [ -n "$SA_JSON" ]; then
     SA_PID=$(echo "$SA_JSON" | jq -r '.project_id // empty' 2>/dev/null || true)
+    SA_EMAIL=$(echo "$SA_JSON" | jq -r '.client_email // empty' 2>/dev/null || true)
     if [ -n "$SA_PID" ]; then
-      echo "    $SA_PID"
+      echo "    project_id: $SA_PID"
     else
-      echo "    (jq failed or project_id missing)"
+      echo "    project_id: (jq failed or missing)"
+    fi
+    if [ -n "$SA_EMAIL" ]; then
+      echo "    client_email: $SA_EMAIL"
+      echo "    → Grant roles/datastore.user to this identity for Firestore (ensure, waiver, workout-counts)"
+    else
+      echo "    client_email: (jq failed or missing)"
     fi
   else
     echo "    (failed: run 'gcloud auth login' or check project access)"

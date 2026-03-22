@@ -46,8 +46,22 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Get active waiver
-    const waiver = await getActiveWaiver();
+    // Get active waiver (onError logs Firestore failures with structured errorCode/errorMessage for Cloud Run)
+    const waiver = await getActiveWaiver({
+      onError: (error) => {
+        const err = error as { code?: string; message?: string } | null;
+        captureApiError(error, {
+          endpoint: "waiver_active",
+          operation: "get_active_waiver",
+        });
+        logger.error("Error fetching active waiver", error, {
+          route: "/api/waiver/active",
+          operation: "get_active_waiver",
+          errorCode: err?.code ?? "unknown",
+          errorMessage: err?.message ?? String(error),
+        });
+      },
+    });
 
     if (!waiver) {
       return NextResponse.json({
@@ -62,9 +76,12 @@ export async function GET(request: NextRequest) {
       endpoint: "waiver_active",
       operation: "get_active_waiver",
     });
+    const err = error as { code?: string; message?: string } | null;
     logger.error("Error fetching active waiver", error, {
       route: "/api/waiver/active",
       operation: "get_active_waiver",
+      errorCode: err?.code ?? "unknown",
+      errorMessage: err?.message ?? String(error),
     });
     return NextResponse.json(
       {

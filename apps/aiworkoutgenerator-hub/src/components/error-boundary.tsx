@@ -42,7 +42,13 @@ export class ErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-    Sentry.captureException(error);
+    try {
+      Sentry.captureException(error);
+    } catch (sentryError) {
+      // If Sentry fails (e.g. 403 on /monitoring tunnel in production),
+      // do not throw—we already surfaced the original error to the user.
+      console.warn("Sentry capture failed (non-fatal):", sentryError);
+    }
   }
 
   componentDidUpdate(

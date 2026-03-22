@@ -144,9 +144,15 @@ export async function POST(request: NextRequest) {
         content: DEFAULT_WAIVER_TEXT,
         is_active: true,
         created_by: "system",
-        created_at: { seconds: Math.floor(Date.now() / 1000) } as LiabilityWaiver["created_at"],
-        updated_at: { seconds: Math.floor(Date.now() / 1000) } as LiabilityWaiver["updated_at"],
-        effective_date: { seconds: Math.floor(Date.now() / 1000) } as LiabilityWaiver["effective_date"],
+        created_at: {
+          seconds: Math.floor(Date.now() / 1000),
+        } as LiabilityWaiver["created_at"],
+        updated_at: {
+          seconds: Math.floor(Date.now() / 1000),
+        } as LiabilityWaiver["updated_at"],
+        effective_date: {
+          seconds: Math.floor(Date.now() / 1000),
+        } as LiabilityWaiver["effective_date"],
       };
     } else {
       return NextResponse.json(

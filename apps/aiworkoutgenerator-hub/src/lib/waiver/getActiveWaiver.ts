@@ -5,6 +5,11 @@ import { calculateVersionHash } from "../api-utils";
 import { DEFAULT_WAIVER_TEXT } from "./default-waiver-text";
 import type { LiabilityWaiver } from "@/types/firestore";
 
+export type GetActiveWaiverOptions = {
+  /** Called when Firestore/Admin throws (e.g. PERMISSION_DENIED). Use for structured logging at the API level. */
+  onError?: (error: unknown) => void;
+};
+
 /**
  * Get the currently active waiver version from Firestore.
  * If no active waiver exists, automatically creates one using DEFAULT_WAIVER_TEXT.
@@ -14,13 +19,17 @@ import type { LiabilityWaiver } from "@/types/firestore";
  *
  * Returns null on any Firestore/Admin error (e.g. PERMISSION_DENIED) so callers
  * can proceed without blocking—users can use the app when waiver system is unavailable.
+ * Pass onError to log the error with structured fields (errorCode, errorMessage) at the caller.
  *
  * @returns The active waiver (existing or newly created), or null if unavailable
  */
-export async function getActiveWaiver(): Promise<LiabilityWaiver | null> {
+export async function getActiveWaiver(
+  options?: GetActiveWaiverOptions
+): Promise<LiabilityWaiver | null> {
   try {
     return await getActiveWaiverOrThrow();
   } catch (error) {
+    options?.onError?.(error);
     console.error("[WAIVER] Failed to get active waiver (returning null):", error);
     return null;
   }
@@ -109,7 +118,7 @@ async function getActiveWaiverOrThrow(): Promise<LiabilityWaiver | null> {
       } as LiabilityWaiver;
     } catch (createError) {
       console.error("[WAIVER] Failed to create default waiver:", createError);
-      return null;
+      throw createError; // Propagate so onError runs for structured API logging
     }
   }
 

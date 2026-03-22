@@ -99,7 +99,23 @@ Sentry uses `tunnelRoute: "/monitoring"` to proxy events through your domain and
 
 ---
 
-## 5. Quick verification checklist
+## 5. /onboarding/continue crash
+
+**Symptom:** The `/onboarding/continue` page crashes (ErrorBoundary or white screen) in production.
+
+**Common causes:** The same auth/proxy issues that affect other API routes. When `ensure` and `workout-counts` return 500, and the Sentry tunnel returns 403, the app can hit cascading failures. The ErrorBoundary now catches Sentry capture failures so they don't cause a secondary crash.
+
+**Fix:** Deploy the troubleshooting branch (or main with the auth fixes):
+
+1. **SENTRY_DISABLE_TUNNEL=1** in `apphosting.yaml` (already present) so `/monitoring` 403s stop.
+2. **Body token fallback** (`_firebaseIdToken` in JSON bodies) so `ensure`, `workout-counts`, and `map-images` work when headers are stripped.
+3. **ErrorBoundary** wraps `Sentry.captureException` in try/catch so Sentry transport failures don't crash the app.
+
+After deploying, trigger a fresh build so the new code and env vars take effect.
+
+---
+
+## 6. Quick verification checklist
 
 - [ ] `NEXT_PUBLIC_FIREBASE_PROJECT_ID` and service account `project_id` match
 - [ ] `firebase-service-account-key` secret exists and is valid

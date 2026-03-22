@@ -21,6 +21,7 @@ import { WORKOUT_LIMITS } from "@/lib/subscription-constants";
 import { TrainerService } from "@/services/trainer/TrainerService";
 import { TrainerEquipmentService } from "@/services/trainer/TrainerEquipmentService";
 import { WaiverService } from "@/services/waiver";
+import { DEFAULT_WAIVER_TEXT } from "@/lib/waiver/default-waiver-text";
 import { WorkoutSummaryService } from "@/services/summaries/WorkoutSummaryService";
 import { AppPageHeader } from "@/components/app";
 import { EquipmentSelector } from "@/components/shared/EquipmentSelector";
@@ -59,6 +60,26 @@ type GenerateStep =
   | "waiver"
   | "equipment"
   | "generating";
+
+/**
+ * Fallback waiver used when the API fails or returns null.
+ * Allows users to read and fill out the waiver; agreement may succeed if server has matching default.
+ */
+function createFallbackWaiver(): LiabilityWaiverType {
+  const now = Math.floor(Date.now() / 1000);
+  return {
+    id: "fallback",
+    version: "1.0.0",
+    version_hash: "",
+    title: "Liability Waiver and Terms of Service",
+    content: DEFAULT_WAIVER_TEXT,
+    is_active: true,
+    created_by: "system",
+    created_at: { seconds: now } as LiabilityWaiverType["created_at"],
+    updated_at: { seconds: now } as LiabilityWaiverType["updated_at"],
+    effective_date: { seconds: now } as LiabilityWaiverType["effective_date"],
+  };
+}
 
 function GenerateWorkoutPageContent() {
   const { user, loading: authLoading } = useUser();
@@ -120,6 +141,8 @@ function GenerateWorkoutPageContent() {
     null
   );
   const [waiverLoading, setWaiverLoading] = useState(true);
+  const [waiverFetchError, setWaiverFetchError] = useState<boolean>(false);
+  const [waiverRetryCount, setWaiverRetryCount] = useState(0);
 
   // Upgrade modal
   const { showUpgradeModal, showPricingModal } = useUpgradeModal();
@@ -305,6 +328,7 @@ function GenerateWorkoutPageContent() {
 
     const checkWaiver = async () => {
       setWaiverLoading(true);
+      setWaiverFetchError(false);
       try {
         const activeWaiver = await WaiverService.getActiveWaiver();
         setWaiver(activeWaiver);
@@ -313,20 +337,23 @@ function GenerateWorkoutPageContent() {
           const hasAgreed = await WaiverService.hasUserAgreed(user.uid);
           setHasAgreedToWaiver(hasAgreed);
         } else {
-          // No active waiver - user cannot proceed until waiver system is available
+          // No active waiver - use fallback so user can still read and attempt to agree
+          setWaiver(createFallbackWaiver());
           setHasAgreedToWaiver(false);
         }
       } catch (error) {
         console.error("Failed to check waiver status:", error);
-        // On error, assume no agreement to be safe
+        // On fetch error, use fallback so user can at least read and fill out the waiver
+        setWaiver(createFallbackWaiver());
         setHasAgreedToWaiver(false);
+        setWaiverFetchError(true);
       } finally {
         setWaiverLoading(false);
       }
     };
 
     checkWaiver();
-  }, [user, authLoading]);
+  }, [user, authLoading, waiverRetryCount]);
 
   // Auth redirect
   useEffect(() => {
@@ -849,6 +876,25 @@ function GenerateWorkoutPageContent() {
         {/* Step 3: Waiver Agreement */}
         {step === "waiver" && (
           <div className="space-y-4">
+            {waiverFetchError && (
+              <div className="flex items-center justify-between gap-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm">
+                <span className="text-amber-700 dark:text-amber-400">
+                  Could not load the latest waiver from the server. Showing
+                  offline copy.
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setWaiverRetryCount((c) => c + 1)}
+                  disabled={waiverLoading}
+                >
+                  <RefreshCw
+                    className={`mr-2 h-4 w-4 ${waiverLoading ? "animate-spin" : ""}`}
+                  />
+                  Retry
+                </Button>
+              </div>
+            )}
             {waiver ? (
               <LiabilityWaiver
                 waiver={waiver}

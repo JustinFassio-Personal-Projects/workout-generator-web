@@ -28,9 +28,26 @@ export function useUserProfile() {
         // conforms to UserProfile interface. Type assertion bypasses TypeScript's
         // type safety and could lead to runtime errors if Firestore document has
         // missing or incorrect fields.
+        if (!snap.exists()) {
+          setState({
+            uid: user.uid,
+            profile: null,
+            loading: false,
+            error: null,
+          });
+          return;
+        }
+        const raw = snap.data() as UserProfile;
+        const profile: UserProfile = {
+          ...raw,
+          equipment_access: ProfileService.normalizeEquipmentAccess(
+            raw.equipment_access,
+            raw.fitness_level
+          ),
+        };
         setState({
           uid: user.uid,
-          profile: snap.exists() ? (snap.data() as UserProfile) : null,
+          profile,
           loading: false,
           error: null,
         });

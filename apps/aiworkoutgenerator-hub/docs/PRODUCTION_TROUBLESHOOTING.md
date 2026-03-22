@@ -146,7 +146,35 @@ gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/
 
 ---
 
-## 7. Firestore IAM fix (500 with PERMISSION_DENIED)
+## 7. Waiver not loading after monorepo migration
+
+If the waiver (or `/api/users/ensure`, `/api/waiver/active`) fails to load after moving from a standalone repo to the monorepo, common causes:
+
+### 7a. Environment variables not loading (local dev)
+
+When running from the monorepo root (e.g. `turbo run dev --filter=ai-workout-generator-hub`), `process.cwd()` may be the monorepo root. If `.env.local` was only at the old app root, it may not be found.
+
+**Fix:** Ensure `.env.local` exists at **`apps/aiworkoutgenerator-hub/.env.local`** (the app directory, not the monorepo root). The app's `next.config.ts` loads env from the config file's directory. Copy or recreate `.env.local` in the app folder and include `FIREBASE_SERVICE_ACCOUNT_KEY`, `NEXT_PUBLIC_FIREBASE_*`, etc.
+
+### 7b. App Hosting root directory
+
+If App Hosting was connected to the standalone repo and is now pointed at the monorepo, **Root directory** must be set to **`apps/aiworkoutgenerator-hub`**. Otherwise the build uses the wrong `package.json` and secrets/env may not apply.
+
+**Check:** Firebase Console → App Hosting → backend → Codebase/Settings → Root directory = `apps/aiworkoutgenerator-hub`.
+
+### 7c. Secrets in Cloud Secret Manager
+
+App Hosting injects secrets from `apphosting.yaml`. Verify the secret `firebase-service-account-key` exists and maps to `FIREBASE_SERVICE_ACCOUNT_KEY`:
+
+```bash
+gcloud secrets list --project=ai-workout-generator-hub | grep firebase-service-account
+```
+
+The waiver and user-ensure flows need Firestore access; the service account in that key must have `roles/datastore.user` (see §8 below).
+
+---
+
+## 8. Firestore IAM fix (500 with PERMISSION_DENIED)
 
 When Cloud Run logs show `errorCode: "7"` or `PERMISSION_DENIED` for ensure/workout-counts, the service account lacks Firestore access.
 
@@ -190,7 +218,7 @@ After applying, no redeploy is needed for IAM changes—they take effect within 
 
 ---
 
-## 8. Deploy verification (body token + resolveIdToken)
+## 9. Deploy verification (body token + resolveIdToken)
 
 Confirm production includes the auth-transfer fixes:
 
@@ -209,7 +237,7 @@ Confirm production includes the auth-transfer fixes:
 
 ---
 
-## 9. Quick verification checklist
+## 10. Quick verification checklist
 
 - [ ] `NEXT_PUBLIC_FIREBASE_PROJECT_ID` and service account `project_id` match
 - [ ] `firebase-service-account-key` secret exists and is valid

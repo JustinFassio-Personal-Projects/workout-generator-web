@@ -1,11 +1,16 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 import path from "path";
+import { existsSync } from "fs";
 import { loadEnvConfig } from "@next/env";
 
-// Load .env.local from this app's directory so env is correct when run from monorepo root (e.g. turbo run dev --filter=ai-workout-generator-hub)
-const appDir = path.resolve(process.cwd());
-loadEnvConfig(appDir);
+// Load .env.local from this app's directory. When run from monorepo root (e.g. turbo run dev --filter=ai-workout-generator-hub),
+// process.cwd() may be the monorepo root—.env.local lives in apps/aiworkoutgenerator-hub. Resolve app dir explicitly.
+const monorepoAppDir = path.join(process.cwd(), "apps", "aiworkoutgenerator-hub");
+const appDir = existsSync(path.join(monorepoAppDir, "package.json"))
+  ? monorepoAppDir
+  : process.cwd();
+loadEnvConfig(path.resolve(appDir));
 
 const nextConfig: NextConfig = {
   // Inlines at build time (e.g. local or App Hosting if you add FIREBASE_WEBAPP_CONFIG to apphosting.yaml).

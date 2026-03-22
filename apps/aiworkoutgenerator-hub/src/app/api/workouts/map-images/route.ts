@@ -160,9 +160,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { workout } = parsedBody;
-
-    if (!workout || !workout.sections) {
+    const workout = parsedBody.workout;
+    if (
+      !workout ||
+      typeof workout !== "object" ||
+      !Array.isArray((workout as Record<string, unknown>).sections)
+    ) {
       return NextResponse.json(
         { error: "Invalid workout object. Must include 'sections' array." },
         { status: 400 }

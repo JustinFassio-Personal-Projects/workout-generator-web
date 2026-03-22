@@ -17,8 +17,14 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   const appCheckResult = await requireAppCheck(request);
   if (!appCheckResult.ok) return appCheckResult.response;
+  let body: Record<string, unknown> = {};
   try {
-    const idToken = extractBearerToken(request);
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    /* empty */
+  }
+  try {
+    const idToken = resolveIdToken(request, body);
     if (!idToken) {
       return NextResponse.json(
         { error: "Missing or invalid authorization header" },

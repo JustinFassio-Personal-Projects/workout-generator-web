@@ -121,10 +121,7 @@ export async function POST(request: NextRequest) {
     const raw = await request.text();
     parsedBody = JSON.parse(raw) as Record<string, unknown>;
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   try {

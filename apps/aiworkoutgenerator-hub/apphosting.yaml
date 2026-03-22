@@ -93,6 +93,7 @@ env:
 
   # Sentry Error Tracking (optional - graceful degradation if not configured)
   # Get DSN from: Sentry > Settings > Projects > [Your Project] > Client Keys (DSN)
+  # Hotfix for 403 ingest: set NEXT_PUBLIC_DISABLE_SENTRY=1 in Console env to disable client Sentry
   - variable: NEXT_PUBLIC_SENTRY_DSN
     secret: sentry-dsn
 

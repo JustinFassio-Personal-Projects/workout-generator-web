@@ -89,9 +89,13 @@ export async function POST(request: NextRequest) {
       endpoint: "users_ensure",
       operation: "ensure_user_document",
     });
+    // Log structured error for Cloud Run / App Hosting logs (diagnose 500: PERMISSION_DENIED, credential, etc.)
+    const err = error as { code?: string; message?: string } | null;
     logger.error("Error ensuring user document", error, {
       route: "/api/users/ensure",
       operation: "ensure_user_document",
+      errorCode: err?.code ?? "unknown",
+      errorMessage: err?.message ?? String(error),
     });
     return NextResponse.json(
       { error: "Failed to ensure user document" },

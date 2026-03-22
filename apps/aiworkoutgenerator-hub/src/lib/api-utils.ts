@@ -2,12 +2,21 @@ import { NextRequest } from "next/server";
 import { createHash } from "crypto";
 import { adminDb, getUserClaims } from "@/lib/firebase-admin";
 import type { SubscriptionTier } from "@/lib/subscription-constants";
+import { FIREBASE_ID_TOKEN_BODY_KEY } from "@/lib/firebase-auth-transfer-constants";
 
 /**
  * Header used as fallback when Authorization is stripped by proxies (e.g. Firebase App Hosting).
  * Some proxies strip Authorization; X-ID-Token is typically forwarded.
  */
 export const ID_TOKEN_HEADER = "X-ID-Token";
+
+/** Second header fallback (some stacks only strip `Authorization`). */
+export const FIREBASE_ID_TOKEN_HEADER = "X-Firebase-ID-Token";
+
+/**
+ * Re-export for route handlers (same string as client `authenticated-fetch`).
+ */
+export { FIREBASE_ID_TOKEN_BODY_KEY };
 
 /**
  * Extract Bearer token from Authorization header, with X-ID-Token fallback.
@@ -27,7 +36,34 @@ export function extractBearerToken(request: NextRequest): string | null {
   if (idTokenHeader?.trim()) {
     return idTokenHeader.trim();
   }
+  const firebaseIdHeader = request.headers.get(FIREBASE_ID_TOKEN_HEADER);
+  if (firebaseIdHeader?.trim()) {
+    return firebaseIdHeader.trim();
+  }
   return null;
+}
+
+/**
+ * Read Firebase ID token from a parsed JSON object body (last resort when headers are stripped).
+ */
+export function extractFirebaseIdTokenFromBody(
+  body: Record<string, unknown> | null | undefined
+): string | null {
+  if (!body || typeof body !== "object") return null;
+  const v = body[FIREBASE_ID_TOKEN_BODY_KEY];
+  return typeof v === "string" && v.trim() ? v.trim() : null;
+}
+
+/**
+ * Resolve ID token from headers first, then optional parsed JSON body.
+ */
+export function resolveIdToken(
+  request: NextRequest,
+  body?: Record<string, unknown> | null
+): string | null {
+  const fromHeaders = extractBearerToken(request);
+  if (fromHeaders) return fromHeaders;
+  return extractFirebaseIdTokenFromBody(body ?? null);
 }
 
 /**

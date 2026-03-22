@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb, verifyIdToken } from "@/lib/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { extractBearerToken } from "@/lib/api-utils";
+import { resolveIdToken } from "@/lib/api-utils";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
@@ -63,6 +63,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, action: "created" });
   } catch (error) {
+    const authErrorCode =
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      typeof (error as { code: unknown }).code === "string"
+        ? ((error as { code: string }).code as string)
+        : undefined;
+    const isAuthError =
+      typeof authErrorCode === "string" && authErrorCode.startsWith("auth/");
+    if (isAuthError) {
+      return NextResponse.json(
+        { error: "Authentication failed" },
+        { status: 401 }
+      );
+    }
+
     captureApiError(error, {
       endpoint: "users_ensure",
       operation: "ensure_user_document",

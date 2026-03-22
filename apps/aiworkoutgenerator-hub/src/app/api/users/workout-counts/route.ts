@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb, verifyIdToken } from "@/lib/firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
-import { extractBearerToken } from "@/lib/api-utils";
+import { resolveIdToken } from "@/lib/api-utils";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
@@ -9,22 +9,12 @@ import { captureApiError } from "@/lib/sentry";
 // Force dynamic rendering - prevents static analysis of firebase-admin at build time
 export const dynamic = "force-dynamic";
 
-/**
- * API route to get workout and image counts for a user.
- * Uses Admin SDK to bypass security rules.
- */
-export async function GET(request: NextRequest) {
-  const appCheckResult = await requireAppCheck(request);
-  if (!appCheckResult.ok) return appCheckResult.response;
+async function workoutCountsHandler(
+  request: NextRequest,
+  idToken: string,
+  tier: string
+): Promise<NextResponse> {
   try {
-    const idToken = extractBearerToken(request);
-    if (!idToken) {
-      return NextResponse.json(
-        { error: "Missing or invalid authorization header" },
-        { status: 401 }
-      );
-    }
-
     // Check if we're using emulators
     const isUsingEmulators =
       process.env.FIRESTORE_EMULATOR_HOST ||
@@ -76,8 +66,6 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = decodedToken.uid;
-
-    const tier = request.nextUrl.searchParams.get("tier") || "free";
 
     // Get workout count
     let workoutsQuery = adminDb
@@ -183,4 +171,47 @@ export async function GET(request: NextRequest) {
       { status }
     );
   }
+}
+
+/**
+ * API route to get workout and image counts for a user.
+ * Uses Admin SDK to bypass security rules.
+ *
+ * POST accepts JSON `{ tier?, _firebaseIdToken? }` when proxies strip auth headers (App Hosting).
+ */
+export async function GET(request: NextRequest) {
+  const appCheckResult = await requireAppCheck(request);
+  if (!appCheckResult.ok) return appCheckResult.response;
+  const idToken = resolveIdToken(request, null);
+  if (!idToken) {
+    return NextResponse.json(
+      { error: "Missing or invalid authorization header" },
+      { status: 401 }
+    );
+  }
+  const tier = request.nextUrl.searchParams.get("tier") || "free";
+  return workoutCountsHandler(request, idToken, tier);
+}
+
+export async function POST(request: NextRequest) {
+  const appCheckResult = await requireAppCheck(request);
+  if (!appCheckResult.ok) return appCheckResult.response;
+  let body: Record<string, unknown> = {};
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    /* empty body */
+  }
+  const idToken = resolveIdToken(request, body);
+  if (!idToken) {
+    return NextResponse.json(
+      { error: "Missing or invalid authorization header" },
+      { status: 401 }
+    );
+  }
+  const tier =
+    (typeof body.tier === "string" ? body.tier : null) ||
+    request.nextUrl.searchParams.get("tier") ||
+    "free";
+  return workoutCountsHandler(request, idToken, tier);
 }

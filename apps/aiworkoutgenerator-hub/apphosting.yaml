@@ -11,7 +11,12 @@
 # NOTE: Do NOT configure NODE_ENV here. Firebase App Hosting's adapter
 # handles NODE_ENV correctly - development for npm install, production for next build.
 # Explicit configuration causes conflicts with Next.js build expectations.
+#
+# Sentry browser tunnel (/monitoring) often returns 403 on App Hosting; disable tunnel so
+# the SDK sends events directly to Sentry (see next.config.ts tunnelRoute).
 env:
+  - variable: SENTRY_DISABLE_TUNNEL
+    value: "1"
   # Firebase configuration - stored as secrets for security
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     secret: firebase-api-key

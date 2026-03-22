@@ -12,6 +12,7 @@
 import type { User } from "firebase/auth";
 import { getIdToken } from "@/lib/auth";
 import { getAppCheckHeaders } from "@/lib/firebase";
+import { FIREBASE_ID_TOKEN_BODY_KEY } from "@/lib/firebase-auth-transfer-constants";
 
 export type AuthenticatedFetchOptions = Omit<RequestInit, "headers"> & {
   /** Optional custom headers merged with auth headers */
@@ -21,6 +22,45 @@ export type AuthenticatedFetchOptions = Omit<RequestInit, "headers"> & {
   /** When provided, use this user's token instead of auth.currentUser (avoids timing mismatches) */
   user?: User;
 };
+
+/**
+ * Embed the ID token in JSON request bodies when possible.
+ * Some App Hosting / proxy paths strip all Authorization-style headers; the body still arrives intact.
+ */
+function mergeFirebaseIdTokenIntoJsonBody(
+  body: BodyInit | null | undefined,
+  method: string | undefined,
+  contentType: string | undefined,
+  token: string
+): BodyInit | null | undefined {
+  if (body == null || typeof body !== "string") {
+    return body;
+  }
+  const m = (method ?? "GET").toUpperCase();
+  if (m === "GET" || m === "HEAD") {
+    return body;
+  }
+  const ct = contentType ?? "";
+  if (!ct.includes("application/json")) {
+    return body;
+  }
+  try {
+    const parsed: unknown = JSON.parse(body);
+    if (
+      parsed !== null &&
+      typeof parsed === "object" &&
+      !Array.isArray(parsed)
+    ) {
+      return JSON.stringify({
+        ...(parsed as Record<string, unknown>),
+        [FIREBASE_ID_TOKEN_BODY_KEY]: token,
+      });
+    }
+  } catch {
+    /* leave body unchanged */
+  }
+  return body;
+}
 
 /**
  * Fetch with authentication headers. Retries once on 401 with a fresh token.
@@ -45,6 +85,7 @@ export async function authenticatedFetch(
     Authorization: _a,
     "X-Firebase-AppCheck": _ac,
     "X-ID-Token": _id,
+    "X-Firebase-ID-Token": _fid,
     ...safeCallerHeaders
   } = headers as Record<string, string>;
 
@@ -61,17 +102,27 @@ export async function authenticatedFetch(
     safeCallerHeaders["Content-Type"] ??
     (typeof fetchOptions.body === "string" ? "application/json" : undefined);
 
+  /** Merge ID token into JSON body so it survives proxies that strip all auth headers (App Hosting). */
+  const bodyWithEmbeddedToken = mergeFirebaseIdTokenIntoJsonBody(
+    fetchOptions.body,
+    fetchOptions.method,
+    contentType,
+    token
+  );
+
   const requestHeaders: Record<string, string> = {
     ...safeCallerHeaders,
     Authorization: `Bearer ${token}`,
     // Fallback for proxies that strip Authorization (Firebase App Hosting → Cloud Run)
     "X-ID-Token": token,
+    "X-Firebase-ID-Token": token,
     ...appCheckHeaders,
     ...(contentType ? { "Content-Type": contentType } : {}),
   };
 
   const response = await fetch(url, {
     ...fetchOptions,
+    body: bodyWithEmbeddedToken,
     headers: requestHeaders,
   });
 
@@ -88,15 +139,23 @@ export async function authenticatedFetch(
         /* ignore */
       }
       const retryAppCheck = await getAppCheckHeaders();
+      const retryBody = mergeFirebaseIdTokenIntoJsonBody(
+        fetchOptions.body,
+        fetchOptions.method,
+        contentType,
+        freshToken
+      );
       const retryHeaders: Record<string, string> = {
         ...safeCallerHeaders,
         Authorization: `Bearer ${freshToken}`,
         "X-ID-Token": freshToken,
+        "X-Firebase-ID-Token": freshToken,
         ...retryAppCheck,
         ...(contentType ? { "Content-Type": contentType } : {}),
       };
       return fetch(url, {
         ...fetchOptions,
+        body: retryBody,
         headers: retryHeaders,
       });
     }

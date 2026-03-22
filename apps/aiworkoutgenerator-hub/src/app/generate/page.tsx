@@ -313,8 +313,7 @@ function GenerateWorkoutPageContent() {
           const hasAgreed = await WaiverService.hasUserAgreed(user.uid);
           setHasAgreedToWaiver(hasAgreed);
         } else {
-          // No active waiver - defer error to handleFocusContinue when user tries to proceed
-          // This prevents showing error immediately on page load (validation loop issue)
+          // No active waiver - user cannot proceed until waiver system is available
           setHasAgreedToWaiver(false);
         }
       } catch (error) {

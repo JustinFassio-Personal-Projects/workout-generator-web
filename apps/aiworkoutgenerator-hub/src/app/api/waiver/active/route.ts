@@ -62,9 +62,12 @@ export async function GET(request: NextRequest) {
       endpoint: "waiver_active",
       operation: "get_active_waiver",
     });
+    const err = error as { code?: string; message?: string } | null;
     logger.error("Error fetching active waiver", error, {
       route: "/api/waiver/active",
       operation: "get_active_waiver",
+      errorCode: err?.code ?? "unknown",
+      errorMessage: err?.message ?? String(error),
     });
     return NextResponse.json(
       {

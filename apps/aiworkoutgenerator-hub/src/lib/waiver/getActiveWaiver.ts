@@ -12,9 +12,21 @@ import type { LiabilityWaiver } from "@/types/firestore";
  * This ensures the waiver system is self-healing and users are never blocked
  * due to missing waiver configuration.
  *
- * @returns The active waiver (existing or newly created)
+ * Returns null on any Firestore/Admin error (e.g. PERMISSION_DENIED) so callers
+ * can proceed without blocking—users can use the app when waiver system is unavailable.
+ *
+ * @returns The active waiver (existing or newly created), or null if unavailable
  */
 export async function getActiveWaiver(): Promise<LiabilityWaiver | null> {
+  try {
+    return await getActiveWaiverOrThrow();
+  } catch (error) {
+    console.error("[WAIVER] Failed to get active waiver (returning null):", error);
+    return null;
+  }
+}
+
+async function getActiveWaiverOrThrow(): Promise<LiabilityWaiver | null> {
   let activeWaiverDoc: FirebaseFirestore.QueryDocumentSnapshot | null = null;
 
   try {
@@ -29,9 +41,10 @@ export async function getActiveWaiver(): Promise<LiabilityWaiver | null> {
     if (!activeWaiverQuery.empty) {
       activeWaiverDoc = activeWaiverQuery.docs[0];
     }
-  } catch (error) {
+  } catch (queryError) {
     // Fallback: Query without orderBy if index doesn't exist yet
-    console.warn("Waiver query index may not exist, using fallback:", error);
+    // Also catches PERMISSION_DENIED from initial query—fallback will throw too, outer catch returns null
+    console.warn("Waiver query index may not exist or Firestore error, using fallback:", queryError);
     const allActiveWaivers = await adminDb
       .collection("liability_waivers")
       .where("is_active", "==", true)

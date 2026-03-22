@@ -117,7 +117,7 @@ After deploying, trigger a fresh build so the new code and env vars take effect.
 
 ## 6. Pulling App Hosting / Cloud Run logs for 500s
 
-When `POST /api/users/ensure` or `POST /api/users/workout-counts` returns 500, use these commands to capture the exact error (PERMISSION_DENIED, credential, etc.):
+When `POST /api/users/ensure`, `GET /api/waiver/active`, or `POST /api/users/workout-counts` returns 500, use these commands to capture the exact error (PERMISSION_DENIED, credential, etc.):
 
 ```bash
 # Replace PROJECT_ID with your Firebase/GCP project ID
@@ -134,7 +134,13 @@ gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/
 # Workout-counts route
 gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/api/users/workout-counts" AND severity>=ERROR' \
   --project=$PROJECT_ID --limit=20 --format="table(timestamp,jsonPayload.errorCode,jsonPayload.errorMessage)"
+
+# Waiver route (note: getActiveWaiver now returns null on Firestore error instead of 500)
+gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/api/waiver/active" AND severity>=ERROR' \
+  --project=$PROJECT_ID --limit=20 --format="table(timestamp,jsonPayload.errorCode,jsonPayload.errorMessage)"
 ```
+
+**Note:** `GET /api/waiver/active` returns `200 { waiver: null }` when Firestore fails—but the waiver is required, so users cannot complete the flow until the waiver system works (fix IAM).
 
 **Firebase App Hosting:** Logs are written by the underlying Cloud Run service. In Firebase Console → App Hosting → your backend → Logs, filter by severity ERROR or search for `ensure` / `workout-counts` / `errorCode` / `PERMISSION_DENIED`.
 
@@ -144,9 +150,16 @@ gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/
 
 When Cloud Run logs show `errorCode: "7"` or `PERMISSION_DENIED` for ensure/workout-counts, the service account lacks Firestore access.
 
-### App Hosting / Next.js (ensure, workout-counts, map-images)
+### App Hosting / Next.js (ensure, workout-counts, map-images, waiver/active)
 
-The Next.js app uses `FIREBASE_SERVICE_ACCOUNT_KEY` (firebase-admin). The **client_email** in that JSON is the identity. Grant it Firestore access:
+The Next.js app uses `FIREBASE_SERVICE_ACCOUNT_KEY` (firebase-admin). The **client_email** in that JSON is the identity that runs Firestore operations—it is typically `firebase-adminsdk-xxxxx@PROJECT_ID.iam.gserviceaccount.com`, not a user email like `justin@aiworkoutgen.app`. Grant the **client_email** Firestore access:
+
+**Verify which identity is used:**
+```bash
+gcloud secrets versions access latest --secret=firebase-service-account-key --project=ai-workout-generator-hub | jq -r '.client_email'
+```
+
+Or run `bash apps/aiworkoutgenerator-hub/scripts/audit-production-auth.sh` to see project_id and client_email.
 
 ```bash
 # 1. Get the service account email from your key (or Firebase Console → Project Settings → Service Accounts)

@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     const tokenSource = getTokenSource(request, bodyObj);
 
     if (!idToken) {
-      logger.warn("Waiver agree: no token found", {
+      logger.warn("Waiver agree: no token found", undefined, {
         route: "/api/waiver/agree",
         source: tokenSource,
       });

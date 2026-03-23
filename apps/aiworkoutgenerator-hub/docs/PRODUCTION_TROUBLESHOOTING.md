@@ -10,6 +10,7 @@
 | Error | Endpoint | Likely Cause | Fix |
 |-------|----------|--------------|-----|
 | **401 Unauthorized** | `POST /api/workouts/map-images` | Token verification fails (project mismatch or expired) | Verify project alignment (see below) |
+| **401 Unauthorized** | `POST /api/waiver/agree` | Token missing (proxy) or verifyIdToken fails (expired, project mismatch) | See §4 and §4a |
 | **500 Internal Server Error** | `POST /api/users/workout-counts` (or legacy `GET`) | Same as above, or Firestore/Admin init failure | Verify project alignment; check App Hosting logs |
 | **500 Internal Server Error** | `POST /api/users/ensure` | Same as above | Same as above |
 | **403 Forbidden** | `POST /monitoring` (Sentry tunnel) | Tunnel rewrite not supported or Sentry ingest rejecting | See Sentry section below |
@@ -94,8 +95,33 @@ Sentry may return 403 when sending events (tunnel or direct to `ingest.us.sentry
 | Caller | Endpoint |
 |--------|----------|
 | `ImageMappingService.client` | `POST /api/workouts/map-images` |
+| `WaiverService.createWaiverAgreement` | `POST /api/waiver/agree` (uses `authenticatedFetch` + body token) |
 | `user-service.ensureUserDocument` | `POST /api/users/ensure` |
 | `useSubscription.refreshWorkoutCount` | `POST /api/users/workout-counts` (`GET` still supported) |
+
+---
+
+## 4a. Waiver agree 401 — diagnosing token failures
+
+When `POST /api/waiver/agree` returns 401, the route logs `token_source` and `errorCode` for diagnosis.
+
+**Check Cloud Run logs:**
+```bash
+gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/api/waiver/agree" AND (severity>=WARNING OR severity>=ERROR)' \
+  --project=ai-workout-generator-hub --limit=20 --format="table(timestamp,jsonPayload.source,jsonPayload.errorCode,jsonPayload.message)"
+```
+
+| `source` | Meaning |
+|----------|---------|
+| `none` | No token received — headers stripped and body missing `_firebaseIdToken`. Ensure client uses `authenticatedFetch` (deployed). |
+| `headers` | Token came from Authorization or X-ID-Token. 401 = verifyIdToken failed (expired or project mismatch). |
+| `body` | Token came from JSON body. 401 = verifyIdToken failed. |
+
+| `errorCode` | Fix |
+|-------------|-----|
+| `auth/id-token-expired` | User was on waiver page too long. Client uses `forceTokenRefresh: true`; ensure latest build is deployed. User can sign out and back in. |
+| `auth/argument-error` | Often project mismatch. Verify §1 (client `NEXT_PUBLIC_FIREBASE_PROJECT_ID` = service account `project_id`). |
+| (none, `source: none`) | Proxy stripped headers; body token not reaching server. Redeploy so `authenticatedFetch` embeds token in body. |
 
 ---
 

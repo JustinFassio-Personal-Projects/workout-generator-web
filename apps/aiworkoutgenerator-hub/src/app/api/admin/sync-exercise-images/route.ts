@@ -52,10 +52,34 @@ function getProductionDb(): admin.firestore.Firestore {
       );
     }
 
-    const serviceAccount = parseServiceAccountKey(serviceAccountKey);
+    let serviceAccount;
+    try {
+      serviceAccount = parseServiceAccountKey(serviceAccountKey);
+    } catch (parseError) {
+      const error = new Error(
+        "FIREBASE_SERVICE_ACCOUNT_KEY is not valid JSON. Please check your environment configuration."
+      );
+      logger.error("[Sync Exercise Images] Configuration error", parseError, {
+        route: "/api/admin/sync-exercise-images",
+        operation: "parse_service_account",
+      });
+      throw error;
+    }
+
     const projectId =
       process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
       getServiceAccountProjectId(serviceAccount);
+
+    if (!projectId) {
+      const error = new Error(
+        "Project ID is required. Set NEXT_PUBLIC_FIREBASE_PROJECT_ID or include projectId in service account."
+      );
+      logger.error("[Sync Exercise Images] Configuration error", error, {
+        route: "/api/admin/sync-exercise-images",
+        operation: "validate_project_id",
+      });
+      throw error;
+    }
 
     // Initialize production app with explicit credentials
     // Note: If FIRESTORE_EMULATOR_HOST is set, this may still use the emulator

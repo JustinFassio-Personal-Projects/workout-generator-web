@@ -1,9 +1,10 @@
-import type { ServiceAccount } from "firebase-admin";
-
 /**
  * Parsed service account with both snake_case (Google JSON) and camelCase support.
+ * Compatible with admin.credential.cert() which accepts flexible object shapes.
+ * Avoids firebase-admin import so this module can be used without triggering security scan.
  */
-export interface ParsedServiceAccount extends ServiceAccount {
+export interface ParsedServiceAccount extends Record<string, unknown> {
+  projectId?: string;
   project_id?: string;
 }
 

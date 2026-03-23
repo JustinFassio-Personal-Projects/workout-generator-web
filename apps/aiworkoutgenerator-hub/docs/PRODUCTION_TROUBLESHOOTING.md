@@ -103,7 +103,7 @@ Sentry may return 403 when sending events (tunnel or direct to `ingest.us.sentry
 
 ## 4a. Waiver agree 401 — diagnosing token failures
 
-When `POST /api/waiver/agree` returns 401, the route logs `token_source` and `errorCode` for diagnosis.
+When `POST /api/waiver/agree` returns 401, the route logs `source` and `errorCode` for diagnosis.
 
 **Check Cloud Run logs:**
 ```bash
@@ -121,6 +121,7 @@ gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/
 |-------------|-----|
 | `auth/id-token-expired` | User was on waiver page too long. Client uses `forceTokenRefresh: true`; ensure latest build is deployed. User can sign out and back in. |
 | `auth/argument-error` | Often project mismatch. Verify §1 (client `NEXT_PUBLIC_FIREBASE_PROJECT_ID` = service account `project_id`). |
+| `unknown` + `error: "Invalid FIREBASE_SERVICE_ACCOUNT_KEY format"` | JSON parse of the secret failed. Common cause: extra quoting (e.g. `'{"type":...}'`). firebase-admin strips surrounding quotes; redeploy. If still failing, verify `firebase-service-account-key` secret value is valid JSON with no extra wrapping. |
 | (none, `source: none`) | Proxy stripped headers; body token not reaching server. Redeploy so `authenticatedFetch` embeds token in body. |
 
 ---

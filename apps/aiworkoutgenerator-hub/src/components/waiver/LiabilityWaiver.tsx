@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import type { User } from "firebase/auth";
 import { AlertCircle, CheckCircle2, ScrollText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,8 @@ interface LiabilityWaiverProps {
   onAgree: () => void | Promise<void>;
   loading?: boolean;
   userFullName?: string; // Pre-fill from user profile if available
+  /** Pass to avoid auth.currentUser timing mismatches (parity with map-images) */
+  user?: User | null;
 }
 
 export function LiabilityWaiver({
@@ -33,6 +36,7 @@ export function LiabilityWaiver({
   onAgree,
   loading = false,
   userFullName = "",
+  user,
 }: LiabilityWaiverProps) {
   const [checkboxes, setCheckboxes] = useState<WaiverAgreementCheckboxes>({
     medical_disclaimer: false,
@@ -112,12 +116,15 @@ export function LiabilityWaiver({
       // against the exact waiver version the user read, not the "current active" version
       const versionHash = await calculateVersionHashClient(waiverContent);
 
-      await WaiverService.createWaiverAgreement({
-        full_name: fullName.trim(),
-        agreement_checkboxes: checkboxes,
-        waiver_version: waiver.version,
-        waiver_version_hash: versionHash,
-      });
+      await WaiverService.createWaiverAgreement(
+        {
+          full_name: fullName.trim(),
+          agreement_checkboxes: checkboxes,
+          waiver_version: waiver.version,
+          waiver_version_hash: versionHash,
+        },
+        { user: user ?? undefined }
+      );
 
       toast.success("Waiver agreement saved successfully");
       await onAgree();

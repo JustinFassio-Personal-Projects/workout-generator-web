@@ -126,8 +126,9 @@ export async function authenticatedFetch(
     headers: requestHeaders,
   });
 
-  // Retry once on 401 with a fresh token (handles expired tokens)
-  if (response.status === 401 && !forceTokenRefresh) {
+  // Retry once on 401 with a fresh token (handles expired tokens, transient failures)
+  // Always retry regardless of forceTokenRefresh—first attempt may have failed for other reasons
+  if (response.status === 401) {
     const freshToken = await getToken(true);
     if (freshToken) {
       // Consume original response body before retry to avoid resource leaks (Copilot review)

@@ -72,7 +72,7 @@ function initializeFirebaseAdmin(): admin.app.App | null {
   if (serviceAccountKey) {
     try {
       const serviceAccount = JSON.parse(serviceAccountKey) as ServiceAccount;
-      const saProjectId = serviceAccount.project_id;
+      const saProjectId = serviceAccount.projectId;
       const clientProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
       if (saProjectId && clientProjectId && saProjectId !== clientProjectId) {
         console.error(

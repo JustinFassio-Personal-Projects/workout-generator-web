@@ -3,8 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb, verifyIdToken } from "@/lib/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import admin from "firebase-admin";
-import type { ServiceAccount } from "firebase-admin";
 import { trimExerciseName } from "@/lib/image-generation-config";
+import {
+  parseServiceAccountKey,
+  getServiceAccountProjectId,
+  type ParsedServiceAccount,
+} from "@/lib/parse-service-account";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
@@ -49,20 +53,58 @@ function getProductionDb(): admin.firestore.Firestore {
       );
     }
 
-    const serviceAccount = JSON.parse(serviceAccountKey) as ServiceAccount;
+    let serviceAccount: ParsedServiceAccount;
+    try {
+      serviceAccount = parseServiceAccountKey(serviceAccountKey);
+    } catch (parseError) {
+      const error = new Error(
+        "FIREBASE_SERVICE_ACCOUNT_KEY is not valid JSON. Please check your environment configuration."
+      );
+      logger.error("[Sync Exercise Images] Configuration error", parseError, {
+        route: "/api/admin/sync-exercise-images",
+        operation: "parse_service_account",
+      });
+      throw error;
+    }
 
-    // Initialize production app with explicit credentials
-    // Note: If FIRESTORE_EMULATOR_HOST is set, this may still use the emulator
-    // as Firebase Admin SDK checks env vars at initialization time
-    productionApp = admin.initializeApp(
-      {
-        credential: admin.credential.cert(serviceAccount),
-        projectId:
-          process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
-          serviceAccount.projectId,
-      },
-      appName
-    );
+    const projectId =
+      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+      getServiceAccountProjectId(serviceAccount);
+
+    if (!projectId) {
+      const error = new Error(
+        "Project ID is required. Set NEXT_PUBLIC_FIREBASE_PROJECT_ID or include projectId in service account."
+      );
+      logger.error("[Sync Exercise Images] Configuration error", error, {
+        route: "/api/admin/sync-exercise-images",
+        operation: "validate_project_id",
+      });
+      throw error;
+    }
+
+    try {
+      // Initialize production app with explicit credentials
+      // Note: If FIRESTORE_EMULATOR_HOST is set, this may still use the emulator
+      // as Firebase Admin SDK checks env vars at initialization time
+      productionApp = admin.initializeApp(
+        {
+          credential: admin.credential.cert(serviceAccount),
+          projectId,
+        },
+        appName
+      );
+    } catch (initError) {
+      const error = new Error(
+        `Failed to initialize production Firebase Admin app: ${
+          initError instanceof Error ? initError.message : String(initError)
+        }`
+      );
+      logger.error("[Sync Exercise Images] Initialization error", initError, {
+        route: "/api/admin/sync-exercise-images",
+        operation: "initialize_production_app",
+      });
+      throw error;
+    }
   }
 
   return productionApp.firestore();

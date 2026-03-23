@@ -1,6 +1,10 @@
 import admin from "firebase-admin";
 import { getAppCheck } from "firebase-admin/app-check";
-import type { ServiceAccount } from "firebase-admin";
+
+import {
+  parseServiceAccountKey,
+  getServiceAccountProjectId,
+} from "@/lib/parse-service-account";
 
 /**
  * Check if we're in a build context (no runtime).
@@ -71,16 +75,8 @@ function initializeFirebaseAdmin(): admin.app.App | null {
 
   if (serviceAccountKey) {
     try {
-      // Strip surrounding quotes (common when secrets are stored with extra quoting, e.g. '{"type":...}')
-      let keyStr = serviceAccountKey.trim();
-      if (
-        (keyStr.startsWith("'") && keyStr.endsWith("'")) ||
-        (keyStr.startsWith('"') && keyStr.endsWith('"'))
-      ) {
-        keyStr = keyStr.slice(1, -1);
-      }
-      const serviceAccount = JSON.parse(keyStr) as ServiceAccount;
-      const saProjectId = serviceAccount.projectId;
+      const serviceAccount = parseServiceAccountKey(serviceAccountKey);
+      const saProjectId = getServiceAccountProjectId(serviceAccount);
       const clientProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
       if (saProjectId && clientProjectId && saProjectId !== clientProjectId) {
         console.error(
@@ -89,9 +85,10 @@ function initializeFirebaseAdmin(): admin.app.App | null {
           clientProjectId
         );
       }
+      // Prefer clientProjectId to match API routes (map-images, biomechanical-analysis, sync-exercise-images)
       return admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        projectId: saProjectId ?? clientProjectId,
+        projectId: clientProjectId || saProjectId,
         storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
       });
     } catch (error) {

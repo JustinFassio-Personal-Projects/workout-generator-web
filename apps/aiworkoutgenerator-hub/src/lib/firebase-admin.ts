@@ -71,7 +71,15 @@ function initializeFirebaseAdmin(): admin.app.App | null {
 
   if (serviceAccountKey) {
     try {
-      const serviceAccount = JSON.parse(serviceAccountKey) as ServiceAccount;
+      // Strip surrounding quotes (common when secrets are stored with extra quoting, e.g. '{"type":...}')
+      let keyStr = serviceAccountKey.trim();
+      if (
+        (keyStr.startsWith("'") && keyStr.endsWith("'")) ||
+        (keyStr.startsWith('"') && keyStr.endsWith('"'))
+      ) {
+        keyStr = keyStr.slice(1, -1);
+      }
+      const serviceAccount = JSON.parse(keyStr) as ServiceAccount;
       const saProjectId = serviceAccount.projectId;
       const clientProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
       if (saProjectId && clientProjectId && saProjectId !== clientProjectId) {

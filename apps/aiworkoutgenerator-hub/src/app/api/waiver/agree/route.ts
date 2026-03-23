@@ -5,7 +5,7 @@ import { z } from "zod";
 import { adminDb, verifyIdToken } from "@/lib/firebase-admin";
 import type { LiabilityWaiver, UserWaiverAgreement } from "@/types/firestore";
 import {
-  extractBearerToken,
+  resolveIdToken,
   calculateVersionHash,
   getClientIp,
 } from "@/lib/api-utils";
@@ -68,11 +68,18 @@ export async function POST(request: NextRequest) {
   const appCheckResult = await requireAppCheck(request);
   if (!appCheckResult.ok) return appCheckResult.response;
   try {
-    // 1. Authenticate request
-    const idToken = extractBearerToken(request);
+    // 1. Parse body first (needed for resolveIdToken body fallback when proxies strip headers)
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
+    }
+
+    const idToken = resolveIdToken(request, body as Record<string, unknown>);
     if (!idToken) {
       return NextResponse.json(
-        { error: "Missing Authorization header" },
+        { error: "Missing or invalid authorization" },
         { status: 401 }
       );
     }
@@ -92,8 +99,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Parse and validate request body
-    const body = await request.json();
+    // 2. Validate request body
     const parseResult = AgreementRequestSchema.safeParse(body);
 
     if (!parseResult.success) {

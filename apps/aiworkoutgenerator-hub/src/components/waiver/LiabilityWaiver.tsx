@@ -107,20 +107,12 @@ export function LiabilityWaiver({
 
     setSubmitting(true);
     try {
-      // Get ID token for the API call
-      const { getIdToken } = await import("@/lib/auth");
-      const idToken = await getIdToken();
-
-      if (!idToken) {
-        throw new Error("You must be signed in to agree to the waiver");
-      }
-
       // Calculate hash of the waiver content the user is actually agreeing to
       // LEGAL COMPLIANCE: Send the version and hash to ensure agreement is recorded
       // against the exact waiver version the user read, not the "current active" version
       const versionHash = await calculateVersionHashClient(waiverContent);
 
-      await WaiverService.createWaiverAgreement(idToken, {
+      await WaiverService.createWaiverAgreement({
         full_name: fullName.trim(),
         agreement_checkboxes: checkboxes,
         waiver_version: waiver.version,

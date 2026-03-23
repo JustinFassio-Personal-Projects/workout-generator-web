@@ -12,6 +12,7 @@ import {
 import { getDbInstance } from "@/lib/firestore";
 import { getIdToken } from "@/lib/auth";
 import { getAppCheckHeaders } from "@/lib/firebase";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import type { LiabilityWaiver, UserWaiverAgreement } from "@/types/firestore";
 import type {
   WaiverAgreementRequest,
@@ -151,25 +152,21 @@ export class WaiverService {
 
   /**
    * Create a waiver agreement for the current user.
-   * Calls the API route which handles server-side validation and IP capture.
+   * Uses authenticatedFetch for token refresh on 401 and body token fallback
+   * when App Hosting/proxies strip auth headers.
    *
-   * @param idToken - Firebase Auth ID token
    * @param request - Waiver agreement data (full name and checkboxes)
    * @returns Agreement response with agreement_id and waiver_version
    * @throws Error if validation fails or request is invalid
    */
   static async createWaiverAgreement(
-    idToken: string,
     request: WaiverAgreementRequest
   ): Promise<WaiverAgreementResponse> {
-    const response = await fetch("/api/waiver/agree", {
+    const response = await authenticatedFetch("/api/waiver/agree", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`,
-        ...(await getAppCheckHeaders()),
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
+      forceTokenRefresh: true, // Force fresh token; user may have been on waiver page a long time
     });
 
     const data = (await response.json()) as WaiverAgreementResponse;
@@ -188,11 +185,7 @@ export class WaiverService {
   static async saveUserAgreement(
     request: WaiverAgreementRequest
   ): Promise<WaiverAgreementResponse> {
-    const idToken = await getIdToken();
-    if (!idToken) {
-      throw new Error("You must be signed in to agree to the waiver");
-    }
-    return this.createWaiverAgreement(idToken, request);
+    return this.createWaiverAgreement(request);
   }
 
   /**

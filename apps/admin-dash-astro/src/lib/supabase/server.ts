@@ -7,20 +7,13 @@ import { createClient } from '@supabase/supabase-js';
 import { config as loadEnv } from 'dotenv';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { normalizeEnvVar } from './normalize-env';
 
 // Load env so API routes get correct values. Load monorepo root first so admin + programs share Supabase.
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../..');
 loadEnv({ path: resolve(rootDir, '.env.local') });
 loadEnv({ path: resolve(process.cwd(), '.env') });
 loadEnv({ path: resolve(process.cwd(), '.env.local') });
-
-function normalizeEnvVar(v: string | undefined): string {
-  if (v == null || typeof v !== 'string') return '';
-  const t = v.trim();
-  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'")))
-    return t.slice(1, -1).trim();
-  return t;
-}
 
 const supabaseUrl =
   normalizeEnvVar(process.env.PUBLIC_SUPABASE_URL) ||

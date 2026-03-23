@@ -2,12 +2,17 @@
  * Server-side Supabase auth: verify session and admin role for admin routes.
  */
 import { createClient } from '@supabase/supabase-js';
+import { normalizeEnvVar } from '../normalize-env';
 
-// Read env at runtime so the module can load on Vercel even before env vars are set.
+// Read env at runtime (process.env for Vercel/serverless; import.meta.env fallback).
 // verifyAdminRequest() checks and throws if missing, so callers can catch and show login or 503.
 function getSupabaseEnv(): { url: string; anonKey: string } {
-  const url = import.meta.env.PUBLIC_SUPABASE_URL;
-  const anonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const url =
+    normalizeEnvVar(process.env.PUBLIC_SUPABASE_URL) ||
+    normalizeEnvVar(import.meta.env.PUBLIC_SUPABASE_URL as string | undefined);
+  const anonKey =
+    normalizeEnvVar(process.env.PUBLIC_SUPABASE_ANON_KEY) ||
+    normalizeEnvVar(import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined);
   if (!url || !anonKey) {
     throw new Error(
       'PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY are required. Set them in Vercel → Project → Settings → Environment Variables (same Supabase project as programs for shared admin).'

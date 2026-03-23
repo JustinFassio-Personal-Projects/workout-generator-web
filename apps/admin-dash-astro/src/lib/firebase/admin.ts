@@ -5,7 +5,10 @@
  */
 
 import admin from 'firebase-admin';
-import type { ServiceAccount } from 'firebase-admin';
+import {
+  parseServiceAccountKey,
+  getServiceAccountProjectId,
+} from '@/lib/parse-service-account';
 
 export interface FirebaseSignupStats {
   signUpsByDay: { date: string; count: number }[];
@@ -37,11 +40,10 @@ function initializeFirebaseAdmin(): admin.auth.Auth | null {
   }
 
   try {
-    const serviceAccount = JSON.parse(serviceAccountKey) as ServiceAccount;
+    const serviceAccount = parseServiceAccountKey(serviceAccountKey);
     const projectId =
       process.env.FIREBASE_PROJECT_ID ??
-      (serviceAccount as { projectId?: string; project_id?: string }).projectId ??
-      (serviceAccount as { project_id?: string }).project_id;
+      getServiceAccountProjectId(serviceAccount);
     if (!projectId) {
       console.warn('[Firebase Admin] No project_id; FIREBASE_PROJECT_ID or service account project_id required');
       return null;

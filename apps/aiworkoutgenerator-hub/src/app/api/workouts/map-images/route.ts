@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import admin from "firebase-admin";
-import type { ServiceAccount } from "firebase-admin";
 import { mapImagesToWorkoutObjectWithDb } from "@/lib/image-mapping-admin";
+import {
+  parseServiceAccountKey,
+  getServiceAccountProjectId,
+} from "@/lib/parse-service-account";
 import { verifyIdToken } from "@/lib/firebase-admin";
 import { resolveIdToken } from "@/lib/api-utils";
 import { requireAppCheck } from "@/lib/app-check";
@@ -45,9 +48,9 @@ function getProductionDb(): admin.firestore.Firestore {
       throw error;
     }
 
-    let serviceAccount: ServiceAccount;
+    let serviceAccount;
     try {
-      serviceAccount = JSON.parse(serviceAccountKey) as ServiceAccount;
+      serviceAccount = parseServiceAccountKey(serviceAccountKey);
     } catch (parseError) {
       const error = new Error(
         "FIREBASE_SERVICE_ACCOUNT_KEY is not valid JSON. Please check your environment configuration."
@@ -60,7 +63,8 @@ function getProductionDb(): admin.firestore.Firestore {
     }
 
     const projectId =
-      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || serviceAccount.projectId;
+      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+      getServiceAccountProjectId(serviceAccount);
 
     if (!projectId) {
       const error = new Error(

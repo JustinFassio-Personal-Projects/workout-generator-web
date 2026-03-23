@@ -3,8 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb, verifyIdToken } from "@/lib/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import admin from "firebase-admin";
-import type { ServiceAccount } from "firebase-admin";
 import { trimExerciseName } from "@/lib/image-generation-config";
+import {
+  parseServiceAccountKey,
+  getServiceAccountProjectId,
+} from "@/lib/parse-service-account";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
 import { captureApiError } from "@/lib/sentry";
@@ -49,7 +52,10 @@ function getProductionDb(): admin.firestore.Firestore {
       );
     }
 
-    const serviceAccount = JSON.parse(serviceAccountKey) as ServiceAccount;
+    const serviceAccount = parseServiceAccountKey(serviceAccountKey);
+    const projectId =
+      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+      getServiceAccountProjectId(serviceAccount);
 
     // Initialize production app with explicit credentials
     // Note: If FIRESTORE_EMULATOR_HOST is set, this may still use the emulator
@@ -57,9 +63,7 @@ function getProductionDb(): admin.firestore.Firestore {
     productionApp = admin.initializeApp(
       {
         credential: admin.credential.cert(serviceAccount),
-        projectId:
-          process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
-          serviceAccount.projectId,
+        projectId,
       },
       appName
     );

@@ -2,6 +2,11 @@ import admin from "firebase-admin";
 import { getAppCheck } from "firebase-admin/app-check";
 import type { ServiceAccount } from "firebase-admin";
 
+import {
+  parseServiceAccountKey,
+  getServiceAccountProjectId,
+} from "@/lib/parse-service-account";
+
 /**
  * Check if we're in a build context (no runtime).
  * During Next.js build, we don't have access to runtime credentials.
@@ -71,16 +76,8 @@ function initializeFirebaseAdmin(): admin.app.App | null {
 
   if (serviceAccountKey) {
     try {
-      // Strip surrounding quotes (common when secrets are stored with extra quoting, e.g. '{"type":...}')
-      let keyStr = serviceAccountKey.trim();
-      if (
-        (keyStr.startsWith("'") && keyStr.endsWith("'")) ||
-        (keyStr.startsWith('"') && keyStr.endsWith('"'))
-      ) {
-        keyStr = keyStr.slice(1, -1);
-      }
-      const serviceAccount = JSON.parse(keyStr) as ServiceAccount;
-      const saProjectId = serviceAccount.projectId;
+      const serviceAccount = parseServiceAccountKey(serviceAccountKey);
+      const saProjectId = getServiceAccountProjectId(serviceAccount);
       const clientProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
       if (saProjectId && clientProjectId && saProjectId !== clientProjectId) {
         console.error(

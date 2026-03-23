@@ -6,6 +6,7 @@ import { adminDb, verifyIdToken } from "@/lib/firebase-admin";
 import type { LiabilityWaiver, UserWaiverAgreement } from "@/types/firestore";
 import {
   resolveIdToken,
+  getTokenSource,
   calculateVersionHash,
   getClientIp,
 } from "@/lib/api-utils";
@@ -76,8 +77,15 @@ export async function POST(request: NextRequest) {
       body = {};
     }
 
-    const idToken = resolveIdToken(request, body as Record<string, unknown>);
+    const bodyObj = body as Record<string, unknown>;
+    const idToken = resolveIdToken(request, bodyObj);
+    const tokenSource = getTokenSource(request, bodyObj);
+
     if (!idToken) {
+      logger.warn("Waiver agree: no token found", {
+        route: "/api/waiver/agree",
+        source: tokenSource,
+      });
       return NextResponse.json(
         { error: "Missing or invalid authorization" },
         { status: 401 }
@@ -89,12 +97,29 @@ export async function POST(request: NextRequest) {
       const decodedToken = await verifyIdToken(idToken);
       uid = decodedToken.uid;
     } catch (error) {
+      const errorCode =
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        typeof (error as { code: unknown }).code === "string"
+          ? ((error as { code: string }).code as string)
+          : "unknown";
       logger.error("Token verification failed", error, {
         route: "/api/waiver/agree",
         operation: "token_verification",
+        source: tokenSource,
+        errorCode,
       });
+      const isExpired =
+        errorCode === "auth/id-token-expired" ||
+        errorCode === "auth/argument-error";
       return NextResponse.json(
-        { error: "Invalid or expired token" },
+        {
+          error: "Invalid or expired token",
+          message: isExpired
+            ? "Session may have expired. Please sign out and sign in again, then try agreeing to the waiver."
+            : "Invalid or expired token. Please refresh the page and try again.",
+        },
         { status: 401 }
       );
     }

@@ -56,6 +56,7 @@ export function extractFirebaseIdTokenFromBody(
 
 /**
  * Resolve ID token from headers first, then optional parsed JSON body.
+ * Returns the token, or null if not found.
  */
 export function resolveIdToken(
   request: NextRequest,
@@ -64,6 +65,18 @@ export function resolveIdToken(
   const fromHeaders = extractBearerToken(request);
   if (fromHeaders) return fromHeaders;
   return extractFirebaseIdTokenFromBody(body ?? null);
+}
+
+/**
+ * Where the ID token was resolved from. For diagnostic logging when 401 occurs.
+ */
+export function getTokenSource(
+  request: NextRequest,
+  body?: Record<string, unknown> | null
+): "headers" | "body" | "none" {
+  if (extractBearerToken(request)) return "headers";
+  if (extractFirebaseIdTokenFromBody(body ?? null)) return "body";
+  return "none";
 }
 
 /**

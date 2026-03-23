@@ -10,7 +10,7 @@ import {
   isFirebaseConfigured,
   listUsersForDateRange,
 } from '@/lib/firebase/admin';
-import { getSupabaseServer } from '../server';
+import { getSupabaseServer, getSupabaseServiceRole } from '../server';
 
 export interface AuthFunnelStats {
   signUpsByDay: { date: string; count: number }[];
@@ -45,6 +45,7 @@ function dateKey(d: Date): string {
 
 export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats> {
   const supabase = getSupabaseServer();
+  const supabaseAdmin = getSupabaseServiceRole();
   const toDate = new Date();
   const fromDate = new Date(toDate.getTime() - days * 24 * 60 * 60 * 1000);
   const fromIso = fromDate.toISOString();
@@ -56,12 +57,12 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
   let oauthCount = 0;
   let emailCount = 0;
 
-  // Auth: listUsers for sign-ups by day, funnel.signUp, funnel.emailConfirmed, and provider mix
+  // Auth: listUsers requires service role (auth.admin API)
   const perPage = 1000;
   let page = 1;
   let hasMore = true;
   while (hasMore) {
-    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
     if (error) {
       if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
         console.error('[getAuthFunnelStats] listUsers error:', error);

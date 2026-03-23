@@ -8,6 +8,7 @@ import { AppPageHeader } from "@/components/app";
 import { useOnboardingStatus } from "@/hooks/useUserProfile";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileDetailsForm } from "@/components/profile/ProfileDetailsForm";
+import { ProfileWaiverView } from "@/components/profile/ProfileWaiverView";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -56,9 +57,10 @@ export default function ProfilePage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="waiver">Waiver</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="mt-6">
@@ -67,6 +69,10 @@ export default function ProfilePage() {
 
           <TabsContent value="details" className="mt-6">
             <ProfileDetailsForm />
+          </TabsContent>
+
+          <TabsContent value="waiver" className="mt-6">
+            <ProfileWaiverView userId={user.uid} />
           </TabsContent>
         </Tabs>
       </div>

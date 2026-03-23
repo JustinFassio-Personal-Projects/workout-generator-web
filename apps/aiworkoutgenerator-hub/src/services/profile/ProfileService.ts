@@ -49,9 +49,10 @@ export class ProfileService {
   }
 
   /**
-   * Convert legacy EquipmentAccess enum to string[] categories for backward compatibility
+   * Convert legacy EquipmentAccess enum to string[] categories for backward compatibility.
+   * Use when reading profile from Firestore (e.g. onSnapshot) since raw docs may have string values.
    */
-  private static migrateEquipmentAccess(
+  static normalizeEquipmentAccess(
     equipmentAccess: unknown,
     fitnessLevel?: FitnessLevel
   ): string[] {
@@ -96,19 +97,10 @@ export class ProfileService {
 
     // Migrate equipment_access from enum to string[] if needed
     const profile = data as UserProfile;
-    if (
-      profile.equipment_access &&
-      typeof profile.equipment_access === "string"
-    ) {
-      // Legacy enum value - migrate to categories
-      profile.equipment_access = this.migrateEquipmentAccess(
-        profile.equipment_access,
-        profile.fitness_level
-      );
-    } else if (!Array.isArray(profile.equipment_access)) {
-      // Ensure it's an array (fallback for any other type)
-      profile.equipment_access = [];
-    }
+    profile.equipment_access = this.normalizeEquipmentAccess(
+      profile.equipment_access,
+      profile.fitness_level
+    );
 
     return profile;
   }

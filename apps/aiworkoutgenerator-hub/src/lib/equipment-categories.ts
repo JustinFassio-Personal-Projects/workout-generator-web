@@ -101,6 +101,7 @@ export function validateCategories(
   categories: string[],
   fitnessLevel: FitnessLevel
 ): string[] {
+  if (!Array.isArray(categories)) return [];
   const allowed = CATEGORY_MAPPING[fitnessLevel];
   return categories.filter((cat) => allowed.includes(cat));
 }

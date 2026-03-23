@@ -12,7 +12,9 @@ export interface ParsedServiceAccount extends Record<string, unknown> {
  * Parse FIREBASE_SERVICE_ACCOUNT_KEY from environment or secret stores.
  *
  * Handles common issues:
- * - Extra surrounding quotes (e.g. '{"type": "..."}' or "{\"type\": \"...\"}")
+ * - Extra surrounding quotes: strips one level of single or double quotes
+ *   (e.g. '{"type": "..."}' or "{\"type\": \"...\"}"). Does not handle
+ *   double-encoded JSON (string containing JSON string).
  * - project_id (snake_case, Google JSON) vs projectId (camelCase, TypeScript)
  *
  * @param raw - Raw string from process.env.FIREBASE_SERVICE_ACCOUNT_KEY

@@ -4,6 +4,7 @@ import { mapImagesToWorkoutObjectWithDb } from "@/lib/image-mapping-admin";
 import {
   parseServiceAccountKey,
   getServiceAccountProjectId,
+  type ParsedServiceAccount,
 } from "@/lib/parse-service-account";
 import { verifyIdToken } from "@/lib/firebase-admin";
 import { resolveIdToken } from "@/lib/api-utils";
@@ -48,7 +49,7 @@ function getProductionDb(): admin.firestore.Firestore {
       throw error;
     }
 
-    let serviceAccount;
+    let serviceAccount: ParsedServiceAccount;
     try {
       serviceAccount = parseServiceAccountKey(serviceAccountKey);
     } catch (parseError) {

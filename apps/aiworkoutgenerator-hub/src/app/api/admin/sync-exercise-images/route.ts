@@ -7,6 +7,7 @@ import { trimExerciseName } from "@/lib/image-generation-config";
 import {
   parseServiceAccountKey,
   getServiceAccountProjectId,
+  type ParsedServiceAccount,
 } from "@/lib/parse-service-account";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
@@ -52,7 +53,7 @@ function getProductionDb(): admin.firestore.Firestore {
       );
     }
 
-    let serviceAccount;
+    let serviceAccount: ParsedServiceAccount;
     try {
       serviceAccount = parseServiceAccountKey(serviceAccountKey);
     } catch (parseError) {

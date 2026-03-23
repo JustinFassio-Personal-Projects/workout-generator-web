@@ -4,6 +4,7 @@ import { verifyIdToken } from "@/lib/firebase-admin";
 import {
   parseServiceAccountKey,
   getServiceAccountProjectId,
+  type ParsedServiceAccount,
 } from "@/lib/parse-service-account";
 import { extractBearerToken } from "@/lib/api-utils";
 import { trimExerciseName } from "@/lib/image-generation-config";
@@ -49,7 +50,7 @@ function getProductionDb(): admin.firestore.Firestore {
       throw error;
     }
 
-    let serviceAccount;
+    let serviceAccount: ParsedServiceAccount;
     try {
       serviceAccount = parseServiceAccountKey(serviceAccountKey);
     } catch (parseError) {

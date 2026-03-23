@@ -1,6 +1,5 @@
 import admin from "firebase-admin";
 import { getAppCheck } from "firebase-admin/app-check";
-import type { ServiceAccount } from "firebase-admin";
 
 import {
   parseServiceAccountKey,
@@ -86,6 +85,7 @@ function initializeFirebaseAdmin(): admin.app.App | null {
           clientProjectId
         );
       }
+      // Prefer clientProjectId to match API routes (map-images, biomechanical-analysis, sync-exercise-images)
       return admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
         projectId: clientProjectId || saProjectId,

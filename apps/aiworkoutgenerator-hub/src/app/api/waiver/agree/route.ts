@@ -110,16 +110,12 @@ export async function POST(request: NextRequest) {
         source: tokenSource,
         errorCode,
       });
-      const isExpired =
-        errorCode === "auth/id-token-expired" ||
-        errorCode === "auth/argument-error";
+      const message =
+        errorCode === "auth/id-token-expired"
+          ? "Session may have expired. Please sign out and sign in again, then try agreeing to the waiver."
+          : "Invalid or expired token. Please refresh the page and try again.";
       return NextResponse.json(
-        {
-          error: "Invalid or expired token",
-          message: isExpired
-            ? "Session may have expired. Please sign out and sign in again, then try agreeing to the waiver."
-            : "Invalid or expired token. Please refresh the page and try again.",
-        },
+        { error: "Invalid or expired token", message },
         { status: 401 }
       );
     }

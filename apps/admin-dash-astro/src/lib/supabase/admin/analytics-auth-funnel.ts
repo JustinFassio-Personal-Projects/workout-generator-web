@@ -45,7 +45,6 @@ function dateKey(d: Date): string {
 
 export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats> {
   const supabase = getSupabaseServer();
-  const supabaseAdmin = getSupabaseServiceRole();
   const toDate = new Date();
   const fromDate = new Date(toDate.getTime() - days * 24 * 60 * 60 * 1000);
   const fromIso = fromDate.toISOString();
@@ -57,38 +56,48 @@ export async function getAuthFunnelStats(days: number): Promise<AuthFunnelStats>
   let oauthCount = 0;
   let emailCount = 0;
 
-  // Auth: listUsers requires service role (auth.admin API)
-  const perPage = 1000;
-  let page = 1;
-  let hasMore = true;
-  while (hasMore) {
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
-    if (error) {
-      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
-        console.error('[getAuthFunnelStats] listUsers error:', error);
+  // Auth: listUsers requires service role. Degrade gracefully when key is missing so
+  // events-based stats (sign-ins, TTFKA, etc.) still work.
+  let supabaseAdmin: ReturnType<typeof getSupabaseServiceRole> | null = null;
+  try {
+    supabaseAdmin = getSupabaseServiceRole();
+  } catch {
+    // SUPABASE_SERVICE_ROLE_KEY missing; skip auth-admin listUsers, continue with partial stats
+  }
+
+  if (supabaseAdmin) {
+    const perPage = 1000;
+    let page = 1;
+    let hasMore = true;
+    while (hasMore) {
+      const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+      if (error) {
+        if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+          console.error('[getAuthFunnelStats] listUsers error:', error);
+        }
+        break;
       }
-      break;
+      const users = data?.users ?? [];
+      for (const u of users) {
+        const createdAt = (u as { created_at?: string }).created_at;
+        if (!createdAt) continue;
+        const created = new Date(createdAt);
+        if (created < fromDate || created > toDate) continue;
+        funnelSignUp += 1;
+        const key = dateKey(created);
+        signUpsByDayMap.set(key, (signUpsByDayMap.get(key) ?? 0) + 1);
+        const emailConfirmed = !!(u as { email_confirmed_at?: string | null }).email_confirmed_at;
+        if (emailConfirmed) funnelEmailConfirmed += 1;
+        const identities = (u as { identities?: Array<{ provider?: string }> }).identities ?? [];
+        const isOAuth = identities.some(
+          (i) => i?.provider && i.provider !== 'email' && i.provider !== 'password'
+        );
+        if (isOAuth) oauthCount += 1;
+        else emailCount += 1;
+      }
+      hasMore = users.length === perPage;
+      page += 1;
     }
-    const users = data?.users ?? [];
-    for (const u of users) {
-      const createdAt = (u as { created_at?: string }).created_at;
-      if (!createdAt) continue;
-      const created = new Date(createdAt);
-      if (created < fromDate || created > toDate) continue;
-      funnelSignUp += 1;
-      const key = dateKey(created);
-      signUpsByDayMap.set(key, (signUpsByDayMap.get(key) ?? 0) + 1);
-      const emailConfirmed = !!(u as { email_confirmed_at?: string | null }).email_confirmed_at;
-      if (emailConfirmed) funnelEmailConfirmed += 1;
-      const identities = (u as { identities?: Array<{ provider?: string }> }).identities ?? [];
-      const isOAuth = identities.some(
-        (i) => i?.provider && i.provider !== 'email' && i.provider !== 'password'
-      );
-      if (isOAuth) oauthCount += 1;
-      else emailCount += 1;
-    }
-    hasMore = users.length === perPage;
-    page += 1;
   }
 
   let signUpsByDay = Array.from(signUpsByDayMap.entries())

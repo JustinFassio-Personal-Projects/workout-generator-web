@@ -1,6 +1,9 @@
 /**
  * Parse FIREBASE_SERVICE_ACCOUNT_KEY from environment.
  * Handles surrounding quotes (common when secrets are stored with extra quoting).
+ *
+ * Mirrors apps/aiworkoutgenerator-hub/src/lib/parse-service-account.ts. Keep behavior in sync;
+ * consider extracting to packages/ if used by more apps.
  */
 
 export interface ParsedServiceAccount extends Record<string, unknown> {

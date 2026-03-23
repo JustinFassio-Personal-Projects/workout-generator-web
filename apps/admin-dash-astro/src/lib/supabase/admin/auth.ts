@@ -2,14 +2,7 @@
  * Server-side Supabase auth: verify session and admin role for admin routes.
  */
 import { createClient } from '@supabase/supabase-js';
-
-function normalizeEnvVar(v: string | undefined): string {
-  if (v == null || typeof v !== 'string') return '';
-  const t = v.trim();
-  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'")))
-    return t.slice(1, -1).trim();
-  return t;
-}
+import { normalizeEnvVar } from '../normalize-env';
 
 // Read env at runtime (process.env for Vercel/serverless; import.meta.env fallback).
 // verifyAdminRequest() checks and throws if missing, so callers can catch and show login or 503.

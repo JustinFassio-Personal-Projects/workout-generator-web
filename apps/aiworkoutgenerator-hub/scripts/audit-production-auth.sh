@@ -94,6 +94,19 @@ else
 fi
 
 echo ""
+echo "--- Phase 6: Waiver agree 401 logs (diagnose token failures) ---"
+echo "Run this when POST /api/waiver/agree returns 401. Inspect jsonPayload.source and jsonPayload.errorCode:"
+echo ""
+echo "  gcloud logging read 'resource.type=\"cloud_run_revision\" AND jsonPayload.route=\"/api/waiver/agree\" AND (severity>=WARNING OR severity>=ERROR)' \\"
+echo "    --project=$PROJECT --limit=20 --format=\"table(timestamp,jsonPayload.source,jsonPayload.errorCode,jsonPayload.message)\""
+echo ""
+if command -v gcloud &>/dev/null; then
+  echo "Latest waiver agree 401-related logs:"
+  gcloud logging read 'resource.type="cloud_run_revision" AND jsonPayload.route="/api/waiver/agree" AND (severity>=WARNING OR severity>=ERROR)' \
+    --project="$PROJECT" --limit=5 --format="table(timestamp,jsonPayload.source,jsonPayload.errorCode,jsonPayload.message)" 2>/dev/null || echo "    (none or failed)"
+fi
+
+echo ""
 echo "--- Phase 4: Sentry Tunnel (optional) ---"
 echo "Test manually: curl -X POST 'https://app.aiworkoutgenerator.com/monitoring?o=...&p=...&r=us' -H 'Content-Type: application/json' -d '{}'"
 echo "Get o (org id) and p (project id) from Sentry project settings or DSN."

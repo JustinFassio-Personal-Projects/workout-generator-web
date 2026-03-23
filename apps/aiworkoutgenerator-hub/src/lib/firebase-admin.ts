@@ -72,9 +72,18 @@ function initializeFirebaseAdmin(): admin.app.App | null {
   if (serviceAccountKey) {
     try {
       const serviceAccount = JSON.parse(serviceAccountKey) as ServiceAccount;
+      const saProjectId = serviceAccount.project_id;
+      const clientProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+      if (saProjectId && clientProjectId && saProjectId !== clientProjectId) {
+        console.error(
+          "[Firebase Admin] PROJECT MISMATCH: service account project_id=%s but NEXT_PUBLIC_FIREBASE_PROJECT_ID=%s. verifyIdToken will fail.",
+          saProjectId,
+          clientProjectId
+        );
+      }
       return admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        projectId: saProjectId ?? clientProjectId,
         storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
       });
     } catch (error) {

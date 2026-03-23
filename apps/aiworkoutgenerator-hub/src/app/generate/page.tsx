@@ -903,6 +903,7 @@ function GenerateWorkoutPageContent() {
                 userFullName={
                   profile ? `${profile.first_name} ${profile.last_name}` : ""
                 }
+                user={user}
               />
             ) : (
               <Card className="border-amber-500/50 bg-amber-500/5">

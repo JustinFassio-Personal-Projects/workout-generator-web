@@ -103,7 +103,7 @@ Sentry may return 403 when sending events (tunnel or direct to `ingest.us.sentry
 
 ## 4a. Waiver agree 401 — diagnosing token failures
 
-When `POST /api/waiver/agree` returns 401, the route logs `token_source` and `errorCode` for diagnosis.
+When `POST /api/waiver/agree` returns 401, the route logs `source` and `errorCode` for diagnosis.
 
 **Check Cloud Run logs:**
 ```bash

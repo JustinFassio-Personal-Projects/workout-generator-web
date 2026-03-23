@@ -9,6 +9,7 @@ import {
   limit,
 } from "firebase/firestore";
 
+import type { User } from "firebase/auth";
 import { getDbInstance } from "@/lib/firestore";
 import { getIdToken } from "@/lib/auth";
 import { getAppCheckHeaders } from "@/lib/firebase";
@@ -156,23 +157,30 @@ export class WaiverService {
    * when App Hosting/proxies strip auth headers.
    *
    * @param request - Waiver agreement data (full name and checkboxes)
+   * @param options - Optional { user } to avoid auth.currentUser timing mismatches (parity with map-images)
    * @returns Agreement response with agreement_id and waiver_version
    * @throws Error if validation fails or request is invalid
    */
   static async createWaiverAgreement(
-    request: WaiverAgreementRequest
+    request: WaiverAgreementRequest,
+    options?: { user?: User }
   ): Promise<WaiverAgreementResponse> {
     const response = await authenticatedFetch("/api/waiver/agree", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
       forceTokenRefresh: true, // Force fresh token; user may have been on waiver page a long time
+      user: options?.user,
     });
 
-    const data = (await response.json()) as WaiverAgreementResponse;
+    const data = (await response.json()) as WaiverAgreementResponse & {
+      message?: string;
+    };
 
     if (!response.ok) {
-      throw new Error(data.error || "Failed to save waiver agreement");
+      throw new Error(
+        data.message ?? data.error ?? "Failed to save waiver agreement"
+      );
     }
 
     return data;
@@ -183,9 +191,10 @@ export class WaiverService {
    * Kept for backward compatibility
    */
   static async saveUserAgreement(
-    request: WaiverAgreementRequest
+    request: WaiverAgreementRequest,
+    options?: { user?: User }
   ): Promise<WaiverAgreementResponse> {
-    return this.createWaiverAgreement(request);
+    return this.createWaiverAgreement(request, options);
   }
 
   /**

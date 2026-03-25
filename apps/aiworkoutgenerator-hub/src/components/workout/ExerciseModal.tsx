@@ -319,14 +319,15 @@ export function ExerciseModal({
                           Weight
                         </th>
                         <th className="py-3 px-4 text-right">Rest / Time</th>
-                        <th className="py-3 px-4 text-right">Done</th>
+                        {showDoneColumn ? (
+                          <th className="py-3 px-4 text-right">Done</th>
+                        ) : null}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border bg-card/50">
                       {activeExercise.setDetails.map((set, idx) => {
                         const isSetCompleted =
-                          showSessionCompletionState &&
-                          set.completed === true;
+                          showSessionCompletionState && set.completed === true;
                         const isExerciseCompleted =
                           showSessionCompletionState &&
                           activeExercise.completed === true;
@@ -543,7 +544,9 @@ export function ExerciseModal({
                                           : ""
                                       }
                                     >
-                                      {isSetCompleted ? "Done" : "Mark Complete"}
+                                      {isSetCompleted
+                                        ? "Done"
+                                        : "Mark Complete"}
                                     </span>
                                   </button>
                                 ) : null}

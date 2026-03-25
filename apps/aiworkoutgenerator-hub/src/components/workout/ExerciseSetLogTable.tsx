@@ -93,8 +93,7 @@ export function ExerciseSetLogTable({
   const isExerciseCompleted =
     showSessionCompletionState && exercise.completed === true;
   const setDetails = ensureSetDetailsForExercise(exercise);
-  const showDoneColumn =
-    Boolean(onToggleSetComplete) && showLoggingColumns;
+  const showDoneColumn = Boolean(onToggleSetComplete) && showLoggingColumns;
   const rowGridClass =
     showLoggingColumns && showDoneColumn
       ? HEADER_GRID_WITH_DONE

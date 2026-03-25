@@ -80,8 +80,7 @@ export function ExerciseCard({
   showSessionCompletionState = true,
 }: ExerciseCardProps) {
   const [showInstructions, setShowInstructions] = useState(false);
-  const isCompleted =
-    showSessionCompletionState && exercise.completed === true;
+  const isCompleted = showSessionCompletionState && exercise.completed === true;
 
   // Get image URL, checking user preferences first
   const imageUrl = useExerciseImage(exercise.name, exercise.image_url);

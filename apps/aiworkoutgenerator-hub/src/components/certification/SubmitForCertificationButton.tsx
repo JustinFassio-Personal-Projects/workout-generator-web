@@ -29,10 +29,7 @@ export function SubmitForCertificationButton({
           Submit for Trainer Certification
         </Button>
       </TooltipTrigger>
-      <TooltipContent
-        side="bottom"
-        className="max-w-sm p-0 bg-popover border"
-      >
+      <TooltipContent side="bottom" className="max-w-sm p-0 bg-popover border">
         <div className="flex gap-3 p-3">
           <div className="relative w-12 h-16 rounded-md overflow-hidden flex-shrink-0">
             <Image

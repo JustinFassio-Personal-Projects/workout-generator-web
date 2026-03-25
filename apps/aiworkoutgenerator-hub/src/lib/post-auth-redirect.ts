@@ -10,8 +10,15 @@ import { hasPhaseAData } from "@/lib/phaseAStorage";
 export async function getPostSignInRedirectPath(user: User): Promise<string> {
   try {
     await user.getIdToken(true);
-    await new Promise((r) => setTimeout(r, 150));
-    const profile = await ProfileService.getUserProfile(user.uid);
+    let profile;
+    try {
+      profile = await ProfileService.getUserProfile(user.uid);
+    } catch {
+      // Some auth/profile reads can be slightly out of sync immediately after
+      // sign-in; retry once to avoid forcing a fixed delay on every success.
+      await new Promise((r) => setTimeout(r, 150));
+      profile = await ProfileService.getUserProfile(user.uid);
+    }
     const hasCompletedOnboarding =
       ProfileService.hasCompletedOnboarding(profile);
     if (!hasCompletedOnboarding) {

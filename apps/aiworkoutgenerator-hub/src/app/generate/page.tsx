@@ -605,7 +605,9 @@ function GenerateWorkoutPageContent() {
         // Refresh workout count to reflect the new workout
         refreshWorkoutCount();
         toast.success("Workout generated successfully!");
-        router.push(`/workouts?id=${workoutId}&from=generate`);
+        router.push(
+          `/workouts?id=${encodeURIComponent(workoutId)}&from=generate`
+        );
       }
     } catch (err) {
       if (isMountedRef.current) {

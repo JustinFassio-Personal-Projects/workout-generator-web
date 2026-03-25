@@ -188,7 +188,7 @@ export function WorkoutDetailsContent() {
               asChild
               className="w-full sm:w-auto border-orange-400/50 animate-pulse-orange-glow"
             >
-              <Link href={`/workouts/${workoutId}/player`}>
+              <Link href={`/workouts/${encodeURIComponent(workoutId)}/player`}>
                 <Play className="h-4 w-4 mr-2" />
                 Workout Player
               </Link>

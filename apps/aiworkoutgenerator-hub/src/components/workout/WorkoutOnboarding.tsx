@@ -163,9 +163,9 @@ function WorkoutDetailsTourTooltip(props: TooltipRenderProps) {
 
   const nextLabel = isLastStep ? "Finish tour" : "Next tool";
 
-  const showFooter = buttons.some(
-    (b) => b === "back" || b === "primary" || b === "skip"
-  );
+  const shouldShowSkipButton = buttons.includes("skip") && !isLastStep;
+  const shouldShowNextToolButton = buttons.includes("primary");
+  const showFooter = shouldShowSkipButton || shouldShowNextToolButton;
 
   const ariaProps = title
     ? {
@@ -201,7 +201,7 @@ function WorkoutDetailsTourTooltip(props: TooltipRenderProps) {
       {showFooter ? (
         <div style={styles.tooltipFooter}>
           <div style={styles.tooltipFooterSpacer}>
-            {buttons.includes("skip") && !isLastStep ? (
+            {shouldShowSkipButton ? (
               <button
                 aria-live="off"
                 data-testid="button-skip"
@@ -211,17 +211,19 @@ function WorkoutDetailsTourTooltip(props: TooltipRenderProps) {
               />
             ) : null}
           </div>
-          <button
-            aria-label={nextLabel}
-            data-action="next-tool"
-            data-testid="button-next-tool"
-            onClick={handleNextTool}
-            style={styles.buttonPrimary}
-            title={nextLabel}
-            type="button"
-          >
-            {nextLabel}
-          </button>
+          {shouldShowNextToolButton ? (
+            <button
+              aria-label={nextLabel}
+              data-action="next-tool"
+              data-testid="button-next-tool"
+              onClick={handleNextTool}
+              style={styles.buttonPrimary}
+              title={nextLabel}
+              type="button"
+            >
+              {nextLabel}
+            </button>
+          ) : null}
         </div>
       ) : null}
       {buttons.includes("close") ? (
@@ -491,7 +493,7 @@ export function WorkoutOnboarding({
       trackWorkoutDetailsTourStepCompleted(
         stepId,
         completedStepIndex,
-        completedStepIndex + 1
+        completedStepIndex
       );
       setRun(false);
 

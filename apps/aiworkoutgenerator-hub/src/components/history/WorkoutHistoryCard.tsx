@@ -185,7 +185,7 @@ export function WorkoutHistoryCard({
         action: {
           label: "View",
           onClick: () =>
-            (window.location.href = `/workouts?id=${newId}&from=history`),
+            (window.location.href = `/workouts?id=${encodeURIComponent(newId)}&from=history`),
         },
       });
     } catch (error) {
@@ -293,7 +293,11 @@ export function WorkoutHistoryCard({
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
             <Button asChild size="sm" variant="default" className="flex-1">
-              <Link href={`/workouts?id=${workout.id}&from=history`}>
+              <Link
+                href={`/workouts?id=${encodeURIComponent(
+                  workout.id
+                )}&from=history`}
+              >
                 <Eye className="w-4 h-4 mr-1" />
                 View
               </Link>

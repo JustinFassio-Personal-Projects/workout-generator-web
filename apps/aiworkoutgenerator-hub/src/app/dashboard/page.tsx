@@ -135,7 +135,7 @@ function RecentWorkoutsCard() {
             {workouts.map((workout) => (
               <Link
                 key={workout.id}
-                href={`/workouts?id=${workout.id}&from=dashboard`}
+                href={`/workouts?id=${encodeURIComponent(workout.id)}&from=dashboard`}
                 className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">

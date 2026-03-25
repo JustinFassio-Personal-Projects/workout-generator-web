@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { onSnapshot } from "firebase/firestore";
 
+import { devLogError, devWarn } from "@/lib/devLog";
 import type { TrainerWorkout } from "@/types/firestore";
 import { TrainerService } from "@/services/trainer/TrainerService";
 import { useUser } from "@/lib/auth";
@@ -105,8 +106,7 @@ export function useTrainerWorkout(workoutId: string) {
                 error: null,
               });
             } else {
-              // Request was stale, log for debugging
-              console.warn(
+              devWarn(
                 "Image mapping completed but request was stale, ignoring result"
               );
             }
@@ -117,7 +117,7 @@ export function useTrainerWorkout(workoutId: string) {
               currentRequestId === requestIdRef.current &&
               isMountedRef.current
             ) {
-              console.error("Error mapping workout images:", error);
+              devLogError("useTrainerWorkout.mapWorkoutImages", error);
               setState({
                 workout,
                 loading: false,

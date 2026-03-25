@@ -17,6 +17,7 @@ import { ExerciseOrderCheckResult } from "./ExerciseOrderCheckResult";
 import { ExerciseImageSelectorModal } from "./ExerciseImageSelectorModal";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useUser } from "@/lib/auth";
+import { exerciseHasCompletedSet } from "@/lib/workout/exerciseCompletion";
 import { generateExerciseImage } from "@/services/image/ImageGenerationService";
 import { AIExerciseService } from "@/services/ai-exercise-service";
 import type {
@@ -162,17 +163,11 @@ export function WorkoutDisplay({
           (set as unknown as Record<string, unknown>).completed = completed;
         }
 
-        // Auto-complete exercise if all sets are now complete
-        if (exercise && exercise.setDetails) {
-          const allSetsComplete =
-            exercise.setDetails.length > 0 &&
-            exercise.setDetails.every(
-              (s) =>
-                (s as unknown as Record<string, unknown>).completed === true
-            );
-          if (allSetsComplete && !exercise.completed) {
-            exercise.completed = true;
-          }
+        if (exercise?.setDetails?.length) {
+          const allSetsComplete = exercise.setDetails.every(
+            (s) => (s as unknown as Record<string, unknown>).completed === true
+          );
+          exercise.completed = allSetsComplete;
         }
 
         return { ...prev, sections: newSections };
@@ -209,15 +204,8 @@ export function WorkoutDisplay({
       // Validate: require at least one completed set before marking exercise complete
       // Validate before calling setState to avoid side effects in state update
       if (completed === true) {
-        // Validate using current state before updating
         const exercise = workout.sections?.[sIdx]?.exercises?.[eIdx];
-        const hasCompletedSet =
-          exercise?.setDetails?.some(
-            (s) => (s as unknown as Record<string, unknown>).completed === true
-          ) ?? false;
-
-        if (!hasCompletedSet) {
-          // Validation failed - show toast immediately and return without updating state
+        if (!exerciseHasCompletedSet(exercise)) {
           toast.error(
             "Please complete at least one set before completing the exercise"
           );

@@ -7,7 +7,7 @@ import { useOnboardingStatus } from "@/hooks/useUserProfile";
 import { useTrainerWorkout } from "@/hooks/useTrainerWorkout";
 import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
-import { WorkoutPlayer } from "@/components/workout/player/WorkoutPlayer";
+import { ManualWorkoutPlayer } from "@/components/workout/player/ManualWorkoutPlayer";
 import WorkoutPlayerLoading from "./loading";
 
 function WorkoutPlayerContent() {
@@ -22,6 +22,8 @@ function WorkoutPlayerContent() {
     loading: workoutLoading,
     error,
   } = useTrainerWorkout(workoutId || "");
+  /** True only while we have no workout yet (initial Firestore load). */
+  const workoutInitialLoad = workoutLoading && !workout;
   const hasLoggedWorkoutRef = useRef<string | null>(null);
 
   // Redirect if not authenticated or onboarding not completed
@@ -33,26 +35,28 @@ function WorkoutPlayerContent() {
     }
   }, [user, authLoading, completed, profileLoading, router]);
 
-  // Log workout opening when workout is successfully loaded (once per workout)
+  // Log workout opening when workout is available (same gate semantics as render: not initial load)
   useEffect(() => {
-    if (workout?.id && user && !workoutLoading) {
-      // Only log if we haven't already logged this workout
+    if (workout?.id && user && !workoutInitialLoad) {
       if (hasLoggedWorkoutRef.current !== workout.id) {
         hasLoggedWorkoutRef.current = workout.id;
-        logUserActivity(
+        void logUserActivity(
           user.uid,
           "workout:open",
           "workout",
           workoutId,
           {},
           sessionId || undefined
-        ).catch(console.error);
+        ).catch(() => {
+          /* non-blocking */
+        });
       }
     }
-  }, [workout?.id, user, workoutLoading, workoutId, sessionId]);
+  }, [workout?.id, user, workoutInitialLoad, workoutId, sessionId]);
 
-  // Loading state
-  if (authLoading || profileLoading || workoutLoading) {
+  // Initial load only — do not unmount the player when `workoutLoading` is true
+  // due to background image mapping after a save (that would reset block session UI).
+  if (authLoading || profileLoading || workoutInitialLoad) {
     return null; // Loading handled by Suspense boundary
   }
 
@@ -84,7 +88,7 @@ function WorkoutPlayerContent() {
     );
   }
 
-  return <WorkoutPlayer workout={workout} />;
+  return <ManualWorkoutPlayer workout={workout} />;
 }
 
 export default function WorkoutPlayerPage() {

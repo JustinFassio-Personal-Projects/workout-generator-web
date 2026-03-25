@@ -9,10 +9,10 @@ A new feature was added to allow users to mark individual exercises as completed
 **Key Components:**
 
 - `TrainerWorkoutExercise` type now includes `completed?: boolean` field
-- `ExerciseCard` component has a "Mark as Complete" button with visual feedback
-- `WorkoutDisplay` component handles exercise completion state and persists to Firestore
+- `ExerciseCard` (in **Workout Player** and similar session surfaces) exposes set/exercise completion controls with visual feedback
+- **`WorkoutDisplay` on the workout details page** (`/workouts?id=…`) is editor/review-only: session completion UI is disabled there; completion happens in the player or via history flows
 - `CompletionModal` automatically calculates completion percentage from completed exercises
-- Completion status is saved to Firestore via `TrainerService.updateWorkoutSections()`
+- In-session progress is persisted on the workout document via updates from the player (and related flows), not from the details editor alone
 
 **Data Flow:**
 

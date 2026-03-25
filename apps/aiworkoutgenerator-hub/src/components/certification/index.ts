@@ -6,3 +6,4 @@ export { CertificationSubmitModal } from "./CertificationSubmitModal";
 export { CertificationStatusCard } from "./CertificationStatusCard";
 export { CertificationMessagesSheet } from "./CertificationMessagesSheet";
 export { CertificationMessagesAlert } from "./CertificationMessagesAlert";
+export { SubmitForCertificationButton } from "./SubmitForCertificationButton";

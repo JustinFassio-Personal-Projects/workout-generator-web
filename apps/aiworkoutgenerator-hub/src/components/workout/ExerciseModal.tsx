@@ -45,6 +45,8 @@ interface ExerciseModalProps {
     setIdx: number,
     completed: boolean
   ) => void;
+  /** When false, ignore completion flags for row styling (editor preview). */
+  showSessionCompletionState?: boolean;
 }
 
 export function ExerciseModal({
@@ -57,9 +59,11 @@ export function ExerciseModal({
   onSaveWeights,
   weightSaveMessage,
   onToggleSetComplete,
+  showSessionCompletionState = true,
 }: ExerciseModalProps) {
   const [showDetailedInstructions, setShowDetailedInstructions] =
     useState(false);
+  const showDoneColumn = Boolean(onToggleSetComplete);
 
   // Get active exercise info (may be null if indices invalid)
   // Calculate this early so we can use it in the hook
@@ -320,8 +324,11 @@ export function ExerciseModal({
                     </thead>
                     <tbody className="divide-y divide-border bg-card/50">
                       {activeExercise.setDetails.map((set, idx) => {
-                        const isSetCompleted = set.completed === true;
+                        const isSetCompleted =
+                          showSessionCompletionState &&
+                          set.completed === true;
                         const isExerciseCompleted =
+                          showSessionCompletionState &&
                           activeExercise.completed === true;
                         const shouldStrikethrough =
                           isExerciseCompleted && !isSetCompleted;
@@ -490,57 +497,58 @@ export function ExerciseModal({
                                 </span>
                               )}
                             </td>
-                            <td className="py-4 px-4 text-right">
-                              {onToggleSetComplete && (
-                                <button
-                                  type="button"
-                                  tabIndex={-1}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onToggleSetComplete(
-                                      activeIndices.sIdx,
-                                      activeIndices.eIdx,
-                                      idx,
-                                      !isSetCompleted
-                                    );
-                                  }}
-                                  onMouseDown={(e) => {
-                                    // Prevent focus change which can cause scroll
-                                    e.preventDefault();
-                                  }}
-                                  className={`inline-flex items-center justify-end gap-2 text-[11px] font-semibold ${
-                                    isSetCompleted
-                                      ? "text-emerald-400"
-                                      : "text-muted-foreground hover:text-emerald-400"
-                                  }`}
-                                  aria-label={
-                                    isSetCompleted
-                                      ? `Mark set ${idx + 1} as incomplete`
-                                      : `Mark set ${idx + 1} as complete`
-                                  }
-                                >
-                                  <span
-                                    className={`h-4 w-4 rounded-full border flex items-center justify-center text-[9px] ${
+                            {showDoneColumn ? (
+                              <td className="py-4 px-4 text-right">
+                                {onToggleSetComplete ? (
+                                  <button
+                                    type="button"
+                                    tabIndex={-1}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      onToggleSetComplete(
+                                        activeIndices.sIdx,
+                                        activeIndices.eIdx,
+                                        idx,
+                                        !isSetCompleted
+                                      );
+                                    }}
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                    }}
+                                    className={`inline-flex items-center justify-end gap-2 text-[11px] font-semibold ${
                                       isSetCompleted
-                                        ? "bg-emerald-500 border-emerald-500 text-white"
-                                        : "border-border"
+                                        ? "text-emerald-400"
+                                        : "text-muted-foreground hover:text-emerald-400"
                                     }`}
-                                  >
-                                    {isSetCompleted ? "✓" : ""}
-                                  </span>
-                                  <span
-                                    className={
-                                      shouldStrikethrough
-                                        ? "line-through opacity-60"
-                                        : ""
+                                    aria-label={
+                                      isSetCompleted
+                                        ? `Mark set ${idx + 1} as incomplete`
+                                        : `Mark set ${idx + 1} as complete`
                                     }
                                   >
-                                    {isSetCompleted ? "Done" : "Mark Complete"}
-                                  </span>
-                                </button>
-                              )}
-                            </td>
+                                    <span
+                                      className={`h-4 w-4 rounded-full border flex items-center justify-center text-[9px] ${
+                                        isSetCompleted
+                                          ? "bg-emerald-500 border-emerald-500 text-white"
+                                          : "border-border"
+                                      }`}
+                                    >
+                                      {isSetCompleted ? "✓" : ""}
+                                    </span>
+                                    <span
+                                      className={
+                                        shouldStrikethrough
+                                          ? "line-through opacity-60"
+                                          : ""
+                                      }
+                                    >
+                                      {isSetCompleted ? "Done" : "Mark Complete"}
+                                    </span>
+                                  </button>
+                                ) : null}
+                              </td>
+                            ) : null}
                           </tr>
                         );
                       })}

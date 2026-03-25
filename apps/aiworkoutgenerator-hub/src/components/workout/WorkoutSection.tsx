@@ -59,6 +59,8 @@ interface WorkoutSectionProps {
   ) => void;
   isEditing?: boolean;
   disableReorder?: boolean;
+  /** When false, hide session completion chrome on exercise cards (editor preview). */
+  showSessionCompletionState?: boolean;
 }
 
 /**
@@ -95,6 +97,7 @@ interface SortableExerciseItemProps {
   onOpenAddExercise: WorkoutSectionProps["onOpenAddExercise"];
   onCheckOrder: WorkoutSectionProps["onCheckOrder"];
   isDraggable: boolean;
+  showSessionCompletionState: WorkoutSectionProps["showSessionCompletionState"];
 }
 
 function SortableExerciseItem({
@@ -113,6 +116,7 @@ function SortableExerciseItem({
   onOpenAddExercise,
   onCheckOrder,
   isDraggable,
+  showSessionCompletionState,
 }: SortableExerciseItemProps) {
   const {
     attributes,
@@ -166,6 +170,7 @@ function SortableExerciseItem({
           onChooseImage={onChooseImage}
           onOpenAddExercise={onOpenAddExercise}
           onCheckOrder={onCheckOrder}
+          showSessionCompletionState={showSessionCompletionState}
         />
       </div>
     </div>
@@ -189,6 +194,7 @@ export function WorkoutSection({
   onReorderExercises,
   isEditing = false,
   disableReorder = false,
+  showSessionCompletionState = true,
 }: WorkoutSectionProps) {
   const isWarmup = section.type === "Warmup";
   const exercises = section.exercises ?? [];
@@ -246,6 +252,7 @@ export function WorkoutSection({
               onOpenAddExercise={onOpenAddExercise}
               onCheckOrder={onCheckOrder}
               isDraggable={true}
+              showSessionCompletionState={showSessionCompletionState}
             />
           );
         }
@@ -267,6 +274,7 @@ export function WorkoutSection({
             onChooseImage={onChooseImage}
             onOpenAddExercise={onOpenAddExercise}
             onCheckOrder={onCheckOrder}
+            showSessionCompletionState={showSessionCompletionState}
           />
         );
       })}

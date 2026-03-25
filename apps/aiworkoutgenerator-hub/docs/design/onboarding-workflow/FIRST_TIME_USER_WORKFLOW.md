@@ -350,12 +350,10 @@ if (hasCompletedOnboarding) {
   - Submit workout for trainer certification
   - View certification status (pending, approved, rejected, certified)
   - Certification status badge displayed if certified
-- **Completion**:
-  - "Complete Workout" FAB (floating action button)
-  - Completion modal for feedback
-  - Marks workout as completed in history
+- **Workout Player** (linked from this page): users log sets, mark exercise progress, and open the completion modal there; workout details here are for review and editing only.
 - **Navigation**:
   - Back to Dashboard button
+  - **Workout Player** (opens `/workouts/{workoutId}/player` for the live session)
   - "Try Different Settings" button (returns to `/generate` with same selections)
   - "Generate Another Workout" button (returns to `/generate` with fresh state)
 

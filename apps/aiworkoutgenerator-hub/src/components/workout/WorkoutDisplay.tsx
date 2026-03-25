@@ -39,6 +39,11 @@ interface WorkoutDisplayProps {
    * @see docs/design/IMAGE_GENERATION_DESIGN_DECISION.md
    */
   onRequestImages?: () => void;
+  /**
+   * When false, hide set/exercise session completion UI (details page editor only).
+   * Completion belongs in the workout player.
+   */
+  sessionCompletionEnabled?: boolean;
 }
 
 /**
@@ -51,6 +56,7 @@ export function WorkoutDisplay({
   isEditing = true,
   onWorkoutStateChange,
   onRequestImages,
+  sessionCompletionEnabled = true,
 }: WorkoutDisplayProps) {
   const [workout, setWorkout] = useState<TrainerWorkout>(initialWorkout);
   const [activeExercise, setActiveExercise] = useState<{
@@ -611,10 +617,15 @@ export function WorkoutDisplay({
             sectionIdx={sIdx}
             onExerciseClick={handleOpenModal}
             onUpdateSet={handleUpdateSet}
-            onToggleSetComplete={handleSetComplete}
+            onToggleSetComplete={
+              sessionCompletionEnabled ? handleSetComplete : undefined
+            }
             onRetryImage={tier !== "free" ? handleRetryImage : undefined}
             retryingImageKey={retryingImageKey}
-            onExerciseComplete={handleExerciseComplete}
+            onExerciseComplete={
+              sessionCompletionEnabled ? handleExerciseComplete : undefined
+            }
+            showSessionCompletionState={sessionCompletionEnabled}
             onOpenAIEditor={isEditing ? handleOpenAIEditor : undefined}
             onOpenCoachExplain={isEditing ? handleOpenCoachExplain : undefined}
             onChooseImage={isEditing ? handleChooseImage : undefined}
@@ -665,7 +676,10 @@ export function WorkoutDisplay({
           onAddSet={handleAddSet}
           onSaveWeights={handleSave}
           weightSaveMessage={weightSaveMessage}
-          onToggleSetComplete={handleSetComplete}
+          onToggleSetComplete={
+            sessionCompletionEnabled ? handleSetComplete : undefined
+          }
+          showSessionCompletionState={sessionCompletionEnabled}
         />
       )}
 

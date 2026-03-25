@@ -1,0 +1,15 @@
+{
+  "ignores": [
+    "@google-cloud/vertexai",
+    "@hookform/resolvers",
+    "@tailwindcss/typography",
+    "tailwindcss-animate",
+    "@tailwindcss/postcss",
+    "@vitest/coverage-v8",
+    "autoprefixer",
+    "hono",
+    "lint-staged",
+    "tailwindcss"
+  ],
+  "skipMissing": ["@next/env"]
+}

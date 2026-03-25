@@ -23,6 +23,7 @@ import type {
   TrainerWorkoutExercise,
 } from "@/types/firestore";
 import { ExerciseCard } from "./ExerciseCard";
+import type { WorkoutTourAnchor } from "./WorkoutDisplay";
 
 interface WorkoutSectionProps {
   section: TrainerWorkoutSection;
@@ -61,6 +62,8 @@ interface WorkoutSectionProps {
   disableReorder?: boolean;
   /** When false, hide session completion chrome on exercise cards (editor preview). */
   showSessionCompletionState?: boolean;
+  /** Optional anchor card for onboarding tour target attributes. */
+  tourAnchor?: WorkoutTourAnchor | null;
 }
 
 /**
@@ -98,6 +101,7 @@ interface SortableExerciseItemProps {
   onCheckOrder: WorkoutSectionProps["onCheckOrder"];
   isDraggable: boolean;
   showSessionCompletionState: WorkoutSectionProps["showSessionCompletionState"];
+  tourAnchor: WorkoutSectionProps["tourAnchor"];
 }
 
 function SortableExerciseItem({
@@ -117,6 +121,7 @@ function SortableExerciseItem({
   onCheckOrder,
   isDraggable,
   showSessionCompletionState,
+  tourAnchor,
 }: SortableExerciseItemProps) {
   const {
     attributes,
@@ -171,6 +176,10 @@ function SortableExerciseItem({
           onOpenAddExercise={onOpenAddExercise}
           onCheckOrder={onCheckOrder}
           showSessionCompletionState={showSessionCompletionState}
+          isTourAnchor={
+            tourAnchor?.sectionIdx === sectionIdx &&
+            tourAnchor?.exerciseIdx === exerciseIdx
+          }
         />
       </div>
     </div>
@@ -195,6 +204,7 @@ export function WorkoutSection({
   isEditing = false,
   disableReorder = false,
   showSessionCompletionState = true,
+  tourAnchor = null,
 }: WorkoutSectionProps) {
   const isWarmup = section.type === "Warmup";
   const exercises = section.exercises ?? [];
@@ -253,6 +263,7 @@ export function WorkoutSection({
               onCheckOrder={onCheckOrder}
               isDraggable={true}
               showSessionCompletionState={showSessionCompletionState}
+              tourAnchor={tourAnchor}
             />
           );
         }
@@ -275,6 +286,10 @@ export function WorkoutSection({
             onOpenAddExercise={onOpenAddExercise}
             onCheckOrder={onCheckOrder}
             showSessionCompletionState={showSessionCompletionState}
+            isTourAnchor={
+              tourAnchor?.sectionIdx === sectionIdx &&
+              tourAnchor?.exerciseIdx === eIdx
+            }
           />
         );
       })}

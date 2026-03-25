@@ -387,3 +387,20 @@
   }
   /* ... keeping your existing firebase overrides ... */
 }
+
+/*
+ * Workout details tour (Joyride ~10000): Radix Dialog/Sheet/AlertDialog use z-50.
+ * While the tour is running, raise modal surfaces above the Joyride overlay so
+ * action-gated steps (AI editor, image picker, etc.) stay usable.
+ * Toggled via document.documentElement[data-workout-details-tour-active].
+ */
+html[data-workout-details-tour-active="true"] [role="dialog"],
+html[data-workout-details-tour-active="true"] [role="alertdialog"] {
+  z-index: 10100 !important;
+}
+
+/* Full-viewport Radix overlays (dialog/sheet backdrop) paired with those primitives */
+html[data-workout-details-tour-active="true"]
+  [data-state="open"].fixed.inset-0.z-50 {
+  z-index: 10100 !important;
+}

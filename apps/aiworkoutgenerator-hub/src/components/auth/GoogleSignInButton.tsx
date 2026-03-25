@@ -12,8 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { getErrorCode, getErrorMessage } from "@/lib/auth-helpers";
-import { ProfileService } from "@/services/profile/ProfileService";
-import { hasPhaseAData } from "@/lib/phaseAStorage";
+import { getPostSignInRedirectPath } from "@/lib/post-auth-redirect";
 import { trackAccountSignupComplete } from "@/lib/websiteAnalyticsSession";
 
 /**
@@ -43,26 +42,7 @@ export function GoogleSignInButton() {
           if (additionalInfo?.isNewUser) {
             trackAccountSignupComplete({ method: "oauth" });
           }
-          // Check if user has completed onboarding
-          const profile = await ProfileService.getUserProfile(result.user.uid);
-          const hasCompletedOnboarding =
-            ProfileService.hasCompletedOnboarding(profile);
-
-          // Determine redirect path:
-          // 1. If completed onboarding -> dashboard
-          // 2. If has Phase A data in localStorage -> Phase B wizard
-          // 3. Otherwise -> standard onboarding
-          //
-          // Note: Phase A data is intentionally session-specific (localStorage) and
-          // not persisted to Firestore. Cross-device login falls back to standard
-          // onboarding, which collects the same information.
-          let redirectPath = "/";
-          if (!hasCompletedOnboarding) {
-            redirectPath = hasPhaseAData()
-              ? "/onboarding/continue"
-              : "/onboarding";
-          }
-
+          const redirectPath = await getPostSignInRedirectPath(result.user);
           router.push(redirectPath);
         }
       } catch (err: unknown) {

@@ -148,7 +148,7 @@ export function CertificationMessagesAlert() {
             {workoutsWithUnread.map((item) => (
               <Link
                 key={item.workoutId}
-                href={`/workouts?id=${item.workoutId}`}
+                href={`/workouts?id=${encodeURIComponent(item.workoutId)}&from=certification`}
                 className="flex items-center gap-3 p-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors group"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
@@ -197,7 +197,7 @@ export function CertificationMessagesAlert() {
             {queueItems.map((item) => (
               <Link
                 key={item.workoutId}
-                href={`/workouts?id=${item.workoutId}`}
+                href={`/workouts?id=${encodeURIComponent(item.workoutId)}&from=certification`}
                 className="flex items-center gap-3 p-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors group"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">

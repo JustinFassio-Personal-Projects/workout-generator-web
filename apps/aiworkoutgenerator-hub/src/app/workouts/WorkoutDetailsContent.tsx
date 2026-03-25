@@ -3,17 +3,27 @@
 import { useEffect, useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { RefreshCw, Sparkles, Play } from "lucide-react";
+import { BookOpen, RefreshCw, Sparkles, Play } from "lucide-react";
 
 import { useUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useOnboardingStatus } from "@/hooks/useUserProfile";
+import { useReplayWorkoutDetailsTour } from "@/hooks/useReplayWorkoutDetailsTour";
 import { useTrainerWorkout } from "@/hooks/useTrainerWorkout";
 import { useCertificationStatus } from "@/hooks/useCertification";
 import { TrainerService } from "@/services/trainer/TrainerService";
 import { AppPageHeader } from "@/components/app";
 import { WorkoutDisplay } from "@/components/workout";
+import { WorkoutOnboarding } from "@/components/workout/WorkoutOnboarding";
 import {
   CertificationStatusCard,
   CertificationSubmitModal,
@@ -21,13 +31,27 @@ import {
   SubmitForCertificationButton,
 } from "@/components/certification";
 import type { TrainerWorkout } from "@/types/firestore";
+import type { WorkoutTourAnchor } from "@/components/workout/WorkoutDisplay";
 
 export function WorkoutDetailsContent() {
   const searchParams = useSearchParams();
   const workoutId = searchParams.get("id") ?? "";
+  const fromParam = searchParams.get("from");
+  const showReviewIntro =
+    fromParam === "generate" ||
+    fromParam === "history" ||
+    fromParam === "dashboard" ||
+    fromParam === "certification";
 
   const { user, loading: authLoading } = useUser();
-  const { completed, loading: profileLoading } = useOnboardingStatus();
+  const {
+    completed,
+    loading: profileLoading,
+    profile,
+    updateProfile,
+  } = useOnboardingStatus();
+  const { busy: replayTourBusy, replay: replayWorkoutDetailsTour } =
+    useReplayWorkoutDetailsTour(updateProfile);
   const { workout, loading, error } = useTrainerWorkout(workoutId);
   const { status: certificationStatus } = useCertificationStatus(
     workoutId || null
@@ -35,6 +59,7 @@ export function WorkoutDetailsContent() {
   const router = useRouter();
 
   const [certificationModalOpen, setCertificationModalOpen] = useState(false);
+  const [workoutDetailsTourRun, setWorkoutDetailsTourRun] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -54,6 +79,23 @@ export function WorkoutDetailsContent() {
     },
     [workoutId]
   );
+
+  const dismissReviewIntro = useCallback(() => {
+    router.replace(`/workouts?id=${encodeURIComponent(workoutId)}`);
+  }, [router, workoutId]);
+
+  const goToPlayerFromIntro = useCallback(() => {
+    router.replace(`/workouts/${encodeURIComponent(workoutId)}/player`);
+  }, [router, workoutId]);
+
+  let tourAnchor: WorkoutTourAnchor | null = null;
+  const sections = workout?.sections ?? [];
+  for (let sectionIdx = 0; sectionIdx < sections.length; sectionIdx += 1) {
+    if ((sections[sectionIdx]?.exercises?.length ?? 0) > 0) {
+      tourAnchor = { sectionIdx, exerciseIdx: 0 };
+      break;
+    }
+  }
 
   if (authLoading || profileLoading) {
     return (
@@ -120,7 +162,7 @@ export function WorkoutDetailsContent() {
     certificationStatus && certificationStatus !== "none";
 
   return (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={workoutDetailsTourRun ? 800 : 300}>
       <div className="container mx-auto py-8 px-4 pb-48 sm:pb-32">
         <div className="max-w-5xl mx-auto">
           <AppPageHeader backHref="/dashboard" backLabel="Back to Dashboard">
@@ -139,17 +181,29 @@ export function WorkoutDetailsContent() {
           </div>
         )}
 
-        <div className="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-          <Button
-            variant="outline"
-            asChild
-            className="w-full sm:w-auto border-orange-400/50 animate-pulse-orange-glow"
-          >
-            <Link href={`/workouts/${workoutId}/player`}>
-              <Play className="h-4 w-4 mr-2" />
-              Workout Player
-            </Link>
-          </Button>
+        <div className="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row flex-wrap gap-3 sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:flex-1 sm:min-w-0">
+            <Button
+              variant="outline"
+              asChild
+              className="w-full sm:w-auto border-orange-400/50 animate-pulse-orange-glow"
+            >
+              <Link href={`/workouts/${workoutId}/player`}>
+                <Play className="h-4 w-4 mr-2" />
+                Workout Player
+              </Link>
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full sm:w-auto shrink-0"
+              disabled={replayTourBusy}
+              onClick={() => void replayWorkoutDetailsTour("workout_details")}
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              {replayTourBusy ? "Resetting tour…" : "Replay guided tour"}
+            </Button>
+          </div>
           {canSubmitForCertification && (
             <SubmitForCertificationButton
               onOpen={() => setCertificationModalOpen(true)}
@@ -158,12 +212,22 @@ export function WorkoutDetailsContent() {
         </div>
 
         {/* Session completion (sets/exercises + modal) lives in Workout Player only. */}
+        <WorkoutOnboarding
+          workoutId={workoutId}
+          tourAnchor={tourAnchor}
+          profile={profile}
+          profileLoading={profileLoading}
+          updateProfile={updateProfile}
+          onRunChange={setWorkoutDetailsTourRun}
+          suppressAutoLaunch={showReviewIntro}
+        />
         <WorkoutDisplay
           workout={workout}
           onSave={handleSaveWorkout}
           isEditing
           sessionCompletionEnabled={false}
           onRequestImages={() => setCertificationModalOpen(true)}
+          tourAnchor={tourAnchor}
         />
 
         {canSubmitForCertification && (
@@ -173,6 +237,55 @@ export function WorkoutDetailsContent() {
             />
           </div>
         )}
+
+        <Dialog
+          open={showReviewIntro}
+          onOpenChange={(open) => {
+            if (!open) dismissReviewIntro();
+          }}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Review and Edit mode</DialogTitle>
+              <DialogDescription className="text-left space-y-3 sm:pt-1">
+                <span className="block">
+                  You&apos;re on the workout details page to review and edit
+                  your plan before you train.
+                </span>
+                <span className="block">
+                  To <span className="font-medium text-foreground">run</span>{" "}
+                  the workout and{" "}
+                  <span className="font-medium text-foreground">
+                    save your session results
+                  </span>
+                  , select{" "}
+                  <span className="font-medium text-foreground">
+                    Workout Player
+                  </span>{" "}
+                  at the top of this page.
+                </span>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={dismissReviewIntro}
+              >
+                Got it
+              </Button>
+              <Button
+                type="button"
+                className="w-full sm:w-auto"
+                onClick={goToPlayerFromIntro}
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Open Workout Player
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <CertificationSubmitModal
           workoutId={workoutId}

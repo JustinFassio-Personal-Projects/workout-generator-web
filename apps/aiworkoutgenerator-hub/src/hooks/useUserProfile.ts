@@ -93,10 +93,10 @@ export function useUserProfile() {
 }
 
 export function useOnboardingStatus() {
-  const { profile, loading, error } = useUserProfile();
+  const { profile, loading, error, updateProfile } = useUserProfile();
   const completed = useMemo(
     () => ProfileService.hasCompletedOnboarding(profile),
     [profile]
   );
-  return { completed, profile, loading, error };
+  return { completed, profile, loading, error, updateProfile };
 }

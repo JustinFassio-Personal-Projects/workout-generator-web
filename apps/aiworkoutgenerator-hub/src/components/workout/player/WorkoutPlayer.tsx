@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import type {
   TrainerWorkout,
   TrainerWorkoutSection,
+  TrainerSetDetail,
   FitnessLevel,
 } from "@/types/firestore";
 import type {
@@ -39,7 +40,9 @@ import { AIExerciseEditor } from "@/components/workout/ai-editor/AIExerciseEdito
 import { ExerciseImageSelectorModal } from "@/components/workout/ExerciseImageSelectorModal";
 import { AIExerciseService } from "@/services/ai-exercise-service";
 import { toast } from "sonner";
+import { devLogError } from "@/lib/devLog";
 import { cn } from "@/lib/utils";
+import { exerciseHasCompletedSet } from "@/lib/workout/exerciseCompletion";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getIdToken } from "@/lib/auth";
 
@@ -516,7 +519,38 @@ export function WorkoutPlayer({ workout }: WorkoutPlayerProps) {
     }
   };
 
-  // Handle set completion from timer
+  const handleUpdateSet = useCallback(
+    (
+      sectionIdx: number,
+      exerciseIdx: number,
+      setIdx: number,
+      field: string,
+      value: string
+    ) => {
+      setWorkoutState((prev) => {
+        const newSections: TrainerWorkoutSection[] = structuredClone(
+          prev.sections
+        );
+        const exercise = newSections[sectionIdx]?.exercises?.[exerciseIdx];
+        const setRow = exercise?.setDetails?.[setIdx];
+        if (!exercise?.setDetails || !setRow) return prev;
+        const key = field as keyof TrainerSetDetail;
+        if (
+          key === "reps" ||
+          key === "weight" ||
+          key === "actualWeight" ||
+          key === "rest" ||
+          key === "notes"
+        ) {
+          setRow[key] = value;
+        }
+        return { ...prev, sections: newSections };
+      });
+    },
+    []
+  );
+
+  // Handle set completion from timer or set-details UI
   const handleToggleSetComplete = useCallback(
     (
       sectionIdx: number,
@@ -533,30 +567,33 @@ export function WorkoutPlayer({ workout }: WorkoutPlayerProps) {
         if (setDetails && setDetails[setIdx]) {
           setDetails[setIdx].completed = completed;
         }
+        if (exercise?.setDetails?.length) {
+          const allDone = exercise.setDetails.every(
+            (s) => s.completed === true
+          );
+          exercise.completed = allDone;
+        }
         return { ...prev, sections: newSections };
       });
     },
     []
   );
 
-  // Handle exercise completion from timer (with validation)
+  // Handle exercise completion from timer or set-details UI (with validation)
   const handleExerciseComplete = useCallback(
     (sectionIdx: number, exerciseIdx: number, completed: boolean) => {
       setWorkoutState((prev) => {
-        // Validate: exercise can only be complete if at least one set is complete
         if (completed === true) {
-          const exercise =
-            prev.sections?.[sectionIdx]?.exercises?.[exerciseIdx];
-          const hasCompletedSet =
-            exercise?.setDetails?.some((s) => s.completed === true) ?? false;
-
-          if (!hasCompletedSet) {
-            // Validation failed - don't update state
+          const ex = prev.sections?.[sectionIdx]?.exercises?.[exerciseIdx];
+          if (!exerciseHasCompletedSet(ex)) {
+            queueMicrotask(() =>
+              toast.error(
+                "Please complete at least one set before completing the exercise"
+              )
+            );
             return prev;
           }
         }
-
-        // Validation passed (or not needed for uncompleting) - proceed with update
         const newSections: TrainerWorkoutSection[] = structuredClone(
           prev.sections
         );
@@ -720,7 +757,7 @@ export function WorkoutPlayer({ workout }: WorkoutPlayerProps) {
         toast.success("Exercise updated with AI!");
         setAIEditorState({ open: false, sectionIdx: null, exerciseIdx: null });
       } catch (error) {
-        console.error("Error applying AI edit from player:", error);
+        devLogError("WorkoutPlayer.applyAIEdit", error);
         toast.error("Failed to apply edit. Please try again.");
 
         setWorkoutState((prev) => ({
@@ -808,7 +845,7 @@ export function WorkoutPlayer({ workout }: WorkoutPlayerProps) {
           return { ...prev, sections: newSections };
         });
       } catch (error) {
-        console.error("Error saving section timer config:", error);
+        devLogError("WorkoutPlayer.saveSectionTimerConfig", error);
         throw error;
       }
     },
@@ -869,7 +906,7 @@ export function WorkoutPlayer({ workout }: WorkoutPlayerProps) {
       try {
         await handleSaveSectionTimerConfig(updatedConfig);
       } catch (error) {
-        console.error("Error saving timer mode change:", error);
+        devLogError("WorkoutPlayer.timerModeChange", error);
         // Mode change is still applied locally even if save fails
       }
     },
@@ -1332,6 +1369,11 @@ export function WorkoutPlayer({ workout }: WorkoutPlayerProps) {
                       exerciseId={`${activeExercise.sectionIdx}-${activeExercise.exerciseIdx}`}
                       safetyMode={safetyMode}
                       isActive={true}
+                      sectionIdx={activeExercise.sectionIdx}
+                      exerciseIdx={activeExercise.exerciseIdx}
+                      onUpdateSet={handleUpdateSet}
+                      onToggleSetComplete={handleToggleSetComplete}
+                      onExerciseComplete={handleExerciseComplete}
                       reasoning={getExerciseReasoning(
                         activeExercise.sectionIdx,
                         activeExercise.exerciseIdx

@@ -160,7 +160,7 @@ function WorkoutDetailsContent() {
         >
           <Link href={`/workouts/${workoutId}/player`}>
             <Play className="h-4 w-4 mr-2" />
-            Interval Workout Player
+            Workout Player
           </Link>
         </Button>
         {canSubmitForCertification && (

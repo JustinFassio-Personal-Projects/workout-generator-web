@@ -29,6 +29,7 @@ import { WorkoutHistoryService } from "@/services/history";
 import { TrainerService } from "@/services/trainer/TrainerService";
 import { SessionSummaryService } from "@/services/session/SessionSummaryService";
 import { WorkoutSummaryService } from "@/services/summaries/WorkoutSummaryService";
+import { devLogError } from "@/lib/devLog";
 import { useUser } from "@/lib/auth";
 import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
@@ -56,16 +57,26 @@ const SESSION_FEEDBACK_OPTIONS = SESSION_FEEDBACK_OPTIONS_BASE.map((opt) => {
   };
 });
 
+function hasPositiveSectionTiming(
+  t: Record<number, number> | undefined
+): boolean {
+  if (!t) return false;
+  return Object.values(t).some((s) => s != null && Number.isFinite(s) && s > 0);
+}
+
 interface CompletionModalProps {
   workout: TrainerWorkout | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Per Firestore section index → elapsed seconds from manual section timers. */
+  sessionSectionTiming?: Record<number, number>;
 }
 
 export function CompletionModal({
   workout,
   open,
   onOpenChange,
+  sessionSectionTiming,
 }: CompletionModalProps) {
   const router = useRouter();
   const { user } = useUser();
@@ -145,7 +156,13 @@ export function CompletionModal({
       await WorkoutHistoryService.markComplete(workout.id, completionData);
 
       try {
-        const summary = SessionSummaryService.generateSessionSummary(workout);
+        const summaryOpts = hasPositiveSectionTiming(sessionSectionTiming)
+          ? { sectionActualSeconds: sessionSectionTiming }
+          : undefined;
+        const summary = SessionSummaryService.generateSessionSummary(
+          workout,
+          summaryOpts
+        );
         await WorkoutSummaryService.saveSummary(
           workout,
           summary,
@@ -153,7 +170,7 @@ export function CompletionModal({
           user.uid
         );
       } catch (summaryError) {
-        console.error("Failed to save workout summary:", summaryError);
+        devLogError("CompletionModal.saveSummary", summaryError);
         toast.warning(
           "Workout marked complete, but session report didn't save",
           {
@@ -171,7 +188,7 @@ export function CompletionModal({
       onOpenChange(false);
       router.push(`/workouts/${workout.id}/summary`);
     } catch (error) {
-      console.error("Failed to mark workout complete:", error);
+      devLogError("CompletionModal.handleSubmit", error);
       toast.error("Failed to save completion");
     } finally {
       setIsSubmitting(false);
@@ -198,7 +215,7 @@ export function CompletionModal({
       await WorkoutHistoryService.markComplete(workout.id, completionData);
 
       if (user) {
-        logUserActivity(
+        void logUserActivity(
           user.uid,
           "workout:complete",
           "workout",
@@ -210,11 +227,19 @@ export function CompletionModal({
             completed_at: new Date().toISOString(),
           },
           sessionId || undefined
-        ).catch(console.error);
+        ).catch(() => {
+          /* non-blocking */
+        });
       }
 
       try {
-        const summary = SessionSummaryService.generateSessionSummary(workout);
+        const summaryOpts = hasPositiveSectionTiming(sessionSectionTiming)
+          ? { sectionActualSeconds: sessionSectionTiming }
+          : undefined;
+        const summary = SessionSummaryService.generateSessionSummary(
+          workout,
+          summaryOpts
+        );
         await WorkoutSummaryService.saveSummary(
           workout,
           summary,
@@ -237,7 +262,7 @@ export function CompletionModal({
       onOpenChange(false);
       router.push(`/workouts/${workout.id}/summary`);
     } catch (error) {
-      console.error("Failed to mark workout complete:", error);
+      devLogError("CompletionModal.handleQuickComplete", error);
       toast.error("Failed to save completion");
     } finally {
       setIsSubmitting(false);

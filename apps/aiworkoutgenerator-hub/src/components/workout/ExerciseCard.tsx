@@ -11,16 +11,18 @@ import {
   CheckCircle2,
   Wand2,
   GraduationCap,
-  RotateCcw,
   ShieldCheck,
   Plus,
   Image as ImageIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ExerciseImageHeader } from "./ExerciseImageHeader";
 import { CoachExplainSection } from "./CoachExplainSection";
+import {
+  ExerciseCompleteFooter,
+  ExerciseSetLogTable,
+} from "./ExerciseSetLogTable";
 import { useExerciseImage } from "@/hooks/useExerciseImage";
 import type { TrainerWorkoutExercise } from "@/types/firestore";
 
@@ -88,13 +90,6 @@ export function ExerciseCard({
   const handleRetryImage = () => {
     if (onRetryImage) {
       onRetryImage(sectionIdx, exerciseIdx);
-    }
-  };
-
-  const handleToggleComplete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onExerciseComplete) {
-      onExerciseComplete(sectionIdx, exerciseIdx, !isCompleted);
     }
   };
 
@@ -286,149 +281,24 @@ export function ExerciseCard({
         <CoachExplainSection content={exercise.ai_coach_explain} size="small" />
       )}
 
-      <div className="space-y-1 mt-auto">
-        <div className="grid grid-cols-[20px_0.8fr_1fr_1fr_0.8fr_0.9fr] gap-2 text-[10px] uppercase text-muted-foreground font-bold mb-1 px-1">
-          <span className="text-left">#</span>
-          <span className="text-center">Reps</span>
-          <span className="text-center">Intensity</span>
-          <span className="text-center text-primary">Weight</span>
-          <span className="text-right">Rest</span>
-          <span className="text-right">Done</span>
-        </div>
-        {exercise.setDetails.map((set, idx) => {
-          const isSetCompleted = set.completed === true;
-          const shouldStrikethrough = isCompleted && !isSetCompleted;
-          return (
-            <div
-              key={idx}
-              className={`grid grid-cols-[20px_0.8fr_1fr_1fr_0.8fr_0.9fr] gap-2 items-center bg-muted p-2 rounded text-sm border border-border ${
-                isSetCompleted ? "border-emerald-500/60 bg-emerald-500/5" : ""
-              }`}
-            >
-              <span
-                className={`text-muted-foreground font-mono text-xs text-center ${
-                  shouldStrikethrough ? "line-through opacity-60" : ""
-                }`}
-              >
-                {idx + 1}
-              </span>
-              <span
-                className={`text-foreground font-medium text-center text-xs ${
-                  shouldStrikethrough ? "line-through opacity-60" : ""
-                }`}
-              >
-                {set.reps || "-"}
-              </span>
-              <span
-                className={`text-foreground font-medium text-center text-[10px] truncate ${
-                  shouldStrikethrough ? "line-through opacity-60" : ""
-                }`}
-                title={set.weight}
-              >
-                {set.weight || "-"}
-              </span>
-              <Input
-                type="text"
-                placeholder="lbs"
-                value={set.actualWeight || ""}
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) =>
-                  onUpdateSet(
-                    sectionIdx,
-                    exerciseIdx,
-                    idx,
-                    "actualWeight",
-                    e.target.value
-                  )
-                }
-                className={`h-7 bg-background border-border text-center text-primary text-xs py-1 px-1 w-full focus:border-primary placeholder-muted-foreground ${
-                  shouldStrikethrough ? "opacity-60" : ""
-                }`}
-              />
-              <span
-                className={`text-foreground font-medium text-right text-xs truncate ${
-                  shouldStrikethrough ? "line-through opacity-60" : ""
-                }`}
-              >
-                {set.duration || set.rest || "-"}
-              </span>
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (onToggleSetComplete) {
-                    onToggleSetComplete(
-                      sectionIdx,
-                      exerciseIdx,
-                      idx,
-                      !isSetCompleted
-                    );
-                  }
-                }}
-                onMouseDown={(e) => {
-                  // Prevent focus change which can cause scroll
-                  e.preventDefault();
-                }}
-                className={`inline-flex items-center justify-end gap-1 text-[10px] font-semibold ${
-                  isSetCompleted
-                    ? "text-emerald-500"
-                    : "text-muted-foreground hover:text-emerald-500"
-                }`}
-                aria-label={
-                  isSetCompleted
-                    ? `Mark set ${idx + 1} as incomplete`
-                    : `Mark set ${idx + 1} as complete`
-                }
-              >
-                <span
-                  className={`h-4 w-4 rounded-full border flex items-center justify-center text-[9px] ${
-                    isSetCompleted
-                      ? "bg-emerald-500 border-emerald-500 text-white"
-                      : "border-border"
-                  }`}
-                >
-                  {isSetCompleted ? "✓" : ""}
-                </span>
-                <span>{isSetCompleted ? "Done" : "Complete"}</span>
-              </button>
-            </div>
-          );
-        })}
-      </div>
+      <ExerciseSetLogTable
+        className="mt-auto"
+        exercise={exercise}
+        sectionIdx={sectionIdx}
+        exerciseIdx={exerciseIdx}
+        onUpdateSet={onUpdateSet}
+        onToggleSetComplete={onToggleSetComplete}
+        showLoggingColumns
+        stopPropagationOnInteract
+      />
 
-      {/* Bottom Center Complete Button */}
-      {onExerciseComplete && (
-        <div className="flex justify-center items-center gap-2 mt-4 pt-4 border-t border-border/50">
-          <Button
-            variant={isCompleted ? "default" : "outline"}
-            size="sm"
-            onClick={handleToggleComplete}
-            className={`w-full sm:w-auto ${
-              isCompleted
-                ? "bg-green-500 hover:bg-green-600 text-white border-green-500"
-                : "border-border hover:bg-background"
-            }`}
-            aria-label={isCompleted ? "Mark as incomplete" : "Mark as complete"}
-          >
-            <CheckCircle2 className={`w-4 h-4 ${isCompleted ? "" : "mr-2"}`} />
-            {isCompleted ? "Completed" : "Complete Exercise"}
-          </Button>
-          {isCompleted && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleToggleComplete}
-              className="shrink-0 border-border hover:bg-background rounded-full p-2 h-8 w-8"
-              aria-label="Restore exercise (mark as incomplete)"
-              title="Restore exercise"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
-      )}
+      <ExerciseCompleteFooter
+        exercise={exercise}
+        sectionIdx={sectionIdx}
+        exerciseIdx={exerciseIdx}
+        onExerciseComplete={onExerciseComplete}
+        stopPropagationOnInteract
+      />
     </div>
   );
 }

@@ -10,6 +10,16 @@ import type {
   SessionStatsSummary,
   SessionSummaryData,
 } from "@/types/sessionSummary";
+import {
+  bucketActualSectionMinutes,
+  getEffectiveMetForSection,
+  intensityBandFromMet,
+} from "@/lib/workout/sectionIntensityMet";
+
+export interface GenerateSessionSummaryOptions {
+  /** Map of Firestore section index → elapsed seconds from manual section timers. */
+  sectionActualSeconds?: Record<number, number>;
+}
 
 function getCompletedSets(exercise: TrainerWorkoutExercise): number {
   return exercise.setDetails?.filter((set) => set.completed)?.length ?? 0;
@@ -64,8 +74,20 @@ function buildExerciseSummary(
 }
 
 function buildSectionSummary(
-  section: TrainerWorkoutSection
+  section: TrainerWorkoutSection,
+  sectionIndex: number,
+  workout: TrainerWorkout,
+  sectionActualSeconds?: Record<number, number>
 ): SessionSectionSummary {
+  const actualSeconds = sectionActualSeconds?.[sectionIndex];
+  const hasActual =
+    actualSeconds != null &&
+    Number.isFinite(actualSeconds) &&
+    actualSeconds > 0;
+  const effectiveMet = hasActual
+    ? getEffectiveMetForSection(section, workout)
+    : null;
+
   return {
     type: section.type,
     durationEstimate: section.durationEstimate,
@@ -73,11 +95,31 @@ function buildSectionSummary(
       section.exercises?.map((exercise) =>
         buildExerciseSummary(exercise as TrainerWorkoutExercise)
       ) ?? [],
+    ...(hasActual
+      ? {
+          actualDurationSeconds: Math.round(actualSeconds),
+          effectiveMet,
+          intensityBand:
+            effectiveMet != null ? intensityBandFromMet(effectiveMet) : null,
+        }
+      : {}),
   };
 }
 
-function buildStatsSummary(workout: TrainerWorkout): SessionStatsSummary {
-  const totalTimeMinutes = workout.totalDuration || workout.duration_minutes;
+function hasAnySectionTiming(
+  sectionActualSeconds?: Record<number, number>
+): boolean {
+  if (!sectionActualSeconds) return false;
+  return Object.values(sectionActualSeconds).some(
+    (s) => s != null && Number.isFinite(s) && s > 0
+  );
+}
+
+function buildStatsSummary(
+  workout: TrainerWorkout,
+  sectionActualSeconds?: Record<number, number>
+): SessionStatsSummary {
+  const plannedTotalMinutes = workout.totalDuration || workout.duration_minutes;
 
   let warmupMinutes = 0;
   let mainMinutes = 0;
@@ -99,7 +141,30 @@ function buildStatsSummary(workout: TrainerWorkout): SessionStatsSummary {
     }
   }
 
-  // Placeholder volume load & strain score – can be refined later
+  const useActual = hasAnySectionTiming(sectionActualSeconds);
+  let actualTotalTimeMinutes: number | null = null;
+  let totalTimeMinutes = plannedTotalMinutes;
+
+  if (useActual && sectionActualSeconds) {
+    const buckets = bucketActualSectionMinutes(
+      workout.sections,
+      sectionActualSeconds
+    );
+    warmupMinutes = buckets.warmupMinutes;
+    mainMinutes = buckets.mainMinutes;
+    finisherMinutes = buckets.finisherMinutes;
+
+    let sumSeconds = 0;
+    for (const v of Object.values(sectionActualSeconds)) {
+      if (v != null && Number.isFinite(v) && v > 0) {
+        sumSeconds += v;
+      }
+    }
+    actualTotalTimeMinutes = Math.round((sumSeconds / 60) * 10) / 10;
+    totalTimeMinutes =
+      Math.round((sumSeconds / 60) * 10) / 10 || plannedTotalMinutes;
+  }
+
   const estimatedVolumeLoad = null;
   const strainScore = workout.difficulty_rating ?? null;
 
@@ -108,6 +173,7 @@ function buildStatsSummary(workout: TrainerWorkout): SessionStatsSummary {
     warmupMinutes,
     mainMinutes,
     finisherMinutes,
+    ...(useActual ? { actualTotalTimeMinutes } : {}),
     estimatedVolumeLoad,
     strainScore,
     completionPercentage: workout.completion_percentage ?? null,
@@ -162,13 +228,23 @@ export class SessionSummaryService {
    * Generate a session report snapshot from a completed workout.
    * This is a pure, synchronous transform of a TrainerWorkout document.
    */
-  static generateSessionSummary(workout: TrainerWorkout): SessionSummaryData {
+  static generateSessionSummary(
+    workout: TrainerWorkout,
+    options?: GenerateSessionSummaryOptions
+  ): SessionSummaryData {
+    const sectionActualSeconds = options?.sectionActualSeconds;
+
     const sections: SessionSectionSummary[] =
-      workout.sections?.map((section) =>
-        buildSectionSummary(section as TrainerWorkoutSection)
+      workout.sections?.map((section, index) =>
+        buildSectionSummary(
+          section as TrainerWorkoutSection,
+          index,
+          workout,
+          sectionActualSeconds
+        )
       ) ?? [];
 
-    const stats = buildStatsSummary(workout);
+    const stats = buildStatsSummary(workout, sectionActualSeconds);
 
     return {
       workoutId: workout.id,

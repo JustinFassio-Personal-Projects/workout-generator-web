@@ -1,8 +1,12 @@
 export { WorkoutPlayer } from "./WorkoutPlayer";
+export { ManualWorkoutPlayer } from "./ManualWorkoutPlayer";
+export { ManualExerciseCard } from "./ManualExerciseCard";
+export { WorkoutPlayerShell } from "./WorkoutPlayerShell";
 export { SafetyToggle } from "./SafetyToggle";
 export { TrustBadge } from "./TrustBadge";
 export type { TrustBadgeType } from "./TrustBadge";
 export { ExerciseCardPlayer } from "./ExerciseCardPlayer";
+export { ResizableExerciseSplit } from "./ResizableExerciseSplit";
 export { ViewMorph } from "./ViewMorph";
 export { ReasoningChip } from "./ReasoningChip";
 export { InjuryVisualizer } from "./InjuryVisualizer";

@@ -17,6 +17,11 @@ if (posthogKey && posthogHost) {
     posthog.init(posthogKey, {
       api_host: posthogHost,
       defaults: "2025-11-30",
+      // Session replay can interfere with focus/clicks on auth forms in dev tools.
+      // Production keeps default recording; set NEXT_PUBLIC_POSTHOG_DISABLE_SESSION_RECORDING=false to force-enable in dev.
+      disable_session_recording:
+        process.env.NODE_ENV === "development" &&
+        process.env.NEXT_PUBLIC_POSTHOG_DISABLE_SESSION_RECORDING !== "false",
     });
   } catch (error) {
     // PostHog is optional, so we continue without it

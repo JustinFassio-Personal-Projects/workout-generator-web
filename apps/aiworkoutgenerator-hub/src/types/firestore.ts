@@ -256,6 +256,13 @@ export interface UserProfile {
   // Metadata
   onboarding_completed: boolean;
   onboarding_completed_at: Timestamp | null;
+  // Workout details tour onboarding
+  workout_details_tour_completed?: boolean;
+  workout_details_tour_completed_at?: Timestamp | null;
+  workout_details_tour_dismissed?: boolean;
+  workout_details_tour_dismissed_at?: Timestamp | null;
+  workout_details_tour_completed_script_version?: number;
+  workout_details_tour_dismissed_script_version?: number;
   profile_completeness: number;
   created_at: Timestamp;
   updated_at: Timestamp;

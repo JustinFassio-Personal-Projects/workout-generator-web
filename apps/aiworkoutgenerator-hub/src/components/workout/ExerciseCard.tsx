@@ -59,6 +59,8 @@ interface ExerciseCardProps {
   onOpenAddExercise?: (sectionIdx: number, exerciseIdx: number) => void;
   /** When false, ignore session completion for card chrome (editor preview). */
   showSessionCompletionState?: boolean;
+  /** Marks this card as the onboarding tour anchor target. */
+  isTourAnchor?: boolean;
 }
 
 export function ExerciseCard({
@@ -78,6 +80,7 @@ export function ExerciseCard({
   onCheckOrder,
   onOpenAddExercise,
   showSessionCompletionState = true,
+  isTourAnchor = false,
 }: ExerciseCardProps) {
   const [showInstructions, setShowInstructions] = useState(false);
   const isCompleted = showSessionCompletionState && exercise.completed === true;
@@ -135,6 +138,7 @@ export function ExerciseCard({
               className="shrink-0 bg-background/90 backdrop-blur-sm border-border hover:bg-background shadow-lg"
               aria-label="Check exercise order"
               title="Check if this exercise is safely positioned in the order"
+              data-tour={isTourAnchor ? "order-check" : undefined}
             >
               <ShieldCheck className="w-4 h-4 mr-1 text-muted-foreground" />
               <span className="text-xs hidden sm:inline">Order</span>
@@ -151,6 +155,7 @@ export function ExerciseCard({
               className="shrink-0 bg-background/90 backdrop-blur-sm border-border hover:bg-background shadow-lg"
               aria-label="Add exercise"
               title="Add exercise before or after this one"
+              data-tour={isTourAnchor ? "add-exercise" : undefined}
             >
               <Plus className="w-4 h-4 mr-1 text-muted-foreground" />
               <span className="text-xs hidden sm:inline">Add</span>
@@ -167,6 +172,7 @@ export function ExerciseCard({
               className="shrink-0 bg-background/90 backdrop-blur-sm border-border hover:bg-background shadow-lg"
               aria-label="Edit with AI"
               title="Edit with AI"
+              data-tour={isTourAnchor ? "ai-edit" : undefined}
             >
               <Wand2 className="w-4 h-4 mr-1 text-[hsl(82.7,77.9%,55.5%)]" />
               <span className="text-xs hidden sm:inline">AI Edit</span>
@@ -197,6 +203,7 @@ export function ExerciseCard({
               className="bg-background/90 backdrop-blur-sm border-border hover:border-primary hover:bg-background shadow-sm"
               aria-label="Choose Image"
               title="Select an image for this exercise"
+              data-tour={isTourAnchor ? "select-image" : undefined}
             >
               <ImageIcon className="w-4 h-4 mr-1.5" />
               <span className="text-xs">Choose Image</span>
@@ -213,6 +220,7 @@ export function ExerciseCard({
               className="bg-background/90 backdrop-blur-sm border-[hsl(82.7,77.9%,55.5%)]/50 hover:border-[hsl(82.7,77.9%,55.5%)] hover:bg-background shadow-sm"
               aria-label="Open Coach Explain"
               title="Get personalized exercise breakdown"
+              data-tour={isTourAnchor ? "coach-info" : undefined}
             >
               <GraduationCap className="w-4 h-4 mr-1.5 text-[hsl(82.7,77.9%,55.5%)]" />
               <span className="text-xs text-[hsl(82.7,77.9%,55.5%)]">

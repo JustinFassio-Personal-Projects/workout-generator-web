@@ -76,7 +76,7 @@ npm install -D \
     "test:critical": "vitest run --grep=\"@critical\"",
     "security:scan": "node scripts/security-scan.js",
     "verify:quick": "npm run type-check && npm run build",
-    "verify:all": "npm run lint && npm run format:check && npm run type-check && npm run test:run && npm run security:scan && npm run build",
+    "verify:all": "npm run lint && npm run format:check && npm run type-check && npm run check-deps && npm run test:run && npm run security:scan && npm run build",
     // Note: verify:quick intentionally excludes lint since linting runs automatically
     // in pre-commit hooks via lint-staged. Use verify:all for comprehensive checks.
     "verify:deploy": "npm run verify:all && npm run test:emulator",
@@ -369,7 +369,7 @@ npm run type-check
 # Note: Linting is already handled by pre-commit hooks via lint-staged
 npm run verify:quick
 
-# Full verification before PR (includes lint, format, type-check, tests, security scan, build)
+# Full verification before PR (includes lint, format, type-check, depcheck, tests, security scan, build)
 npm run verify:all
 
 # Test with Firebase emulators

@@ -31,9 +31,10 @@ if (shouldInit) {
       Sentry.feedbackIntegration({ autoInject: false, colorScheme: "system" }),
     ],
 
-    // Session Replay: capture 10% of all sessions, 100% of sessions with errors
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
+    // Session Replay: capture 10% of all sessions, 100% of sessions with errors.
+    // Disable in development to avoid rrweb/DOM instrumentation interfering with inputs (e.g. /login).
+    replaysSessionSampleRate: isDevelopment ? 0 : 0.1,
+    replaysOnErrorSampleRate: isDevelopment ? 0 : 1.0,
 
     // Redact sensitive data before sending
     beforeSend(event) {

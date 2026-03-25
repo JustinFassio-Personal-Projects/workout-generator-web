@@ -26,6 +26,11 @@ import type {
   AIOrderCheckResponse,
 } from "@/types/ai-exercise-editor";
 
+export interface WorkoutTourAnchor {
+  sectionIdx: number;
+  exerciseIdx: number;
+}
+
 interface WorkoutDisplayProps {
   workout: TrainerWorkout;
   onSave?: (updatedWorkout: TrainerWorkout) => Promise<void>;
@@ -44,6 +49,8 @@ interface WorkoutDisplayProps {
    * Completion belongs in the workout player.
    */
   sessionCompletionEnabled?: boolean;
+  /** Optional anchor card for onboarding tour target attributes. */
+  tourAnchor?: WorkoutTourAnchor | null;
 }
 
 /**
@@ -57,6 +64,7 @@ export function WorkoutDisplay({
   onWorkoutStateChange,
   onRequestImages,
   sessionCompletionEnabled = true,
+  tourAnchor = null,
 }: WorkoutDisplayProps) {
   const [workout, setWorkout] = useState<TrainerWorkout>(initialWorkout);
   const [activeExercise, setActiveExercise] = useState<{
@@ -634,6 +642,7 @@ export function WorkoutDisplay({
             onReorderExercises={isEditing ? handleReorderExercises : undefined}
             isEditing={isEditing}
             disableReorder={isSaving}
+            tourAnchor={tourAnchor}
           />
         ))}
       </div>

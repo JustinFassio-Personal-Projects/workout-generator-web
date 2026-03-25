@@ -1,4 +1,5 @@
 export { WorkoutDisplay } from "./WorkoutDisplay";
+export { WorkoutOnboarding } from "./WorkoutOnboarding";
 export { WorkoutHeader } from "./WorkoutHeader";
 export { WorkoutSection } from "./WorkoutSection";
 export { ExerciseCard } from "./ExerciseCard";

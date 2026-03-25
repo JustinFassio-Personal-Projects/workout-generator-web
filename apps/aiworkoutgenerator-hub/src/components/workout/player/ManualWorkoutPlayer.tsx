@@ -79,6 +79,15 @@ export function ManualWorkoutPlayer({ workout }: ManualWorkoutPlayerProps) {
     sectionsRef.current = workoutState.sections || [];
   }, [workoutState.sections]);
 
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
+      }
+    };
+  }, [workoutState.id]);
+
   const phaseMap = getPhaseMap(workoutState.sections);
   const currentSectionData = phaseMap[currentPhase];
   const currentSection = currentSectionData?.section;
@@ -388,7 +397,6 @@ export function ManualWorkoutPlayer({ workout }: ManualWorkoutPlayerProps) {
     <>
       <WorkoutPlayerShell
         workout={workoutState}
-        safetyMode={safetyMode}
         onSafetyToggle={setSafetyMode}
         hideTopChrome={focusMode}
       >

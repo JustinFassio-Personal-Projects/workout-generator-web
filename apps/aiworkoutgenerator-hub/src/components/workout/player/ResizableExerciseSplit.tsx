@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_PREFIX = "exercise-card-split:";
@@ -56,6 +62,8 @@ export function ResizableExerciseSplit({
   right,
 }: ResizableExerciseSplitProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  /** Abort active window listeners on unmount or new drag so pointer handlers never leak. */
+  const dragAbortRef = useRef<AbortController | null>(null);
   const fullKey = STORAGE_PREFIX + storageKey;
   const [leftPercent, setLeftPercent] = useState(() =>
     readStoredLeftPercent(
@@ -77,15 +85,29 @@ export function ResizableExerciseSplit({
     [fullKey]
   );
 
+  useEffect(() => {
+    return () => {
+      dragAbortRef.current?.abort();
+      dragAbortRef.current = null;
+    };
+  }, []);
+
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
       const row = containerRef.current;
       if (!row) return;
+
+      dragAbortRef.current?.abort();
+      const ac = new AbortController();
+      dragAbortRef.current = ac;
+      const { signal } = ac;
+
       const rowRect = row.getBoundingClientRect();
       const startX = e.clientX;
       const startPct = leftPercent;
+      let ended = false;
 
       const onMove = (ev: PointerEvent) => {
         const dx = ev.clientX - startX;
@@ -96,10 +118,9 @@ export function ResizableExerciseSplit({
         );
         setLeftPercent(next);
       };
-      const onUp = (ev: PointerEvent) => {
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
-        window.removeEventListener("pointercancel", onUp);
+      const onEnd = (ev: PointerEvent) => {
+        if (ended) return;
+        ended = true;
         const dx = ev.clientX - startX;
         const final = clamp(
           startPct + (dx / rowRect.width) * 100,
@@ -108,10 +129,15 @@ export function ResizableExerciseSplit({
         );
         setLeftPercent(final);
         persist(final);
+        ac.abort();
+        if (dragAbortRef.current === ac) {
+          dragAbortRef.current = null;
+        }
       };
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp);
-      window.addEventListener("pointercancel", onUp);
+
+      window.addEventListener("pointermove", onMove, { signal });
+      window.addEventListener("pointerup", onEnd, { signal });
+      window.addEventListener("pointercancel", onEnd, { signal });
     },
     [leftPercent, minLeftPercent, maxLeftPercent, persist]
   );

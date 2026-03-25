@@ -58,7 +58,8 @@ export function bucketActualSectionMinutes(
 
     if (section.type === "Warmup") {
       warmupMinutes += mins;
-    } else if (section.type === "Finisher") {
+    } else if (section.type === "Finisher" || section.type === "Cooldown") {
+      // Cooldown shares the finisher phase in getPhaseMap (type includes "cool"); keep buckets aligned.
       finisherMinutes += mins;
     } else {
       mainMinutes += mins;

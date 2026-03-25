@@ -9,7 +9,6 @@ import { ConflictResolution } from "./ConflictResolution";
 
 interface WorkoutPlayerShellProps {
   workout: TrainerWorkout;
-  safetyMode: boolean;
   onSafetyToggle: (enabled: boolean) => void;
   /** When true, hides sticky header (back, title, safety, conflict) for focus mode. */
   hideTopChrome?: boolean;
@@ -22,7 +21,6 @@ interface WorkoutPlayerShellProps {
  */
 export function WorkoutPlayerShell({
   workout,
-  safetyMode,
   onSafetyToggle,
   hideTopChrome = false,
   children,

@@ -57,6 +57,8 @@ interface ExerciseCardProps {
   onChooseImage?: (sectionIdx: number, exerciseIdx: number) => void;
   onCheckOrder?: (sectionIdx: number, exerciseIdx: number) => void;
   onOpenAddExercise?: (sectionIdx: number, exerciseIdx: number) => void;
+  /** When false, ignore session completion for card chrome (editor preview). */
+  showSessionCompletionState?: boolean;
 }
 
 export function ExerciseCard({
@@ -75,9 +77,10 @@ export function ExerciseCard({
   onChooseImage,
   onCheckOrder,
   onOpenAddExercise,
+  showSessionCompletionState = true,
 }: ExerciseCardProps) {
   const [showInstructions, setShowInstructions] = useState(false);
-  const isCompleted = exercise.completed === true;
+  const isCompleted = showSessionCompletionState && exercise.completed === true;
 
   // Get image URL, checking user preferences first
   const imageUrl = useExerciseImage(exercise.name, exercise.image_url);
@@ -290,6 +293,7 @@ export function ExerciseCard({
         onToggleSetComplete={onToggleSetComplete}
         showLoggingColumns
         stopPropagationOnInteract
+        showSessionCompletionState={showSessionCompletionState}
       />
 
       <ExerciseCompleteFooter

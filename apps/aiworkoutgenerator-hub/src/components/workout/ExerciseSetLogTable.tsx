@@ -60,10 +60,19 @@ export interface ExerciseSetLogTableProps {
   className?: string;
   /** min-width grid for horizontal scroll on narrow viewports */
   gridMinWidth?: string;
+  /**
+   * When false, ignore exercise/set completion flags for row styling (editor preview).
+   */
+  showSessionCompletionState?: boolean;
 }
 
-const HEADER_GRID =
+/** #, Reps, Note, Intensity, Weight, Rest, Done */
+const HEADER_GRID_WITH_DONE =
   "grid grid-cols-[22px_minmax(2.5rem,0.55fr)_minmax(4rem,1fr)_minmax(3rem,0.75fr)_minmax(3.5rem,0.75fr)_minmax(2.25rem,0.5fr)_minmax(4.5rem,0.7fr)] gap-1.5 sm:gap-2";
+
+/** #, Reps, Note, Intensity, Weight, Rest (no Done column) */
+const HEADER_GRID_NO_DONE =
+  "grid grid-cols-[22px_minmax(2.5rem,0.55fr)_minmax(4rem,1fr)_minmax(3rem,0.75fr)_minmax(3.5rem,0.75fr)_minmax(2.25rem,0.5fr)] gap-1.5 sm:gap-2";
 
 /**
  * Shared set log: #, Reps (count + note via parseRepsDisplay), Intensity (prescription weight),
@@ -79,9 +88,18 @@ export function ExerciseSetLogTable({
   stopPropagationOnInteract = false,
   className,
   gridMinWidth = "min-w-[36rem]",
+  showSessionCompletionState = true,
 }: ExerciseSetLogTableProps) {
-  const isExerciseCompleted = exercise.completed === true;
+  const isExerciseCompleted =
+    showSessionCompletionState && exercise.completed === true;
   const setDetails = ensureSetDetailsForExercise(exercise);
+  const showDoneColumn = Boolean(onToggleSetComplete) && showLoggingColumns;
+  const rowGridClass =
+    showLoggingColumns && showDoneColumn
+      ? HEADER_GRID_WITH_DONE
+      : showLoggingColumns
+        ? HEADER_GRID_NO_DONE
+        : HEADER_GRID_WITH_DONE;
 
   const sp = (e: React.MouseEvent | React.SyntheticEvent) => {
     if (stopPropagationOnInteract) e.stopPropagation();
@@ -93,7 +111,7 @@ export function ExerciseSetLogTable({
         <div className={cn(gridMinWidth)}>
           <div
             className={cn(
-              HEADER_GRID,
+              rowGridClass,
               "text-[10px] uppercase text-muted-foreground font-bold mb-1 px-0.5"
             )}
           >
@@ -105,7 +123,9 @@ export function ExerciseSetLogTable({
               <>
                 <span className="text-center text-primary">Weight</span>
                 <span className="text-right">Rest</span>
-                <span className="text-right">Done</span>
+                {showDoneColumn ? (
+                  <span className="text-right">Done</span>
+                ) : null}
               </>
             ) : (
               <>
@@ -116,7 +136,8 @@ export function ExerciseSetLogTable({
             )}
           </div>
           {setDetails.map((set, idx) => {
-            const isSetCompleted = set.completed === true;
+            const isSetCompleted =
+              showSessionCompletionState && set.completed === true;
             const shouldStrikethrough = isExerciseCompleted && !isSetCompleted;
             const repsParts = parseRepsDisplay(set.reps || "");
 
@@ -124,7 +145,7 @@ export function ExerciseSetLogTable({
               <div
                 key={idx}
                 className={cn(
-                  HEADER_GRID,
+                  rowGridClass,
                   "items-center bg-muted p-1.5 sm:p-2 rounded text-sm border border-border gap-1.5 sm:gap-2",
                   isSetCompleted && "border-emerald-500/60 bg-emerald-500/5"
                 )}
@@ -221,48 +242,50 @@ export function ExerciseSetLogTable({
                     >
                       {set.duration || set.rest || "—"}
                     </span>
-                    <button
-                      type="button"
-                      tabIndex={-1}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        sp(e);
-                        onToggleSetComplete?.(
-                          sectionIdx,
-                          exerciseIdx,
-                          idx,
-                          !isSetCompleted
-                        );
-                      }}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                      }}
-                      className={cn(
-                        "inline-flex items-center justify-end gap-1 text-[10px] font-semibold min-w-0",
-                        isSetCompleted
-                          ? "text-emerald-500"
-                          : "text-muted-foreground hover:text-emerald-500"
-                      )}
-                      aria-label={
-                        isSetCompleted
-                          ? `Mark set ${idx + 1} as incomplete`
-                          : `Mark set ${idx + 1} as complete`
-                      }
-                    >
-                      <span
+                    {showDoneColumn ? (
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          sp(e);
+                          onToggleSetComplete?.(
+                            sectionIdx,
+                            exerciseIdx,
+                            idx,
+                            !isSetCompleted
+                          );
+                        }}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                        }}
                         className={cn(
-                          "h-4 w-4 rounded-full border flex items-center justify-center text-[9px] shrink-0",
+                          "inline-flex items-center justify-end gap-1 text-[10px] font-semibold min-w-0",
                           isSetCompleted
-                            ? "bg-emerald-500 border-emerald-500 text-white"
-                            : "border-border"
+                            ? "text-emerald-500"
+                            : "text-muted-foreground hover:text-emerald-500"
                         )}
+                        aria-label={
+                          isSetCompleted
+                            ? `Mark set ${idx + 1} as incomplete`
+                            : `Mark set ${idx + 1} as complete`
+                        }
                       >
-                        {isSetCompleted ? "✓" : ""}
-                      </span>
-                      <span className="truncate">
-                        {isSetCompleted ? "Done" : "Complete"}
-                      </span>
-                    </button>
+                        <span
+                          className={cn(
+                            "h-4 w-4 rounded-full border flex items-center justify-center text-[9px] shrink-0",
+                            isSetCompleted
+                              ? "bg-emerald-500 border-emerald-500 text-white"
+                              : "border-border"
+                          )}
+                        >
+                          {isSetCompleted ? "✓" : ""}
+                        </span>
+                        <span className="truncate">
+                          {isSetCompleted ? "Done" : "Complete"}
+                        </span>
+                      </button>
+                    ) : null}
                   </>
                 ) : (
                   <>

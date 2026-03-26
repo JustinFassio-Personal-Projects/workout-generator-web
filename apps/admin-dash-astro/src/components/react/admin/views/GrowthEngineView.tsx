@@ -211,6 +211,7 @@ const GrowthEngineView: React.FC = () => {
     const run = async () => {
       setSuggestionsLoading(true);
       setSuggestionsError(null);
+      setExperimentError(null);
       try {
         const response = await fetch('/api/admin/growth-engine/messaging-suggestions?days=30', {
           credentials: 'include',
@@ -222,7 +223,6 @@ const GrowthEngineView: React.FC = () => {
         if (!cancelled) {
           setSuggestions((data as MessagingSuggestionsResponse).suggestions ?? []);
           setSuggestionsWarnings((data as MessagingSuggestionsResponse).warnings ?? []);
-          await loadExperiments();
         }
       } catch (err) {
         if (!cancelled) {
@@ -233,6 +233,17 @@ const GrowthEngineView: React.FC = () => {
         }
       } finally {
         if (!cancelled) setSuggestionsLoading(false);
+      }
+
+      // Load experiments separately so errors don't get reported as suggestions errors.
+      if (cancelled) return;
+      try {
+        await loadExperiments();
+      } catch (err) {
+        if (!cancelled) {
+          setExperimentError(err instanceof Error ? err.message : 'Failed to load experiment drafts');
+          setExperimentRows([]);
+        }
       }
     };
     run();

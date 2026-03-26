@@ -23,6 +23,12 @@ import {
 } from "@/components/ui/card";
 import { PRICING_TIERS } from "@/lib/pricing-tiers";
 import { getIdToken } from "@/lib/auth";
+import { getAppCheckHeaders } from "@/lib/firebase";
+import {
+  getOrCreatePurchaseFlowId,
+  getPurchaseFlowId,
+  trackPurchaseFunnelEvent,
+} from "@/lib/purchase-funnel-analytics";
 import { toast } from "sonner";
 import { logger } from "@/lib/logger";
 
@@ -150,13 +156,16 @@ export function PricingModal({ open, onOpenChange, user }: PricingModalProps) {
         return;
       }
 
+      const flowId = getPurchaseFlowId() || getOrCreatePurchaseFlowId();
+
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${idToken}`,
+          ...(await getAppCheckHeaders()),
         },
-        body: JSON.stringify({ tier: tierId }),
+        body: JSON.stringify({ tier: tierId, purchase_flow_id: flowId }),
       });
 
       const data = await response.json();
@@ -177,8 +186,19 @@ export function PricingModal({ open, onOpenChange, user }: PricingModalProps) {
         throw new Error(data.error || "Failed to create checkout session");
       }
 
-      // Redirect to Stripe Checkout
+      // Redirect to Stripe Checkout (URL is required; session id is best-effort for funnel correlation)
       if (data.url) {
+        const redirectProps: Record<string, unknown> = {
+          firebase_uid: user.uid,
+        };
+        if (data.sessionId) {
+          redirectProps.stripe_checkout_session_id = data.sessionId;
+        }
+        trackPurchaseFunnelEvent(
+          "purchase_stripe_redirect",
+          redirectProps,
+          flowId
+        );
         window.location.href = data.url;
       } else {
         throw new Error("No checkout URL returned");

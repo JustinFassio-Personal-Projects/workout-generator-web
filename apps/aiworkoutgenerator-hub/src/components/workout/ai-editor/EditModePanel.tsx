@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { AIExerciseService } from "@/services/ai-exercise-service";
+import { AIQuotaExceededError } from "@/lib/ai-quota-error";
 import { buildAIEditContext } from "@/lib/genkit/utils/ai-context-helpers";
 // Note: Cannot import DEFAULT_MODEL from @/lib/genkit in client components (Genkit is server-only)
 // Using the actual model name as a constant here to match the server-side DEFAULT_MODEL
@@ -235,27 +236,26 @@ export function EditModePanel({
             };
           }
 
-          // Use the detailed message if available, otherwise fall back to error field
           const errorMessage =
             errorData.message ||
             errorData.error ||
             "Failed to generate Coach Explain";
 
-          // Create error object with additional context for better error handling
-          const error = new Error(errorMessage) as Error & {
-            tier?: string;
-            remaining?: number;
-          };
+          const isAIQuotaLimit =
+            errorData.error === "AI action limit reached" &&
+            (response.status === 403 || response.status === 429);
 
-          // Attach additional context for rate limit handling
-          if (errorData.tier !== undefined) {
-            error.tier = errorData.tier;
-          }
-          if (errorData.remaining !== undefined) {
-            error.remaining = errorData.remaining;
+          if (isAIQuotaLimit) {
+            throw new AIQuotaExceededError(
+              errorData.message || errorData.error || "AI action limit reached",
+              {
+                tier: errorData.tier,
+                remaining: errorData.remaining ?? 0,
+              }
+            );
           }
 
-          throw error;
+          throw new Error(errorMessage);
         }
 
         const data: CoachExplainResponse = await response.json();
@@ -263,37 +263,28 @@ export function EditModePanel({
         toast.success("Coach Explain generated successfully!", {
           description:
             data.usage?.remaining != null
-              ? `${data.usage.remaining} AI actions remaining`
+              ? `${data.usage.remaining} Coach Explain requests remaining`
               : undefined,
         });
       } catch (err: unknown) {
-        console.error("Error generating Coach Explain:", err);
-
-        // Handle rate limit with upgrade/pricing modal (tier from API so free vs paid get correct modal)
-        if (err && typeof err === "object" && "remaining" in err) {
-          const rateErr = err as {
-            remaining?: number | null;
-            tier?: string;
-            message?: string;
-          };
-          const remaining = rateErr.remaining;
-          const tier = rateErr.tier;
-          const errorMessage =
-            err instanceof Error ? err.message : "Access denied";
-          if (remaining === 0 || remaining === null) {
-            if (tier === "basic" || tier === "pro") {
+        if (AIQuotaExceededError.is(err)) {
+          const exhausted = (err.remaining ?? 0) === 0;
+          if (exhausted) {
+            if (err.tier === "basic" || err.tier === "pro") {
               showPricingModal();
             } else {
               showUpgradeModal("coach_explain_limit");
             }
           } else {
-            toast.error(errorMessage, {
-              description: `You have ${remaining} Coach Explain requests remaining.`,
+            toast.error(err.message, {
+              description: `You have ${err.remaining} Coach Explain requests remaining.`,
             });
           }
-          setError(errorMessage);
+          setError(null);
         } else {
-          // Generic error handling
+          if (process.env.NODE_ENV === "development") {
+            console.error("Error generating Coach Explain:", err);
+          }
           const errorMessage =
             err instanceof Error
               ? err.message
@@ -429,7 +420,29 @@ export function EditModePanel({
             : undefined,
       });
     } catch (err: unknown) {
-      console.error("Error generating edit:", err);
+      if (AIQuotaExceededError.is(err)) {
+        const exhausted = (err.remaining ?? 0) === 0;
+        if (exhausted) {
+          if (err.tier === "basic" || err.tier === "pro") {
+            showPricingModal();
+          } else {
+            showUpgradeModal("ai_edit_limit");
+          }
+        } else {
+          toast.error(err.message, {
+            description:
+              err.remaining > 0
+                ? `You have ${err.remaining} AI actions remaining this month.`
+                : undefined,
+          });
+        }
+        setError(null);
+        return;
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error generating edit:", err);
+      }
 
       // Handle waiver redirect
       if (err && typeof err === "object" && "waiver_url" in err) {
@@ -443,31 +456,6 @@ export function EditModePanel({
           },
         });
         setError("Waiver agreement required");
-        return;
-      }
-
-      // Handle rate limit with upgrade/pricing modal (tier from API so free vs paid get correct modal)
-      if (err && typeof err === "object" && "remaining" in err) {
-        const rateErr = err as {
-          remaining?: number;
-          tier?: string;
-          message?: string;
-        };
-        const remaining = rateErr.remaining;
-        const tier = rateErr.tier;
-        const msg = err instanceof Error ? err.message : "Rate limit reached";
-        if (remaining === 0) {
-          if (tier === "basic" || tier === "pro") {
-            showPricingModal();
-          } else {
-            showUpgradeModal("ai_edit_limit");
-          }
-        } else {
-          toast.error(msg, {
-            description: `You have ${remaining} edits remaining this month.`,
-          });
-        }
-        setError(msg);
         return;
       }
 
@@ -635,7 +623,9 @@ export function EditModePanel({
         setAppliedEditId(editId);
         setShowFeedback(true);
       } catch (err) {
-        console.error("Error applying Coach Explain:", err);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error applying Coach Explain:", err);
+        }
         toast.error("Failed to apply Coach Explain. Please try again.");
       } finally {
         setApplying(false);
@@ -694,7 +684,9 @@ export function EditModePanel({
       setAppliedEditId(editId);
       setShowFeedback(true);
     } catch (err) {
-      console.error("Error applying edit:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error applying edit:", err);
+      }
       toast.error("Failed to apply edit. Please try again.");
     } finally {
       setApplying(false);
@@ -1013,7 +1005,9 @@ export function EditModePanel({
                   try {
                     await onUpdateImageUrl(newImageUrl);
                   } catch (error) {
-                    console.error("Failed to update image URL:", error);
+                    if (process.env.NODE_ENV === "development") {
+                      console.error("Failed to update image URL:", error);
+                    }
                     toast.error(
                       "Failed to update image. Please refresh the page."
                     );

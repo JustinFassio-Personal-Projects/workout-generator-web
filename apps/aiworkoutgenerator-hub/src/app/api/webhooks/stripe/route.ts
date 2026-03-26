@@ -9,6 +9,11 @@ import {
   type SubscriptionTier,
 } from "@/lib/stripe";
 import { logger } from "@/lib/logger";
+import { getMonetizationProfileSnapshot } from "@/lib/monetization-profile-snapshot";
+import {
+  recordPurchaseSubscriptionActivated,
+  shouldIncludeProfileSnapshotInAnalytics,
+} from "@/lib/record-purchase-subscription-analytics";
 import { captureApiError, incrementMetric } from "@/lib/sentry";
 
 // Force dynamic rendering - prevents static analysis of firebase-admin at build time
@@ -85,6 +90,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     await updateUserSubscription(uid, tier, "active", subscription.id);
     incrementMetric("stripe.conversion", 1, { tier });
+
+    const flowId =
+      typeof session.metadata?.purchase_flow_id === "string"
+        ? session.metadata.purchase_flow_id
+        : null;
+    const profileSnapshot = shouldIncludeProfileSnapshotInAnalytics()
+      ? await getMonetizationProfileSnapshot(uid)
+      : null;
+    void recordPurchaseSubscriptionActivated({
+      funnelSessionId: flowId || session.id,
+      firebaseUid: uid,
+      stripeCheckoutSessionId: session.id,
+      profileSnapshot: profileSnapshot ?? undefined,
+    });
   }
 }
 

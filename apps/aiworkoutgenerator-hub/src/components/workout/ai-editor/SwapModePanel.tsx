@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AIExerciseService } from "@/services/ai-exercise-service";
+import { AIQuotaExceededError } from "@/lib/ai-quota-error";
 import { buildAIEditContext } from "@/lib/genkit/utils/ai-context-helpers";
 import { useUpgradeModal } from "@/components/upgrade";
 import { AIProcessingState } from "./AIProcessingState";
@@ -269,7 +270,29 @@ export function SwapModePanel({
         );
       }
     } catch (err: unknown) {
-      console.error("Error generating swap:", err);
+      if (AIQuotaExceededError.is(err)) {
+        const exhausted = (err.remaining ?? 0) === 0;
+        if (exhausted) {
+          if (err.tier === "basic" || err.tier === "pro") {
+            showPricingModal();
+          } else {
+            showUpgradeModal("ai_swap_limit");
+          }
+        } else {
+          toast.error(err.message, {
+            description:
+              err.remaining > 0
+                ? `You have ${err.remaining} AI actions remaining this month.`
+                : undefined,
+          });
+        }
+        setError(null);
+        return;
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error generating swap:", err);
+      }
 
       // Handle waiver redirect
       if (err && typeof err === "object" && "waiver_url" in err) {
@@ -283,31 +306,6 @@ export function SwapModePanel({
           },
         });
         setError("Waiver agreement required");
-        return;
-      }
-
-      // Handle rate limit with upgrade/pricing modal (tier from API so free vs paid get correct modal)
-      if (err && typeof err === "object" && "remaining" in err) {
-        const rateErr = err as {
-          remaining?: number;
-          tier?: string;
-          message?: string;
-        };
-        const remaining = rateErr.remaining;
-        const tier = rateErr.tier;
-        const msg = err instanceof Error ? err.message : "Rate limit reached";
-        if (remaining === 0) {
-          if (tier === "basic" || tier === "pro") {
-            showPricingModal();
-          } else {
-            showUpgradeModal("ai_swap_limit");
-          }
-        } else {
-          toast.error(msg, {
-            description: `You have ${remaining} swaps remaining this month.`,
-          });
-        }
-        setError(msg);
         return;
       }
 
@@ -730,7 +728,9 @@ export function SwapModePanel({
                   try {
                     await onUpdateImageUrl(newImageUrl);
                   } catch (error) {
-                    console.error("Failed to update image URL:", error);
+                    if (process.env.NODE_ENV === "development") {
+                      console.error("Failed to update image URL:", error);
+                    }
                     toast.error(
                       "Failed to update image. Please refresh the page."
                     );

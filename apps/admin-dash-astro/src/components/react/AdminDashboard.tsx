@@ -30,6 +30,8 @@ import AdminDeepDiveView from './admin/AdminDeepDiveView';
 import ExerciseImageGenerator from '@/components/ExerciseImageGenerator';
 import TutorialLabView from '@/features/TutorialLab/components/TutorialLabView';
 import AnalyticsView from './admin/views/AnalyticsView';
+import GrowthEngineView from './admin/views/GrowthEngineView';
+import AnalyticsDetailView from './admin/views/AnalyticsDetailView';
 
 const navLinkClass = (isActive: boolean) =>
   `flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
@@ -105,6 +107,8 @@ const AdminDashboard: React.FC = () => {
           <Route path="/" element={<AdminLayout />}>
             <Route index element={<DashboardHome />} />
             <Route path="analytics" element={<AnalyticsView />} />
+            <Route path="growth-engine" element={<GrowthEngineView />} />
+            <Route path="analytics/details/:datasetKey" element={<AnalyticsDetailView />} />
             <Route path="users" element={<ManageUsers />} />
             <Route path="zones" element={<ManageZones />} />
             <Route path="exercises/:slug/deep-dive" element={<AdminDeepDiveView />} />

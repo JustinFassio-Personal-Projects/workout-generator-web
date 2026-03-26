@@ -29,6 +29,12 @@ const FUNNEL_EVENT_WHITELIST = new Set([
   'onboarding_create_account_clicked',
   'account_signup_complete',
   'account_login_complete',
+  // Hub monetization drop-off (Stripe checkout funnel; session_id = purchase_flow_id)
+  'purchase_paywall_opened',
+  'purchase_cta_checkout_started',
+  'purchase_checkout_session_created',
+  'purchase_stripe_redirect',
+  'purchase_return_success',
 ]);
 
 interface TrackEventBody {

@@ -20,6 +20,8 @@ import { useUser } from "@/lib/auth";
 import { exerciseHasCompletedSet } from "@/lib/workout/exerciseCompletion";
 import { generateExerciseImage } from "@/services/image/ImageGenerationService";
 import { AIExerciseService } from "@/services/ai-exercise-service";
+import { AIQuotaExceededError } from "@/lib/ai-quota-error";
+import { useUpgradeModal } from "@/components/upgrade";
 import type {
   ExerciseAIEditHistory,
   ExerciseAIAddHistoryEntry,
@@ -109,6 +111,7 @@ export function WorkoutDisplay({
   });
   const { tier } = useSubscription();
   const { user } = useUser();
+  const { showUpgradeModal, showPricingModal } = useUpgradeModal();
   const workoutRef = useRef<TrainerWorkout>(initialWorkout);
 
   // Sync with external updates
@@ -366,6 +369,30 @@ export function WorkoutDisplay({
           error: null,
         }));
       } catch (err) {
+        if (AIQuotaExceededError.is(err)) {
+          const exhausted = (err.remaining ?? 0) === 0;
+          if (exhausted) {
+            if (err.tier === "basic" || err.tier === "pro") {
+              showPricingModal();
+            } else {
+              showUpgradeModal("general");
+            }
+          } else {
+            toast.error(err.message, {
+              description:
+                err.remaining > 0
+                  ? `You have ${err.remaining} AI actions remaining this month.`
+                  : undefined,
+            });
+          }
+          setOrderCheckState((prev) => ({
+            ...prev,
+            loading: false,
+            result: null,
+            error: null,
+          }));
+          return;
+        }
         const msg =
           err instanceof Error ? err.message : "Failed to check exercise order";
         setOrderCheckState((prev) => ({
@@ -377,7 +404,7 @@ export function WorkoutDisplay({
         toast.error(msg);
       }
     },
-    [workout.id]
+    [workout.id, showPricingModal, showUpgradeModal]
   );
 
   const handleReorderExercises = useCallback(

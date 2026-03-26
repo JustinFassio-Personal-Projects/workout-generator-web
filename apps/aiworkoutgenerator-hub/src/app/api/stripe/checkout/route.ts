@@ -11,6 +11,11 @@ import {
 } from "@/lib/stripe";
 import { requireAppCheck } from "@/lib/app-check";
 import { logger } from "@/lib/logger";
+import { getMonetizationProfileSnapshot } from "@/lib/monetization-profile-snapshot";
+import {
+  recordPurchaseFunnelServerEvent,
+  shouldIncludeProfileSnapshotInAnalytics,
+} from "@/lib/record-purchase-subscription-analytics";
 import { captureApiError } from "@/lib/sentry";
 
 // Force dynamic rendering - prevents static analysis of firebase-admin at build time
@@ -22,6 +27,12 @@ export const dynamic = "force-dynamic";
 
 const RequestBodySchema = z.object({
   tier: z.enum(["basic", "pro", "elite", "coach", "coach_pro"]),
+  /** Client purchase funnel id; stored on Stripe session for webhook analytics */
+  purchase_flow_id: z
+    .string()
+    .max(64)
+    .regex(/^[a-zA-Z0-9_-]+$/)
+    .optional(),
 });
 
 // ============================================
@@ -156,7 +167,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    tier = (parseResult.data as { tier: SubscriptionTier }).tier;
+    const parsed = parseResult.data;
+    tier = parsed.tier;
+    const purchaseFlowId = parsed.purchase_flow_id;
+    const funnelSessionId =
+      purchaseFlowId || `srv_${uid}_${Date.now().toString(36)}`;
+    const profileSnapshot = shouldIncludeProfileSnapshotInAnalytics()
+      ? await getMonetizationProfileSnapshot(uid)
+      : null;
+
+    void recordPurchaseFunnelServerEvent({
+      eventName: "purchase_cta_checkout_started",
+      funnelSessionId,
+      firebaseUid: uid,
+      checkoutTier: tier,
+      idempotencyKey: `checkout_started:${funnelSessionId}:${tier}`,
+      profileSnapshot: profileSnapshot ?? undefined,
+    });
 
     // 3. Get price ID for the tier
     const tierConfig = SUBSCRIPTION_TIERS[tier];
@@ -194,6 +221,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         firebaseUID: uid,
         tier,
+        purchase_flow_id: funnelSessionId,
       },
       subscription_data: {
         metadata: {
@@ -203,6 +231,16 @@ export async function POST(request: NextRequest) {
     });
 
     // 6. Return session ID for client redirect
+    void recordPurchaseFunnelServerEvent({
+      eventName: "purchase_checkout_session_created",
+      funnelSessionId,
+      firebaseUid: uid,
+      stripeCheckoutSessionId: session.id,
+      checkoutTier: tier,
+      idempotencyKey: `checkout_session_created:${session.id}`,
+      profileSnapshot: profileSnapshot ?? undefined,
+    });
+
     return NextResponse.json({
       sessionId: session.id,
       url: session.url,

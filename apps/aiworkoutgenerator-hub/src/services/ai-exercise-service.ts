@@ -1,4 +1,5 @@
 import { getIdToken } from "@/lib/auth";
+import { AIQuotaExceededError } from "@/lib/ai-quota-error";
 import type {
   AIEditRequest,
   AIEditResponse,
@@ -83,15 +84,16 @@ export class AIExerciseService {
         error.waiver_version = errorWithVersion.waiver_version;
         throw error;
       }
-      // Quota/rate-limit 403 (e.g. free-tier limit); attach tier/remaining so UI can show correct modal
+      // Quota / plan limit 403 (e.g. free-tier lifetime cap) — expected UX, not a bug
       if (errorData.tier !== undefined || errorData.remaining !== undefined) {
-        const err = new Error(
+        throw new AIQuotaExceededError(
           errorData.message ||
-            "You don't have permission to perform this action"
-        ) as Error & { tier?: string; remaining?: number };
-        err.tier = errorData.tier;
-        err.remaining = errorData.remaining;
-        throw err;
+            "You don't have permission to perform this action",
+          {
+            tier: errorData.tier,
+            remaining: errorData.remaining ?? 0,
+          }
+        );
       }
       throw new Error(
         errorData.message || "You don't have permission to perform this action"
@@ -99,12 +101,16 @@ export class AIExerciseService {
     }
 
     if (response.status === 429) {
-      const error = new Error(
-        errorData.message || "Rate limit reached"
-      ) as Error & { tier?: string; remaining?: number };
-      error.tier = errorData.tier;
-      error.remaining = errorData.remaining;
-      throw error;
+      if (errorData.tier !== undefined || errorData.remaining !== undefined) {
+        throw new AIQuotaExceededError(
+          errorData.message || "Rate limit reached",
+          {
+            tier: errorData.tier,
+            remaining: errorData.remaining ?? 0,
+          }
+        );
+      }
+      throw new Error(errorData.message || "Rate limit reached");
     }
 
     if (response.status === 404) {

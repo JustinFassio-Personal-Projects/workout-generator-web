@@ -8,13 +8,14 @@ const FLOW_TS_KEY = "wg_purchase_flow_started_at";
 const PAYWALL_ONCE_PREFIX = "md_po_";
 const TTL_MS = 24 * 60 * 60 * 1000;
 
+/** Hub → public `/api/analytics/track-event` only; must stay in sync with astro-site whitelist. */
 export const PURCHASE_FUNNEL_EVENT_NAMES = [
   "purchase_paywall_opened",
   "purchase_cta_checkout_started",
   "purchase_checkout_session_created",
   "purchase_stripe_redirect",
   "purchase_return_success",
-  "purchase_subscription_activated",
+  // purchase_subscription_activated is server-only (Stripe webhook → track-event-internal), not public CORS.
 ] as const;
 
 export type PurchaseFunnelEventName =

@@ -277,7 +277,7 @@ export function EditModePanel({
             }
           } else {
             toast.error(err.message, {
-              description: `You have ${err.remaining} AI actions remaining.`,
+              description: `You have ${err.remaining} Coach Explain requests remaining.`,
             });
           }
           setError(null);

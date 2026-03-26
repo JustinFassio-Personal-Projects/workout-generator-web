@@ -22,6 +22,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { getIdToken } from "@/lib/auth";
 import { getAppCheckHeaders } from "@/lib/firebase";
+import {
+  getOrCreatePurchaseFlowId,
+  getPurchaseFlowId,
+  trackPurchaseFunnelEvent,
+} from "@/lib/purchase-funnel-analytics";
 import { toast } from "sonner";
 import { logger } from "@/lib/logger";
 
@@ -163,6 +168,8 @@ export function UpgradeModal({
         );
       }
 
+      const flowId = getPurchaseFlowId() || getOrCreatePurchaseFlowId();
+
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: {
@@ -170,7 +177,10 @@ export function UpgradeModal({
           Authorization: `Bearer ${idToken}`,
           ...(await getAppCheckHeaders()),
         },
-        body: JSON.stringify({ tier: checkoutTier }),
+        body: JSON.stringify({
+          tier: checkoutTier,
+          purchase_flow_id: flowId,
+        }),
       });
 
       const data = await response.json();
@@ -186,6 +196,17 @@ export function UpgradeModal({
       }
 
       if (data.url) {
+        const redirectProps: Record<string, unknown> = {
+          firebase_uid: user.uid,
+        };
+        if (data.sessionId) {
+          redirectProps.stripe_checkout_session_id = data.sessionId;
+        }
+        trackPurchaseFunnelEvent(
+          "purchase_stripe_redirect",
+          redirectProps,
+          flowId
+        );
         window.location.href = data.url;
       } else {
         throw new Error("No checkout URL returned");

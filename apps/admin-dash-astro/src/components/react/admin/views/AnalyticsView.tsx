@@ -151,6 +151,12 @@ interface MonetizationCandidateRow {
   reasons: string[];
 }
 
+interface MonetizationDropOffRow {
+  step: string;
+  completed: number;
+  dropped: number;
+}
+
 interface MonetizationCandidatesStats {
   enabled?: boolean;
   segment: 'new' | 'return';
@@ -213,6 +219,11 @@ const AnalyticsView: React.FC = () => {
   const [candidatesLoading, setCandidatesLoading] = useState(true);
   const [candidatesError, setCandidatesError] = useState<string | null>(null);
   const [candidatesSegment, setCandidatesSegment] = useState<'new' | 'return'>('new');
+  const [monetizationDropOff, setMonetizationDropOff] = useState<MonetizationDropOffRow[] | null>(
+    null
+  );
+  const [monetizationDropOffLoading, setMonetizationDropOffLoading] = useState(true);
+  const [monetizationDropOffError, setMonetizationDropOffError] = useState<string | null>(null);
   const [days, setDays] = useState(30);
 
   useEffect(() => {
@@ -412,6 +423,35 @@ const AnalyticsView: React.FC = () => {
     };
     fetchCandidates();
   }, [candidatesSegment]);
+
+  useEffect(() => {
+    const fetchMonetizationDropOff = async () => {
+      try {
+        setMonetizationDropOffLoading(true);
+        setMonetizationDropOffError(null);
+        const res = await fetch(`/api/admin/analytics/monetization-dropoff?days=${days}`, {
+          credentials: 'include',
+        });
+        const data = (await res.json()) as
+          | { monetizationDropOff: MonetizationDropOffRow[] }
+          | { error?: string };
+        if (!res.ok) {
+          throw new Error((data as { error?: string }).error ?? 'Failed to load');
+        }
+        setMonetizationDropOff(
+          (data as { monetizationDropOff: MonetizationDropOffRow[] }).monetizationDropOff ?? null
+        );
+      } catch (err) {
+        setMonetizationDropOffError(
+          err instanceof Error ? err.message : 'Failed to load monetization drop-off'
+        );
+        setMonetizationDropOff(null);
+      } finally {
+        setMonetizationDropOffLoading(false);
+      }
+    };
+    fetchMonetizationDropOff();
+  }, [days]);
 
   return (
     <div className="space-y-8">
@@ -1535,6 +1575,51 @@ const AnalyticsView: React.FC = () => {
             )}
           </div>
         )}
+      </div>
+
+      {/* Monetization drop-off (Hub Stripe funnel; analytics_funnel_events app_id=hub) */}
+      <div className="rounded-lg border border-white/10 bg-black/20 p-6">
+        <h2 className="mb-2 font-heading text-xl font-bold">Monetization drop-off</h2>
+        <p className="mb-4 text-sm text-white/60">
+          Hub checkout funnel (distinct <code className="rounded bg-white/10 px-1">session_id</code>{' '}
+          = purchase flow). Separate from paid/trial KPIs below (programs / Supabase profiles).
+        </p>
+        {monetizationDropOffLoading && <p className="text-white/60">Loading…</p>}
+        {monetizationDropOffError && <p className="text-red-400">{monetizationDropOffError}</p>}
+        {!monetizationDropOffLoading &&
+          !monetizationDropOffError &&
+          monetizationDropOff &&
+          monetizationDropOff.length > 0 && (
+            <div className="overflow-hidden rounded border border-white/10">
+              <table className="w-full text-sm">
+                <thead className="bg-black/30">
+                  <tr>
+                    <th className="px-3 py-2 text-left text-white/80">Step</th>
+                    <th className="px-3 py-2 text-right text-white/80">Completed</th>
+                    <th className="px-3 py-2 text-right text-white/80">Dropped</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {monetizationDropOff.map((row, i) => (
+                    <tr key={i}>
+                      <td className="px-3 py-2 text-white/80">{row.step}</td>
+                      <td className="px-3 py-2 text-right text-white/70">
+                        {row.completed.toLocaleString()}
+                      </td>
+                      <td className="px-3 py-2 text-right text-white/70">
+                        {row.dropped.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        {!monetizationDropOffLoading &&
+          !monetizationDropOffError &&
+          (!monetizationDropOff || monetizationDropOff.length === 0) && (
+            <p className="text-white/60">No funnel data in range.</p>
+          )}
       </div>
 
       {/* Monetization (Phase 5) */}

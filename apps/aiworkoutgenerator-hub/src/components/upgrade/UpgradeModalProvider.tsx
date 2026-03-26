@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { useUser } from "@/lib/auth";
+import { trackPurchasePaywallFirstTouch } from "@/lib/purchase-funnel-analytics";
 import type { UpgradeTrigger } from "./UpgradeModal";
 
 // Lazy-load modals to keep them out of the initial client bundle; chunks load when first opened
@@ -53,16 +54,28 @@ export function UpgradeModalProvider({ children }: { children: ReactNode }) {
   const [hasOpenedUpgrade, setHasOpenedUpgrade] = useState(false);
   const [hasOpenedPricing, setHasOpenedPricing] = useState(false);
 
-  const showUpgradeModal = useCallback((t: UpgradeTrigger = "general") => {
-    setTrigger(t);
-    setHasOpenedUpgrade(true);
-    setUpgradeOpen(true);
-  }, []);
+  const showUpgradeModal = useCallback(
+    (t: UpgradeTrigger = "general") => {
+      trackPurchasePaywallFirstTouch({
+        modal: "upgrade",
+        trigger: t,
+        firebaseUid: user?.uid ?? null,
+      });
+      setTrigger(t);
+      setHasOpenedUpgrade(true);
+      setUpgradeOpen(true);
+    },
+    [user?.uid]
+  );
 
   const showPricingModal = useCallback(() => {
+    trackPurchasePaywallFirstTouch({
+      modal: "pricing",
+      firebaseUid: user?.uid ?? null,
+    });
     setHasOpenedPricing(true);
     setPricingOpen(true);
-  }, []);
+  }, [user?.uid]);
 
   const handleViewAllPlans = useCallback(() => {
     setUpgradeOpen(false);

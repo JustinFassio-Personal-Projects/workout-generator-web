@@ -16,6 +16,13 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { PRICING_TIERS } from "@/lib/pricing-tiers";
+import { getAppCheckHeaders } from "@/lib/firebase";
+import {
+  getOrCreatePurchaseFlowId,
+  getPurchaseFlowId,
+  trackPurchaseFunnelEvent,
+  trackPurchasePaywallFirstTouch,
+} from "@/lib/purchase-funnel-analytics";
 import { logger } from "@/lib/logger";
 
 // ============================================
@@ -179,6 +186,15 @@ function PricingContent() {
     };
   }, []);
 
+  useEffect(() => {
+    if (authLoading || !user) return;
+    trackPurchasePaywallFirstTouch({
+      modal: "pricing",
+      firebaseUid: user.uid,
+      surface: "/pricing",
+    });
+  }, [authLoading, user]);
+
   const handleSubscribe = async (
     tierId: "basic" | "pro" | "elite" | "coach" | "coach_pro"
   ) => {
@@ -209,13 +225,16 @@ function PricingContent() {
         return;
       }
 
+      const flowId = getPurchaseFlowId() || getOrCreatePurchaseFlowId();
+
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${idToken}`,
+          ...(await getAppCheckHeaders()),
         },
-        body: JSON.stringify({ tier: tierId }),
+        body: JSON.stringify({ tier: tierId, purchase_flow_id: flowId }),
       });
 
       const data = await response.json();
@@ -243,8 +262,19 @@ function PricingContent() {
         throw new Error(data.error || "Failed to create checkout session");
       }
 
-      // Redirect to Stripe Checkout
+      // Redirect to Stripe Checkout (URL is required; session id is best-effort for funnel correlation)
       if (data.url) {
+        const redirectProps: Record<string, unknown> = {
+          firebase_uid: user.uid,
+        };
+        if (data.sessionId) {
+          redirectProps.stripe_checkout_session_id = data.sessionId;
+        }
+        trackPurchaseFunnelEvent(
+          "purchase_stripe_redirect",
+          redirectProps,
+          flowId
+        );
         window.location.href = data.url;
       } else {
         throw new Error("No checkout URL returned");

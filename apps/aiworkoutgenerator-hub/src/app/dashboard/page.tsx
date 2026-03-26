@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Home, Check, Clock, ChevronRight, Dumbbell } from "lucide-react";
 
@@ -21,6 +21,7 @@ import { BoardSection } from "@/components/board/BoardSection";
 import { BoardBanner } from "@/components/board/BoardBanner";
 import { useBoard } from "@/hooks/useBoard";
 import { CertificationMessagesAlert } from "@/components/certification";
+import { PurchaseReturnAnalytics } from "@/components/dashboard/PurchaseReturnAnalytics";
 
 function formatDate(
   timestamp: {
@@ -215,6 +216,9 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto py-8 max-w-4xl px-4">
+      <Suspense fallback={null}>
+        <PurchaseReturnAnalytics />
+      </Suspense>
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>

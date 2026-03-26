@@ -53,8 +53,9 @@ export function useSubscription() {
   const [workoutsWithImagesThisMonth, setWorkoutsWithImagesThisMonth] =
     useState<number>(0);
   const [countLoading, setCountLoading] = useState(false);
+  const [refreshNonce, setRefreshNonce] = useState(0);
 
-  // Fetch claims on auth change
+  // Fetch claims on auth change or explicit refresh trigger
   useEffect(() => {
     let cancelled = false;
 
@@ -90,7 +91,14 @@ export function useSubscription() {
     return () => {
       cancelled = true;
     };
-  }, [user, authLoading]);
+  }, [user, authLoading, refreshNonce]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => setRefreshNonce((n) => n + 1);
+    window.addEventListener("subscription:refresh", handler);
+    return () => window.removeEventListener("subscription:refresh", handler);
+  }, []);
 
   // Derived values
   const tier: SubscriptionTier = useMemo(() => {

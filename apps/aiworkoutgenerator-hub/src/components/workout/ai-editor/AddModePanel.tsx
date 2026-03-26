@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AIExerciseService } from "@/services/ai-exercise-service";
+import { AIQuotaExceededError } from "@/lib/ai-quota-error";
 import { buildAIEditContext } from "@/lib/genkit/utils/ai-context-helpers";
 import { useUpgradeModal } from "@/components/upgrade";
 import { AIProcessingState } from "./AIProcessingState";
@@ -246,6 +247,26 @@ export function AddModePanel({
         );
       }
     } catch (err: unknown) {
+      if (AIQuotaExceededError.is(err)) {
+        const exhausted = (err.remaining ?? 0) === 0;
+        if (exhausted) {
+          if (err.tier === "basic" || err.tier === "pro") {
+            showPricingModal();
+          } else {
+            showUpgradeModal("ai_add_limit");
+          }
+        } else {
+          toast.error(err.message, {
+            description:
+              err.remaining > 0
+                ? `You have ${err.remaining} AI actions remaining this month.`
+                : undefined,
+          });
+        }
+        setError(null);
+        return;
+      }
+
       if (err && typeof err === "object" && "waiver_url" in err) {
         const waiverUrl = (err as { waiver_url?: string }).waiver_url;
         toast.error("Waiver agreement required", {
@@ -259,31 +280,6 @@ export function AddModePanel({
             : undefined,
         });
         setError("Waiver agreement required");
-        return;
-      }
-      // Handle rate limit with upgrade/pricing modal (tier from API so free vs paid get correct modal)
-      if (err && typeof err === "object" && "remaining" in err) {
-        const rateErr = err as {
-          remaining?: number;
-          tier?: string;
-          message?: string;
-        };
-        const remaining = rateErr.remaining;
-        const tier = rateErr.tier;
-        const msg = err instanceof Error ? err.message : "Rate limit reached";
-        if (remaining === 0) {
-          // Paid users (basic/pro) see full pricing modal to upgrade tier; free users see Basic-focused upgrade modal
-          if (tier === "basic" || tier === "pro") {
-            showPricingModal();
-          } else {
-            showUpgradeModal("ai_add_limit");
-          }
-        } else {
-          toast.error(msg, {
-            description: `You have ${remaining} remaining this month.`,
-          });
-        }
-        setError(msg);
         return;
       }
       const msg =

@@ -85,10 +85,7 @@ export async function runGrowthEngineBatchJob() {
         const msg = err instanceof Error ? err.message : String(err);
         llmNarrativeMetrics.llm_narrative_status = 'error';
         llmNarrativeMetrics.llm_narrative_error = msg.slice(0, 300);
-        if (
-          process.env.NODE_ENV === 'development' ||
-          process.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true'
-        ) {
+        if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
           console.error('[growth-engine-batch] narrative error:', err);
         }
       }

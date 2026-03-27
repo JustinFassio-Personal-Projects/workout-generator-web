@@ -94,7 +94,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       typeof subscription.trial_end === "number" && subscription.trial_end > 0
         ? new Date(subscription.trial_end * 1000).toISOString()
         : null;
-    await updateUserSubscription(uid, tier, "active", subscription.id, trialEndsAt);
+    await updateUserSubscription(
+      uid,
+      tier,
+      "active",
+      subscription.id,
+      trialEndsAt
+    );
     incrementMetric("stripe.conversion", 1, { tier });
 
     const flowId =

@@ -7,6 +7,7 @@ import type { APIRoute } from 'astro';
 import { getSupabaseForAnalytics } from '@/lib/supabase/server';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const FIREBASE_UID_REGEX = /^[A-Za-z0-9_-]{6,128}$/;
 const SESSION_ID_MAX_LENGTH = 64;
 const SESSION_ID_REGEX = /^[a-zA-Z0-9_-]+$/;
 
@@ -16,6 +17,14 @@ function normalizeSessionId(raw: string | null | undefined): string | null {
   if (!trimmed || trimmed.length > SESSION_ID_MAX_LENGTH) return null;
   if (!SESSION_ID_REGEX.test(trimmed)) return null;
   return trimmed;
+}
+
+function normalizeUserId(raw: string | null | undefined): string | null {
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (UUID_REGEX.test(trimmed) || FIREBASE_UID_REGEX.test(trimmed)) return trimmed;
+  return null;
 }
 
 /** Subset allowed from trusted servers (hub API + webhook); keep tight. */
@@ -67,11 +76,18 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const userId =
-      typeof body.user_id === 'string' && UUID_REGEX.test(body.user_id) ? body.user_id : null;
     const sessionId = normalizeSessionId(body.session_id);
-    const properties =
-      body.properties && typeof body.properties === 'object' ? body.properties : {};
+    const normalizedUserId = normalizeUserId(body.user_id);
+    const properties: Record<string, unknown> =
+      body.properties && typeof body.properties === 'object' ? { ...body.properties } : {};
+    // If Hub sends user_id without properties.firebase_uid, preserve attribution for the pipeline.
+    if (
+      normalizedUserId &&
+      FIREBASE_UID_REGEX.test(normalizedUserId) &&
+      typeof properties.firebase_uid !== 'string'
+    ) {
+      properties.firebase_uid = normalizedUserId;
+    }
 
     const supabase = getSupabaseForAnalytics();
     const idempotencyKey =
@@ -122,9 +138,11 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
+    // Anon client + RLS: inserts require user_id IS NULL (see analytics_funnel_events_insert_anon).
+    // Column is uuid FK; Firebase UIDs belong in properties.firebase_uid only.
     const { error } = await supabase.from('analytics_funnel_events').insert({
       event_name: eventName,
-      user_id: userId,
+      user_id: null,
       session_id: sessionId,
       timestamp: new Date().toISOString(),
       properties: enrichedProperties,

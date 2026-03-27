@@ -6,6 +6,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
+
+import { adminFetch } from '@/lib/supabase/client/admin-fetch';
 import {
   LineChart,
   Line,
@@ -231,9 +233,7 @@ const AnalyticsView: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`/api/admin/analytics/overview?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/overview?days=${days}`);
         const data = (await res.json()) as AnalyticsOverview | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');
@@ -254,9 +254,7 @@ const AnalyticsView: React.FC = () => {
       try {
         setAcqLoading(true);
         setAcqError(null);
-        const res = await fetch(`/api/admin/analytics/acquisition?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/acquisition?days=${days}`);
         const data = (await res.json()) as AcquisitionStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');
@@ -277,9 +275,7 @@ const AnalyticsView: React.FC = () => {
       try {
         setAuthFunnelLoading(true);
         setAuthFunnelError(null);
-        const res = await fetch(`/api/admin/analytics/auth-funnel?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/auth-funnel?days=${days}`);
         const data = (await res.json()) as AuthFunnelStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');
@@ -300,9 +296,7 @@ const AnalyticsView: React.FC = () => {
       try {
         setEngagementLoading(true);
         setEngagementError(null);
-        const res = await fetch(`/api/admin/analytics/engagement?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/engagement?days=${days}`);
         const data = (await res.json()) as EngagementStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');
@@ -323,9 +317,7 @@ const AnalyticsView: React.FC = () => {
       try {
         setMonetizationLoading(true);
         setMonetizationError(null);
-        const res = await fetch(`/api/admin/analytics/monetization?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/monetization?days=${days}`);
         const data = (await res.json()) as MonetizationStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');
@@ -348,9 +340,7 @@ const AnalyticsView: React.FC = () => {
       try {
         setQualityLoading(true);
         setQualityError(null);
-        const res = await fetch(`/api/admin/analytics/quality?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/quality?days=${days}`);
         const data = (await res.json()) as QualityStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');
@@ -376,10 +366,7 @@ const AnalyticsView: React.FC = () => {
             ? 'cohortWeeks=12&periods=13&granularity=week'
             : 'cohortDays=30&periods=31&granularity=day';
         const params = `${baseParams}&activeDefinition=${retentionActiveDefinition}`;
-        const res = await fetch(
-          `/api/admin/analytics/retention-cohorts?${params}`,
-          { credentials: 'include' }
-        );
+        const res = await adminFetch(`/api/admin/analytics/retention-cohorts?${params}`);
         const data = (await res.json()) as RetentionCohortsStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');
@@ -403,10 +390,7 @@ const AnalyticsView: React.FC = () => {
         setCandidatesLoading(true);
         setCandidatesError(null);
         const params = `segment=${candidatesSegment}&windowDays=14&recentDays=7&limit=50&totalActiveLookbackDays=365`;
-        const res = await fetch(
-          `/api/admin/analytics/monetization-candidates?${params}`,
-          { credentials: 'include' }
-        );
+        const res = await adminFetch(`/api/admin/analytics/monetization-candidates?${params}`);
         const data = (await res.json()) as MonetizationCandidatesStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');
@@ -429,9 +413,7 @@ const AnalyticsView: React.FC = () => {
       try {
         setMonetizationDropOffLoading(true);
         setMonetizationDropOffError(null);
-        const res = await fetch(`/api/admin/analytics/monetization-dropoff?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/monetization-dropoff?days=${days}`);
         const data = (await res.json()) as
           | { monetizationDropOff: MonetizationDropOffRow[] }
           | { error?: string };

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import { adminFetch } from '@/lib/supabase/client/admin-fetch';
+
 import type { MonetizationDropOffRow } from './types';
 
 const MonetizationDropoffDetailPanel: React.FC = () => {
@@ -13,9 +15,7 @@ const MonetizationDropoffDetailPanel: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`/api/admin/analytics/monetization-dropoff?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/monetization-dropoff?days=${days}`);
         const data = (await res.json()) as
           | { monetizationDropOff: MonetizationDropOffRow[] }
           | { error?: string };

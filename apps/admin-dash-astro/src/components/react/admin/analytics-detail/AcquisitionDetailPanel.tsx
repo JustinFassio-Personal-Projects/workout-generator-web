@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import { adminFetch } from '@/lib/supabase/client/admin-fetch';
+
 import type { AcquisitionStats } from './types';
 
 const AcquisitionDetailPanel: React.FC = () => {
@@ -13,7 +15,7 @@ const AcquisitionDetailPanel: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`/api/admin/analytics/acquisition?days=${days}`, { credentials: 'include' });
+        const res = await adminFetch(`/api/admin/analytics/acquisition?days=${days}`);
         const data = (await res.json()) as AcquisitionStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load acquisition stats');

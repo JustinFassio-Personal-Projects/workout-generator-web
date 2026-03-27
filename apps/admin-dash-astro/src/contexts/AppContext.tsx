@@ -2,9 +2,10 @@
  * Admin-scoped AppContext: user, session, isAdmin, handleLogout.
  * Trimmed from programs AppContext for admin-dash-astro only.
  */
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import type { Session } from '@supabase/supabase-js';
+import { setAuthCookie } from '@/lib/auth-cookie';
 
 export interface AdminUser {
   uid: string;
@@ -18,6 +19,8 @@ interface AppContextType {
   user: AdminUser | null;
   session: Session | null;
   isAdmin: boolean;
+  /** True after first auth state sync (session + sb-access-token cookie). Routes should wait to avoid 401 on API calls. */
+  authHydrated: boolean;
   setProfile: (p: AdminUser | null) => void;
   handleLogout: () => Promise<void>;
 }
@@ -33,38 +36,9 @@ export const useAppContext = () => {
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<AdminUser | null>(null);
+  const [authHydrated, setAuthHydrated] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        fetchProfile(
-          session.user.id,
-          session.user.email ?? undefined,
-          session.user.user_metadata as Record<string, unknown> | undefined
-        );
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session?.user) {
-        fetchProfile(
-          session.user.id,
-          session.user.email ?? undefined,
-          session.user.user_metadata as Record<string, unknown> | undefined
-        );
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const fetchProfile = async (userId: string, email?: string, userMetadata?: Record<string, unknown>) => {
+  const fetchProfile = useCallback(async (userId: string, email?: string, userMetadata?: Record<string, unknown>) => {
     try {
       const adminUsersResult = await supabase.from('admin_users').select('id').eq('id', userId).single();
       const isAdmin = !adminUsersResult.error && !!adminUsersResult.data;
@@ -82,7 +56,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         isAdmin,
       });
     } catch (err) {
-      console.error('Profile fetch failed', err);
+      if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
+        console.error('Profile fetch failed', err);
+      }
       const adminUsersResult = await supabase.from('admin_users').select('id').eq('id', userId).single();
       const isAdmin = !adminUsersResult.error && !!adminUsersResult.data;
       setUser({
@@ -91,7 +67,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         isAdmin,
       });
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      setSession(session);
+      setAuthCookie(session);
+      setAuthHydrated(true);
+      if (session?.user) {
+        void fetchProfile(
+          session.user.id,
+          session.user.email ?? undefined,
+          session.user.user_metadata as Record<string, unknown> | undefined
+        );
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [fetchProfile]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -105,6 +107,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         user,
         session,
         isAdmin: !!user?.isAdmin,
+        authHydrated,
         setProfile: setUser,
         handleLogout,
       }}

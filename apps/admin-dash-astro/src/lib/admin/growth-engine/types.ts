@@ -29,6 +29,35 @@ export type GrowthEngineBriefSummary = {
   rulePackVersion: string;
 };
 
+/** LLM-generated narrative; numbers must be grounded in batch context (see narrative-grounding). */
+export type GrowthEngineNarrative = {
+  executiveSummary: string;
+  cardNarratives: Array<{ id: string; narrative: string }>;
+};
+
+/** Verbatim JSON input for the narrative model (grounding source of truth). */
+export type GrowthEngineNarrativeContext = {
+  schemaVersion: 'growth-engine-narrative-context-v1';
+  insightRunId: string;
+  rulePackVersion: string;
+  cards: GrowthEngineCard[];
+  batchMetrics: Record<string, unknown>;
+  recentInterventions: Array<{
+    id: string;
+    created_at: string;
+    directive_id: string | null;
+    directive_type: string | null;
+    channel: string | null;
+    target_type: string;
+    notes_excerpt: string | null;
+  }>;
+  realtimeAlerts: {
+    activeCount: number;
+    bySeverity: Record<string, number>;
+    byAlertType: Record<string, number>;
+  };
+};
+
 export type GrowthState =
   | 'trial_active'
   | 'trial_expiring_24h'
@@ -45,6 +74,8 @@ export type GrowthPipelineDriver = {
 export type GrowthPipelineRow = {
   uid: string;
   displayLabel: string;
+  /** Resolved from Hub display fields (full_name/display_name/email), else null. */
+  displayName: string | null;
   growthState: GrowthState | null;
   trialEndsAt: string | null;
   purchasedIndex: number | null;

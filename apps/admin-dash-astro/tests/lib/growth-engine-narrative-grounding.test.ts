@@ -39,6 +39,15 @@ describe('assertNarrativeDigitsGrounded', () => {
     expect(() => assertNarrativeDigitsGrounded(narrative, ctx)).toThrow(/99999/);
   });
 
+  it('rejects substring-only matches (e.g. 42 vs 142 in context)', () => {
+    const ctx = minimalContext({ batchMetrics: { monetization_rows: 142 } });
+    const narrative: GrowthEngineNarrative = {
+      executiveSummary: 'We saw 42 monetization rows.',
+      cardNarratives: [{ id: 'x', narrative: 'Ok.' }],
+    };
+    expect(() => assertNarrativeDigitsGrounded(narrative, ctx)).toThrow(/42/);
+  });
+
   it('allows narratives with no digits', () => {
     const ctx = minimalContext();
     const narrative: GrowthEngineNarrative = {

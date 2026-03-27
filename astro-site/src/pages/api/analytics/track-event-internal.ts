@@ -76,10 +76,18 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const userId = normalizeUserId(body.user_id);
     const sessionId = normalizeSessionId(body.session_id);
-    const properties =
-      body.properties && typeof body.properties === 'object' ? body.properties : {};
+    const normalizedUserId = normalizeUserId(body.user_id);
+    const properties: Record<string, unknown> =
+      body.properties && typeof body.properties === 'object' ? { ...body.properties } : {};
+    // If Hub sends user_id without properties.firebase_uid, preserve attribution for the pipeline.
+    if (
+      normalizedUserId &&
+      FIREBASE_UID_REGEX.test(normalizedUserId) &&
+      typeof properties.firebase_uid !== 'string'
+    ) {
+      properties.firebase_uid = normalizedUserId;
+    }
 
     const supabase = getSupabaseForAnalytics();
     const idempotencyKey =
@@ -130,9 +138,11 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
+    // Anon client + RLS: inserts require user_id IS NULL (see analytics_funnel_events_insert_anon).
+    // Column is uuid FK; Firebase UIDs belong in properties.firebase_uid only.
     const { error } = await supabase.from('analytics_funnel_events').insert({
       event_name: eventName,
-      user_id: userId,
+      user_id: null,
       session_id: sessionId,
       timestamp: new Date().toISOString(),
       properties: enrichedProperties,

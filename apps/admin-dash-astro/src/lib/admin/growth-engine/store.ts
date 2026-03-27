@@ -329,11 +329,18 @@ async function getRecentFunnelSignalsByUser(userIds: string[]): Promise<
       properties?: Record<string, unknown> | null;
     };
     const firebaseUid = typeof rowObj.properties?.firebase_uid === 'string' ? rowObj.properties.firebase_uid : null;
-    const userId = rowObj.user_id ?? firebaseUid;
+    // Prefer whichever id exists in byUser (Firebase pipeline keys by Hub UID; legacy rows may only have user_id).
+    let keyedUserId: string | null = null;
+    for (const candidate of [firebaseUid, rowObj.user_id]) {
+      if (typeof candidate === 'string' && candidate && byUser.has(candidate)) {
+        keyedUserId = candidate;
+        break;
+      }
+    }
     const eventName = (row as { event_name: string }).event_name;
     const ts = (row as { timestamp: string }).timestamp;
-    if (!userId || !byUser.has(userId)) continue;
-    const s = byUser.get(userId)!;
+    if (!keyedUserId) continue;
+    const s = byUser.get(keyedUserId)!;
 
     if (eventName === 'purchase_cta_checkout_started' && ts >= from7d) s.checkoutStarted7d = true;
     if (eventName === 'purchase_checkout_session_created' && ts >= from48h) s.checkoutAbandoned48h = true;

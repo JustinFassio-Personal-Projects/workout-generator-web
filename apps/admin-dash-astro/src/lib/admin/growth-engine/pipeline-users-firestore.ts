@@ -1,4 +1,4 @@
-import { FieldPath } from 'firebase-admin/firestore';
+import { FieldPath, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 import type { GrowthState } from './types';
 import { getFirebaseFirestore } from '@/lib/firebase/admin';
@@ -110,42 +110,47 @@ export async function listPipelineUsersFromFirestore(params?: {
   if (!db) return { users: [], nextCursor: null };
 
   const limit = Math.min(200, Math.max(1, params?.limit ?? 50));
-  let query = db.collection('users').orderBy(FieldPath.documentId(), 'desc').limit(limit + 1);
-  if (params?.cursor) {
-    const snap = await db.collection('users').doc(params.cursor).get();
-    if (snap.exists) query = query.startAfter(snap);
+  const growthStateFilter = params?.growthState ?? null;
+
+  const users: FirestorePipelineUser[] = [];
+  let firestoreCursor = params?.cursor ?? null;
+  let nextCursor: string | null = null;
+
+  while (users.length < limit) {
+    let query = db.collection('users').orderBy(FieldPath.documentId(), 'desc').limit(limit + 1);
+    if (firestoreCursor) {
+      const snap = await db.collection('users').doc(firestoreCursor).get();
+      if (snap.exists) query = query.startAfter(snap);
+    }
+
+    const snapshot = await query.get();
+    const docs = snapshot.docs;
+    if (docs.length === 0) {
+      nextCursor = null;
+      break;
+    }
+
+    const hasMore = docs.length > limit;
+    const batchDocs = hasMore ? docs.slice(0, limit) : docs;
+
+    for (const doc of batchDocs) {
+      const row = toFirestorePipelineUser(doc);
+      if (!growthStateFilter || row.growthState === growthStateFilter) {
+        if (users.length < limit) users.push(row);
+      }
+    }
+
+    const lastDocId = batchDocs[batchDocs.length - 1]?.id ?? null;
+    if (!hasMore) {
+      nextCursor = null;
+      break;
+    }
+    firestoreCursor = lastDocId;
+    if (users.length >= limit) {
+      nextCursor = lastDocId;
+      break;
+    }
   }
 
-  const snapshot = await query.get();
-  const docs = snapshot.docs;
-  const hasMore = docs.length > limit;
-  const selected = hasMore ? docs.slice(0, limit) : docs;
-
-  const users = selected
-    .map((doc) => {
-      const data = (doc.data() ?? {}) as FirestoreUserDoc;
-      const email = normalizeText(data.email);
-      const trialEndsAt =
-        parseTrialEndIso(data.trial_ends_at) ??
-        parseTrialEndIso(data.trial_end_at) ??
-        parseTrialEndIso(data.trial_end);
-      const growthState = deriveGrowthStateFromHubUser({
-        subscriptionTier: normalizeText(data.subscription_tier),
-        subscriptionStatus: normalizeText(data.subscription_status),
-        trialEndsAt,
-      });
-      const row: FirestorePipelineUser = {
-        id: doc.id,
-        email,
-        displayName: displayNameFromHubUser(data, email),
-        growthState,
-        trialEndsAt,
-        purchasedIndex: growthState === 'subscriber_active' ? 0 : null,
-      };
-      return row;
-    })
-    .filter((row) => (params?.growthState ? row.growthState === params.growthState : true));
-
-  const nextCursor = hasMore ? selected[selected.length - 1]?.id ?? null : null;
   return { users, nextCursor };
 }

@@ -7,6 +7,7 @@ import type { APIRoute } from 'astro';
 import { getSupabaseForAnalytics } from '@/lib/supabase/server';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const FIREBASE_UID_REGEX = /^[A-Za-z0-9_-]{6,128}$/;
 const SESSION_ID_MAX_LENGTH = 64;
 const SESSION_ID_REGEX = /^[a-zA-Z0-9_-]+$/;
 
@@ -16,6 +17,14 @@ function normalizeSessionId(raw: string | null | undefined): string | null {
   if (!trimmed || trimmed.length > SESSION_ID_MAX_LENGTH) return null;
   if (!SESSION_ID_REGEX.test(trimmed)) return null;
   return trimmed;
+}
+
+function normalizeUserId(raw: string | null | undefined): string | null {
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (UUID_REGEX.test(trimmed) || FIREBASE_UID_REGEX.test(trimmed)) return trimmed;
+  return null;
 }
 
 /** Subset allowed from trusted servers (hub API + webhook); keep tight. */
@@ -67,8 +76,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const userId =
-      typeof body.user_id === 'string' && UUID_REGEX.test(body.user_id) ? body.user_id : null;
+    const userId = normalizeUserId(body.user_id);
     const sessionId = normalizeSessionId(body.session_id);
     const properties =
       body.properties && typeof body.properties === 'object' ? body.properties : {};

@@ -11,6 +11,8 @@ import {
   YAxis,
 } from 'recharts';
 
+import { adminFetch } from '@/lib/supabase/client/admin-fetch';
+
 import type { EngagementStats } from './types';
 
 const EngagementDetailPanel: React.FC = () => {
@@ -24,9 +26,7 @@ const EngagementDetailPanel: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`/api/admin/analytics/engagement?days=${days}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/engagement?days=${days}`);
         const data = (await res.json()) as EngagementStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');

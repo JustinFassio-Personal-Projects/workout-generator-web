@@ -46,7 +46,8 @@ async function updateUserSubscription(
   uid: string,
   tier: SubscriptionTier,
   status: "active" | "canceled" | "past_due",
-  subscriptionId: string | null
+  subscriptionId: string | null,
+  trialEndsAt: string | null = null
 ) {
   // Update Firestore
   await adminDb.collection("users").doc(uid).set(
@@ -54,6 +55,7 @@ async function updateUserSubscription(
       subscription_tier: tier,
       subscription_status: status,
       stripe_subscription_id: subscriptionId,
+      trial_ends_at: trialEndsAt,
       updated_at: FieldValue.serverTimestamp(),
     },
     { merge: true }
@@ -88,7 +90,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const priceId = subscription.items.data[0]?.price.id;
     const tier = priceId ? getTierFromPriceId(priceId) : "free";
 
-    await updateUserSubscription(uid, tier, "active", subscription.id);
+    const trialEndsAt =
+      typeof subscription.trial_end === "number" && subscription.trial_end > 0
+        ? new Date(subscription.trial_end * 1000).toISOString()
+        : null;
+    await updateUserSubscription(uid, tier, "active", subscription.id, trialEndsAt);
     incrementMetric("stripe.conversion", 1, { tier });
 
     const flowId =
@@ -132,7 +138,11 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     status = "past_due";
   }
 
-  await updateUserSubscription(uid, tier, status, subscription.id);
+  const trialEndsAt =
+    typeof subscription.trial_end === "number" && subscription.trial_end > 0
+      ? new Date(subscription.trial_end * 1000).toISOString()
+      : null;
+  await updateUserSubscription(uid, tier, status, subscription.id, trialEndsAt);
 }
 
 /**
@@ -150,7 +160,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   }
 
   // Downgrade to free tier
-  await updateUserSubscription(uid, "free", "canceled", null);
+  await updateUserSubscription(uid, "free", "canceled", null, null);
 }
 
 /**

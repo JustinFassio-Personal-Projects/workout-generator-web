@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { adminFetch } from '@/lib/supabase/client/admin-fetch';
+
 type CommandCard = {
   id: string;
   title: string;
@@ -14,6 +16,11 @@ type CommandCard = {
 
 type SummaryResponse = {
   generatedAt: string | null;
+  narrativeEnabled: boolean;
+  narrative: {
+    executiveSummary: string;
+    cardNarratives: Array<{ id: string; narrative: string }>;
+  } | null;
   cards: Array<{
     id: string;
     title: string;
@@ -31,6 +38,7 @@ type SummaryResponse = {
 type PipelineRow = {
   uid: string;
   displayLabel: string;
+  displayName: string | null;
   growthState: string | null;
   trialEndsAt: string | null;
   leadScore: number;
@@ -168,7 +176,7 @@ const GrowthEngineView: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('/api/admin/growth-engine/summary', { credentials: 'include' });
+        const response = await adminFetch('/api/admin/growth-engine/summary');
         const data = (await response.json()) as SummaryResponse | { error?: string };
         if (!response.ok) {
           throw new Error((data as { error?: string })?.error ?? 'Failed to load growth summary');
@@ -191,7 +199,7 @@ const GrowthEngineView: React.FC = () => {
   }, []);
 
   const loadExperiments = async () => {
-    const response = await fetch('/api/admin/growth-engine/experiments?limit=20', { credentials: 'include' });
+    const response = await adminFetch('/api/admin/growth-engine/experiments?limit=20');
     const data = (await response.json()) as {
       rows?: ExperimentDraft[];
       error?: string;
@@ -213,9 +221,7 @@ const GrowthEngineView: React.FC = () => {
       setSuggestionsError(null);
       setExperimentError(null);
       try {
-        const response = await fetch('/api/admin/growth-engine/messaging-suggestions?days=30', {
-          credentials: 'include',
-        });
+        const response = await adminFetch('/api/admin/growth-engine/messaging-suggestions?days=30');
         const data = (await response.json()) as MessagingSuggestionsResponse | { error?: string };
         if (!response.ok) {
           throw new Error((data as { error?: string })?.error ?? 'Failed to load messaging suggestions');
@@ -258,9 +264,7 @@ const GrowthEngineView: React.FC = () => {
       setPipelineLoading(true);
       setPipelineError(null);
       try {
-        const response = await fetch(`/api/admin/growth-engine/pipeline?limit=50&sort=${pipelineSort}`, {
-          credentials: 'include',
-        });
+        const response = await adminFetch(`/api/admin/growth-engine/pipeline?limit=50&sort=${pipelineSort}`);
         const data = (await response.json()) as PipelineResponse | { error?: string };
         if (!response.ok) {
           throw new Error((data as { error?: string })?.error ?? 'Failed to load growth pipeline');
@@ -289,9 +293,9 @@ const GrowthEngineView: React.FC = () => {
       setFeatureRoiLoading(true);
       setFeatureRoiError(null);
       try {
-        const response = await fetch('/api/admin/growth-engine/feature-roi?days=30&correlationWindowDays=90', {
-          credentials: 'include',
-        });
+        const response = await adminFetch(
+          '/api/admin/growth-engine/feature-roi?days=30&correlationWindowDays=90'
+        );
         const data = (await response.json()) as FeatureRoiResponse | { error?: string };
         if (!response.ok) {
           throw new Error((data as { error?: string })?.error ?? 'Failed to load feature ROI matrix');
@@ -330,6 +334,17 @@ const GrowthEngineView: React.FC = () => {
     }));
   }, [summary]);
 
+  const narrativeByCardId = useMemo(() => {
+    const list = summary?.narrative?.cardNarratives ?? [];
+    return new Map(list.map((c) => [c.id, c.narrative]));
+  }, [summary]);
+
+  const showNarrativeConfigHint =
+    Boolean(summary?.narrativeEnabled) &&
+    !summary?.narrative?.executiveSummary &&
+    !loading &&
+    !error;
+
   const matrixCounts = useMemo(() => {
     return {
       highStrong: featureRoiRows.filter((row) => row.adoptionBucket === 'high' && row.correlationTier === 'strong').length,
@@ -344,9 +359,8 @@ const GrowthEngineView: React.FC = () => {
     setLogActionError(null);
     setLogActionSuccess(null);
     try {
-      const response = await fetch('/api/admin/growth-engine/interventions', {
+      const response = await adminFetch('/api/admin/growth-engine/interventions', {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           directive_id: suggestion.id,
@@ -374,9 +388,8 @@ const GrowthEngineView: React.FC = () => {
     setExperimentError(null);
     setExperimentSuccess(null);
     try {
-      const response = await fetch('/api/admin/growth-engine/experiments', {
+      const response = await adminFetch('/api/admin/growth-engine/experiments', {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: suggestion.title,
@@ -434,6 +447,20 @@ const GrowthEngineView: React.FC = () => {
         </Link>
       </div>
 
+      {summary?.narrative?.executiveSummary && (
+        <div className="rounded-lg border border-[#ffbf00]/20 bg-[#ffbf00]/5 p-4">
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[#ffbf00]/90">AI narrative</p>
+          <p className="text-sm leading-relaxed text-white/90">{summary.narrative.executiveSummary}</p>
+        </div>
+      )}
+
+      {showNarrativeConfigHint && (
+        <p className="text-xs text-white/40">
+          Narrative mode is enabled on the server; the latest brief has no AI narrative yet. Ensure{' '}
+          <code className="rounded bg-white/10 px-1">GEMINI_API_KEY</code> is set and run the batch job.
+        </p>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-3">
         {cards.map((card) => (
           <div key={card.id} className="rounded-lg border border-white/10 bg-black/20 p-6">
@@ -466,6 +493,12 @@ const GrowthEngineView: React.FC = () => {
                   {card.evidenceLabel}
                 </Link>
               </div>
+              {narrativeByCardId.has(card.id) && (
+                <details className="mt-3 rounded border border-white/5 bg-black/30 p-3">
+                  <summary className="cursor-pointer text-xs text-white/60">AI narrative</summary>
+                  <p className="mt-2 text-sm text-white/80">{narrativeByCardId.get(card.id)}</p>
+                </details>
+              )}
             </div>
           </div>
         ))}
@@ -504,6 +537,7 @@ const GrowthEngineView: React.FC = () => {
               <thead className="bg-black/30">
                 <tr>
                   <th className="px-3 py-2 text-left text-white/80">User</th>
+                  <th className="px-3 py-2 text-left text-white/80">Name</th>
                   <th className="px-3 py-2 text-left text-white/80">State</th>
                   <th className="px-3 py-2 text-left text-white/80">Trial ends</th>
                   <th className="px-3 py-2 text-right text-white/80">Lead score</th>
@@ -515,6 +549,7 @@ const GrowthEngineView: React.FC = () => {
                 {pipelineRows.map((row) => (
                   <tr key={row.uid}>
                     <td className="px-3 py-2 text-white/80">{row.displayLabel}</td>
+                    <td className="px-3 py-2 text-white/80">{row.displayName ?? '—'}</td>
                     <td className="px-3 py-2 text-white/70">{row.growthState ?? 'unknown'}</td>
                     <td className="px-3 py-2 text-white/70">
                       {row.trialEndsAt ? new Date(row.trialEndsAt).toLocaleDateString() : 'n/a'}

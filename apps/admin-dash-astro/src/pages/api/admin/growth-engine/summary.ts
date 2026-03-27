@@ -1,13 +1,16 @@
 import type { APIRoute } from 'astro';
 
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
+import { isGrowthEngineNarrativeEnabled } from '@/lib/admin/growth-engine/narrative-context';
 import { getActiveRealtimeAlerts, getLatestDailyBrief } from '@/lib/admin/growth-engine/store';
-import type { GrowthEngineCard } from '@/lib/admin/growth-engine/types';
+import type { GrowthEngineCard, GrowthEngineNarrative } from '@/lib/admin/growth-engine/types';
 
 type SummaryResponse = {
   generatedAt: string | null;
   insightRunId: string | null;
   rulePackVersion: string | null;
+  narrativeEnabled: boolean;
+  narrative: GrowthEngineNarrative | null;
   cards: GrowthEngineCard[];
   realtime: {
     unresolvedCount: number;
@@ -37,6 +40,8 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
       generatedAt: brief?.generated_at ?? null,
       insightRunId: brief?.insight_run_id ?? null,
       rulePackVersion: brief?.rule_pack_version ?? null,
+      narrativeEnabled: isGrowthEngineNarrativeEnabled(),
+      narrative: brief?.summary?.narrative ?? null,
       cards: brief?.summary?.cards ?? [],
       realtime: {
         unresolvedCount: alerts.length,

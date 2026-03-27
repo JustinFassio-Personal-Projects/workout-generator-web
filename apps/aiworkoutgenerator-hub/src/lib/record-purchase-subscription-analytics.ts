@@ -47,7 +47,7 @@ export async function recordPurchaseFunnelServerEvent(options: {
       body: JSON.stringify({
         event_name: options.eventName,
         session_id: options.funnelSessionId,
-        user_id: null,
+        user_id: options.firebaseUid,
         app_id: "hub",
         properties: {
           firebase_uid: options.firebaseUid,

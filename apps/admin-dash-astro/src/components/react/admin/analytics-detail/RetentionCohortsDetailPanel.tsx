@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import { adminFetch } from '@/lib/supabase/client/admin-fetch';
+
 import type { RetentionCohortsStats } from './types';
 
 const RetentionCohortsDetailPanel: React.FC = () => {
@@ -21,9 +23,7 @@ const RetentionCohortsDetailPanel: React.FC = () => {
             ? 'cohortWeeks=12&periods=13&granularity=week'
             : 'cohortDays=30&periods=31&granularity=day';
         const params = `${baseParams}&activeDefinition=${retentionActiveDefinition}`;
-        const res = await fetch(`/api/admin/analytics/retention-cohorts?${params}`, {
-          credentials: 'include',
-        });
+        const res = await adminFetch(`/api/admin/analytics/retention-cohorts?${params}`);
         const data = (await res.json()) as RetentionCohortsStats | { error?: string };
         if (!res.ok) {
           throw new Error((data as { error?: string }).error ?? 'Failed to load');

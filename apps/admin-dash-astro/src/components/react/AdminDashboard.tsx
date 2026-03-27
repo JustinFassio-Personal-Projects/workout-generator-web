@@ -47,50 +47,53 @@ const AdminLayout: React.FC = () => {
     window.location.href = adminPaths.login;
   };
   return (
-    <div className="flex h-screen bg-[#0d0500] text-white">
-      <aside className="w-64 border-r border-white/10 bg-black/20">
-        <div className="flex h-full flex-col">
-          <div className="border-b border-white/10 p-6">
-            <h1 className="text-xl font-bold">Admin Dashboard</h1>
-            <p className="mt-1 text-xs text-white/50">admin-dash-astro</p>
-          </div>
-          <nav className="flex-1 space-y-1 p-4">
-            {ADMIN_NAV_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = isAdminNavActive(item.path, location.pathname);
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.path === '/'}
-                  className={() => navLinkClass(isActive)}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
-                </NavLink>
-              );
-            })}
-          </nav>
-          <div className="space-y-1 border-t border-white/10 p-4">
-            <a
-              href={adminPaths.home}
-              className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
-            >
-              <Home className="h-5 w-5" />
-              <span className="font-medium">Return to site</span>
-            </a>
-            <button
-              onClick={onSignOut}
-              className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="font-medium">Sign out</span>
-            </button>
-          </div>
+    <div className="flex h-[100dvh] min-h-0 flex-col bg-[#0d0500] text-white md:h-screen md:flex-row">
+      {/*
+        Sidebar: avoid nav { flex: 1 } — it stretched the nav between header and account actions,
+        leaving a tall empty flex region (read as a "sticky footer" band). Stack on small screens
+        with a capped sidebar height; on md+ the whole column scrolls as one unit (no flex-1 void).
+      */}
+      <aside className="flex max-h-[min(44vh,21rem)] w-full shrink-0 flex-col overflow-y-auto overflow-x-hidden border-b border-white/10 bg-black/20 md:sticky md:top-0 md:max-h-[100dvh] md:h-[100dvh] md:w-64 md:border-r md:border-b-0">
+        <div className="shrink-0 border-b border-white/10 p-6">
+          <h1 className="text-xl font-bold">Admin Dashboard</h1>
+          <p className="mt-1 text-xs text-white/50">admin-dash-astro</p>
+        </div>
+        <nav className="space-y-1 p-4">
+          {ADMIN_NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = isAdminNavActive(item.path, location.pathname);
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                end={item.path === '/'}
+                className={() => navLinkClass(isActive)}
+              >
+                <Icon className="h-5 w-5" />
+                <span className="font-medium">{item.label}</span>
+              </NavLink>
+            );
+          })}
+        </nav>
+        <div className="shrink-0 space-y-1 border-t border-white/10 p-4">
+          <a
+            href={adminPaths.home}
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <Home className="h-5 w-5" />
+            <span className="font-medium">Return to site</span>
+          </a>
+          <button
+            onClick={onSignOut}
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="font-medium">Sign out</span>
+          </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-8">
+      <main className="min-h-0 flex-1 overflow-y-auto">
+        <div className="p-4 sm:p-8">
           <Outlet />
         </div>
       </main>
@@ -98,12 +101,19 @@ const AdminLayout: React.FC = () => {
   );
 };
 
-const AdminDashboard: React.FC = () => {
+const AdminRoutes: React.FC = () => {
+  const { authHydrated } = useAppContext();
+  if (!authHydrated) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#0d0500] text-white">
+        <p className="text-sm text-white/70">Loading session…</p>
+      </div>
+    );
+  }
   return (
-    <AppProvider>
-      <BrowserRouter basename={adminPaths.root}>
-        <Toaster richColors position="top-right" />
-        <Routes>
+    <>
+      <Toaster richColors position="top-right" />
+      <Routes>
           <Route path="/" element={<AdminLayout />}>
             <Route index element={<DashboardHome />} />
             <Route path="analytics" element={<AnalyticsView />} />
@@ -131,6 +141,15 @@ const AdminDashboard: React.FC = () => {
             <Route path="*" element={<ComingSoon />} />
           </Route>
         </Routes>
+    </>
+  );
+};
+
+const AdminDashboard: React.FC = () => {
+  return (
+    <AppProvider>
+      <BrowserRouter basename={adminPaths.root}>
+        <AdminRoutes />
       </BrowserRouter>
     </AppProvider>
   );

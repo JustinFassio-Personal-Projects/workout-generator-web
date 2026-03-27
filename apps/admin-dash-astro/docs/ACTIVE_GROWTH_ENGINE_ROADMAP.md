@@ -11,7 +11,7 @@ This document describes the **pivot** from “what happened?” to “what shoul
 
 ## Development schedule status
 
-- **Current phase:** Phase G (Phase F complete)
+- **Current phase:** Phase G complete (optional narrative shipped behind flag)
 - **Last updated:** 2026-03-26
 - **Source of truth registry:** `apps/admin-dash-astro/src/lib/admin/analytics-datasets.ts`
 - **Completed in Phase A:** route shell, static command center cards, detail-page template, sidebar/navigation wiring, canonical dataset inventory module.
@@ -259,6 +259,8 @@ Reverse trials and checkout abandonment are **time-sensitive**. A **nightly-only
 
 - [x] Phase D completed (2026-03-26).
 - Growth-state synchronization is currently driven by scheduled reconciliation; event-driven hub/webhook write-path ownership remains open.
+- Conversion pipeline user source now defaults to **Hub Firebase `users`** (`GROWTH_PIPELINE_USER_SOURCE=firebase`), with Supabase `profiles` retained as a fallback path.
+- Funnel attribution contract: Hub events must carry Firebase UID in **`properties.firebase_uid`** (and may set `user_id` only when it is a valid Supabase auth UUID). Lead scoring joins Firebase pipeline users via `properties->>firebase_uid`; widening `user_id` to text is optional future work.
 
 ### Phase E — Feature ROI matrix
 
@@ -276,8 +278,17 @@ Reverse trials and checkout abandonment are **time-sensitive**. A **nightly-only
 
 ### Phase G — LLM narrative layer (optional)
 
-- [ ] Strict **grounding** prompts; red-team for numeric fabrication.
-- [ ] Feature flag: **rules-only** vs **rules + narrative**.
+- [x] Strict **grounding** prompts (verbatim JSON context + JSON-only model output); post-parse **digit grounding** check (`assertNarrativeDigitsGrounded`).
+- [x] Feature flag: **`GROWTH_ENGINE_NARRATIVE_ENABLED`** — **rules-only** (default) vs **rules + narrative** (requires `GEMINI_API_KEY`).
+- [x] Batch writes optional `summary.narrative` on `daily_brief`; **`GET /api/admin/growth-engine/summary`** exposes `narrative` + `narrativeEnabled`; Growth Engine UI shows executive blurb + per-card **AI narrative** (`<details>`).
+- [x] Phase G completed (2026-03-26).
+
+**Red-team / QA checklist (numeric fabrication):**
+
+1. With narrative **off**, confirm batch job completes with **no** `llm_narrative_*` metrics and **no** Gemini traffic.
+2. With narrative **on** and key set, run batch; confirm `daily_brief.metrics.llm_narrative_status` is `ok` or a documented `skipped` / `error`.
+3. Inspect narrative text: any digits should appear in the grounding context (cards, `batchMetrics`, interventions, alert counts) — automated test covers the validator; spot-check for qualitative-only summaries when needed.
+4. Temporarily inject a bad mock response with a fabricated large integer and confirm grounding **throws** before persist (unit test: `growth-engine-narrative-grounding.test.ts`).
 
 ---
 

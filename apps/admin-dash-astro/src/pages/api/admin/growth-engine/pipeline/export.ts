@@ -37,12 +37,22 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
       growthState,
     });
 
-    const header = ['uid', 'display_label', 'growth_state', 'lead_score', 'score_version', 'recommended_trigger', 'insight'];
+    const header = [
+      'uid',
+      'display_name',
+      'display_label',
+      'growth_state',
+      'lead_score',
+      'score_version',
+      'recommended_trigger',
+      'insight',
+    ];
     const lines = [header.join(',')];
     for (const row of result.rows) {
       lines.push(
         [
           escapeCsv(row.uid),
+          escapeCsv(row.displayName ?? ''),
           escapeCsv(row.displayLabel),
           escapeCsv(row.growthState ?? ''),
           String(row.leadScore),

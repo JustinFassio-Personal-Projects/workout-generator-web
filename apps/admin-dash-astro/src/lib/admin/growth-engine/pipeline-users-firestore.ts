@@ -94,6 +94,28 @@ function displayNameFromHubUser(data: FirestoreUserDoc, email: string | null): s
   return at > 0 ? email.slice(0, at) : email;
 }
 
+function toFirestorePipelineUser(doc: QueryDocumentSnapshot): FirestorePipelineUser {
+  const data = (doc.data() ?? {}) as FirestoreUserDoc;
+  const email = normalizeText(data.email);
+  const trialEndsAt =
+    parseTrialEndIso(data.trial_ends_at) ??
+    parseTrialEndIso(data.trial_end_at) ??
+    parseTrialEndIso(data.trial_end);
+  const growthState = deriveGrowthStateFromHubUser({
+    subscriptionTier: normalizeText(data.subscription_tier),
+    subscriptionStatus: normalizeText(data.subscription_status),
+    trialEndsAt,
+  });
+  return {
+    id: doc.id,
+    email,
+    displayName: displayNameFromHubUser(data, email),
+    growthState,
+    trialEndsAt,
+    purchasedIndex: growthState === 'subscriber_active' ? 0 : null,
+  };
+}
+
 export function getGrowthPipelineUserSource(): GrowthPipelineUserSource {
   const raw = (process.env.GROWTH_PIPELINE_USER_SOURCE ?? '').trim().toLowerCase();
   if (raw === 'supabase') return 'supabase';
@@ -119,8 +141,8 @@ export async function listPipelineUsersFromFirestore(params?: {
   while (users.length < limit) {
     let query = db.collection('users').orderBy(FieldPath.documentId(), 'desc').limit(limit + 1);
     if (firestoreCursor) {
-      const snap = await db.collection('users').doc(firestoreCursor).get();
-      if (snap.exists) query = query.startAfter(snap);
+      // Use scalar cursor value so pagination still advances even if cursor doc was deleted.
+      query = query.startAfter(firestoreCursor);
     }
 
     const snapshot = await query.get();

@@ -71,6 +71,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   useEffect(() => {
     let mounted = true;
+
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      setSession(session);
+      setAuthCookie(session);
+      setAuthHydrated(true);
+      if (session?.user) {
+        void fetchProfile(
+          session.user.id,
+          session.user.email ?? undefined,
+          session.user.user_metadata as Record<string, unknown> | undefined
+        );
+      } else {
+        setUser(null);
+      }
+    });
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {

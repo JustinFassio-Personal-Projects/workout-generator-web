@@ -1,3 +1,5 @@
+import type { GrowthState } from '@workout-generator/growth-state';
+
 export type GrowthEngineOwner = 'Marketing' | 'Product' | 'Engineering';
 
 export type GrowthEngineSeverity = 'P1' | 'P2' | 'P3';
@@ -58,7 +60,7 @@ export type GrowthEngineNarrativeContext = {
   };
 };
 
-export type { GrowthState } from '@workout-generator/growth-state';
+export type { GrowthState };
 
 export type GrowthPipelineDriver = {
   key: string;

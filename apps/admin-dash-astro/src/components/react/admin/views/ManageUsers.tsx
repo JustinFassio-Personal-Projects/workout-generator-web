@@ -4,13 +4,15 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Search, Filter, LogOut } from 'lucide-react';
+import { Search, Filter, LogOut, RefreshCw } from 'lucide-react';
 import type {
   AdminUsersTabId,
   FirestoreHubUser,
   MergedAdminUserRow,
   UserProfile,
 } from '@/types/admin-users';
+import { ADMIN_STATS_TIMEZONE } from '@/lib/admin/adminStatsTimezone';
+import { computeSignupQuickStats, type SignupQuickStats } from '@/lib/admin/signupQuickStats';
 
 const PROVIDER_LABELS: Record<string, string> = {
   'google.com': 'Google',
@@ -29,7 +31,12 @@ function formatDate(dateString: string | null | undefined): string {
   if (!dateString) return 'N/A';
   try {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('en-US', {
+      timeZone: ADMIN_STATS_TIMEZONE,
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   } catch {
     return dateString;
   }
@@ -39,6 +46,36 @@ function purchasedLabel(purchasedIndex: number | null | undefined): string {
   if (purchasedIndex !== null && purchasedIndex !== undefined) return `Program ${purchasedIndex}`;
   return 'None';
 }
+
+function formatDeltaPct(pct: number | null): string {
+  if (pct === null) return '—';
+  const rounded = Math.round(pct * 10) / 10;
+  const body = rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1);
+  return `${pct >= 0 ? '+' : ''}${body}%`;
+}
+
+function formatHubSnapshotAt(iso: string | null): string {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleString('en-US', {
+      timeZone: ADMIN_STATS_TIMEZONE,
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+  } catch {
+    return iso;
+  }
+}
+
+type HubDashboardJson = {
+  configured: boolean;
+  generatedAt: string | null;
+  quickStats: SignupQuickStats | null;
+  users: FirestoreHubUser[];
+  totalUsers: number;
+  nextOffset: number | null;
+  excludedFromStatsCount: number;
+};
 
 /** All-tab merge is not deduped; Hub slice is first page only (see fetch when tab=all). */
 function buildMergedRows(supabase: UserProfile[], hub: FirestoreHubUser[]): MergedAdminUserRow[] {
@@ -100,22 +137,28 @@ const ManageUsers: React.FC = () => {
   const [supabaseUsers, setSupabaseUsers] = useState<UserProfile[]>([]);
   const [supabaseLoading, setSupabaseLoading] = useState(true);
 
-  const [firestoreStatus, setFirestoreStatus] = useState<'unset' | 'loading' | 'ready'>('unset');
+  const [firestoreStatus, setFirestoreStatus] = useState<'loading' | 'ready'>('loading');
   const [firestoreUsers, setFirestoreUsers] = useState<FirestoreHubUser[]>([]);
-  const [firestoreNextCursor, setFirestoreNextCursor] = useState<string | null>(null);
+  const [firestoreNextOffset, setFirestoreNextOffset] = useState<number | null>(null);
+  const [firestoreTotalUsers, setFirestoreTotalUsers] = useState(0);
   const [firestoreConfigured, setFirestoreConfigured] = useState<boolean | null>(null);
   const [firestorePageLoading, setFirestorePageLoading] = useState(false);
 
   const [mergeHubUsers, setMergeHubUsers] = useState<FirestoreHubUser[]>([]);
-  const [mergeHubLoading, setMergeHubLoading] = useState(false);
   const [mergeHubConfigured, setMergeHubConfigured] = useState<boolean | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [revokingUid, setRevokingUid] = useState<string | null>(null);
 
-  /** Avoid re-fetching Hub list when revisiting the tab; reset only on full remount. */
-  const firestoreInitialLoadDoneRef = useRef(false);
+  /** First Hub dashboard request (stats + first page of users, one Firestore snapshot). */
+  const [hubBootstrapLoading, setHubBootstrapLoading] = useState(true);
+  const [hubStatsConfigured, setHubStatsConfigured] = useState<boolean | null>(null);
+  const [hubQuickStats, setHubQuickStats] = useState<SignupQuickStats | null>(null);
+  const [hubGeneratedAt, setHubGeneratedAt] = useState<string | null>(null);
+  const [hubExcludedFromStatsCount, setHubExcludedFromStatsCount] = useState(0);
+
+  const hubPollReadyRef = useRef(false);
 
   const fetchSupabaseUsers = useCallback(async () => {
     try {
@@ -150,122 +193,117 @@ const ManageUsers: React.FC = () => {
     void fetchSupabaseUsers();
   }, [fetchSupabaseUsers]);
 
-  // Do not put `firestoreStatus` in deps: setting `loading` re-runs the effect, cleanup cancels the
-  // in-flight fetch, so Hub users never load. Gate initial fetch with a ref instead.
-  useEffect(() => {
-    if (tab !== 'firestore') return;
-    if (firestoreInitialLoadDoneRef.current) return;
+  const applyHubDashboardResponse = useCallback((data: HubDashboardJson, mode: 'replace' | 'append') => {
+    setHubStatsConfigured(data.configured);
+    setMergeHubConfigured(data.configured);
+    if (!data.configured) {
+      setHubQuickStats(null);
+      setHubGeneratedAt(null);
+      setHubExcludedFromStatsCount(0);
+      setFirestoreUsers([]);
+      setMergeHubUsers([]);
+      setFirestoreNextOffset(null);
+      setFirestoreTotalUsers(0);
+      setFirestoreConfigured(false);
+      setFirestoreStatus('ready');
+      return;
+    }
+    setHubQuickStats(data.quickStats);
+    setHubGeneratedAt(data.generatedAt);
+    setHubExcludedFromStatsCount(data.excludedFromStatsCount);
+    setFirestoreConfigured(true);
+    setFirestoreTotalUsers(data.totalUsers);
+    if (mode === 'replace') {
+      setFirestoreUsers(data.users);
+      setMergeHubUsers(data.users);
+      setFirestoreNextOffset(data.nextOffset);
+    } else {
+      setFirestoreUsers((prev) => [...prev, ...data.users]);
+      setFirestoreNextOffset(data.nextOffset);
+    }
+    setFirestoreStatus('ready');
+  }, []);
 
-    let cancelled = false;
-    setFirestoreStatus('loading');
-    setError(null);
-
-    void (async () => {
+  const fetchHubDashboard = useCallback(
+    async (offset: number, options: { append?: boolean; skipBootstrapSpinner?: boolean } = {}) => {
+      const append = options.append ?? false;
+      const skipBootstrapSpinner = options.skipBootstrapSpinner ?? false;
+      if (!append && !skipBootstrapSpinner) setHubBootstrapLoading(true);
+      if (!append) setError(null);
       try {
-        const response = await fetch('/api/admin/users/firestore?limit=100', {
+        const params = new URLSearchParams({ limit: '100', offset: String(offset) });
+        const response = await fetch(`/api/admin/users/hub-dashboard?${params}`, {
           credentials: 'include',
         });
         if (!response.ok) {
           if (response.status === 401) {
             throw new Error('Unauthorized. Please ensure you have admin access.');
           }
-          throw new Error('Failed to fetch Firestore users');
+          throw new Error('Failed to load Hub dashboard');
         }
-        const data = (await response.json()) as {
-          users: FirestoreHubUser[];
-          nextCursor: string | null;
-          configured: boolean;
-        };
-        if (cancelled) return;
-        setFirestoreConfigured(data.configured);
-        setFirestoreUsers(data.users);
-        setFirestoreNextCursor(data.nextCursor);
-        firestoreInitialLoadDoneRef.current = true;
+        const data = (await response.json()) as HubDashboardJson;
+        applyHubDashboardResponse(data, append ? 'append' : 'replace');
+        hubPollReadyRef.current = true;
       } catch (err) {
-        if (!cancelled) {
-          const msg = err instanceof Error ? err.message : 'Failed to load Firestore users';
-          setError(msg);
-          if (import.meta.env.DEV) {
-            console.error('[ManageUsers] Error fetching Firestore users (initial):', err);
-          }
+        if (!append) {
+          setHubStatsConfigured(false);
+          setHubQuickStats(null);
+          setHubGeneratedAt(null);
+          setHubExcludedFromStatsCount(0);
+          setMergeHubConfigured(false);
+          setFirestoreUsers([]);
+          setMergeHubUsers([]);
+          setFirestoreNextOffset(null);
+          setFirestoreTotalUsers(0);
+          setFirestoreConfigured(false);
+          setFirestoreStatus('ready');
         }
+        const msg = err instanceof Error ? err.message : 'Failed to load Hub data';
+        setError(msg);
+        if (import.meta.env.DEV) {
+          console.error('[ManageUsers] Hub dashboard fetch failed:', err);
+        }
+        if (append) throw err instanceof Error ? err : new Error(String(err));
       } finally {
-        if (!cancelled) setFirestoreStatus('ready');
-        else setFirestoreStatus('unset');
+        if (!append && !skipBootstrapSpinner) setHubBootstrapLoading(false);
       }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [tab]);
+    },
+    [applyHubDashboardResponse]
+  );
 
   useEffect(() => {
-    if (tab !== 'all') return;
+    void fetchHubDashboard(0, {});
+  }, [fetchHubDashboard]);
 
-    let cancelled = false;
-    setMergeHubLoading(true);
-    setError(null);
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (!hubPollReadyRef.current) return;
+      void fetchHubDashboard(0, { skipBootstrapSpinner: true });
+    }, 60_000);
+    return () => clearInterval(id);
+  }, [fetchHubDashboard]);
 
-    void (async () => {
-      try {
-        const response = await fetch('/api/admin/users/firestore?limit=100', {
-          credentials: 'include',
-        });
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error('Unauthorized. Please ensure you have admin access.');
-          }
-          throw new Error('Failed to fetch Firestore users for merge');
-        }
-        const data = (await response.json()) as {
-          users: FirestoreHubUser[];
-          configured: boolean;
-        };
-        if (cancelled) return;
-        setMergeHubConfigured(data.configured);
-        setMergeHubUsers(data.users);
-      } catch (err) {
-        if (!cancelled) {
-          const msg = err instanceof Error ? err.message : 'Failed to load merged list';
-          setError(msg);
-          if (import.meta.env.DEV) {
-            console.error('[ManageUsers] Error fetching Firestore users (merge tab):', err);
-          }
-        }
-      } finally {
-        if (!cancelled) setMergeHubLoading(false);
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === 'visible' && hubPollReadyRef.current) {
+        void fetchHubDashboard(0, { skipBootstrapSpinner: true });
       }
-    })();
-
-    return () => {
-      cancelled = true;
     };
-  }, [tab]);
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, [fetchHubDashboard]);
 
   const loadMoreFirestore = async () => {
-    if (!firestoreNextCursor || firestorePageLoading) return;
+    if (firestoreNextOffset === null || firestorePageLoading) return;
     setFirestorePageLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ limit: '100', cursor: firestoreNextCursor });
-      const response = await fetch(`/api/admin/users/firestore?${params}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        throw new Error('Failed to load more Firestore users');
-      }
-      const data = (await response.json()) as {
-        users: FirestoreHubUser[];
-        nextCursor: string | null;
-      };
-      setFirestoreUsers((prev) => [...prev, ...data.users]);
-      setFirestoreNextCursor(data.nextCursor);
+      await fetchHubDashboard(firestoreNextOffset, { append: true, skipBootstrapSpinner: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to load more';
       setError(msg);
       if (import.meta.env.DEV) {
-        console.error('[ManageUsers] Error loading more Firestore users:', err);
+        console.error('[ManageUsers] Error loading more Hub users:', err);
       }
     } finally {
       setFirestorePageLoading(false);
@@ -306,14 +344,6 @@ const ManageUsers: React.FC = () => {
     return [...supabaseUsers].sort((a, b) => compareSignupDesc(a.createdAt, b.createdAt));
   }, [supabaseUsers]);
 
-  const firestoreSortedBySignup = useMemo(() => {
-    return [...firestoreUsers].sort((a, b) => {
-      const byDate = compareSignupDesc(a.createdAt, b.createdAt);
-      if (byDate !== 0) return byDate;
-      return b.firebaseUid.localeCompare(a.firebaseUid);
-    });
-  }, [firestoreUsers]);
-
   const filteredSupabase = useMemo(() => {
     if (!searchQuery) return supabaseSortedBySignup;
     const q = searchQuery.toLowerCase();
@@ -326,16 +356,16 @@ const ManageUsers: React.FC = () => {
   }, [supabaseSortedBySignup, searchQuery]);
 
   const filteredFirestore = useMemo(() => {
-    if (!searchQuery) return firestoreSortedBySignup;
+    if (!searchQuery) return firestoreUsers;
     const q = searchQuery.toLowerCase();
-    return firestoreSortedBySignup.filter(
+    return firestoreUsers.filter(
       (user) =>
         user.email?.toLowerCase().includes(q) ||
         (user.displayName?.toLowerCase().includes(q) ?? false) ||
         user.firebaseUid.toLowerCase().includes(q) ||
         (user.growthState?.toLowerCase().includes(q) ?? false)
     );
-  }, [firestoreSortedBySignup, searchQuery]);
+  }, [firestoreUsers, searchQuery]);
 
   const filteredMerged = useMemo(() => {
     if (!searchQuery) return mergedRows;
@@ -371,12 +401,24 @@ const ManageUsers: React.FC = () => {
     return rows;
   }, [filteredMerged]);
 
+  const now = new Date();
+  const useHubQuickStats = hubStatsConfigured === true && hubQuickStats !== null;
+  const statsTzOpts = { timeZone: ADMIN_STATS_TIMEZONE };
+  const signupQuickStats = useHubQuickStats
+    ? hubQuickStats
+    : computeSignupQuickStats(supabaseUsers, now, statsTzOpts);
+
+  const quickStatsLoading = hubBootstrapLoading || (!useHubQuickStats && supabaseLoading);
+
+  /** Same hub-dashboard snapshot as list + period stats; Supabase = auth list length. */
+  const quickStatsTotalUsers = useHubQuickStats ? firestoreTotalUsers : supabaseUsers.length;
+
   const loading =
     tab === 'supabase'
       ? supabaseLoading
       : tab === 'firestore'
-        ? firestoreStatus === 'loading' || firestoreStatus === 'unset'
-        : supabaseLoading || mergeHubLoading;
+        ? firestoreStatus === 'loading'
+        : supabaseLoading || hubBootstrapLoading;
 
   const showTable =
     !error &&
@@ -384,7 +426,7 @@ const ManageUsers: React.FC = () => {
       ? !supabaseLoading
       : tab === 'firestore'
         ? firestoreStatus === 'ready'
-        : !supabaseLoading && !mergeHubLoading);
+        : !supabaseLoading && !hubBootstrapLoading);
 
   return (
     <div className="min-w-0 space-y-6">
@@ -446,8 +488,8 @@ const ManageUsers: React.FC = () => {
       )}
       {tab === 'all' && mergeHubConfigured === true && (
         <p className="text-sm text-white/50">
-          Merged view: first 100 Hub users plus all Supabase Auth users; not deduplicated. Use the
-          Firestore tab to page through Hub.
+          Merged view: same Hub snapshot as quick stats (newest signups first), first page plus all
+          Supabase Auth users; not deduplicated. Use the Firestore tab to load more Hub rows.
         </p>
       )}
 
@@ -456,6 +498,128 @@ const ManageUsers: React.FC = () => {
           Firebase Admin is not configured — cannot list Hub Firestore users.
         </p>
       )}
+
+      <div className="flex flex-wrap gap-3 rounded-lg border border-white/10 bg-black/20 p-4 backdrop-blur-sm">
+        <div className="flex w-full flex-wrap items-start justify-between gap-2">
+          <p className="min-w-0 flex-1 text-xs text-white/45">
+            {useHubQuickStats ? (
+              <>
+                Hub quick stats and table share one snapshot (sorted by signup). Calendar:{' '}
+                {ADMIN_STATS_TIMEZONE}.
+                {hubExcludedFromStatsCount > 0 && (
+                  <>
+                    {' '}
+                    {hubExcludedFromStatsCount} user
+                    {hubExcludedFromStatsCount !== 1 ? 's' : ''} missing parseable{' '}
+                    <code className="text-white/60">created_at</code> — listed but excluded from
+                    counts.
+                  </>
+                )}
+                {hubGeneratedAt && (
+                  <>
+                    {' '}
+                    Snapshot: {formatHubSnapshotAt(hubGeneratedAt)}.
+                  </>
+                )}
+              </>
+            ) : (
+              `Quick stats: Supabase Auth created_at — calendar in ${ADMIN_STATS_TIMEZONE} (Hub not configured or unavailable).`
+            )}
+          </p>
+          {useHubQuickStats && (
+            <button
+              type="button"
+              onClick={() => void fetchHubDashboard(0, {})}
+              disabled={hubBootstrapLoading}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10 disabled:opacity-50"
+              title="Reload Hub stats and first page from Firestore"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${hubBootstrapLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          )}
+        </div>
+        <div className="min-w-[140px] flex-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-white/50">
+            Today (new signups)
+          </p>
+          <p className="mt-1 font-heading text-2xl font-bold tabular-nums text-white">
+            {quickStatsLoading ? '—' : signupQuickStats.today}
+          </p>
+        </div>
+        <div className="hidden h-10 w-px self-center bg-white/10 sm:block" aria-hidden />
+        <div className="min-w-[160px] flex-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-white/50">
+            Week to date
+          </p>
+          <p className="mt-1 font-heading text-2xl font-bold tabular-nums text-white">
+            {quickStatsLoading ? '—' : signupQuickStats.wtd.count}
+          </p>
+          <p
+            className={`mt-0.5 text-sm tabular-nums ${
+              quickStatsLoading
+                ? 'text-white/40'
+                : signupQuickStats.wtd.pctVsPrev === null
+                  ? 'text-white/50'
+                  : signupQuickStats.wtd.pctVsPrev >= 0
+                    ? 'text-emerald-400/90'
+                    : 'text-rose-400/90'
+            }`}
+            title={
+              useHubQuickStats
+                ? 'vs same span last week (Firestore Hub)'
+                : 'vs same span last week (Supabase Auth)'
+            }
+          >
+            {quickStatsLoading
+              ? '—'
+              : `${formatDeltaPct(signupQuickStats.wtd.pctVsPrev)} vs prior WTD`}
+          </p>
+        </div>
+        <div className="hidden h-10 w-px self-center bg-white/10 sm:block" aria-hidden />
+        <div className="min-w-[160px] flex-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-white/50">
+            Month to date
+          </p>
+          <p className="mt-1 font-heading text-2xl font-bold tabular-nums text-white">
+            {quickStatsLoading ? '—' : signupQuickStats.mtd.count}
+          </p>
+          <p
+            className={`mt-0.5 text-sm tabular-nums ${
+              quickStatsLoading
+                ? 'text-white/40'
+                : signupQuickStats.mtd.pctVsPrev === null
+                  ? 'text-white/50'
+                  : signupQuickStats.mtd.pctVsPrev >= 0
+                    ? 'text-emerald-400/90'
+                    : 'text-rose-400/90'
+            }`}
+            title={
+              useHubQuickStats
+                ? 'vs same calendar day/time last month (Firestore Hub)'
+                : 'vs same calendar day/time last month (Supabase Auth)'
+            }
+          >
+            {quickStatsLoading
+              ? '—'
+              : `${formatDeltaPct(signupQuickStats.mtd.pctVsPrev)} vs prior MTD`}
+          </p>
+        </div>
+        <div className="hidden h-10 w-px self-center bg-white/10 sm:block" aria-hidden />
+        <div className="min-w-[120px] flex-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-white/50">Total users</p>
+          <p
+            className="mt-1 font-heading text-2xl font-bold tabular-nums text-white"
+            title={
+              useHubQuickStats
+                ? 'All Hub user documents in the current snapshot (same as table total)'
+                : 'Supabase Auth users loaded for this view'
+            }
+          >
+            {quickStatsLoading ? '—' : quickStatsTotalUsers}
+          </p>
+        </div>
+      </div>
 
       <div className="flex gap-4">
         <div className="relative flex-1">
@@ -624,9 +788,10 @@ const ManageUsers: React.FC = () => {
           <div className="flex flex-col gap-2 text-sm text-white/60 sm:flex-row sm:items-center sm:justify-between">
             <div>
               Showing {filteredFirestore.length} of {firestoreUsers.length} loaded
-              {searchQuery && ` (filtered from ${firestoreUsers.length})`}
+              {firestoreTotalUsers > 0 && ` (${firestoreTotalUsers} total in Hub)`}
+              {searchQuery && ` — filtered from ${firestoreUsers.length} on this page`}
             </div>
-            {firestoreNextCursor ? (
+            {firestoreNextOffset !== null ? (
               <button
                 type="button"
                 onClick={() => void loadMoreFirestore()}

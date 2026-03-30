@@ -425,7 +425,7 @@ async function listPipelineSeedRowsFromSupabase(params?: {
   if (error && isMissingColumnError(error)) {
     const retry = await runProfilesSelect('id, trial_ends_at, purchased_index, growth_state, full_name, email');
     if (!retry.error) {
-      data = ((retry.data ?? []) as PipelineProfileRow[]).map((row) => ({
+      data = ((retry.data ?? []) as unknown as PipelineProfileRow[]).map((row) => ({
         ...row,
         firebase_uid: null,
       }));
@@ -438,7 +438,7 @@ async function listPipelineSeedRowsFromSupabase(params?: {
     const retry2 = await runProfilesSelect('id, trial_ends_at, purchased_index, growth_state');
     if (!retry2.error) {
       data = (
-        (retry2.data ?? []) as Array<{
+        (retry2.data ?? []) as unknown as Array<{
           id: string;
           trial_ends_at: string | null;
           purchased_index: number | null;

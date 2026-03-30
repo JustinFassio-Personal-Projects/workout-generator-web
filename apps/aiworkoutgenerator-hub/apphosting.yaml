@@ -17,6 +17,10 @@
 env:
   - variable: SENTRY_DISABLE_TUNNEL
     value: "1"
+
+  # Reverse trial: server-side AI/capability enforcement (see docs/REVERSE_TRIAL_ROADMAP.md)
+  - variable: REVERSE_TRIAL_ENFORCEMENT
+    value: "true"
   # Firebase configuration - stored as secrets for security
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     secret: firebase-api-key

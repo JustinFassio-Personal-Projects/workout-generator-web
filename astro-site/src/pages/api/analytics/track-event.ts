@@ -35,6 +35,9 @@ const FUNNEL_EVENT_WHITELIST = new Set([
   'purchase_checkout_session_created',
   'purchase_stripe_redirect',
   'purchase_return_success',
+  // Hub reverse trial (Phase 4); session_id = reverse_trial correlation id
+  'trial_expired_viewed',
+  'feature_lock_click',
 ]);
 
 interface TrackEventBody {

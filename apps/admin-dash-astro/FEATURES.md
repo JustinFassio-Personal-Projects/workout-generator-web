@@ -11,7 +11,7 @@ Copy one feature at a time into this app. For each, add API routes, components, 
 | **Exercises** | `api/admin/exercises/[id]/*` (generate-page, generate-biomechanics, update-deep-dive, …) | `ManageExercises`, `AdminExerciseDetail`, `DeepDiveEditor` | ✅ Deep Dive (generate, edit) migrated |
 | **WOD Engine** | `api/wod/index.ts`, `api/ai/generate-wod`, `suggest-wod-name` | `WODEngine`, `WODEditor` views | |
 | **Warm-Up Engine** | `api/warmup-config.ts`, admin warmup API if any | `WarmUpEngine` view | |
-| **Users** | `api/admin/users.ts`, `users/[uid]/revoke.ts` | `ManageUsers` view | |
+| **Users** | `api/admin/users.ts`, `users/firestore.ts`, `users/[uid]/revoke.ts` | `ManageUsers` view | |
 | **Zones** | (if any admin API) | `ManageZones` view | |
 | **Exercise Image Lab** | `api/admin/exercises/…`, `generate-exercise-image`, etc. | `ExerciseImageGenerator`, `ExerciseVisualizationLabModal` | |
 

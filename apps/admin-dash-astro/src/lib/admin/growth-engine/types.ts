@@ -58,12 +58,7 @@ export type GrowthEngineNarrativeContext = {
   };
 };
 
-export type GrowthState =
-  | 'trial_active'
-  | 'trial_expiring_24h'
-  | 'downgraded_free'
-  | 'subscriber_active'
-  | 'churned';
+export type { GrowthState } from '@workout-generator/growth-state';
 
 export type GrowthPipelineDriver = {
   key: string;
@@ -76,6 +71,9 @@ export type GrowthPipelineRow = {
   displayLabel: string;
   /** Resolved from Hub display fields (full_name/display_name/email), else null. */
   displayName: string | null;
+  email: string | null;
+  /** Hub Firebase UID when known (Firestore pipeline uid or profiles.firebase_uid). */
+  firebaseUid: string | null;
   growthState: GrowthState | null;
   trialEndsAt: string | null;
   purchasedIndex: number | null;

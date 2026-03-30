@@ -18,14 +18,20 @@ import {
 import { toast } from "sonner";
 
 import { useUser } from "@/lib/auth";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useOnboardingStatus } from "@/hooks/useUserProfile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { WorkoutSummaryService } from "@/services/summaries/WorkoutSummaryService";
 import { getPublicSummaryUrl } from "@/lib/share-config";
+import { useUpgradeModal } from "@/components/upgrade";
+import { useReverseTrialCapabilities } from "@/components/reverse-trial/ReverseTrialCapabilitiesContext";
+import { trackFeatureLockClick } from "@/lib/reverse-trial-funnel-analytics";
+import { TrialEndedExplainerTrigger } from "@/components/reverse-trial/TrialEndedExplainer";
 import type { WorkoutSummary, SummaryAnalytics } from "@/types/workoutSummary";
 
 function formatDate(date: Date): string {
@@ -192,9 +198,12 @@ export default function SummariesPage() {
   const { user, loading: authLoading } = useUser();
   const { completed, loading: profileLoading } = useOnboardingStatus();
   const router = useRouter();
+  const { showUpgradeModal } = useUpgradeModal();
+  const { capabilities: reverseCap } = useReverseTrialCapabilities();
 
   const [summaries, setSummaries] = useState<WorkoutSummary[]>([]);
   const [analytics, setAnalytics] = useState<SummaryAnalytics | null>(null);
+  const [analyticsAccessBlocked, setAnalyticsAccessBlocked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [lastDoc, setLastDoc] =
@@ -234,21 +243,38 @@ export default function SummariesPage() {
   );
 
   const loadAnalytics = useCallback(async () => {
-    if (!user?.uid) return;
+    if (!user?.uid || !user) return;
 
+    setAnalyticsAccessBlocked(false);
     try {
-      const analyticsData = await WorkoutSummaryService.getSummaryAnalytics(
-        user.uid
-      );
+      const res = await authenticatedFetch("/api/summaries/analytics", {
+        user,
+      });
+      if (res.status === 403) {
+        const body = (await res.json().catch(() => ({}))) as {
+          code?: string;
+        };
+        if (body.code === "reverse_trial_analytics_blocked") {
+          setAnalytics(null);
+          setAnalyticsAccessBlocked(true);
+          return;
+        }
+      }
+      if (!res.ok) {
+        console.error("Failed to load analytics:", res.status);
+        return;
+      }
+      const analyticsData = (await res.json()) as SummaryAnalytics;
       setAnalytics(analyticsData);
     } catch (error) {
       console.error("Failed to load analytics:", error);
     }
-  }, [user?.uid]);
+  }, [user]);
 
   useEffect(() => {
     if (user?.uid && !authLoading && completed) {
       setLoading(true);
+      setAnalyticsAccessBlocked(false);
       setSummaries([]);
       setLastDoc(null);
       // Use a fresh function call to avoid lastDoc dependency
@@ -343,6 +369,49 @@ export default function SummariesPage() {
             </Card>
           ))}
         </div>
+      ) : analyticsAccessBlocked ? (
+        <Alert className="mb-8 border-muted-foreground/30">
+          <TrendingUp className="h-4 w-4" />
+          <AlertTitle>Analytics unavailable</AlertTitle>
+          <AlertDescription className="flex flex-col gap-3">
+            <span>
+              Detailed workout analytics are part of Premium. Subscribe to see
+              reports and trends again — your completed summaries stay in your
+              list below.
+            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="default"
+                className="shrink-0"
+                onClick={() => {
+                  trackFeatureLockClick("summaries_analytics", {
+                    firebaseUid: user?.uid ?? null,
+                    capabilities: reverseCap,
+                  });
+                  showUpgradeModal(
+                    reverseCap?.ended_reason === "churned"
+                      ? "churned_winback"
+                      : "reverse_trial_analytics"
+                  );
+                }}
+              >
+                Restore analytics
+              </Button>
+              <Button asChild size="sm" variant="outline" className="shrink-0">
+                <Link href="/pricing">View plans</Link>
+              </Button>
+              {reverseCap ? (
+                <TrialEndedExplainerTrigger
+                  endedReason={reverseCap.ended_reason}
+                  variant="outline"
+                  size="sm"
+                />
+              ) : null}
+            </div>
+          </AlertDescription>
+        </Alert>
       ) : analytics ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           <StatCard

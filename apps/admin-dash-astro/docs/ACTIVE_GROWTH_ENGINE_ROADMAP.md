@@ -180,7 +180,7 @@ Reverse trials and checkout abandonment are **time-sensitive**. A **nightly-only
 **Event-driven or near-real-time** — use for:
 
 - **Top revenue leak / checkout abandonment:** e.g. `purchase_checkout_session_created` (already written to **`analytics_funnel_events`** from hub server ingest) **without** `purchase_subscription_activated` or verified **`purchase_return_success`** within **T minutes** (recommended first value: **30**; tune with data).
-- **High-urgency reverse-trial windows** (e.g. transition into `trial_expiring_24h`) for Marketing alerts and CRM triggers.
+- **High-urgency reverse-trial windows** (e.g. `reverse_trial_expiring`) for Marketing alerts and CRM triggers.
 
 **Implementation patterns** (pick one per environment; all align with current hub → `analytics_funnel_events` pipeline):
 
@@ -218,11 +218,11 @@ Reverse trials and checkout abandonment are **time-sensitive**. A **nightly-only
 
   | State | Meaning (sketch) |
   |-------|------------------|
-  | `trial_active` | Reverse trial (or trial) in days 0–N; full premium access per product rules |
-  | `trial_expiring_24h` | High-urgency window before trial end (drives Marketing real-time alerts) |
-  | `downgraded_free` | Trial ended without conversion; on free tier |
-  | `subscriber_active` | Paying / active subscription |
-  | `churned` | Operational definition: e.g. inactive 30+ days or account deleted (product-defined) |
+  | `reverse_trial_active` | Reverse trial days 1–3 (calendar days since signup, UTC); full Pro per product rules |
+  | `reverse_trial_expiring` | Days 4–6 and/or last 24h before `trial_ends_at`; urgency window for Marketing |
+  | `reverse_trial_expired` | Trial ended without conversion; free / locked Pro per product rules |
+  | `premium_subscriber` | Paying / active subscription |
+  | `churned` | Canceled or past_due / unpaid (Hub/Firestore billing fields); sticky on `profiles` until resubscribe |
 
 - [x] **Persist** `growth_state` (and optionally `growth_state_updated_at`, `trial_ends_at`) on the **authoritative profile row the Growth Engine reads** — recommended: **Supabase `profiles`** (or adjacent table keyed by stable user id) so admin SQL, lead scoring, and `intervention_logs` joins stay simple.
 - [ ] **Keep in sync with hub reality:** billing source of truth remains **Stripe + Firebase** today; app or webhook path must **update** the Supabase field on subscription/trial transitions (scheduled job acceptable only as reconciliation, not as the primary definition).
@@ -249,11 +249,12 @@ Reverse trials and checkout abandonment are **time-sensitive**. A **nightly-only
 - [x] UI reads latest **daily_brief** + **live alerts** + shows evidence links to detail pages.
 
 - [x] Phase C completed (2026-03-26).
-- Marketing reverse-trial urgency rules remain gated until the growth state machine prerequisite ships.
+- Marketing reverse-trial urgency copy in **rule pack v1** is **unblocked** when **`GROWTH_STATE_READY`** is set on the batch job host; until then the card explains that `growth_state` is implemented but the flag is off (verification gate, not missing code).
 
 ### Phase D — Conversion pipeline & scoring
 
 - [x] Define **lead score spec v1** (document weights; version in DB) — **`growth_state` is a required input feature**.
+- [x] **Lead score v2** (`lead-score-v2`): same funnel weights as v1; lifecycle deltas updated for reverse-trial `growth_state` enum (pipeline uses v2; v1 row kept in `growth_lead_score_versions` for audit).
 - [x] Pipeline table with **explainability** tooltips.
 - [x] Optional: CSV export for CRM (with audit log).
 
@@ -261,6 +262,7 @@ Reverse trials and checkout abandonment are **time-sensitive**. A **nightly-only
 - Growth-state synchronization is currently driven by scheduled reconciliation; event-driven hub/webhook write-path ownership remains open.
 - Conversion pipeline user source now defaults to **Hub Firebase `users`** (`GROWTH_PIPELINE_USER_SOURCE=firebase`), with Supabase `profiles` retained as a fallback path.
 - Funnel attribution contract: Hub events must carry Firebase UID in **`properties.firebase_uid`** (and may set `user_id` only when it is a valid Supabase auth UUID). Lead scoring joins Firebase pipeline users via `properties->>firebase_uid`; widening `user_id` to text is optional future work.
+- **Hub profile mirror (CRM / SQL parity):** migration `20260328100000_hub_profile_firebase_sync.sql` (`firebase_uid`, `hub_synced_at`, RPC `upsert_profile_from_hub`). Sync runs inside **`POST /api/admin/growth-engine/jobs/batch`** when **`HUB_PROFILE_SYNC_ON_BATCH=true`** on the deploy; **`HUB_PROFILE_SYNC_MAX_DOCS`** caps docs per run. Pair with **`GROWTH_RECONCILE_PROFILES_ON_BATCH`** when pipeline source is still Firebase (see **REVERSE_TRIAL_ROADMAP** Phase 1 cron / Strategy B). Funnel joins use **`profiles.firebase_uid`** so **`GROWTH_PIPELINE_USER_SOURCE=supabase`** keeps signals for mirrored Hub users.
 
 ### Phase E — Feature ROI matrix
 
@@ -322,7 +324,7 @@ Reverse trials and checkout abandonment are **time-sensitive**. A **nightly-only
 
 The following are **still** product choices, but **trial/reverse-trial semantics and enum states are no longer “open during build”** — they are **Prerequisite** in §6.
 
-- **Trial length and clock start:** calendar days since `X` event (signup, first workout, feature flag) — document once; drives `trial_active` → `trial_expiring_24h` automation.
+- **Trial length and clock start:** calendar days since signup (`profiles.created_at`, UTC for v1 reconciliation) — document once; drives `reverse_trial_active` → `reverse_trial_expiring` → `reverse_trial_expired` (with optional `trial_ends_at` override; see `growth-state-derive.ts`).
 - **Churned definition:** exact inactivity window and whether uninstall is observable.
 - **Supabase vs Firebase as write path:** billing remains on Firebase/Stripe; confirm whether **`profiles.growth_state`** is updated from **hub app**, **Stripe webhook sidecar**, or **reconciliation job** (prefer event-driven updates).
 - **Where batch vs realtime jobs run:** same host as admin vs separate worker vs edge (cost vs simplicity).

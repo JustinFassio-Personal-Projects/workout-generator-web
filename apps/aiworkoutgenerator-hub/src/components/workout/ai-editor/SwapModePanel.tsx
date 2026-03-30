@@ -19,6 +19,8 @@ import { AIExerciseService } from "@/services/ai-exercise-service";
 import { AIQuotaExceededError } from "@/lib/ai-quota-error";
 import { buildAIEditContext } from "@/lib/genkit/utils/ai-context-helpers";
 import { useUpgradeModal } from "@/components/upgrade";
+import { ReverseTrialAiLockedBanner } from "@/components/reverse-trial/ReverseTrialAiLockedBanner";
+import { useReverseTrialAiLock } from "@/hooks/useReverseTrialAiLock";
 import { AIProcessingState } from "./AIProcessingState";
 import { FeedbackCollection } from "./FeedbackCollection";
 import {
@@ -86,6 +88,7 @@ export function SwapModePanel({
   );
   const bottomRef = useRef<HTMLDivElement>(null);
   const { showUpgradeModal, showPricingModal } = useUpgradeModal();
+  const { aiLocked, onLockedAction } = useReverseTrialAiLock("ai_swap_panel");
 
   // Reset post-edit state when exercise changes (indicates new dialog session)
   useEffect(() => {
@@ -139,6 +142,10 @@ export function SwapModePanel({
 
   const handleGenerateSwap = useCallback(async () => {
     if (loading) return;
+    if (aiLocked) {
+      onLockedAction();
+      return;
+    }
 
     const option = selectedSwapOption
       ? getSwapOption(selectedSwapOption)
@@ -321,6 +328,8 @@ export function SwapModePanel({
     }
   }, [
     loading,
+    aiLocked,
+    onLockedAction,
     swapReason,
     constraints,
     selectedSwapOption,
@@ -449,6 +458,7 @@ export function SwapModePanel({
 
   return (
     <div className="space-y-6">
+      <ReverseTrialAiLockedBanner />
       {/* Header: Title */}
       <Label className="text-base font-semibold">Swap Exercise</Label>
 

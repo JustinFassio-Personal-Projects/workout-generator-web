@@ -7,6 +7,7 @@
 
 import type { APIRoute } from 'astro';
 
+import { ADMIN_STATS_TIMEZONE } from '@/lib/admin/adminStatsTimezone';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { getFirebaseFirestore } from '@/lib/firebase/admin';
 import {
@@ -33,13 +34,10 @@ function parseOffset(raw: string | null): number {
   return n;
 }
 
-function serverAdminStatsTimeZone(): string {
-  if (typeof import.meta !== 'undefined' && import.meta.env?.PUBLIC_ADMIN_STATS_TIMEZONE) {
-    const z = String(import.meta.env.PUBLIC_ADMIN_STATS_TIMEZONE).trim();
-    if (z) return z;
-  }
-  return 'America/Los_Angeles';
-}
+const JSON_NO_STORE = {
+  'Content-Type': 'application/json',
+  'Cache-Control': 'no-store',
+} as const;
 
 export const GET: APIRoute = async ({ request, cookies, url }) => {
   try {
@@ -56,13 +54,15 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
           nextOffset: null,
           excludedFromStatsCount: 0,
         }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
+        { status: 200, headers: JSON_NO_STORE }
       );
     }
 
     const limit = parseLimit(url.searchParams.get('limit'));
     const offset = parseOffset(url.searchParams.get('offset'));
 
+    // Full collection read each request: trades Firestore cost for one consistent signup-sorted
+    // snapshot (stats + table + offset paging stay aligned). Cursor paging would desync sort vs stats.
     const rows = await loadAllHubUsersForAdminSnapshot();
     const totalUsers = rows.length;
     const excludedFromStatsCount = rows.filter((r) => signupMsFromPipelineRow(r) === null).length;
@@ -74,8 +74,9 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     }
 
     const now = new Date();
-    const timeZone = serverAdminStatsTimeZone();
-    const quickStats = computeSignupQuickStatsFromMs(timesMs, now, { timeZone });
+    const quickStats = computeSignupQuickStatsFromMs(timesMs, now, {
+      timeZone: ADMIN_STATS_TIMEZONE,
+    });
 
     const slice = rows.slice(offset, offset + limit);
     const users = slice.map(pipelineRowToFirestoreHubUser);
@@ -94,7 +95,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
 
     return new Response(JSON.stringify(body), {
       status: 200,
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+      headers: JSON_NO_STORE,
     });
   } catch (error) {
     if (error instanceof Error) {

@@ -159,6 +159,8 @@ const ManageUsers: React.FC = () => {
   const [hubExcludedFromStatsCount, setHubExcludedFromStatsCount] = useState(0);
 
   const hubPollReadyRef = useRef(false);
+  /** Monotonic id for replace-mode hub-dashboard fetches; drop stale responses when poll/refresh overlap. */
+  const hubDashboardReplaceGenRef = useRef(0);
 
   const fetchSupabaseUsers = useCallback(async () => {
     try {
@@ -228,6 +230,7 @@ const ManageUsers: React.FC = () => {
     async (offset: number, options: { append?: boolean; skipBootstrapSpinner?: boolean } = {}) => {
       const append = options.append ?? false;
       const skipBootstrapSpinner = options.skipBootstrapSpinner ?? false;
+      const replaceGenAtStart = !append ? ++hubDashboardReplaceGenRef.current : null;
       if (!append && !skipBootstrapSpinner) setHubBootstrapLoading(true);
       if (!append) setError(null);
       try {
@@ -242,9 +245,16 @@ const ManageUsers: React.FC = () => {
           throw new Error('Failed to load Hub dashboard');
         }
         const data = (await response.json()) as HubDashboardJson;
+        if (!append && replaceGenAtStart !== hubDashboardReplaceGenRef.current) {
+          return;
+        }
         applyHubDashboardResponse(data, append ? 'append' : 'replace');
         hubPollReadyRef.current = true;
       } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to load Hub data';
+        if (!append && replaceGenAtStart !== hubDashboardReplaceGenRef.current) {
+          return;
+        }
         if (!append) {
           setHubStatsConfigured(false);
           setHubQuickStats(null);
@@ -258,14 +268,19 @@ const ManageUsers: React.FC = () => {
           setFirestoreConfigured(false);
           setFirestoreStatus('ready');
         }
-        const msg = err instanceof Error ? err.message : 'Failed to load Hub data';
         setError(msg);
         if (import.meta.env.DEV) {
           console.error('[ManageUsers] Hub dashboard fetch failed:', err);
         }
         if (append) throw err instanceof Error ? err : new Error(String(err));
       } finally {
-        if (!append && !skipBootstrapSpinner) setHubBootstrapLoading(false);
+        if (
+          !append &&
+          !skipBootstrapSpinner &&
+          replaceGenAtStart === hubDashboardReplaceGenRef.current
+        ) {
+          setHubBootstrapLoading(false);
+        }
       }
     },
     [applyHubDashboardResponse]
@@ -275,6 +290,8 @@ const ManageUsers: React.FC = () => {
     void fetchHubDashboard(0, {});
   }, [fetchHubDashboard]);
 
+  // Admin-only page; interval refreshes stats+snapshot. Uses full Hub scan server-side by design
+  // (see hub-dashboard) so we keep a modest cadence instead of a second lighter API.
   useEffect(() => {
     const id = window.setInterval(() => {
       if (!hubPollReadyRef.current) return;
@@ -293,6 +310,8 @@ const ManageUsers: React.FC = () => {
     return () => document.removeEventListener('visibilitychange', onVis);
   }, [fetchHubDashboard]);
 
+  // Load more via hub-dashboard (not cursor firestore) so appended rows stay on the same signup-sorted
+  // snapshot as quick stats; server rescans each time by intentional tradeoff.
   const loadMoreFirestore = async () => {
     if (firestoreNextOffset === null || firestorePageLoading) return;
     setFirestorePageLoading(true);
@@ -401,12 +420,15 @@ const ManageUsers: React.FC = () => {
     return rows;
   }, [filteredMerged]);
 
-  const now = new Date();
   const useHubQuickStats = hubStatsConfigured === true && hubQuickStats !== null;
-  const statsTzOpts = { timeZone: ADMIN_STATS_TIMEZONE };
-  const signupQuickStats = useHubQuickStats
-    ? hubQuickStats
-    : computeSignupQuickStats(supabaseUsers, now, statsTzOpts);
+  const signupQuickStats = useMemo(() => {
+    if (useHubQuickStats && hubQuickStats) {
+      return hubQuickStats;
+    }
+    return computeSignupQuickStats(supabaseUsers, new Date(), {
+      timeZone: ADMIN_STATS_TIMEZONE,
+    });
+  }, [useHubQuickStats, hubQuickStats, supabaseUsers]);
 
   const quickStatsLoading = hubBootstrapLoading || (!useHubQuickStats && supabaseLoading);
 

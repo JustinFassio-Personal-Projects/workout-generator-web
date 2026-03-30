@@ -5,7 +5,7 @@
  * Signup quick stats: Hub `created_at` (ms) or Supabase rows; calendar boundaries in an IANA TZ.
  */
 
-import { startOfDay, startOfMonth, startOfWeek, subMonths } from 'date-fns';
+import { startOfDay, startOfMonth, startOfWeek, subMonths, subWeeks } from 'date-fns';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 import type { UserProfile } from '@/types/admin-users';
@@ -117,9 +117,9 @@ export function computeSignupQuickStatsFromMs(
   const weekToDate = countMsInRange(timesMs, wtdStart, now);
   const monthToDate = countMsInRange(timesMs, mtdStart, now);
 
-  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-  const prevWtdStart = new Date(wtdStart.getTime() - msPerWeek);
-  const prevWtdEnd = new Date(now.getTime() - msPerWeek);
+  // Calendar-week shift in zoned local time (not fixed ms) so prior WTD matches DST transitions.
+  const prevWtdStart = fromZonedTime(subWeeks(toZonedTime(wtdStart, timeZone), 1), timeZone);
+  const prevWtdEnd = fromZonedTime(subWeeks(toZonedTime(now, timeZone), 1), timeZone);
   const weekToDatePrev = countMsInRange(timesMs, prevWtdStart, prevWtdEnd);
 
   const prevMtdEnd = subtractMonthsPreserveClockZoned(now, 1, timeZone);

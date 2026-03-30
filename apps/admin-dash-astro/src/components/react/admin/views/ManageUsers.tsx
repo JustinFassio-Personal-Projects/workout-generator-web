@@ -51,7 +51,7 @@ function formatDeltaPct(pct: number | null): string {
   if (pct === null) return '—';
   const rounded = Math.round(pct * 10) / 10;
   const body = rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1);
-  return `${pct >= 0 ? '+' : ''}${body}%`;
+  return `${pct > 0 ? '+' : ''}${body}%`;
 }
 
 function formatHubSnapshotAt(iso: string | null): string {

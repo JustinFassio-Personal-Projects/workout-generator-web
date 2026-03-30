@@ -221,6 +221,7 @@ const ManageUsers: React.FC = () => {
       setFirestoreNextOffset(data.nextOffset);
     } else {
       setFirestoreUsers((prev) => [...prev, ...data.users]);
+      setMergeHubUsers((prev) => [...prev, ...data.users]);
       setFirestoreNextOffset(data.nextOffset);
     }
     setFirestoreStatus('ready');

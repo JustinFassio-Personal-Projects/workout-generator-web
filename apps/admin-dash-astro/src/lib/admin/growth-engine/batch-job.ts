@@ -115,8 +115,6 @@ export async function runGrowthEngineBatchJob() {
     }
   }
 
-  const latencyMs = Date.now() - startedAt;
-
   const lifecycleMetrics: Record<string, unknown> = {};
   if (isLifecycleJobOnBatchEnabled()) {
     try {
@@ -126,6 +124,8 @@ export async function runGrowthEngineBatchJob() {
         err instanceof Error ? err.message : String(err);
     }
   }
+
+  const latencyMs = Date.now() - startedAt;
 
   const row = await insertDailyBrief({
     insightRunId,

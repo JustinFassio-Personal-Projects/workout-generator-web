@@ -14,11 +14,8 @@ ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS hub_synced_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMPTZ;
 
+-- One partial index on firebase_uid is enough for equality lookups (no duplicate non-unique index on the same predicate).
 CREATE UNIQUE INDEX IF NOT EXISTS profiles_firebase_uid_uidx
-  ON public.profiles (firebase_uid)
-  WHERE firebase_uid IS NOT NULL;
-
-CREATE INDEX IF NOT EXISTS idx_profiles_firebase_uid_lookup
   ON public.profiles (firebase_uid)
   WHERE firebase_uid IS NOT NULL;
 
@@ -41,12 +38,15 @@ AS $$
 DECLARE
   v_id uuid;
   v_inserted boolean := false;
+  v_firebase_uid text;
 BEGIN
   IF p_firebase_uid IS NULL OR btrim(p_firebase_uid) = '' THEN
     RETURN jsonb_build_object('ok', false, 'error', 'missing_firebase_uid');
   END IF;
 
-  SELECT id INTO v_id FROM public.profiles WHERE firebase_uid = p_firebase_uid LIMIT 1;
+  v_firebase_uid := btrim(p_firebase_uid);
+
+  SELECT id INTO v_id FROM public.profiles WHERE firebase_uid = v_firebase_uid LIMIT 1;
 
   IF v_id IS NULL THEN
     v_id := gen_random_uuid();
@@ -65,7 +65,7 @@ BEGIN
     )
     VALUES (
       v_id,
-      btrim(p_firebase_uid),
+      v_firebase_uid,
       nullif(btrim(coalesce(p_email, '')), ''),
       nullif(btrim(coalesce(p_full_name, '')), ''),
       p_trial_ends_at,

@@ -1,4 +1,7 @@
 -- Reverse trial: replace legacy growth_state literals with reverse_trial_* + premium_subscriber.
+-- created_at must exist before predicates below; later migration 20260328100000 also ensures it.
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS created_at timestamptz DEFAULT now();
 
 UPDATE public.profiles
 SET growth_state = 'premium_subscriber'

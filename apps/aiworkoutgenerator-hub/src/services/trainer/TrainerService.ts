@@ -102,8 +102,10 @@ export class TrainerService {
         response.status === 403 &&
         errorData.code === "reverse_trial_ai_blocked"
       ) {
+        // API routes typically return `error`; some paths set `message` — prefer both.
         const msg =
-          errorData.message ||
+          errorData.message ??
+          errorData.error ??
           "Your trial period has ended. Upgrade to continue using AI workout generation.";
         const e = new Error(msg) as ErrorWithMetadata;
         e.reverseTrialAiBlocked = true;

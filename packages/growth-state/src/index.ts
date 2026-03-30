@@ -69,8 +69,8 @@ export function deriveGrowthStateFromProfileRow(
 }
 
 /**
- * Calendar day index since signup (UTC day boundaries, same formula as growth_state derivation).
- * Day 1 is the calendar day of `createdAtIso`. Returns null if missing or unparseable.
+ * Calendar day index since signup (UTC date boundaries; aligns with growth_state day buckets).
+ * Day 1 is the UTC calendar day that contains `createdAtIso`. Returns null if missing or unparseable.
  */
 export function calendarTrialDayNumberSinceSignupUtc(
   createdAtIso: string | null | undefined,
@@ -79,7 +79,16 @@ export function calendarTrialDayNumberSinceSignupUtc(
   if (!createdAtIso) return null;
   const createdMs = Date.parse(createdAtIso);
   if (!Number.isFinite(createdMs)) return null;
-  return Math.floor((nowMs - createdMs) / MS_PER_DAY) + 1;
+  const created = new Date(createdMs);
+  const now = new Date(nowMs);
+  const startUtc = Date.UTC(
+    created.getUTCFullYear(),
+    created.getUTCMonth(),
+    created.getUTCDate()
+  );
+  const nowUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const dayDiff = Math.floor((nowUtc - startUtc) / MS_PER_DAY);
+  return dayDiff + 1;
 }
 
 function dayNumberSinceCreated(createdAt: string | null, nowMs: number): number | null {

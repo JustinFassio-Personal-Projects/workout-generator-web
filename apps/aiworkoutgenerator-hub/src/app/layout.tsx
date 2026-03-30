@@ -8,6 +8,8 @@ import { SupportFAB } from "@/components/support/SupportFAB";
 import { SessionProvider } from "@/lib/session-tracker";
 import { SessionTracker } from "@/components/session-tracker";
 import { UpgradeModalProvider } from "@/components/upgrade";
+import { ReverseTrialCapabilitiesProvider } from "@/components/reverse-trial/ReverseTrialCapabilitiesContext";
+import { ReverseTrialBanner } from "@/components/reverse-trial/ReverseTrialBanner";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -53,11 +55,14 @@ export default function RootLayout({
           >
             <AuthProvider>
               <UpgradeModalProvider>
-                <SessionProvider>
-                  <SessionTracker />
-                  {children}
-                  <SupportFAB />
-                </SessionProvider>
+                <ReverseTrialCapabilitiesProvider>
+                  <SessionProvider>
+                    <SessionTracker />
+                    <ReverseTrialBanner />
+                    {children}
+                    <SupportFAB />
+                  </SessionProvider>
+                </ReverseTrialCapabilitiesProvider>
               </UpgradeModalProvider>
             </AuthProvider>
             <Toaster position="top-center" richColors />

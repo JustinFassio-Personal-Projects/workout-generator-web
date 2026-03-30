@@ -1,11 +1,13 @@
 import { getSupabaseServiceRole } from '@/lib/supabase/server';
 import type { GrowthState } from './types';
+import { deriveGrowthStateFromProfileRow } from './growth-state-derive';
 
 type ProfileStateRow = {
   id: string;
   purchased_index: number | null;
   trial_ends_at: string | null;
   growth_state: GrowthState | null;
+  created_at: string | null;
 };
 
 function isMissingColumnError(error: unknown): boolean {
@@ -13,26 +15,12 @@ function isMissingColumnError(error: unknown): boolean {
   return code === '42703';
 }
 
-function deriveGrowthState(row: Pick<ProfileStateRow, 'purchased_index' | 'trial_ends_at'>): GrowthState {
-  const purchasedIndex = row.purchased_index;
-  if (typeof purchasedIndex === 'number' && purchasedIndex >= 0) return 'subscriber_active';
-  if (!row.trial_ends_at) return 'downgraded_free';
-
-  const now = Date.now();
-  const trialEndsAt = new Date(row.trial_ends_at).getTime();
-  if (Number.isNaN(trialEndsAt)) return 'downgraded_free';
-
-  if (trialEndsAt <= now) return 'downgraded_free';
-  if (trialEndsAt - now <= 24 * 60 * 60 * 1000) return 'trial_expiring_24h';
-  return 'trial_active';
-}
-
 export async function reconcileGrowthStates(limit = 2000): Promise<{ updated: number; scanned: number }> {
   const supabase = getSupabaseServiceRole();
   let canWriteGrowthState = true;
   let result = await supabase
     .from('profiles')
-    .select('id, purchased_index, trial_ends_at, growth_state')
+    .select('id, purchased_index, trial_ends_at, growth_state, created_at')
     .order('created_at', { ascending: false })
     .limit(limit);
   if (result.error && isMissingColumnError(result.error)) {
@@ -49,6 +37,7 @@ export async function reconcileGrowthStates(limit = 2000): Promise<{ updated: nu
         purchased_index: row.purchased_index,
         growth_state: null,
         trial_ends_at: null,
+        created_at: null,
       })),
       error: null,
     } as typeof result;
@@ -59,7 +48,7 @@ export async function reconcileGrowthStates(limit = 2000): Promise<{ updated: nu
 
   const updates = rows
     .map((row) => {
-      const next = deriveGrowthState(row);
+      const next = deriveGrowthStateFromProfileRow(row);
       if (row.growth_state === next) return null;
       return { id: row.id, growth_state: next, growth_state_updated_at: new Date().toISOString() };
     })

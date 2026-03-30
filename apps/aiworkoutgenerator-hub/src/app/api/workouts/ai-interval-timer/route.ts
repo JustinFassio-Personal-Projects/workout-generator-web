@@ -20,6 +20,7 @@ import { logger } from "@/lib/logger";
 import { checkApiRateLimit } from "@/lib/rate-limit";
 import { requireAppCheck } from "@/lib/app-check";
 import { captureApiError, incrementMetric } from "@/lib/sentry";
+import { assertReverseTrialAllowsAi } from "@/lib/reverse-trial/capabilities";
 import type { AIIntervalTimerResponse } from "@/types/ai-exercise-editor";
 import type { TrainerWorkout, FitnessLevel } from "@/types/firestore";
 
@@ -91,6 +92,9 @@ export async function POST(request: NextRequest) {
 
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
+
+    const reverseTrialBlock = await assertReverseTrialAllowsAi(userId);
+    if (reverseTrialBlock) return reverseTrialBlock;
 
     const apiRateLimit = await checkApiRateLimit(userId, "ai_interval_timer");
     if (!apiRateLimit.allowed) {

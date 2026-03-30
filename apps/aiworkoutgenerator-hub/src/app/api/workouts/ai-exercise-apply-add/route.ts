@@ -10,6 +10,7 @@ import { logger } from "@/lib/logger";
 import { checkApiRateLimit } from "@/lib/rate-limit";
 import { requireAppCheck } from "@/lib/app-check";
 import { captureApiError, incrementMetric } from "@/lib/sentry";
+import { assertReverseTrialAllowsAi } from "@/lib/reverse-trial/capabilities";
 import type { TrainerWorkout, TrainerWorkoutExercise } from "@/types/firestore";
 import type { ExerciseAIAddHistoryEntry } from "@/types/ai-exercise-editor";
 
@@ -83,6 +84,9 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    const reverseTrialBlock = await assertReverseTrialAllowsAi(uid);
+    if (reverseTrialBlock) return reverseTrialBlock;
 
     const rateLimit = await checkApiRateLimit(uid, "ai_exercise_apply_add");
     if (!rateLimit.allowed) {

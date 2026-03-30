@@ -19,6 +19,8 @@ import { AIExerciseService } from "@/services/ai-exercise-service";
 import { AIQuotaExceededError } from "@/lib/ai-quota-error";
 import { buildAIEditContext } from "@/lib/genkit/utils/ai-context-helpers";
 import { useUpgradeModal } from "@/components/upgrade";
+import { ReverseTrialAiLockedBanner } from "@/components/reverse-trial/ReverseTrialAiLockedBanner";
+import { useReverseTrialAiLock } from "@/hooks/useReverseTrialAiLock";
 import { AIProcessingState } from "./AIProcessingState";
 import { FeedbackCollection } from "./FeedbackCollection";
 import { SWAP_OPTIONS, getSwapOption } from "./constants";
@@ -70,6 +72,7 @@ export function AddModePanel({
   const [showFeedback, setShowFeedback] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const { showUpgradeModal, showPricingModal } = useUpgradeModal();
+  const { aiLocked, onLockedAction } = useReverseTrialAiLock("ai_add_panel");
 
   const addedExerciseIndex =
     insertPosition === "before" ? exerciseIndex : exerciseIndex + 1;
@@ -121,6 +124,10 @@ export function AddModePanel({
 
   const handleGenerate = useCallback(async () => {
     if (loading) return;
+    if (aiLocked) {
+      onLockedAction();
+      return;
+    }
 
     const opt = selectedOptionId ? getSwapOption(selectedOptionId) : null;
     const isSearchByName = opt?.requiresInput === true;
@@ -293,6 +300,8 @@ export function AddModePanel({
     }
   }, [
     loading,
+    aiLocked,
+    onLockedAction,
     addReason,
     constraints,
     selectedOptionId,
@@ -381,6 +390,7 @@ export function AddModePanel({
 
   return (
     <div className="space-y-6">
+      <ReverseTrialAiLockedBanner />
       <Label className="text-base font-semibold">Add Exercise</Label>
 
       <div>

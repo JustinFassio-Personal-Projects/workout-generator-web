@@ -42,7 +42,7 @@ export function buildBatchCards(input: RuleInput): GrowthEngineCard[] {
             ? 'Growth-state-aware lifecycle segmentation is active, but retention sample size is still building.'
             : `Lifecycle segments are active; latest first-period retention is ${d1Pct}%.`,
         action:
-          'Target trial and recovery journeys by growth_state segment with urgency and value reinforcement copy.',
+          'Target reverse_trial_expiring and reverse_trial_expired cohorts (and churned win-back) using growth_state-aware journeys, urgency in days 4–6, and recovery offers after expiry.',
         executionMode: 'batch',
         evidence: {
           datasetKey: 'retention-cohorts',
@@ -55,16 +55,17 @@ export function buildBatchCards(input: RuleInput): GrowthEngineCard[] {
         title: 'Top conversion opportunity',
         owner: 'Marketing',
         severity: 'P2',
-        signal: 'Marketing lifecycle rule is gated: growth_state prerequisite is not shipped yet.',
+        signal:
+          'growth_state labeling is shipped (Supabase reconcile + Hub/Firestore pipeline); cohort messaging stays conservative until GROWTH_STATE_READY is enabled on the batch host.',
         action:
-          'Ship growth_state write path before enabling reverse-trial urgency and churn-risk segmentation rules.',
+          'After verifying production segmentation (profiles + pipeline), set GROWTH_STATE_READY=true on the Growth Engine cron environment to unlock reverse_trial_* / churned cohort copy.',
         executionMode: 'batch',
         evidence: {
           datasetKey: 'retention-cohorts',
           label: 'View retention detail',
           path: '/analytics/details/retention-cohorts',
         },
-        metadata: { blocked: true, gate: 'growth_state_prerequisite' },
+        metadata: { blocked: true, gate: 'growth_state_ready_env' },
       };
 
   const productCard: GrowthEngineCard = {

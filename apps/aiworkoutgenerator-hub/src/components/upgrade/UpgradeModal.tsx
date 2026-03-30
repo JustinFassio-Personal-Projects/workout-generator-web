@@ -41,7 +41,19 @@ export type UpgradeTrigger =
   | "ai_add_limit"
   | "coach_explain_limit"
   | "image_limit"
+  | "reverse_trial_ai"
+  | "reverse_trial_analytics"
+  | "churned_winback"
   | "general";
+
+/** Loss-aversion / post-trial paywall — show Premium entry ($11.99) copy (see PHASE2_APP_STRIPE_NOTE). */
+export function isPremiumEntryUpgradeTrigger(trigger: UpgradeTrigger): boolean {
+  return (
+    trigger === "reverse_trial_ai" ||
+    trigger === "reverse_trial_analytics" ||
+    trigger === "churned_winback"
+  );
+}
 
 interface UpgradeModalProps {
   open: boolean;
@@ -89,7 +101,31 @@ const TRIGGER_COPY: Record<
     headline: "Upgrade to unlock more",
     subtext: "Get more workouts, AI Actions, and premium features.",
   },
+  reverse_trial_ai: {
+    headline: "Your Pro trial ended — keep building with Premium",
+    subtext:
+      "You still have every workout you created. Subscribe to unlock AI generation and coaching tools again.",
+  },
+  reverse_trial_analytics: {
+    headline: "Analytics are part of Premium",
+    subtext:
+      "Restore advanced workout reports and trends. Your completed workouts stay in your library.",
+  },
+  churned_winback: {
+    headline: "Welcome back — restore your full access",
+    subtext:
+      "Reactivate Premium to get AI workouts, analytics, and the features you had before.",
+  },
 };
+
+/** Display pricing for post-trial / win-back modal (entry paid tier; Stripe price from env). */
+const PREMIUM_ENTRY_PRICE_LABEL = 11.99;
+const PREMIUM_ENTRY_FEATURES = [
+  "20 AI-generated workouts/month",
+  "100 AI Actions/month (edits, adds, swaps)",
+  "Workout history analytics",
+  "Basic exercise library & check-ins",
+];
 
 const BASIC_FEATURES = [
   "20 AI-generated workouts/month",
@@ -115,6 +151,10 @@ export function UpgradeModal({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const copy = TRIGGER_COPY[trigger];
+  const premiumEntry = isPremiumEntryUpgradeTrigger(trigger);
+  const featureList = premiumEntry ? PREMIUM_ENTRY_FEATURES : BASIC_FEATURES;
+  const displayPrice = premiumEntry ? PREMIUM_ENTRY_PRICE_LABEL : 5.99;
+  const planLabel = premiumEntry ? "Premium" : "Basic";
 
   const handleUpgrade = async () => {
     if (!user) {
@@ -228,7 +268,11 @@ export function UpgradeModal({
     if (onViewAllPlans) {
       onViewAllPlans();
     } else {
-      router.push("/pricing");
+      router.push(
+        isPremiumEntryUpgradeTrigger(trigger)
+          ? "/pricing?from=trial_ended"
+          : "/pricing"
+      );
     }
     onOpenChange(false);
   };
@@ -255,19 +299,32 @@ export function UpgradeModal({
         <div className="px-6 pb-6 space-y-5">
           {/* Price + trial badge */}
           <div className="text-center space-y-2">
+            {premiumEntry ? (
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {planLabel}
+              </p>
+            ) : null}
             <div className="flex items-baseline justify-center gap-1">
-              <span className="text-4xl font-bold tracking-tight">$5.99</span>
+              <span className="text-4xl font-bold tracking-tight">
+                ${displayPrice.toFixed(2)}
+              </span>
               <span className="text-muted-foreground text-base">/month</span>
             </div>
-            <div className="inline-flex items-center gap-1.5 bg-green-500/10 text-green-700 dark:text-green-400 text-sm font-medium px-3 py-1 rounded-full">
-              <Sparkles className="h-3.5 w-3.5" />
-              7-day free trial included
-            </div>
+            {premiumEntry ? (
+              <div className="inline-flex items-center gap-1.5 bg-muted text-muted-foreground text-sm font-medium px-3 py-1 rounded-full">
+                Billed monthly · Cancel anytime
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 bg-green-500/10 text-green-700 dark:text-green-400 text-sm font-medium px-3 py-1 rounded-full">
+                <Sparkles className="h-3.5 w-3.5" />
+                7-day free trial included
+              </div>
+            )}
           </div>
 
           {/* Features list */}
           <ul className="space-y-2.5">
-            {BASIC_FEATURES.map((feature) => (
+            {featureList.map((feature) => (
               <li key={feature} className="flex items-start gap-2.5">
                 <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
                 <span className="text-sm">{feature}</span>
@@ -289,7 +346,7 @@ export function UpgradeModal({
             ) : (
               <>
                 <Zap className="mr-2 h-5 w-5" />
-                Start Free Trial
+                {premiumEntry ? "Subscribe to Premium" : "Start Free Trial"}
               </>
             )}
           </Button>

@@ -21,6 +21,7 @@ import { logger } from "@/lib/logger";
 import { checkApiRateLimit } from "@/lib/rate-limit";
 import { requireAppCheck } from "@/lib/app-check";
 import { captureApiError, incrementMetric } from "@/lib/sentry";
+import { assertReverseTrialAllowsAi } from "@/lib/reverse-trial/capabilities";
 import type { TrainerWorkout } from "@/types/firestore";
 
 export const dynamic = "force-dynamic";
@@ -53,6 +54,9 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    const reverseTrialBlock = await assertReverseTrialAllowsAi(uid);
+    if (reverseTrialBlock) return reverseTrialBlock;
 
     const apiRateLimit = await checkApiRateLimit(
       uid,

@@ -39,6 +39,8 @@ type PipelineRow = {
   uid: string;
   displayLabel: string;
   displayName: string | null;
+  email?: string | null;
+  firebaseUid?: string | null;
   growthState: string | null;
   trialEndsAt: string | null;
   leadScore: number;

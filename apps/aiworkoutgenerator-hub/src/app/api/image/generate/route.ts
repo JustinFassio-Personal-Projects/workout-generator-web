@@ -8,6 +8,7 @@ import { logger } from "@/lib/logger";
 import { checkApiRateLimit } from "@/lib/rate-limit";
 import { requireAppCheck } from "@/lib/app-check";
 import { captureApiError, incrementMetric } from "@/lib/sentry";
+import { assertReverseTrialAllowsAi } from "@/lib/reverse-trial/capabilities";
 
 // Force dynamic rendering - prevents static analysis of firebase-admin at build time
 export const dynamic = "force-dynamic";
@@ -483,6 +484,9 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    const reverseTrialBlock = await assertReverseTrialAllowsAi(uid);
+    if (reverseTrialBlock) return reverseTrialBlock;
 
     // 2. Per-user rate limit
     const rateLimit = await checkApiRateLimit(uid, "image_generate");

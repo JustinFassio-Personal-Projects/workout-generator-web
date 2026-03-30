@@ -13,11 +13,12 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+/** @deprecated Prefer {@link computeLeadScoreV2}; v1 predates reverse-trial `GrowthState` enum. */
 function growthStateDelta(state: GrowthState | null): number {
-  if (state === 'trial_expiring_24h') return 25;
-  if (state === 'trial_active') return 15;
-  if (state === 'downgraded_free') return 10;
-  if (state === 'subscriber_active') return -20;
+  if (state === 'reverse_trial_expiring') return 25;
+  if (state === 'reverse_trial_active') return 15;
+  if (state === 'reverse_trial_expired') return 10;
+  if (state === 'premium_subscriber') return -20;
   if (state === 'churned') return 5;
   return 0;
 }

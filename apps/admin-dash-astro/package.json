@@ -26,6 +26,7 @@
     "@workout-generator/content-generation-lab": "*",
     "@workout-generator/design-system": "*",
     "@workout-generator/exercise-mapping": "*",
+    "@workout-generator/growth-state": "*",
     "astro": "^5.0.0",
     "clsx": "^2.1.1",
     "dompurify": "^3.3.1",

@@ -10,6 +10,7 @@ import { logger } from "@/lib/logger";
 import { checkApiRateLimit } from "@/lib/rate-limit";
 import { requireAppCheck } from "@/lib/app-check";
 import { captureApiError, incrementMetric } from "@/lib/sentry";
+import { assertReverseTrialAllowsAi } from "@/lib/reverse-trial/capabilities";
 import type { SubscriptionTier } from "@/lib/stripe";
 import type { TrainerWorkout, TrainerWorkoutSection } from "@/types/firestore";
 
@@ -132,6 +133,9 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    const reverseTrialBlock = await assertReverseTrialAllowsAi(uid);
+    if (reverseTrialBlock) return reverseTrialBlock;
 
     // 2. Per-user rate limit
     const rateLimit = await checkApiRateLimit(uid, "generate_images");

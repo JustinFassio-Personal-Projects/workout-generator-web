@@ -1,6 +1,7 @@
 import { getSupabaseServiceRole } from '@/lib/supabase/server';
 import { LEAD_SCORE_SPEC_V1, LEAD_SCORE_VERSION_V1 } from './lead-score-spec-v1';
-import { computeLeadScoreV1 } from './lead-score-v1';
+import { LEAD_SCORE_SPEC_V2, LEAD_SCORE_VERSION_V2 } from './lead-score-spec-v2';
+import { computeLeadScoreV2 } from './lead-score-v2';
 import {
   getGrowthPipelineUserSource,
   listPipelineUsersFromFirestore,
@@ -39,6 +40,7 @@ type PipelineProfileRow = {
   growth_state: GrowthState | null;
   full_name: string | null;
   email: string | null;
+  firebase_uid: string | null;
 };
 
 type PipelineSeedRow = {
@@ -48,6 +50,7 @@ type PipelineSeedRow = {
   growth_state: GrowthState | null;
   full_name: string | null;
   email: string | null;
+  firebase_uid: string | null;
 };
 
 function pipelineDisplayName(row: PipelineProfileRow): string | null {
@@ -217,25 +220,26 @@ export async function getRealtimeAlertSummaryForNarrative(): Promise<{
 
 export async function upsertLeadScoreSpecVersion() {
   const supabase = getSupabaseServiceRole();
-  const { data, error } = await supabase
-    .from('growth_lead_score_versions')
-    .upsert(
-      {
-        version: LEAD_SCORE_VERSION_V1,
-        spec_json: LEAD_SCORE_SPEC_V1,
-      },
-      { onConflict: 'version' }
-    )
-    .select('version')
-    .single();
-
-  if (error || !data) {
-    if (isMissingTableError(error)) {
-      return { version: LEAD_SCORE_VERSION_V1 };
+  const versions = [
+    { version: LEAD_SCORE_VERSION_V1, spec_json: LEAD_SCORE_SPEC_V1 },
+    { version: LEAD_SCORE_VERSION_V2, spec_json: LEAD_SCORE_SPEC_V2 },
+  ];
+  let lastVersion = LEAD_SCORE_VERSION_V2;
+  for (const row of versions) {
+    const { data, error } = await supabase
+      .from('growth_lead_score_versions')
+      .upsert(row, { onConflict: 'version' })
+      .select('version')
+      .single();
+    if (error) {
+      if (isMissingTableError(error)) {
+        return { version: lastVersion };
+      }
+      throw error;
     }
-    throw error ?? new Error('Failed to upsert lead score version');
+    if (data) lastVersion = (data as { version: string }).version;
   }
-  return data as { version: string };
+  return { version: lastVersion };
 }
 
 async function getRecentFunnelSignalsByUser(userIds: string[]): Promise<
@@ -256,7 +260,22 @@ async function getRecentFunnelSignalsByUser(userIds: string[]): Promise<
   const from48h = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();
 
   const uuidIds = userIds.filter(isSupabaseProfileUuid);
-  const firebaseIds = userIds.filter((id) => !isSupabaseProfileUuid(id));
+  const firebaseIds = new Set(userIds.filter((id) => !isSupabaseProfileUuid(id)));
+
+  /** Map Hub firebase_uid → Supabase profile UUID (mirrored profiles). */
+  const firebaseUidToProfileId = new Map<string, string>();
+  if (uuidIds.length > 0) {
+    const { data, error } = await supabase.from('profiles').select('id, firebase_uid').in('id', uuidIds);
+    if (!error && data) {
+      for (const r of data as Array<{ id: string; firebase_uid?: string | null }>) {
+        const fb = r.firebase_uid;
+        if (typeof fb === 'string' && fb) firebaseUidToProfileId.set(fb, r.id);
+      }
+    }
+    // Missing column: treat as no links (funnel still uses user_id for UUID rows).
+  }
+
+  for (const fb of firebaseUidToProfileId.keys()) firebaseIds.add(fb);
 
   const funnelSelect = 'id, user_id, event_name, timestamp, properties';
 
@@ -279,11 +298,12 @@ async function getRecentFunnelSignalsByUser(userIds: string[]): Promise<
     rows.push(...((data ?? []) as typeof rows));
   }
 
-  if (firebaseIds.length > 0) {
+  const firebaseKeys = Array.from(firebaseIds);
+  if (firebaseKeys.length > 0) {
     const { data, error } = await supabase
       .from('analytics_funnel_events')
       .select(funnelSelect)
-      .in('properties->>firebase_uid', firebaseIds)
+      .in('properties->>firebase_uid', firebaseKeys)
       .gte('timestamp', from30d)
       .limit(50000);
     if (error) throw error;
@@ -329,13 +349,17 @@ async function getRecentFunnelSignalsByUser(userIds: string[]): Promise<
       properties?: Record<string, unknown> | null;
     };
     const firebaseUid = typeof rowObj.properties?.firebase_uid === 'string' ? rowObj.properties.firebase_uid : null;
-    // Prefer whichever id exists in byUser (Firebase pipeline keys by Hub UID; legacy rows may only have user_id).
+    // Prefer whichever id exists in byUser (Firebase pipeline keys by Hub UID; mirrored profiles use UUID id).
     let keyedUserId: string | null = null;
     for (const candidate of [firebaseUid, rowObj.user_id]) {
       if (typeof candidate === 'string' && candidate && byUser.has(candidate)) {
         keyedUserId = candidate;
         break;
       }
+    }
+    if (!keyedUserId && firebaseUid && firebaseUidToProfileId.has(firebaseUid)) {
+      const profileId = firebaseUidToProfileId.get(firebaseUid)!;
+      if (byUser.has(profileId)) keyedUserId = profileId;
     }
     const eventName = (row as { event_name: string }).event_name;
     const ts = (row as { timestamp: string }).timestamp;
@@ -393,16 +417,28 @@ async function listPipelineSeedRowsFromSupabase(params?: {
   let error: unknown = null;
   {
     const result = await runProfilesSelect(
-      'id, trial_ends_at, purchased_index, growth_state, full_name, email'
+      'id, trial_ends_at, purchased_index, growth_state, full_name, email, firebase_uid'
     );
     data = (result.data as PipelineProfileRow[] | null) ?? null;
     error = result.error;
   }
   if (error && isMissingColumnError(error)) {
-    const retry = await runProfilesSelect('id, trial_ends_at, purchased_index, growth_state');
+    const retry = await runProfilesSelect('id, trial_ends_at, purchased_index, growth_state, full_name, email');
     if (!retry.error) {
+      data = ((retry.data ?? []) as PipelineProfileRow[]).map((row) => ({
+        ...row,
+        firebase_uid: null,
+      }));
+      error = null;
+    } else {
+      error = retry.error;
+    }
+  }
+  if (error && isMissingColumnError(error)) {
+    const retry2 = await runProfilesSelect('id, trial_ends_at, purchased_index, growth_state');
+    if (!retry2.error) {
       data = (
-        (retry.data ?? []) as Array<{
+        (retry2.data ?? []) as Array<{
           id: string;
           trial_ends_at: string | null;
           purchased_index: number | null;
@@ -412,10 +448,11 @@ async function listPipelineSeedRowsFromSupabase(params?: {
         ...row,
         full_name: null,
         email: null,
+        firebase_uid: null,
       }));
       error = null;
     } else {
-      error = retry.error;
+      error = retry2.error;
     }
   }
   if (error && isMissingColumnError(error)) {
@@ -434,6 +471,7 @@ async function listPipelineSeedRowsFromSupabase(params?: {
       trial_ends_at: null,
       full_name: null,
       email: null,
+      firebase_uid: null,
     }));
     error = null;
   }
@@ -471,6 +509,7 @@ export async function getGrowthPipelineRows(params?: {
       growth_state: row.growthState,
       full_name: row.displayName,
       email: row.email,
+      firebase_uid: row.id,
     }));
     nextCursor = out.nextCursor;
   } else {
@@ -489,7 +528,7 @@ export async function getGrowthPipelineRows(params?: {
       returnSuccessNoActivation: false,
       workoutSignals30d: 0,
     };
-    const score = computeLeadScoreV1({
+    const score = computeLeadScoreV2({
       growthState: row.growth_state,
       checkoutStarted7d: signals.checkoutStarted7d,
       checkoutAbandoned48h: signals.checkoutAbandoned48h,
@@ -508,6 +547,8 @@ export async function getGrowthPipelineRows(params?: {
       uid: row.id,
       displayLabel,
       displayName,
+      email: row.email,
+      firebaseUid: row.firebase_uid,
       growthState: row.growth_state,
       trialEndsAt: row.trial_ends_at,
       purchasedIndex: row.purchased_index,
@@ -520,7 +561,7 @@ export async function getGrowthPipelineRows(params?: {
   });
 
   rows.sort((a, b) => (sort === 'score_asc' ? a.leadScore - b.leadScore : b.leadScore - a.leadScore));
-  return { rows, nextCursor, scoreVersion: LEAD_SCORE_VERSION_V1 };
+  return { rows, nextCursor, scoreVersion: LEAD_SCORE_VERSION_V2 };
 }
 
 export async function logGrowthPipelineExport(input: {

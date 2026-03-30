@@ -30,6 +30,8 @@ import { buildAIEditContext } from "@/lib/genkit/utils/ai-context-helpers";
 const DEFAULT_AI_MODEL = "googleai/gemini-2.0-flash";
 import { getIdToken } from "@/lib/auth";
 import { useUpgradeModal } from "@/components/upgrade";
+import { ReverseTrialAiLockedBanner } from "@/components/reverse-trial/ReverseTrialAiLockedBanner";
+import { useReverseTrialAiLock } from "@/hooks/useReverseTrialAiLock";
 import { AIProcessingState } from "./AIProcessingState";
 import { ExercisePreview } from "./ExercisePreview";
 import { FeedbackCollection } from "./FeedbackCollection";
@@ -100,6 +102,7 @@ export function EditModePanel({
   const fitnessLevelDropdownRef = useRef<HTMLDivElement>(null);
   const generateCoachExplainButtonRef = useRef<HTMLButtonElement>(null);
   const { showUpgradeModal, showPricingModal } = useUpgradeModal();
+  const { aiLocked, onLockedAction } = useReverseTrialAiLock("ai_edit_panel");
 
   // Reset post-edit state when exercise changes (indicates new dialog session)
   useEffect(() => {
@@ -177,6 +180,10 @@ export function EditModePanel({
 
   const handleGenerateEdit = useCallback(async () => {
     if (loading) return;
+    if (aiLocked) {
+      onLockedAction();
+      return;
+    }
 
     const action = selectedAction
       ? QUICK_ACTIONS.find((a) => a.id === selectedAction)
@@ -471,6 +478,8 @@ export function EditModePanel({
     }
   }, [
     loading,
+    aiLocked,
+    onLockedAction,
     selectedAction,
     customPrompt,
     additionalInput,
@@ -704,6 +713,7 @@ export function EditModePanel({
 
   return (
     <div className="space-y-6">
+      <ReverseTrialAiLockedBanner />
       {/* Quick Actions Grid */}
       <div>
         <Label className="text-base font-semibold mb-3 block">

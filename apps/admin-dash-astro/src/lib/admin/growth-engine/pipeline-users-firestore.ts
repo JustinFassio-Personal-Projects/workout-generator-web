@@ -1,9 +1,12 @@
 import { FieldPath, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 import type { GrowthState } from './types';
+import { deriveGrowthStateFromHubUser } from './growth-state-derive';
 import { getFirebaseFirestore } from '@/lib/firebase/admin';
 
 export type GrowthPipelineUserSource = 'firebase' | 'supabase';
+
+export { deriveGrowthStateFromHubUser };
 
 type FirestoreUserDoc = {
   id?: string;
@@ -17,6 +20,7 @@ type FirestoreUserDoc = {
   trial_end?: unknown;
   trial_end_at?: unknown;
   trial_ends_at?: unknown;
+  created_at?: unknown;
 };
 
 export type FirestorePipelineUser = {
@@ -26,6 +30,8 @@ export type FirestorePipelineUser = {
   growthState: GrowthState | null;
   trialEndsAt: string | null;
   purchasedIndex: number | null;
+  /** Hub `created_at` when parseable; used for admin merged list sorting. */
+  createdAt: string | null;
 };
 
 function normalizeText(value: unknown): string | null {
@@ -56,30 +62,6 @@ function parseTrialEndIso(value: unknown): string | null {
   return null;
 }
 
-export function deriveGrowthStateFromHubUser(input: {
-  subscriptionTier?: string | null;
-  subscriptionStatus?: string | null;
-  trialEndsAt?: string | null;
-}): GrowthState | null {
-  const tier = (input.subscriptionTier ?? '').trim().toLowerCase();
-  const status = (input.subscriptionStatus ?? '').trim().toLowerCase();
-  const trialEndsAt = input.trialEndsAt ? Date.parse(input.trialEndsAt) : Number.NaN;
-  const isTrialFuture = Number.isFinite(trialEndsAt) && trialEndsAt > Date.now();
-
-  if (isTrialFuture) {
-    return trialEndsAt - Date.now() <= 24 * 60 * 60 * 1000 ? 'trial_expiring_24h' : 'trial_active';
-  }
-
-  const isPaidTier = tier !== '' && tier !== 'free' && tier !== 'none' && tier !== 'null';
-  if (isPaidTier && status === 'active') return 'subscriber_active';
-
-  if (status === 'canceled' || status === 'cancelled') return 'churned';
-  if (status === 'past_due' || status === 'unpaid') return 'churned';
-
-  if (!isPaidTier || status === 'none' || status === 'inactive') return 'downgraded_free';
-  return null;
-}
-
 function displayNameFromHubUser(data: FirestoreUserDoc, email: string | null): string | null {
   const direct =
     normalizeText(data.display_name) ?? normalizeText(data.full_name) ?? normalizeText(data.id);
@@ -101,10 +83,12 @@ function toFirestorePipelineUser(doc: QueryDocumentSnapshot): FirestorePipelineU
     parseTrialEndIso(data.trial_ends_at) ??
     parseTrialEndIso(data.trial_end_at) ??
     parseTrialEndIso(data.trial_end);
+  const createdAt = parseTrialEndIso(data.created_at);
   const growthState = deriveGrowthStateFromHubUser({
     subscriptionTier: normalizeText(data.subscription_tier),
     subscriptionStatus: normalizeText(data.subscription_status),
     trialEndsAt,
+    createdAt: createdAt ?? undefined,
   });
   return {
     id: doc.id,
@@ -112,7 +96,31 @@ function toFirestorePipelineUser(doc: QueryDocumentSnapshot): FirestorePipelineU
     displayName: displayNameFromHubUser(data, email),
     growthState,
     trialEndsAt,
-    purchasedIndex: growthState === 'subscriber_active' ? 0 : null,
+    purchasedIndex: growthState === 'premium_subscriber' ? 0 : null,
+    createdAt,
+  };
+}
+
+/**
+ * Maps Firestore `users/{docId}` to the marketing/billing fields mirrored into Supabase `profiles`
+ * (see `sync-firestore-profiles.ts` and hub profile sync migration).
+ */
+export function hubUserSnapshotToProfileSyncPayload(doc: QueryDocumentSnapshot): {
+  firebase_uid: string;
+  email: string | null;
+  full_name: string | null;
+  trial_ends_at: string | null;
+  purchased_index: number | null;
+  created_at: string | null;
+} {
+  const row = toFirestorePipelineUser(doc);
+  return {
+    firebase_uid: doc.id,
+    email: row.email,
+    full_name: row.displayName,
+    trial_ends_at: row.trialEndsAt,
+    purchased_index: row.purchasedIndex,
+    created_at: row.createdAt,
   };
 }
 
@@ -127,11 +135,14 @@ export async function listPipelineUsersFromFirestore(params?: {
   limit?: number;
   cursor?: string | null;
   growthState?: GrowthState | null;
+  /** Admin Users UI only; raises per-request cap from 200 to 500. */
+  forAdminList?: boolean;
 }): Promise<{ users: FirestorePipelineUser[]; nextCursor: string | null }> {
   const db = getFirebaseFirestore();
   if (!db) return { users: [], nextCursor: null };
 
-  const limit = Math.min(200, Math.max(1, params?.limit ?? 50));
+  const maxCap = params?.forAdminList ? 500 : 200;
+  const limit = Math.min(maxCap, Math.max(1, params?.limit ?? 50));
   const growthStateFilter = params?.growthState ?? null;
 
   const users: FirestorePipelineUser[] = [];
@@ -141,7 +152,6 @@ export async function listPipelineUsersFromFirestore(params?: {
   while (users.length < limit) {
     let query = db.collection('users').orderBy(FieldPath.documentId(), 'desc').limit(limit + 1);
     if (firestoreCursor) {
-      // Use scalar cursor value so pagination still advances even if cursor doc was deleted.
       query = query.startAfter(firestoreCursor);
     }
 

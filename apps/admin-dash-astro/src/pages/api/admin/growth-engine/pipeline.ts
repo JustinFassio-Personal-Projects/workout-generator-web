@@ -1,21 +1,8 @@
 import type { APIRoute } from 'astro';
 
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
+import { parseGrowthState } from '@/lib/admin/growth-engine/growth-state-constants';
 import { getGrowthPipelineRows, upsertLeadScoreSpecVersion } from '@/lib/admin/growth-engine/store';
-import type { GrowthState } from '@/lib/admin/growth-engine/types';
-
-function parseGrowthState(input: string | null): GrowthState | null {
-  if (
-    input === 'trial_active' ||
-    input === 'trial_expiring_24h' ||
-    input === 'downgraded_free' ||
-    input === 'subscriber_active' ||
-    input === 'churned'
-  ) {
-    return input;
-  }
-  return null;
-}
 
 export const GET: APIRoute = async ({ request, cookies, url }) => {
   try {

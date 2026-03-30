@@ -22,6 +22,7 @@ import { logger } from "@/lib/logger";
 import { checkApiRateLimit } from "@/lib/rate-limit";
 import { requireAppCheck } from "@/lib/app-check";
 import { captureApiError, incrementMetric } from "@/lib/sentry";
+import { assertReverseTrialAllowsAi } from "@/lib/reverse-trial/capabilities";
 import type { CoachExplainResponse } from "@/types/ai-exercise-editor";
 import type { TrainerWorkout } from "@/types/firestore";
 import { normalizeTrainerData } from "@/lib/trainer-normalize";
@@ -82,6 +83,9 @@ export async function POST(request: NextRequest) {
 
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
+
+    const reverseTrialBlock = await assertReverseTrialAllowsAi(userId);
+    if (reverseTrialBlock) return reverseTrialBlock;
 
     // Per-user rate limit
     const apiRateLimit = await checkApiRateLimit(userId, "coach_explain");

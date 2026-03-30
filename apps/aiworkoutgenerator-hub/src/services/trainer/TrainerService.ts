@@ -34,11 +34,15 @@ type ErrorResponse = {
   tier?: string;
   remaining?: number;
   retryable?: boolean;
+  /** Stable machine code from Hub (e.g. reverse-trial enforcement). */
+  code?: string;
 };
 
 interface ErrorWithMetadata extends Error {
   actionable?: string;
   retryable?: boolean;
+  /** Set when Hub returns 403 `reverse_trial_ai_blocked` (Phase 3 paywall UX). */
+  reverseTrialAiBlocked?: boolean;
 }
 
 export class TrainerService {
@@ -93,6 +97,18 @@ export class TrainerService {
     // Handle errors
     if (!response.ok) {
       const errorData = data as ErrorResponse;
+
+      if (
+        response.status === 403 &&
+        errorData.code === "reverse_trial_ai_blocked"
+      ) {
+        const msg =
+          errorData.message ||
+          "Your trial period has ended. Upgrade to continue using AI workout generation.";
+        const e = new Error(msg) as ErrorWithMetadata;
+        e.reverseTrialAiBlocked = true;
+        throw e;
+      }
 
       // Provide more specific error messages based on error type
       if (response.status === 429) {
@@ -176,4 +192,14 @@ export class TrainerService {
       updated_at: serverTimestamp(),
     });
   }
+}
+
+/** True when {@link TrainerService.generateWorkout} failed with Hub `reverse_trial_ai_blocked`. */
+export function isReverseTrialAiBlockedError(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    "reverseTrialAiBlocked" in err &&
+    (err as { reverseTrialAiBlocked?: boolean }).reverseTrialAiBlocked === true
+  );
 }

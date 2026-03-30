@@ -24,6 +24,10 @@ import {
   trackPurchasePaywallFirstTouch,
 } from "@/lib/purchase-funnel-analytics";
 import { logger } from "@/lib/logger";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useReverseTrialCapabilities } from "@/components/reverse-trial/ReverseTrialCapabilitiesContext";
+import { TrialEndedExplainerTrigger } from "@/components/reverse-trial/TrialEndedExplainer";
+import { trackTrialExpiredViewedOnce } from "@/lib/reverse-trial-funnel-analytics";
 
 // ============================================
 // Tier Configuration (extends base tiers with page-specific fields)
@@ -123,8 +127,20 @@ function CanceledHandler() {
 
 function PricingContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading: authLoading } = useUser();
+  const { capabilities } = useReverseTrialCapabilities();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+  const fromTrialEnded = searchParams.get("from") === "trial_ended";
+  const growthState = capabilities?.growth_state ?? null;
+  const showPaywallPivot =
+    fromTrialEnded ||
+    Boolean(
+      capabilities?.enforcement_enabled &&
+      (growthState === "reverse_trial_expired" || growthState === "churned")
+    );
+  const pivotChurned = capabilities?.ended_reason === "churned";
 
   // Handle scroll to anchor on page load
   useEffect(() => {
@@ -194,6 +210,18 @@ function PricingContent() {
       surface: "/pricing",
     });
   }, [authLoading, user]);
+
+  useEffect(() => {
+    if (!capabilities?.enforcement_enabled) return;
+    if (growthState !== "reverse_trial_expired" && growthState !== "churned") {
+      return;
+    }
+    if (!showPaywallPivot) return;
+    trackTrialExpiredViewedOnce("pricing_pivot_strip", {
+      firebaseUid: user?.uid ?? null,
+      capabilities,
+    });
+  }, [capabilities, growthState, showPaywallPivot, user?.uid]);
 
   const handleSubscribe = async (
     tierId: "basic" | "pro" | "elite" | "coach" | "coach_pro"
@@ -312,6 +340,34 @@ function PricingContent() {
         </p>
       </div>
 
+      {showPaywallPivot ? (
+        <Alert className="mb-10 border-primary/35 bg-primary/5 text-left">
+          <Sparkles className="h-4 w-4 text-primary" />
+          <AlertTitle>
+            {pivotChurned ? "Reactivate Premium" : "After your Pro trial"}
+          </AlertTitle>
+          <AlertDescription className="space-y-3">
+            <p>
+              {pivotChurned
+                ? "Restore AI workout generation, advanced analytics, and the rest of your paid features. Workouts you already completed stay in your account."
+                : "You keep every workout you created during the trial. Subscribe to unlock new AI generation and advanced summary analytics again."}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <TrialEndedExplainerTrigger
+                endedReason={
+                  capabilities?.ended_reason ??
+                  (growthState === "churned"
+                    ? "churned"
+                    : "reverse_trial_expired")
+                }
+                variant="outline"
+                size="sm"
+              />
+            </div>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       {/* Pricing Cards */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {TIERS.map((tier) => (
@@ -322,8 +378,19 @@ function PricingContent() {
               tier.popular
                 ? "border-primary shadow-lg scale-105 z-10"
                 : "border-border"
+            } ${
+              showPaywallPivot && tier.id === "pro"
+                ? "ring-2 ring-primary/70 border-primary/40 shadow-md md:scale-[1.02] z-[5]"
+                : ""
             }`}
           >
+            {showPaywallPivot && tier.id === "pro" ? (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
+                <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full">
+                  Restores AI &amp; analytics
+                </span>
+              </div>
+            ) : null}
             {tier.popular && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
@@ -430,11 +497,15 @@ function PricingContent() {
 
 export default function PricingPage() {
   return (
-    <>
-      <Suspense fallback={null}>
-        <CanceledHandler />
-      </Suspense>
+    <Suspense
+      fallback={
+        <div className="container mx-auto py-12 text-center text-muted-foreground">
+          Loading pricing…
+        </div>
+      }
+    >
+      <CanceledHandler />
       <PricingContent />
-    </>
+    </Suspense>
   );
 }

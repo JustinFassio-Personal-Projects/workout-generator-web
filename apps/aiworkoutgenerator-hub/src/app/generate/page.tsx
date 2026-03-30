@@ -18,7 +18,10 @@ import {
 import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
 import { WORKOUT_LIMITS } from "@/lib/subscription-constants";
-import { TrainerService } from "@/services/trainer/TrainerService";
+import {
+  TrainerService,
+  isReverseTrialAiBlockedError,
+} from "@/services/trainer/TrainerService";
 import { TrainerEquipmentService } from "@/services/trainer/TrainerEquipmentService";
 import { WaiverService } from "@/services/waiver";
 import { DEFAULT_WAIVER_TEXT } from "@/lib/waiver/default-waiver-text";
@@ -31,6 +34,8 @@ import {
   WorkoutIterationSelection,
 } from "@/components/generate";
 import { useUpgradeModal } from "@/components/upgrade";
+import { useReverseTrialCapabilities } from "@/components/reverse-trial/ReverseTrialCapabilitiesContext";
+import { trackFeatureLockClick } from "@/lib/reverse-trial-funnel-analytics";
 import { LiabilityWaiver } from "@/components/waiver";
 import type { LiabilityWaiver as LiabilityWaiverType } from "@/types/firestore";
 import type { TrainerId, Trainer } from "@/types/trainer";
@@ -39,6 +44,7 @@ import type { WorkoutSummary } from "@/types/workoutSummary";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -146,6 +152,10 @@ function GenerateWorkoutPageContent() {
 
   // Upgrade modal
   const { showUpgradeModal, showPricingModal } = useUpgradeModal();
+  const { capabilities: reverseCap } = useReverseTrialCapabilities();
+  const reverseTrialAiLocked = Boolean(
+    reverseCap?.enforcement_enabled && reverseCap.can_use_ai === false
+  );
 
   // Workout settings
   const [submitting, setSubmitting] = useState(false);
@@ -520,6 +530,23 @@ function GenerateWorkoutPageContent() {
       return;
     }
 
+    if (reverseTrialAiLocked) {
+      trackFeatureLockClick("generate_page", {
+        firebaseUid: user?.uid ?? null,
+        capabilities: reverseCap,
+      });
+      toast.error(
+        "Your Pro trial has ended. Subscribe to Premium to generate new AI workouts.",
+        { duration: 6000 }
+      );
+      showUpgradeModal(
+        reverseCap?.ended_reason === "churned"
+          ? "churned_winback"
+          : "reverse_trial_ai"
+      );
+      return;
+    }
+
     setSubmitting(true);
     setStep("generating");
 
@@ -613,6 +640,22 @@ function GenerateWorkoutPageContent() {
       if (isMountedRef.current) {
         // Refresh count in case it's out of sync (helps debug limit issues)
         refreshWorkoutCount();
+
+        if (isReverseTrialAiBlockedError(err)) {
+          showUpgradeModal(
+            reverseCap?.ended_reason === "churned"
+              ? "churned_winback"
+              : "reverse_trial_ai"
+          );
+          toast.error(
+            err instanceof Error
+              ? err.message
+              : "Your trial period has ended. Upgrade to continue.",
+            { duration: 8000 }
+          );
+          setStep("equipment");
+          return;
+        }
 
         const errorMessage =
           err instanceof Error ? err.message : "Failed to generate workout";
@@ -945,6 +988,36 @@ function GenerateWorkoutPageContent() {
         {/* Step 4: Equipment & Duration */}
         {step === "equipment" && selectedTrainer && (
           <div className="space-y-6">
+            {reverseTrialAiLocked ? (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>AI generation locked</AlertTitle>
+                <AlertDescription className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <span>
+                    New AI workouts need Premium after your Pro trial. You can
+                    still open workouts you already created from your library.
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => {
+                      trackFeatureLockClick("generate_page", {
+                        firebaseUid: user?.uid ?? null,
+                        capabilities: reverseCap,
+                      });
+                      showUpgradeModal(
+                        reverseCap?.ended_reason === "churned"
+                          ? "churned_winback"
+                          : "reverse_trial_ai"
+                      );
+                    }}
+                  >
+                    View Premium
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            ) : null}
             {/* Selected Trainer Summary */}
             <Card className={selectedTrainer.accentColor}>
               <CardContent className="py-4">
@@ -1110,9 +1183,11 @@ function GenerateWorkoutPageContent() {
               >
                 {submitting
                   ? "Generating…"
-                  : !canGenerate
-                    ? "Workout Limit Reached"
-                    : `Generate with ${selectedTrainer.name.split(" ")[0]}`}
+                  : reverseTrialAiLocked
+                    ? "Trial ended — upgrade for AI"
+                    : !canGenerate
+                      ? "Workout Limit Reached"
+                      : `Generate with ${selectedTrainer.name.split(" ")[0]}`}
               </Button>
             </div>
           </div>

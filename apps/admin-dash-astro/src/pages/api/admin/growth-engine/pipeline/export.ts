@@ -1,21 +1,8 @@
 import type { APIRoute } from 'astro';
 
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
+import { parseGrowthState } from '@/lib/admin/growth-engine/growth-state-constants';
 import { getGrowthPipelineRows, logGrowthPipelineExport } from '@/lib/admin/growth-engine/store';
-import type { GrowthState } from '@/lib/admin/growth-engine/types';
-
-function parseGrowthState(input: string | null): GrowthState | null {
-  if (
-    input === 'trial_active' ||
-    input === 'trial_expiring_24h' ||
-    input === 'downgraded_free' ||
-    input === 'subscriber_active' ||
-    input === 'churned'
-  ) {
-    return input;
-  }
-  return null;
-}
 
 function escapeCsv(value: string): string {
   if (value.includes('"') || value.includes(',') || value.includes('\n')) {
@@ -39,9 +26,12 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
 
     const header = [
       'uid',
+      'firebase_uid',
+      'email',
       'display_name',
       'display_label',
       'growth_state',
+      'trial_ends_at',
       'lead_score',
       'score_version',
       'recommended_trigger',
@@ -52,9 +42,12 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
       lines.push(
         [
           escapeCsv(row.uid),
+          escapeCsv(row.firebaseUid ?? ''),
+          escapeCsv(row.email ?? ''),
           escapeCsv(row.displayName ?? ''),
           escapeCsv(row.displayLabel),
           escapeCsv(row.growthState ?? ''),
+          escapeCsv(row.trialEndsAt ?? ''),
           String(row.leadScore),
           escapeCsv(row.scoreVersion),
           escapeCsv(row.recommendedTrigger),

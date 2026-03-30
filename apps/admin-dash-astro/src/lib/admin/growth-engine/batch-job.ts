@@ -1,8 +1,11 @@
 import { getEngagementStats } from '@/lib/supabase/admin/analytics-engagement';
 import { getMonetizationDropOffStats } from '@/lib/supabase/admin/analytics-monetization-dropoff';
 import { getRetentionCohortStats } from '@/lib/firebase/retention-cohorts';
+import { isLifecycleJobOnBatchEnabled, runLifecycleAutomationJob } from './lifecycle-job';
 import { reconcileGrowthStates } from './growth-state';
 import { getGrowthPipelineUserSource } from './pipeline-users-firestore';
+import { isHubProfileSyncOnBatchEnabled, runHubProfileSyncFromFirestore } from './sync-firestore-profiles';
+import { getFirebaseFirestore } from '@/lib/firebase/admin';
 import { buildGrowthEngineNarrativeContext, isGrowthEngineNarrativeEnabled } from './narrative-context';
 import {
   generateGrowthEngineNarrative,
@@ -21,14 +24,32 @@ function isGrowthStateReady(): boolean {
   return process.env.GROWTH_STATE_READY === 'true' || process.env.GROWTH_STATE_READY === '1';
 }
 
+function isGrowthReconcileProfilesOnBatchEnabled(): boolean {
+  const raw = (process.env.GROWTH_RECONCILE_PROFILES_ON_BATCH ?? '').trim().toLowerCase();
+  return raw === 'true' || raw === '1';
+}
+
 export async function runGrowthEngineBatchJob() {
   const startedAt = Date.now();
   const insightRunId = makeInsightRunId();
   const pipelineUserSource = getGrowthPipelineUserSource();
-  const growthStateSync =
-    pipelineUserSource === 'firebase'
-      ? { updated: 0, scanned: 0 }
-      : await reconcileGrowthStates(5000);
+
+  let hubProfileSyncMetrics: Record<string, unknown> = {};
+  if (isHubProfileSyncOnBatchEnabled() && getFirebaseFirestore()) {
+    try {
+      hubProfileSyncMetrics.hub_profile_sync = await runHubProfileSyncFromFirestore();
+    } catch (err) {
+      hubProfileSyncMetrics.hub_profile_sync_error =
+        err instanceof Error ? err.message.slice(0, 300) : String(err).slice(0, 300);
+    }
+  }
+
+  /** When pipeline reads Firestore, reconcile is skipped unless `GROWTH_RECONCILE_PROFILES_ON_BATCH` is set (see REVERSE_TRIAL_ROADMAP Phase 1). */
+  const runProfileReconcile =
+    pipelineUserSource !== 'firebase' || isGrowthReconcileProfilesOnBatchEnabled();
+  const growthStateSync = runProfileReconcile
+    ? await reconcileGrowthStates(5000)
+    : { updated: 0, scanned: 0 };
 
   const [monetization, engagement, retention] = await Promise.all([
     getMonetizationDropOffStats(30),
@@ -57,6 +78,8 @@ export async function runGrowthEngineBatchJob() {
     growth_state_rows_updated: growthStateSync.updated,
     growth_state_rows_scanned: growthStateSync.scanned,
     growth_state_source: pipelineUserSource,
+    growth_state_profile_reconcile_ran: runProfileReconcile,
+    ...hubProfileSyncMetrics,
   };
 
   let narrative: GrowthEngineNarrative | undefined;
@@ -93,6 +116,17 @@ export async function runGrowthEngineBatchJob() {
   }
 
   const latencyMs = Date.now() - startedAt;
+
+  const lifecycleMetrics: Record<string, unknown> = {};
+  if (isLifecycleJobOnBatchEnabled()) {
+    try {
+      lifecycleMetrics.lifecycle_automation = await runLifecycleAutomationJob();
+    } catch (err) {
+      lifecycleMetrics.lifecycle_automation_error =
+        err instanceof Error ? err.message : String(err);
+    }
+  }
+
   const row = await insertDailyBrief({
     insightRunId,
     rulePackVersion: RULE_PACK_V1,
@@ -102,6 +136,7 @@ export async function runGrowthEngineBatchJob() {
       ...preMetrics,
       latency_ms: latencyMs,
       ...llmNarrativeMetrics,
+      ...lifecycleMetrics,
     },
   });
 

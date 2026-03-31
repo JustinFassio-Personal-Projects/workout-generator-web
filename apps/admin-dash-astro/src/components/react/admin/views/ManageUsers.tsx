@@ -250,7 +250,6 @@ const ManageUsers: React.FC = () => {
           return;
         }
         applyHubDashboardResponse(data, append ? 'append' : 'replace');
-        hubPollReadyRef.current = true;
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Failed to load Hub data';
         if (!append && replaceGenAtStart !== hubDashboardReplaceGenRef.current) {
@@ -275,6 +274,11 @@ const ManageUsers: React.FC = () => {
         }
         if (append) throw err instanceof Error ? err : new Error(String(err));
       } finally {
+        // Enable interval + visibility retry after this replace finishes (success or failure).
+        // Only the current generation may flip the flag so superseded in-flight requests do not.
+        if (!append && replaceGenAtStart === hubDashboardReplaceGenRef.current) {
+          hubPollReadyRef.current = true;
+        }
         if (
           !append &&
           !skipBootstrapSpinner &&

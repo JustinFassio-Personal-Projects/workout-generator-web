@@ -6,7 +6,10 @@
 import type { APIRoute } from 'astro';
 
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
-import { listPipelineUsersFromFirestore } from '@/lib/admin/growth-engine/pipeline-users-firestore';
+import {
+  listPipelineUsersFromFirestore,
+  pipelineRowToFirestoreHubUser,
+} from '@/lib/admin/growth-engine/pipeline-users-firestore';
 import { getFirebaseFirestore } from '@/lib/firebase/admin';
 import type { FirestoreHubUser } from '@/types/admin-users';
 
@@ -16,26 +19,6 @@ function parseLimit(raw: string | null): number {
   const n = raw ? Number.parseInt(raw, 10) : 50;
   if (!Number.isFinite(n)) return 50;
   return Math.min(500, Math.max(1, n));
-}
-
-function pipelineRowToHubUser(row: {
-  id: string;
-  email: string | null;
-  displayName: string | null;
-  growthState: string | null;
-  trialEndsAt: string | null;
-  purchasedIndex: number | null;
-  createdAt: string | null;
-}): FirestoreHubUser {
-  return {
-    firebaseUid: row.id,
-    email: row.email,
-    displayName: row.displayName,
-    growthState: row.growthState,
-    trialEndsAt: row.trialEndsAt,
-    purchasedIndex: row.purchasedIndex,
-    createdAt: row.createdAt,
-  };
 }
 
 export const GET: APIRoute = async ({ request, cookies, url }) => {
@@ -63,7 +46,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     });
 
     const body = {
-      users: users.map(pipelineRowToHubUser),
+      users: users.map(pipelineRowToFirestoreHubUser),
       nextCursor,
       configured: true,
     };

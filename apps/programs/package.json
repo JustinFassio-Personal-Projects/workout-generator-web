@@ -68,7 +68,7 @@
     "tailwind-merge": "^2.5.5"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.60.0"
+    "@rollup/rollup-linux-x64-gnu": "^4.60.1"
   },
   "overrides": {
     "fast-xml-parser": ">=5.3.4",

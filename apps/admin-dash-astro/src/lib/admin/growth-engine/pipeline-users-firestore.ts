@@ -3,6 +3,8 @@ import { FieldPath, type QueryDocumentSnapshot } from 'firebase-admin/firestore'
 import type { GrowthState } from './types';
 import { deriveGrowthStateFromHubUser } from './growth-state-derive';
 import { getFirebaseFirestore } from '@/lib/firebase/admin';
+import { parseSignupTimeMs } from '@/lib/admin/signupQuickStats';
+import type { FirestoreHubUser } from '@/types/admin-users';
 
 export type GrowthPipelineUserSource = 'firebase' | 'supabase';
 
@@ -101,6 +103,66 @@ function toFirestorePipelineUser(doc: QueryDocumentSnapshot): FirestorePipelineU
   };
 }
 
+/** Same ms logic as admin signup stats (single source of truth). */
+export function signupMsFromPipelineRow(row: FirestorePipelineUser): number | null {
+  return parseSignupTimeMs(row.createdAt);
+}
+
+export function pipelineRowToFirestoreHubUser(row: FirestorePipelineUser): FirestoreHubUser {
+  return {
+    firebaseUid: row.id,
+    email: row.email,
+    displayName: row.displayName,
+    growthState: row.growthState,
+    trialEndsAt: row.trialEndsAt,
+    purchasedIndex: row.purchasedIndex,
+    createdAt: row.createdAt,
+  };
+}
+
+/** Newest signup first; missing `created_at` last; stable tie-break on id. */
+export function sortHubUsersBySignupDesc(rows: FirestorePipelineUser[]): FirestorePipelineUser[] {
+  return [...rows].sort((a, b) => {
+    const ma = signupMsFromPipelineRow(a);
+    const mb = signupMsFromPipelineRow(b);
+    if (ma === null && mb === null) return a.id.localeCompare(b.id);
+    if (ma === null) return 1;
+    if (mb === null) return -1;
+    if (mb !== ma) return mb - ma;
+    return a.id.localeCompare(b.id);
+  });
+}
+
+const HUB_SIGNUP_STATS_BATCH = 500;
+
+/**
+ * Full `users` collection walk; sorted by signup time for admin list + stats alignment.
+ * One snapshot per call (full scan). See hub-dashboard API.
+ */
+export async function loadAllHubUsersForAdminSnapshot(): Promise<FirestorePipelineUser[]> {
+  const db = getFirebaseFirestore();
+  if (!db) return [];
+
+  const rows: FirestorePipelineUser[] = [];
+  let lastDoc: QueryDocumentSnapshot | null = null;
+
+  for (;;) {
+    let q = db.collection('users').orderBy(FieldPath.documentId(), 'desc').limit(HUB_SIGNUP_STATS_BATCH);
+    if (lastDoc) q = q.startAfter(lastDoc);
+    const snapshot = await q.get();
+    if (snapshot.empty) break;
+
+    for (const doc of snapshot.docs) {
+      rows.push(toFirestorePipelineUser(doc));
+    }
+
+    lastDoc = snapshot.docs[snapshot.docs.length - 1] ?? null;
+    if (snapshot.docs.length < HUB_SIGNUP_STATS_BATCH) break;
+  }
+
+  return sortHubUsersBySignupDesc(rows);
+}
+
 /**
  * Maps Firestore `users/{docId}` to the marketing/billing fields mirrored into Supabase `profiles`
  * (see `sync-firestore-profiles.ts` and hub profile sync migration).
@@ -185,4 +247,17 @@ export async function listPipelineUsersFromFirestore(params?: {
   }
 
   return { users, nextCursor };
+}
+
+/**
+ * Walks all Hub users (via `loadAllHubUsersForAdminSnapshot`) and returns signup instants in ms.
+ */
+export async function listAllHubSignupTimesMsFromFirestore(): Promise<number[]> {
+  const sorted = await loadAllHubUsersForAdminSnapshot();
+  const timesMs: number[] = [];
+  for (const row of sorted) {
+    const ms = signupMsFromPipelineRow(row);
+    if (ms !== null) timesMs.push(ms);
+  }
+  return timesMs;
 }

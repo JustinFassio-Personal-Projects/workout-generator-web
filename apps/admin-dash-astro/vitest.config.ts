@@ -6,6 +6,8 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
     globals: false,
+    // Stable date tests on Windows/macOS/Linux without POSIX-only `TZ=UTC` in package.json scripts.
+    env: { TZ: 'UTC' },
   },
   resolve: {
     alias: {

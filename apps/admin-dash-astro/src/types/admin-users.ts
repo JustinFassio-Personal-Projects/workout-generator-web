@@ -24,7 +24,7 @@ export type AdminUsersTabId = 'all' | 'supabase' | 'firestore';
 /** Provenance for merged “All” list rows. */
 export type AdminUserListSource = 'supabase' | 'firestore';
 
-/** Hub Firestore `users/{docId}` row for admin JSON (`GET /api/admin/users/firestore`). */
+/** Hub Firestore `users/{docId}` row for admin JSON (`GET /api/admin/users/firestore` or `hub-dashboard`). */
 export interface FirestoreHubUser {
   firebaseUid: string;
   email: string | null;

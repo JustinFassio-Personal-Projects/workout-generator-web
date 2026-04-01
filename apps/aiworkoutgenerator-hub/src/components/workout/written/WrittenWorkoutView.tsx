@@ -217,8 +217,6 @@ export function WrittenWorkoutView({
     sections.length,
   ]);
 
-  let exerciseFlatCounter = 0;
-
   return (
     <div
       className={cn(
@@ -355,7 +353,11 @@ export function WrittenWorkoutView({
                 </AccordionTrigger>
                 <AccordionContent className="px-2 pb-4 pt-0 sm:px-3 space-y-4 border-0">
                   {(section.exercises ?? []).map((exercise, exerciseIdx) => {
-                    const flatExerciseIndex = exerciseFlatCounter++;
+                    const flatExerciseIndex = flatIndexFromParts(
+                      sectionIdx,
+                      exerciseIdx,
+                      sections
+                    );
                     const muscle =
                       exercise.muscleTarget ||
                       exercise.muscle_groups?.join(" · ") ||
@@ -368,7 +370,7 @@ export function WrittenWorkoutView({
 
                     return (
                       <WrittenExerciseCard
-                        key={`${sectionIdx}-${exerciseIdx}-${flatExerciseIndex}`}
+                        key={`written-exercise-${sectionIdx}-${exerciseIdx}`}
                         exercise={exercise}
                         sectionIdx={sectionIdx}
                         exerciseIdx={exerciseIdx}

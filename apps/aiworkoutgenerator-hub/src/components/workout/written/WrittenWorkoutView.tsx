@@ -1,5 +1,6 @@
 "use client";
 
+import type { Dispatch, SetStateAction } from "react";
 import { useLayoutEffect, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -49,6 +50,7 @@ import {
 import {
   flatIndexFromParts,
   maxFlattenedExerciseIndex,
+  type WrittenSessionState,
 } from "@/lib/workout/writtenSession";
 import {
   countExercisesCompleted,
@@ -77,6 +79,167 @@ function formatClock(totalSeconds: number): string {
   const m = Math.floor(s / 60);
   const r = s % 60;
   return `${m}:${r.toString().padStart(2, "0")}`;
+}
+
+const EMPTY_SECTIONS: TrainerWorkoutSection[] = [];
+
+type ExerciseEditState = {
+  mode: WrittenExerciseEditMode;
+  sectionIdx: number;
+  exerciseIdx: number;
+  initialExercise: TrainerWorkoutExercise;
+} | null;
+
+interface WrittenWorkoutAccordionSectionsProps {
+  sectionAccordionIds: string[];
+  sections: TrainerWorkoutSection[];
+  sessionState: WrittenSessionState;
+  lastSummary: WorkoutSummary | null;
+  workoutState: TrainerWorkout;
+  setExerciseEdit: Dispatch<SetStateAction<ExerciseEditState>>;
+  handleUpdateSetString: (
+    sIdx: number,
+    eIdx: number,
+    setIdx: number,
+    field: string,
+    value: string
+  ) => void;
+  handleSetComplete: (
+    sIdx: number,
+    eIdx: number,
+    setIdx: number,
+    completed: boolean
+  ) => void;
+  handleExerciseComplete: (
+    sIdx: number,
+    eIdx: number,
+    completed: boolean
+  ) => void;
+  handleAddSet: (sIdx: number, eIdx: number) => void;
+}
+
+function WrittenWorkoutAccordionSections({
+  sectionAccordionIds,
+  sections,
+  sessionState,
+  lastSummary,
+  workoutState,
+  setExerciseEdit,
+  handleUpdateSetString,
+  handleSetComplete,
+  handleExerciseComplete,
+  handleAddSet,
+}: WrittenWorkoutAccordionSectionsProps) {
+  const [openSectionIds, setOpenSectionIds] = useState(
+    () => [...sectionAccordionIds]
+  );
+
+  useEffect(() => {
+    const expandFromHash = () => {
+      if (typeof window === "undefined") return;
+      const id = window.location.hash.replace(/^#/, "");
+      if (id.startsWith("written-section-")) {
+        setOpenSectionIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      }
+    };
+    queueMicrotask(expandFromHash);
+    window.addEventListener("hashchange", expandFromHash);
+    return () => window.removeEventListener("hashchange", expandFromHash);
+  }, []);
+
+  return (
+    <Accordion
+      type="multiple"
+      className="written-workout-section-accordion space-y-3"
+      value={openSectionIds}
+      onValueChange={setOpenSectionIds}
+    >
+      {sections.map((section, sectionIdx) => (
+        <AccordionItem
+          key={`${section.type}-${sectionIdx}`}
+          value={`written-section-${sectionIdx}`}
+          id={`written-section-${sectionIdx}`}
+          className="scroll-mt-24 border-0 rounded-2xl border border-border bg-card/20 overflow-hidden shadow-sm data-[state=open]:shadow-md"
+        >
+          <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]]:border-b border-border/50">
+            <div className="flex flex-1 min-w-0 items-baseline justify-between gap-2 pr-2 text-left">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                {section.type}
+              </h2>
+              {section.durationEstimate?.trim() ? (
+                <span className="text-xs text-muted-foreground tabular-nums shrink-0">
+                  {section.durationEstimate}
+                </span>
+              ) : null}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-2 pb-4 pt-0 sm:px-3 space-y-4 border-0">
+            {(section.exercises ?? []).map((exercise, exerciseIdx) => {
+              const flatExerciseIndex = flatIndexFromParts(
+                sectionIdx,
+                exerciseIdx,
+                sections
+              );
+              const muscle =
+                exercise.muscleTarget ||
+                exercise.muscle_groups?.join(" · ") ||
+                "—";
+
+              const isFocusedExercise =
+                sessionState.status !== "idle" &&
+                flatExerciseIndex === sessionState.focusedExerciseFlatIndex;
+
+              return (
+                <WrittenExerciseCard
+                  key={`written-exercise-${sectionIdx}-${exerciseIdx}`}
+                  exercise={exercise}
+                  sectionIdx={sectionIdx}
+                  exerciseIdx={exerciseIdx}
+                  flatExerciseIndex={flatExerciseIndex}
+                  muscleLabel={muscle}
+                  isFocusedExercise={isFocusedExercise}
+                  lastSummary={lastSummary}
+                  onUpdateSet={handleUpdateSetString}
+                  onToggleSetComplete={handleSetComplete}
+                  onExerciseComplete={handleExerciseComplete}
+                  onAddSet={handleAddSet}
+                  onEditExercise={() => {
+                    const ex =
+                      workoutState.sections?.[sectionIdx]?.exercises?.[
+                        exerciseIdx
+                      ];
+                    if (!ex) return;
+                    setExerciseEdit({
+                      mode: "edit",
+                      sectionIdx,
+                      exerciseIdx,
+                      initialExercise: structuredClone(ex),
+                    });
+                  }}
+                  onAddExerciseBefore={() => {
+                    setExerciseEdit({
+                      mode: "insert-before",
+                      sectionIdx,
+                      exerciseIdx,
+                      initialExercise: createBlankTrainerExercise(),
+                    });
+                  }}
+                  onAddExerciseAfter={() => {
+                    setExerciseEdit({
+                      mode: "insert-after",
+                      sectionIdx,
+                      exerciseIdx,
+                      initialExercise: createBlankTrainerExercise(),
+                    });
+                  }}
+                />
+              );
+            })}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
 }
 
 interface WrittenWorkoutViewProps {
@@ -169,7 +332,10 @@ export function WrittenWorkoutView({
     return { pct, completed, total };
   }, [workoutState]);
 
-  const sections: TrainerWorkoutSection[] = workoutState.sections ?? [];
+  const sections = useMemo(
+    () => workoutState.sections ?? EMPTY_SECTIONS,
+    [workoutState.sections]
+  );
   const maxExerciseFlatIndex = maxFlattenedExerciseIndex(sections);
 
   const sectionAccordionIds = useMemo(
@@ -177,25 +343,10 @@ export function WrittenWorkoutView({
     [sections]
   );
 
-  const [openSectionIds, setOpenSectionIds] =
-    useState<string[]>(sectionAccordionIds);
-
-  useEffect(() => {
-    setOpenSectionIds(sectionAccordionIds);
-  }, [workoutState.id, sectionAccordionIds.join("|")]);
-
-  useEffect(() => {
-    const expandFromHash = () => {
-      if (typeof window === "undefined") return;
-      const id = window.location.hash.replace(/^#/, "");
-      if (id.startsWith("written-section-")) {
-        setOpenSectionIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
-      }
-    };
-    expandFromHash();
-    window.addEventListener("hashchange", expandFromHash);
-    return () => window.removeEventListener("hashchange", expandFromHash);
-  }, []);
+  const sectionsLayoutKey = useMemo(
+    () => `${workoutState.id}|${sectionAccordionIds.join("|")}`,
+    [workoutState.id, sectionAccordionIds]
+  );
 
   useLayoutEffect(() => {
     if (sessionState.status !== "active_work") return;
@@ -326,98 +477,19 @@ export function WrittenWorkoutView({
         ) : null}
 
         {sections.length > 0 ? (
-          <Accordion
-            type="multiple"
-            className="written-workout-section-accordion space-y-3"
-            value={openSectionIds}
-            onValueChange={setOpenSectionIds}
-          >
-            {sections.map((section, sectionIdx) => (
-              <AccordionItem
-                key={`${section.type}-${sectionIdx}`}
-                value={`written-section-${sectionIdx}`}
-                id={`written-section-${sectionIdx}`}
-                className="scroll-mt-24 border-0 rounded-2xl border border-border bg-card/20 overflow-hidden shadow-sm data-[state=open]:shadow-md"
-              >
-                <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]]:border-b border-border/50">
-                  <div className="flex flex-1 min-w-0 items-baseline justify-between gap-2 pr-2 text-left">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
-                      {section.type}
-                    </h2>
-                    {section.durationEstimate?.trim() ? (
-                      <span className="text-xs text-muted-foreground tabular-nums shrink-0">
-                        {section.durationEstimate}
-                      </span>
-                    ) : null}
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-2 pb-4 pt-0 sm:px-3 space-y-4 border-0">
-                  {(section.exercises ?? []).map((exercise, exerciseIdx) => {
-                    const flatExerciseIndex = flatIndexFromParts(
-                      sectionIdx,
-                      exerciseIdx,
-                      sections
-                    );
-                    const muscle =
-                      exercise.muscleTarget ||
-                      exercise.muscle_groups?.join(" · ") ||
-                      "—";
-
-                    const isFocusedExercise =
-                      sessionState.status !== "idle" &&
-                      flatExerciseIndex ===
-                        sessionState.focusedExerciseFlatIndex;
-
-                    return (
-                      <WrittenExerciseCard
-                        key={`written-exercise-${sectionIdx}-${exerciseIdx}`}
-                        exercise={exercise}
-                        sectionIdx={sectionIdx}
-                        exerciseIdx={exerciseIdx}
-                        flatExerciseIndex={flatExerciseIndex}
-                        muscleLabel={muscle}
-                        isFocusedExercise={isFocusedExercise}
-                        lastSummary={lastSummary}
-                        onUpdateSet={handleUpdateSetString}
-                        onToggleSetComplete={handleSetComplete}
-                        onExerciseComplete={handleExerciseComplete}
-                        onAddSet={handleAddSet}
-                        onEditExercise={() => {
-                          const ex =
-                            workoutState.sections?.[sectionIdx]?.exercises?.[
-                              exerciseIdx
-                            ];
-                          if (!ex) return;
-                          setExerciseEdit({
-                            mode: "edit",
-                            sectionIdx,
-                            exerciseIdx,
-                            initialExercise: structuredClone(ex),
-                          });
-                        }}
-                        onAddExerciseBefore={() => {
-                          setExerciseEdit({
-                            mode: "insert-before",
-                            sectionIdx,
-                            exerciseIdx,
-                            initialExercise: createBlankTrainerExercise(),
-                          });
-                        }}
-                        onAddExerciseAfter={() => {
-                          setExerciseEdit({
-                            mode: "insert-after",
-                            sectionIdx,
-                            exerciseIdx,
-                            initialExercise: createBlankTrainerExercise(),
-                          });
-                        }}
-                      />
-                    );
-                  })}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <WrittenWorkoutAccordionSections
+            key={sectionsLayoutKey}
+            sectionAccordionIds={sectionAccordionIds}
+            sections={sections}
+            sessionState={sessionState}
+            lastSummary={lastSummary}
+            workoutState={workoutState}
+            setExerciseEdit={setExerciseEdit}
+            handleUpdateSetString={handleUpdateSetString}
+            handleSetComplete={handleSetComplete}
+            handleExerciseComplete={handleExerciseComplete}
+            handleAddSet={handleAddSet}
+          />
         ) : null}
 
         <div className="written-workout-no-print">

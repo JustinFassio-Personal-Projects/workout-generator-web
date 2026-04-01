@@ -1,13 +1,19 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { beforeAuthStateChanged } from "firebase/auth";
 import { useUser } from "@/lib/auth";
+import { devLogError } from "@/lib/devLog";
+import { getAuthInstance } from "@/lib/firebase";
 import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
 
 /**
  * Component that tracks app-level session events
  * Logs app:open, app:session_start, and app:session_end
+ *
+ * Session end on logout/account switch uses `beforeAuthStateChanged` so
+ * `logUserActivity` still sees the outgoing user (matches userId + token).
  */
 export function SessionTracker() {
   const { user } = useUser();
@@ -16,45 +22,50 @@ export function SessionTracker() {
   const sessionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
-      // If user logs out, end the session if one was active
-      if (loggedUserIdRef.current && sessionIdRef.current) {
-        logUserActivity(
-          loggedUserIdRef.current,
+    const auth = getAuthInstance();
+    const unsubscribe = beforeAuthStateChanged(auth, async (nextUser) => {
+      const outgoing = auth.currentUser;
+      if (!outgoing) return;
+      if (nextUser && nextUser.uid === outgoing.uid) return;
+
+      if (loggedUserIdRef.current !== outgoing.uid || !sessionIdRef.current) {
+        return;
+      }
+
+      try {
+        await logUserActivity(
+          outgoing.uid,
           "app:session_end",
           "app",
           null,
           {},
-          sessionIdRef.current
-        ).catch(console.error);
-        endSession();
-        loggedUserIdRef.current = null;
-        sessionIdRef.current = null;
+          sessionIdRef.current,
+          outgoing
+        );
+      } catch (err) {
+        devLogError(
+          "SessionTracker.beforeAuthStateChanged.logUserActivity",
+          err
+        );
       }
+      endSession();
+      loggedUserIdRef.current = null;
+      sessionIdRef.current = null;
+    });
+
+    return () => unsubscribe();
+  }, [endSession]);
+
+  useEffect(() => {
+    if (!user) {
       return;
     }
 
-    // Only start a new session if this is a different user or first time
     if (loggedUserIdRef.current !== user.uid) {
-      // End previous session if switching users
-      if (loggedUserIdRef.current && sessionIdRef.current) {
-        logUserActivity(
-          loggedUserIdRef.current,
-          "app:session_end",
-          "app",
-          null,
-          {},
-          sessionIdRef.current
-        ).catch(console.error);
-        endSession();
-      }
-
-      // Start new session and log app open
       const newSessionId = startSession();
       loggedUserIdRef.current = user.uid;
       sessionIdRef.current = newSessionId;
 
-      // Log app open (daily active user tracking)
       logUserActivity(
         user.uid,
         "app:open",
@@ -62,9 +73,8 @@ export function SessionTracker() {
         null,
         {},
         newSessionId
-      ).catch(console.error);
+      ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
 
-      // Log session start
       logUserActivity(
         user.uid,
         "app:session_start",
@@ -72,10 +82,9 @@ export function SessionTracker() {
         null,
         {},
         newSessionId
-      ).catch(console.error);
+      ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
     }
 
-    // Cleanup on unmount
     return () => {
       if (loggedUserIdRef.current && sessionIdRef.current) {
         logUserActivity(
@@ -85,8 +94,10 @@ export function SessionTracker() {
           null,
           {},
           sessionIdRef.current
-        ).catch(console.error);
+        ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
         endSession();
+        loggedUserIdRef.current = null;
+        sessionIdRef.current = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Only re-run on user change. startSession/endSession are stable; including them would not change behavior.

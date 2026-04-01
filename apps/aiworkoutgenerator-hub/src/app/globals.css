@@ -36,6 +36,21 @@
   }
 }
 
+/* Sky Pulse Glow — matches Written workout CTA (sky-400 family) */
+@keyframes pulse-sky-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 8px rgba(56, 189, 248, 0.35),
+      0 0 12px rgba(56, 189, 248, 0.22);
+  }
+  50% {
+    box-shadow:
+      0 0 12px rgba(56, 189, 248, 0.55),
+      0 0 18px rgba(56, 189, 248, 0.32);
+  }
+}
+
 /* Gold Pulse Glow Animation - defined at root level
  * Note: Uses box-shadow which can impact performance on lower-end devices.
  * Consider limiting concurrent animated elements if performance issues arise.
@@ -176,6 +191,7 @@
   /* Animation custom properties */
   --animate-breathe: breathe 4s infinite ease-in-out;
   --animate-pulse-orange-glow: pulse-orange-glow 2s ease-in-out infinite;
+  --animate-pulse-sky-glow: pulse-sky-glow 2s ease-in-out infinite;
   --animate-pulse-gold-glow: pulse-gold-glow 2s ease-in-out infinite;
   --animate-breathe-gold-glow: breathe-gold-glow 4s infinite ease-in-out;
   --animate-breathe-orange-glow: breathe-orange-glow 4s infinite ease-in-out;
@@ -341,6 +357,11 @@
     animation: var(--animate-pulse-orange-glow);
   }
 
+  /* Pulse sky glow animation utility */
+  .animate-pulse-sky-glow {
+    animation: var(--animate-pulse-sky-glow);
+  }
+
   /* Pulse gold glow animation utility */
   .animate-pulse-gold-glow {
     animation: var(--animate-pulse-gold-glow);
@@ -379,6 +400,23 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* CTA pulse glow: static shadow instead of infinite pulse when reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse-orange-glow {
+      animation: none !important;
+      box-shadow:
+        0 0 10px rgba(251, 146, 60, 0.35),
+        0 0 14px rgba(251, 146, 60, 0.22);
+    }
+
+    .animate-pulse-sky-glow {
+      animation: none !important;
+      box-shadow:
+        0 0 10px rgba(56, 189, 248, 0.35),
+        0 0 14px rgba(56, 189, 248, 0.22);
+    }
+  }
 }
 
 @layer components {
@@ -386,6 +424,40 @@
     font-family: ui-sans-serif, system-ui, sans-serif;
   }
   /* ... keeping your existing firebase overrides ... */
+}
+
+/* Written workout: printable sheet; hide session chrome when printing */
+@media print {
+  .written-workout-no-print {
+    display: none !important;
+  }
+
+  .written-workout-print-root {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .written-workout-print-root main {
+    padding-bottom: 0;
+  }
+
+  /* Expand Radix accordion panels so printed sheet includes every section */
+  .written-workout-print-root
+    .written-workout-section-accordion
+    [data-state="closed"] {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .written-workout-print-root
+    .written-workout-section-accordion
+    [data-state="closed"]
+    > div {
+    display: block !important;
+  }
 }
 
 /*

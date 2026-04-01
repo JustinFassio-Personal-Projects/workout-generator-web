@@ -1,4 +1,8 @@
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import type { User } from "firebase/auth";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
+import { devLogError } from "@/lib/devLog";
+import { getAuthInstance } from "@/lib/firebase";
 import { getDbInstance } from "@/lib/firestore";
 
 /**
@@ -50,6 +54,7 @@ export interface UserActivityLog {
  * @param resourceId - ID of the resource (null for app-level actions)
  * @param details - Additional action-specific data
  * @param sessionId - Optional session identifier for grouping activities
+ * @param authUser - Optional; when set, use for tokens instead of `auth.currentUser`
  */
 export async function logUserActivity(
   userId: string,
@@ -57,39 +62,77 @@ export async function logUserActivity(
   resourceType: UserActivityResourceType,
   resourceId: string | null = null,
   details: Record<string, unknown> = {},
-  sessionId?: string
+  sessionId?: string,
+  authUser?: User | null
 ): Promise<void> {
   try {
-    // Client-side only - getDbInstance() will throw if called on server
-    const db = getDbInstance();
+    const currentUser = authUser ?? getAuthInstance().currentUser;
+    if (!currentUser || currentUser.uid !== userId) {
+      return;
+    }
 
-    // Get client metadata
     const userAgent =
       typeof navigator !== "undefined" ? navigator.userAgent : null;
 
-    // Note: IP address detection from client-side is limited
-    // Consider using a server-side endpoint or Cloud Function
-    // For now, we'll leave it null and let server-side enrich if needed
+    try {
+      const res = await authenticatedFetch("/api/analytics/log-activity", {
+        method: "POST",
+        body: JSON.stringify({
+          action,
+          resource_type: resourceType,
+          resource_id: resourceId,
+          details,
+          ...(sessionId !== undefined ? { session_id: sessionId } : {}),
+          user_agent: userAgent,
+        }),
+        headers: { "Content-Type": "application/json" },
+        user: currentUser,
+      });
+      if (res.ok) {
+        return;
+      }
+    } catch {
+      /* fall through to client Firestore */
+    }
+
+    const db = getDbInstance();
+    await currentUser.getIdToken();
+
     const ipAddress = null;
 
-    await addDoc(collection(db, "user_activity_logs"), {
+    const payload = {
       user_id: userId,
       action,
       resource_type: resourceType,
       resource_id: resourceId,
       details,
-      session_id: sessionId,
+      ...(sessionId !== undefined ? { session_id: sessionId } : {}),
       ip_address: ipAddress,
       user_agent: userAgent,
       timestamp: serverTimestamp(),
     } as Omit<UserActivityLog, "timestamp"> & {
       timestamp: ReturnType<typeof serverTimestamp>;
-    });
+    };
+
+    const writeOnce = () =>
+      addDoc(collection(db, "user_activity_logs"), payload);
+
+    try {
+      await writeOnce();
+    } catch (firstError: unknown) {
+      const code =
+        firstError && typeof firstError === "object" && "code" in firstError
+          ? String((firstError as { code?: string }).code)
+          : "";
+      if (code === "permission-denied") {
+        await currentUser.getIdToken(true);
+        await new Promise((r) => setTimeout(r, 150));
+        await writeOnce();
+      } else {
+        throw firstError;
+      }
+    }
   } catch (error) {
-    // Don't block user flow - log silently
-    // Activity logging should never prevent user actions
-    // Note: This is separate from your app's main logger (src/lib/logger.ts)
-    // Activity logging is specifically for user engagement tracking
-    console.error("Failed to log user activity:", error);
+    devLogError("logUserActivity", error);
   }
 }

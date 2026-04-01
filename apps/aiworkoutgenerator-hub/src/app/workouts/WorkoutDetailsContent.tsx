@@ -3,7 +3,7 @@
 import { useEffect, useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, RefreshCw, Sparkles, Play } from "lucide-react";
+import { BookOpen, RefreshCw, Sparkles, Play, ScrollText } from "lucide-react";
 
 import { useUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -86,6 +86,10 @@ export function WorkoutDetailsContent() {
 
   const goToPlayerFromIntro = useCallback(() => {
     router.replace(`/workouts/${encodeURIComponent(workoutId)}/player`);
+  }, [router, workoutId]);
+
+  const goToWrittenFromIntro = useCallback(() => {
+    router.replace(`/workouts/${encodeURIComponent(workoutId)}/written`);
   }, [router, workoutId]);
 
   let tourAnchor: WorkoutTourAnchor | null = null;
@@ -194,6 +198,16 @@ export function WorkoutDetailsContent() {
               </Link>
             </Button>
             <Button
+              variant="outline"
+              asChild
+              className="w-full sm:w-auto border-sky-500/45 hover:border-sky-400/70 hover:bg-sky-500/10 text-sky-100 animate-pulse-sky-glow"
+            >
+              <Link href={`/workouts/${encodeURIComponent(workoutId)}/written`}>
+                <ScrollText className="h-4 w-4 mr-2" />
+                Written workout
+              </Link>
+            </Button>
+            <Button
               type="button"
               variant="secondary"
               className="w-full sm:w-auto shrink-0"
@@ -253,6 +267,17 @@ export function WorkoutDetailsContent() {
                   your plan before you train.
                 </span>
                 <span className="block">
+                  For a{" "}
+                  <span className="font-medium text-foreground">
+                    one-page written sheet
+                  </span>{" "}
+                  of every exercise and set, use{" "}
+                  <span className="font-medium text-foreground">
+                    Written workout
+                  </span>{" "}
+                  at the top of this page.
+                </span>
+                <span className="block">
                   To <span className="font-medium text-foreground">run</span>{" "}
                   the workout and{" "}
                   <span className="font-medium text-foreground">
@@ -274,6 +299,15 @@ export function WorkoutDetailsContent() {
                 onClick={dismissReviewIntro}
               >
                 Got it
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto border-sky-500/45 hover:border-sky-400/70 hover:bg-sky-500/10 text-sky-100 animate-pulse-sky-glow"
+                onClick={goToWrittenFromIntro}
+              >
+                <ScrollText className="h-4 w-4 mr-2" />
+                Open written workout
               </Button>
               <Button
                 type="button"

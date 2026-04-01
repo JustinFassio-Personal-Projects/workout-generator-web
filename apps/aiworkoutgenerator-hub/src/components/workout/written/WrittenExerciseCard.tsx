@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Info, MoreVertical } from "lucide-react";
+import {
+  ArrowDownToLine,
+  ArrowUpToLine,
+  Info,
+  MoreVertical,
+  Pencil,
+} from "lucide-react";
 import type { TrainerWorkoutExercise } from "@/types/firestore";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -45,6 +52,9 @@ export interface WrittenExerciseCardProps {
   ) => void;
   onExerciseComplete: (sIdx: number, eIdx: number, completed: boolean) => void;
   onAddSet: (sIdx: number, eIdx: number) => void;
+  onEditExercise?: () => void;
+  onAddExerciseBefore?: () => void;
+  onAddExerciseAfter?: () => void;
 }
 
 export function WrittenExerciseCard({
@@ -59,6 +69,9 @@ export function WrittenExerciseCard({
   onToggleSetComplete,
   onExerciseComplete,
   onAddSet,
+  onEditExercise,
+  onAddExerciseBefore,
+  onAddExerciseAfter,
 }: WrittenExerciseCardProps) {
   const [instructionsOpen, setInstructionsOpen] = useState(false);
   const sets = ensureSetDetailsForExercise(exercise);
@@ -107,11 +120,32 @@ export function WrittenExerciseCard({
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem onSelect={() => setInstructionsOpen(true)}>
                   <Info className="h-4 w-4 mr-2" />
                   Instructions
                 </DropdownMenuItem>
+                {(onEditExercise ||
+                  onAddExerciseBefore ||
+                  onAddExerciseAfter) && <DropdownMenuSeparator />}
+                {onEditExercise ? (
+                  <DropdownMenuItem onSelect={() => onEditExercise()}>
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit exercise
+                  </DropdownMenuItem>
+                ) : null}
+                {onAddExerciseBefore ? (
+                  <DropdownMenuItem onSelect={() => onAddExerciseBefore()}>
+                    <ArrowUpToLine className="h-4 w-4 mr-2" />
+                    Add exercise before
+                  </DropdownMenuItem>
+                ) : null}
+                {onAddExerciseAfter ? (
+                  <DropdownMenuItem onSelect={() => onAddExerciseAfter()}>
+                    <ArrowDownToLine className="h-4 w-4 mr-2" />
+                    Add exercise after
+                  </DropdownMenuItem>
+                ) : null}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
 
 import {
+  adjustFocusAfterExerciseInsert,
   createEmptySession,
+  flatIndexFromParts,
   getSegmentSeconds,
   getTotalSessionSeconds,
   parseStoredSession,
@@ -192,5 +194,47 @@ describe("getSegmentSeconds", () => {
       focusedExerciseFlatIndex: 0,
     };
     expect(getSegmentSeconds(s, 130_000)).toBe(30);
+  });
+});
+
+describe("flatIndexFromParts", () => {
+  const sections = [
+    { exercises: [{}, {}] },
+    { exercises: [{}] },
+  ];
+
+  it("returns flat index for first section", () => {
+    expect(flatIndexFromParts(0, 0, sections)).toBe(0);
+    expect(flatIndexFromParts(0, 1, sections)).toBe(1);
+  });
+
+  it("returns flat index for second section", () => {
+    expect(flatIndexFromParts(1, 0, sections)).toBe(2);
+  });
+});
+
+describe("adjustFocusAfterExerciseInsert", () => {
+  const active: WrittenSessionState = {
+    ...createEmptySession(W, U),
+    status: "active_work",
+    sessionStartedAt: 0,
+    segmentStartedAt: 0,
+    focusedExerciseFlatIndex: 2,
+  };
+
+  it("does not change idle session", () => {
+    const idle = createEmptySession(W, U);
+    const next = adjustFocusAfterExerciseInsert(idle, 0, 5);
+    expect(next.focusedExerciseFlatIndex).toBe(0);
+  });
+
+  it("bumps focus when insert is at or before focus", () => {
+    const next = adjustFocusAfterExerciseInsert(active, 2, 5);
+    expect(next.focusedExerciseFlatIndex).toBe(3);
+  });
+
+  it("does not bump when insert is after focus", () => {
+    const next = adjustFocusAfterExerciseInsert(active, 3, 5);
+    expect(next.focusedExerciseFlatIndex).toBe(2);
   });
 });

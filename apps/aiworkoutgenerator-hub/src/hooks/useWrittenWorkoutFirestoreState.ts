@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import type {
   TrainerWorkout,
+  TrainerWorkoutExercise,
   TrainerWorkoutSection,
   TrainerSetDetail,
 } from "@/types/firestore";
@@ -49,7 +50,8 @@ export function useWrittenWorkoutFirestoreState(
     saveTimeoutRef.current = setTimeout(async () => {
       saveTimeoutRef.current = null;
       const sections = sectionsRef.current;
-      if (!workoutState.id || !sections.length) return;
+      if (!workoutState.id) return;
+      if (sections.length === 0) return;
       try {
         await TrainerService.updateWorkoutSections(workoutState.id, sections);
         toast.success("Workout progress saved.", { duration: 2000 });
@@ -241,6 +243,64 @@ export function useWrittenWorkoutFirestoreState(
     [debouncedSave]
   );
 
+  const replaceExerciseAt = useCallback(
+    (sIdx: number, eIdx: number, next: TrainerWorkoutExercise) => {
+      const setDetails = next.setDetails ?? [];
+      const normalized: TrainerWorkoutExercise = {
+        ...next,
+        setDetails,
+        sets: setDetails.length,
+      };
+      setWorkoutState((prev) => {
+        const sections = prev.sections || [];
+        const newSections = structuredClone(sections);
+        const section = newSections[sIdx];
+        if (!section?.exercises?.[eIdx]) return prev;
+        newSections[sIdx] = { ...section };
+        newSections[sIdx].exercises = [...section.exercises];
+        newSections[sIdx].exercises[eIdx] = normalized;
+        return { ...prev, sections: newSections };
+      });
+      debouncedSave();
+    },
+    [debouncedSave]
+  );
+
+  const insertExerciseAt = useCallback(
+    (sIdx: number, insertIndex: number, exercise: TrainerWorkoutExercise) => {
+      const setDetails = exercise.setDetails ?? [];
+      const normalized: TrainerWorkoutExercise = {
+        ...exercise,
+        setDetails,
+        sets: setDetails.length,
+      };
+      setWorkoutState((prev) => {
+        const sections = prev.sections || [];
+        const newSections = structuredClone(sections);
+        const section = newSections[sIdx];
+        if (!section?.exercises) return prev;
+        const nextEx = [...section.exercises];
+        const idx = Math.max(0, Math.min(insertIndex, nextEx.length));
+        nextEx.splice(idx, 0, normalized);
+        newSections[sIdx] = { ...section, exercises: nextEx };
+        return { ...prev, sections: newSections };
+      });
+      debouncedSave();
+    },
+    [debouncedSave]
+  );
+
+  const appendSection = useCallback(
+    (section: TrainerWorkoutSection) => {
+      setWorkoutState((prev) => ({
+        ...prev,
+        sections: [...(prev.sections || []), section],
+      }));
+      debouncedSave();
+    },
+    [debouncedSave]
+  );
+
   return {
     workoutState,
     setWorkoutState,
@@ -248,5 +308,8 @@ export function useWrittenWorkoutFirestoreState(
     handleSetComplete,
     handleExerciseComplete,
     handleAddSet,
+    replaceExerciseAt,
+    insertExerciseAt,
+    appendSection,
   };
 }

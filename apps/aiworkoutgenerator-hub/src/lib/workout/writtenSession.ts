@@ -220,6 +220,40 @@ export function maxFlattenedExerciseIndex(
   return Math.max(0, n - 1);
 }
 
+/** Flat list index for sectionIdx + exerciseIdx (0-based). */
+export function flatIndexFromParts(
+  sectionIdx: number,
+  exerciseIdx: number,
+  sections: { exercises?: unknown[] | null }[] | null | undefined
+): number {
+  if (!sections?.length) return 0;
+  let sum = 0;
+  for (let s = 0; s < sectionIdx; s++) {
+    sum += sections[s]?.exercises?.length ?? 0;
+  }
+  return sum + exerciseIdx;
+}
+
+/**
+ * After inserting one exercise at insertFlatIndex, bump session focus if it
+ * pointed at or after that slot so highlighting stays on the same logical exercise.
+ */
+export function adjustFocusAfterExerciseInsert(
+  state: WrittenSessionState,
+  insertFlatIndex: number,
+  newMaxFlatIndex: number
+): WrittenSessionState {
+  if (state.status === "idle") return state;
+  const next = state.focusedExerciseFlatIndex;
+  if (next >= insertFlatIndex) {
+    return {
+      ...state,
+      focusedExerciseFlatIndex: Math.min(next + 1, newMaxFlatIndex),
+    };
+  }
+  return state;
+}
+
 /** Current work or rest segment elapsed seconds (0 if idle). */
 export function getSegmentSeconds(
   state: WrittenSessionState,

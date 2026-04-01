@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
+  adjustFocusAfterExerciseInsert,
   createEmptySession,
   getSegmentSeconds,
   getTotalSessionSeconds,
@@ -126,6 +127,20 @@ export function useWrittenWorkoutSession(workoutId: string, userId: string) {
     }
   }, [workoutId, userId]);
 
+  /**
+   * When an exercise is inserted at insertFlatIndex, bump focus if needed.
+   * Pass total exercise count **before** the insert (so new max flat index = that count).
+   */
+  const bumpFocusAfterExerciseInsertAt = useCallback(
+    (insertFlatIndex: number, exerciseCountBeforeInsert: number) => {
+      const newMaxFlatIndex = exerciseCountBeforeInsert;
+      setState((s) =>
+        adjustFocusAfterExerciseInsert(s, insertFlatIndex, newMaxFlatIndex)
+      );
+    },
+    []
+  );
+
   return {
     state,
     hydrated,
@@ -135,5 +150,6 @@ export function useWrittenWorkoutSession(workoutId: string, userId: string) {
     lap,
     endSession,
     resetSession,
+    bumpFocusAfterExerciseInsertAt,
   };
 }

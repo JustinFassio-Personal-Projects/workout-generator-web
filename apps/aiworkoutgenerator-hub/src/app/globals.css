@@ -440,6 +440,19 @@
   .written-workout-print-root main {
     padding-bottom: 0;
   }
+
+  /* Expand Radix accordion panels so printed sheet includes every section */
+  .written-workout-print-root .written-workout-section-accordion [data-state="closed"] {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .written-workout-print-root .written-workout-section-accordion [data-state="closed"] > div {
+    display: block !important;
+  }
 }
 
 /*

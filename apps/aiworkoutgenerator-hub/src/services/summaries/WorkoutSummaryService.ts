@@ -282,6 +282,27 @@ export class WorkoutSummaryService {
   }
 
   /**
+   * Most recent session report for this workout (by completed_at).
+   * Used for "Previous" column on the written workout surface.
+   */
+  static async getLatestSummaryForWorkout(
+    workoutId: string,
+    userId: string
+  ): Promise<WorkoutSummary | null> {
+    const q = query(
+      this.getCollection(),
+      where("user_id", "==", userId),
+      where("workout_id", "==", workoutId),
+      orderBy("completed_at", "desc"),
+      limit(1)
+    );
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const d = snapshot.docs[0];
+    return { ...d.data(), id: d.id } as WorkoutSummary;
+  }
+
+  /**
    * Update session feedback fields in a session report
    *
    * @param summaryId - The ID of the report to update

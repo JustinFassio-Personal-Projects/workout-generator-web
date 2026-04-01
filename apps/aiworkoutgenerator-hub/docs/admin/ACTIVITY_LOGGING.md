@@ -466,7 +466,7 @@ function OnboardingFlow() {
 ### Workout Actions
 
 - `workout:generate` - User generates a new workout
-- `workout:open` - User opens/views a workout
+- `workout:open` - User opens/views a workout (optionally disambiguate with `details.surface`, e.g. `"written_sheet"` for the one-page written view vs the workout player)
 - `workout:start` - User starts a workout
 - `workout:complete` - User completes a workout
 - `workout:save` - User saves a workout

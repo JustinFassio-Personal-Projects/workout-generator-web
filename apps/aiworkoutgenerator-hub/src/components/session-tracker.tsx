@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useUser } from "@/lib/auth";
+import { devLogError } from "@/lib/devLog";
 import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
 
@@ -26,7 +27,7 @@ export function SessionTracker() {
           null,
           {},
           sessionIdRef.current
-        ).catch(console.error);
+        ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
         endSession();
         loggedUserIdRef.current = null;
         sessionIdRef.current = null;
@@ -45,7 +46,7 @@ export function SessionTracker() {
           null,
           {},
           sessionIdRef.current
-        ).catch(console.error);
+        ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
         endSession();
       }
 
@@ -62,7 +63,7 @@ export function SessionTracker() {
         null,
         {},
         newSessionId
-      ).catch(console.error);
+      ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
 
       // Log session start
       logUserActivity(
@@ -72,7 +73,7 @@ export function SessionTracker() {
         null,
         {},
         newSessionId
-      ).catch(console.error);
+      ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
     }
 
     // Cleanup on unmount
@@ -85,7 +86,7 @@ export function SessionTracker() {
           null,
           {},
           sessionIdRef.current
-        ).catch(console.error);
+        ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
         endSession();
       }
     };

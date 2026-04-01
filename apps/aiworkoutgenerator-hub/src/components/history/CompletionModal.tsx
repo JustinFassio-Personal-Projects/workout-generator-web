@@ -40,6 +40,7 @@ import {
   WEIGHT_INDEX_LABELS,
   SESSION_FEEDBACK_OPTIONS as SESSION_FEEDBACK_OPTIONS_BASE,
 } from "@/lib/autoregulation";
+import { getExerciseCompletionPercentRounded } from "@/lib/workout/exerciseCompletionPercent";
 
 const FEEDBACK_ICONS: Record<string, typeof Clock> = {
   ran_out_of_time: Clock,
@@ -89,21 +90,7 @@ export function CompletionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const calculateExerciseCompletion = useCallback(() => {
-    if (!workout?.sections) return 100;
-
-    let total = 0;
-    let completed = 0;
-
-    workout.sections.forEach((section) => {
-      (section.exercises || []).forEach((exercise) => {
-        total++;
-        if (exercise.completed === true) completed++;
-      });
-    });
-
-    if (total === 0) return 100;
-    const pct = Math.round((completed / total) * 100);
-    return Math.round(pct / 10) * 10;
+    return getExerciseCompletionPercentRounded(workout);
   }, [workout]);
 
   useEffect(() => {
@@ -154,6 +141,22 @@ export function CompletionModal({
       };
 
       await WorkoutHistoryService.markComplete(workout.id, completionData);
+
+      void logUserActivity(
+        user.uid,
+        "workout:complete",
+        "workout",
+        workout.id,
+        {
+          difficulty_rating: null,
+          enjoyment_rating: null,
+          completion_percentage: completionPct,
+          completed_at: new Date().toISOString(),
+        },
+        sessionId || undefined
+      ).catch(() => {
+        /* non-blocking */
+      });
 
       try {
         const summaryOpts = hasPositiveSectionTiming(sessionSectionTiming)
@@ -247,7 +250,10 @@ export function CompletionModal({
           user.uid
         );
       } catch (summaryError) {
-        console.error("Failed to save workout summary:", summaryError);
+        devLogError(
+          "CompletionModal.handleQuickComplete.saveSummary",
+          summaryError
+        );
         toast.warning(
           "Workout marked complete, but session report didn't save",
           {

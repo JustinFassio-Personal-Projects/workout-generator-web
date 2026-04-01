@@ -42,7 +42,8 @@ export function SessionTracker() {
           "app",
           null,
           {},
-          sessionIdRef.current
+          sessionIdRef.current,
+          outgoing
         );
       } catch (err) {
         devLogError(

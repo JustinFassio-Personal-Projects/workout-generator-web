@@ -1,4 +1,5 @@
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import type { User } from "firebase/auth";
 import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { devLogError } from "@/lib/devLog";
 import { getAuthInstance } from "@/lib/firebase";
@@ -53,6 +54,7 @@ export interface UserActivityLog {
  * @param resourceId - ID of the resource (null for app-level actions)
  * @param details - Additional action-specific data
  * @param sessionId - Optional session identifier for grouping activities
+ * @param authUser - Optional; when set, use for tokens instead of `auth.currentUser`
  */
 export async function logUserActivity(
   userId: string,
@@ -60,11 +62,11 @@ export async function logUserActivity(
   resourceType: UserActivityResourceType,
   resourceId: string | null = null,
   details: Record<string, unknown> = {},
-  sessionId?: string
+  sessionId?: string,
+  authUser?: User | null
 ): Promise<void> {
   try {
-    const auth = getAuthInstance();
-    const currentUser = auth.currentUser;
+    const currentUser = authUser ?? getAuthInstance().currentUser;
     if (!currentUser || currentUser.uid !== userId) {
       return;
     }

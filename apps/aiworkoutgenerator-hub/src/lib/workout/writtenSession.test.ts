@@ -198,10 +198,7 @@ describe("getSegmentSeconds", () => {
 });
 
 describe("flatIndexFromParts", () => {
-  const sections = [
-    { exercises: [{}, {}] },
-    { exercises: [{}] },
-  ];
+  const sections = [{ exercises: [{}, {}] }, { exercises: [{}] }];
 
   it("returns flat index for first section", () => {
     expect(flatIndexFromParts(0, 0, sections)).toBe(0);

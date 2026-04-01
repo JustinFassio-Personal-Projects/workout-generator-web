@@ -28,10 +28,7 @@ export function SessionTracker() {
       if (!outgoing) return;
       if (nextUser && nextUser.uid === outgoing.uid) return;
 
-      if (
-        loggedUserIdRef.current !== outgoing.uid ||
-        !sessionIdRef.current
-      ) {
+      if (loggedUserIdRef.current !== outgoing.uid || !sessionIdRef.current) {
         return;
       }
 

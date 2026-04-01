@@ -130,9 +130,9 @@ function WrittenWorkoutAccordionSections({
   handleExerciseComplete,
   handleAddSet,
 }: WrittenWorkoutAccordionSectionsProps) {
-  const [openSectionIds, setOpenSectionIds] = useState(
-    () => [...sectionAccordionIds]
-  );
+  const [openSectionIds, setOpenSectionIds] = useState(() => [
+    ...sectionAccordionIds,
+  ]);
 
   useEffect(() => {
     const expandFromHash = () => {

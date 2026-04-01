@@ -442,7 +442,9 @@
   }
 
   /* Expand Radix accordion panels so printed sheet includes every section */
-  .written-workout-print-root .written-workout-section-accordion [data-state="closed"] {
+  .written-workout-print-root
+    .written-workout-section-accordion
+    [data-state="closed"] {
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
@@ -450,7 +452,10 @@
     animation: none !important;
   }
 
-  .written-workout-print-root .written-workout-section-accordion [data-state="closed"] > div {
+  .written-workout-print-root
+    .written-workout-section-accordion
+    [data-state="closed"]
+    > div {
     display: block !important;
   }
 }

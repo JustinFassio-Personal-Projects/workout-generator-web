@@ -61,19 +61,6 @@ export function SessionTracker() {
 
   useEffect(() => {
     if (!user) {
-      if (loggedUserIdRef.current && sessionIdRef.current) {
-        logUserActivity(
-          loggedUserIdRef.current,
-          "app:session_end",
-          "app",
-          null,
-          {},
-          sessionIdRef.current
-        ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
-        endSession();
-        loggedUserIdRef.current = null;
-        sessionIdRef.current = null;
-      }
       return;
     }
 
@@ -112,6 +99,8 @@ export function SessionTracker() {
           sessionIdRef.current
         ).catch((err) => devLogError("SessionTracker.logUserActivity", err));
         endSession();
+        loggedUserIdRef.current = null;
+        sessionIdRef.current = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Only re-run on user change. startSession/endSession are stable; including them would not change behavior.

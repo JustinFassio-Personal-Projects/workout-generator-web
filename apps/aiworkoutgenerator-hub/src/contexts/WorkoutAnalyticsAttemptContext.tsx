@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 /** Logged in `details.surface` for workout player analytics (admin journey). */
 export type WorkoutPlayerSurface =

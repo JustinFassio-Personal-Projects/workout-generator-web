@@ -232,11 +232,7 @@ export function WrittenWorkoutMobileView({
 
   const handleStartWorkout = useCallback(() => {
     startWorkout();
-    if (
-      loggedWorkoutStartRef.current ||
-      !analytics ||
-      !workoutState.id
-    ) {
+    if (loggedWorkoutStartRef.current || !analytics || !workoutState.id) {
       return;
     }
     loggedWorkoutStartRef.current = true;
@@ -256,13 +252,7 @@ export function WrittenWorkoutMobileView({
     ).catch(() => {
       /* non-blocking */
     });
-  }, [
-    startWorkout,
-    userId,
-    analytics,
-    workoutState.id,
-    sessionId,
-  ]);
+  }, [startWorkout, userId, analytics, workoutState.id, sessionId]);
 
   const backHref = `/workouts?id=${encodeURIComponent(workoutState.id)}`;
 

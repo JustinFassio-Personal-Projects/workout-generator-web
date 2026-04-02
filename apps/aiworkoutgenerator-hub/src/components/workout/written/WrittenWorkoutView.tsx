@@ -296,11 +296,7 @@ export function WrittenWorkoutView({
 
   const handleStartWorkout = useCallback(() => {
     startWorkout();
-    if (
-      loggedWorkoutStartRef.current ||
-      !analytics ||
-      !workoutState.id
-    ) {
+    if (loggedWorkoutStartRef.current || !analytics || !workoutState.id) {
       return;
     }
     loggedWorkoutStartRef.current = true;
@@ -320,13 +316,7 @@ export function WrittenWorkoutView({
     ).catch(() => {
       /* non-blocking */
     });
-  }, [
-    startWorkout,
-    userId,
-    analytics,
-    workoutState.id,
-    sessionId,
-  ]);
+  }, [startWorkout, userId, analytics, workoutState.id, sessionId]);
 
   const [exerciseEdit, setExerciseEdit] = useState<{
     mode: WrittenExerciseEditMode;

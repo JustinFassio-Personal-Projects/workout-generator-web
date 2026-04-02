@@ -64,14 +64,7 @@ function WorkoutPlayerContent() {
         });
       }
     }
-  }, [
-    analytics,
-    workout?.id,
-    user,
-    workoutInitialLoad,
-    workoutId,
-    sessionId,
-  ]);
+  }, [analytics, workout?.id, user, workoutInitialLoad, workoutId, sessionId]);
 
   // Initial load only — do not unmount the player when `workoutLoading` is true
   // due to background image mapping after a save (that would reset block session UI).

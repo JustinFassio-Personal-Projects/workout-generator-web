@@ -240,7 +240,9 @@ export function CompletionModal({
             completion_percentage: 100,
             completed_at: new Date().toISOString(),
             ...(analyticsSurface ? { surface: analyticsSurface } : {}),
-            ...(workoutAttemptId ? { workout_attempt_id: workoutAttemptId } : {}),
+            ...(workoutAttemptId
+              ? { workout_attempt_id: workoutAttemptId }
+              : {}),
           },
           {
             sessionId: sessionId || undefined,

@@ -33,10 +33,17 @@ export function SessionTracker() {
       }
 
       try {
-        await logUserActivity(outgoing.uid, "app:session_end", "app", null, {}, {
-          sessionId: sessionIdRef.current,
-          authUser: outgoing,
-        });
+        await logUserActivity(
+          outgoing.uid,
+          "app:session_end",
+          "app",
+          null,
+          {},
+          {
+            sessionId: sessionIdRef.current,
+            authUser: outgoing,
+          }
+        );
       } catch (err) {
         devLogError(
           "SessionTracker.beforeAuthStateChanged.logUserActivity",

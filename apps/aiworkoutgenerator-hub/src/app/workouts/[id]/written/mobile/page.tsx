@@ -62,14 +62,7 @@ function WrittenWorkoutMobileContent() {
         });
       }
     }
-  }, [
-    analytics,
-    workout?.id,
-    user,
-    workoutInitialLoad,
-    workoutId,
-    sessionId,
-  ]);
+  }, [analytics, workout?.id, user, workoutInitialLoad, workoutId, sessionId]);
 
   if (authLoading || profileLoading || workoutInitialLoad) {
     return <WrittenWorkoutLoading />;

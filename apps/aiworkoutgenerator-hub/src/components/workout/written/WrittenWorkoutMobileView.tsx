@@ -75,34 +75,33 @@ function WrittenWorkoutMobileAccordionSections({
   handleExerciseComplete,
   handleAddSet,
 }: WrittenWorkoutMobileAccordionSectionsProps) {
-  const [openSectionIds, setOpenSectionIds] = useState<string[]>([]);
+  const [userOpenSectionIds, setUserOpenSectionIds] = useState<string[]>([]);
 
-  const focusedSectionIndex = useMemo(() => {
+  // Merge user toggles + hash with the section that contains the focused exercise
+  // during an active session (derive in render—no setState in layout effect).
+  const focusedSectionId = useMemo(() => {
     if (sessionState.status !== "active_work" && sessionState.status !== "rest") {
       return null;
     }
-    return sectionIndexFromFlatExerciseIndex(
+    const idx = sectionIndexFromFlatExerciseIndex(
       sessionState.focusedExerciseFlatIndex,
       sections
     );
+    return idx === null ? null : `written-section-${idx}`;
   }, [sessionState.status, sessionState.focusedExerciseFlatIndex, sections]);
 
-  // useLayoutEffect: open the section containing the focused exercise before the
-  // parent scrollIntoView runs (child layout effects run before parent). Covers
-  // rest as well as active_work so highlight stays visible when the accordion
-  // would otherwise unmount closed content.
-  useLayoutEffect(() => {
-    if (focusedSectionIndex === null) return;
-    const id = `written-section-${focusedSectionIndex}`;
-    setOpenSectionIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
-  }, [focusedSectionIndex]);
+  const openSectionIds = useMemo(() => {
+    if (!focusedSectionId) return userOpenSectionIds;
+    if (userOpenSectionIds.includes(focusedSectionId)) return userOpenSectionIds;
+    return [...userOpenSectionIds, focusedSectionId];
+  }, [userOpenSectionIds, focusedSectionId]);
 
   useEffect(() => {
     const expandFromHash = () => {
       if (typeof window === "undefined") return;
       const id = window.location.hash.replace(/^#/, "");
       if (id.startsWith("written-section-")) {
-        setOpenSectionIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+        setUserOpenSectionIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
       }
     };
     queueMicrotask(expandFromHash);
@@ -115,7 +114,7 @@ function WrittenWorkoutMobileAccordionSections({
       type="multiple"
       className="written-workout-section-accordion space-y-3"
       value={openSectionIds}
-      onValueChange={setOpenSectionIds}
+      onValueChange={setUserOpenSectionIds}
     >
       {sections.map((section, sectionIdx) => (
         <AccordionItem

@@ -60,16 +60,22 @@ const GLOSSARY_BY_DATASET_KEY: Record<string, AnalyticsGlossary> = {
           'Optional UUID on hub activity logs tying one player visit together. Expected sequence: workout:open → workout:start → workout:complete for the same id when the user finishes.',
       },
       {
+        id: 'generation-id',
+        title: 'generation_id',
+        definition:
+          'Optional UUID on hub activity logs tying generate → open → start → complete when the user continues from a generation in the same tab. Used for Workout generated journey timelines in the admin explorer.',
+      },
+      {
         id: 'workout-surface',
         title: 'Workout surface',
         definition:
           'details.surface on workout events: workout_player (guided player), simple_player (written desktop), mobile_player (written mobile). Legacy values may appear as surface_legacy for dashboards comparing older data.',
       },
       {
-        id: 'workout-journey-explorer',
-        title: 'Workout journey explorer',
+        id: 'activity-journey-explorer',
+        title: 'Activity journey explorer',
         definition:
-          'Engagement drill-down that lists recent workout:start rows from Firestore and loads an ordered timeline for a chosen workout_attempt_id.',
+          'Engagement drill-down below Hub feature adoption: lists recent rows for configured actions (workout:start via workout-journey; other actions via activity-journey list=1&action=…) and loads ordered timelines by workout_attempt_id, generation_id, or session_id when the registry enables it, driven by activity-drill-down-config.',
       },
     ],
   },

@@ -2,13 +2,21 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  *
- * Query ordered activity rows for one workout attempt or list recent workout:start events.
+ * Query ordered activity rows for one workout attempt, generation funnel, or list recent rows by action.
  */
 
 import admin from 'firebase-admin';
 import { getFirebaseFirestore } from './admin';
 
 const WORKOUT_ATTEMPT_ID_MAX_LEN = 64;
+
+/** Keep in sync with hub `GENERATION_ID_MAX_LEN` in aiworkoutgenerator-hub `user-activity-constants.ts`. */
+const GENERATION_ID_MAX_LEN = 64;
+
+/** Hub accepts session_id as string without a separate max in log-activity; cap for admin query safety. */
+const SESSION_ID_MAX_LEN = 128;
+
+const TIMELINE_ROW_LIMIT = 100;
 
 export interface WorkoutActivityLogRow {
   id: string;
@@ -18,6 +26,7 @@ export interface WorkoutActivityLogRow {
   session_id: string | null;
   resource_id: string | null;
   workout_attempt_id: string | null;
+  generation_id: string | null;
   details: Record<string, unknown>;
 }
 
@@ -53,8 +62,32 @@ function docToRow(doc: admin.firestore.DocumentSnapshot): WorkoutActivityLogRow 
     resource_id: data.resource_id != null ? String(data.resource_id) : null,
     workout_attempt_id:
       data.workout_attempt_id != null ? String(data.workout_attempt_id) : null,
+    generation_id: data.generation_id != null ? String(data.generation_id) : null,
     details,
   };
+}
+
+async function timelineByTopLevelField(
+  field: 'workout_attempt_id' | 'generation_id' | 'session_id',
+  id: string,
+  maxLen: number,
+  limitRows: number
+): Promise<WorkoutActivityLogRow[] | null> {
+  const db = getFirebaseFirestore();
+  if (!db) return null;
+  const trimmed = id.trim();
+  if (!trimmed || trimmed.length > maxLen) {
+    return [];
+  }
+
+  const snap = await db
+    .collection(activityCollectionName())
+    .where(field, '==', trimmed)
+    .orderBy('timestamp', 'asc')
+    .limit(limitRows)
+    .get();
+
+  return snap.docs.map((d) => docToRow(d)).filter(Boolean) as WorkoutActivityLogRow[];
 }
 
 /**
@@ -63,27 +96,47 @@ function docToRow(doc: admin.firestore.DocumentSnapshot): WorkoutActivityLogRow 
 export async function getWorkoutJourneyByAttemptId(
   attemptId: string
 ): Promise<WorkoutActivityLogRow[] | null> {
-  const db = getFirebaseFirestore();
-  if (!db) return null;
-  const trimmed = attemptId.trim();
-  if (!trimmed || trimmed.length > WORKOUT_ATTEMPT_ID_MAX_LEN) {
-    return [];
-  }
-
-  const snap = await db
-    .collection(activityCollectionName())
-    .where('workout_attempt_id', '==', trimmed)
-    .orderBy('timestamp', 'asc')
-    .limit(100)
-    .get();
-
-  return snap.docs.map((d) => docToRow(d)).filter(Boolean) as WorkoutActivityLogRow[];
+  return timelineByTopLevelField(
+    'workout_attempt_id',
+    attemptId,
+    WORKOUT_ATTEMPT_ID_MAX_LEN,
+    TIMELINE_ROW_LIMIT
+  );
 }
 
 /**
- * Recent workout:start rows in range, newest first. Returns null if Firestore is unavailable.
+ * All log rows sharing a generation funnel id, oldest first. Returns null if Firestore is unavailable.
  */
-export async function listRecentWorkoutStarts(
+export async function timelineByGenerationId(
+  generationId: string
+): Promise<WorkoutActivityLogRow[] | null> {
+  return timelineByTopLevelField(
+    'generation_id',
+    generationId,
+    GENERATION_ID_MAX_LEN,
+    TIMELINE_ROW_LIMIT
+  );
+}
+
+/**
+ * All log rows for a single client session id, oldest first. Returns null if Firestore is unavailable.
+ */
+export async function timelineBySessionId(
+  sessionId: string
+): Promise<WorkoutActivityLogRow[] | null> {
+  return timelineByTopLevelField(
+    'session_id',
+    sessionId,
+    SESSION_ID_MAX_LEN,
+    TIMELINE_ROW_LIMIT
+  );
+}
+
+/**
+ * Recent rows for a given action in range, newest first. Returns null if Firestore is unavailable.
+ */
+export async function listRecentByAction(
+  action: string,
   days: number,
   limit: number
 ): Promise<WorkoutActivityLogRow[] | null> {
@@ -97,11 +150,21 @@ export async function listRecentWorkoutStarts(
 
   const snap = await db
     .collection(activityCollectionName())
-    .where('action', '==', 'workout:start')
+    .where('action', '==', action)
     .where('timestamp', '>=', fromTs)
     .orderBy('timestamp', 'desc')
     .limit(cappedLimit)
     .get();
 
   return snap.docs.map((d) => docToRow(d)).filter(Boolean) as WorkoutActivityLogRow[];
+}
+
+/**
+ * Recent workout:start rows in range, newest first. Returns null if Firestore is unavailable.
+ */
+export async function listRecentWorkoutStarts(
+  days: number,
+  limit: number
+): Promise<WorkoutActivityLogRow[] | null> {
+  return listRecentByAction('workout:start', days, limit);
 }

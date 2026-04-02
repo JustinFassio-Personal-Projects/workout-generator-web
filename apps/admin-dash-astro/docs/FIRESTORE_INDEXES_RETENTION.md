@@ -53,9 +53,9 @@ Composite index (also declared in [`apps/aiworkoutgenerator-hub/firestore.indexe
 
 - `workout_attempt_id` (Ascending), `timestamp` (Ascending)
 
-### Generation funnel timeline (admin, future)
+### Generation funnel timeline (admin)
 
-The hub logs optional top-level `generation_id` on `user_activity_logs` to correlate **generate → open → start → complete** when the user continues from a fresh generation in the same tab. Future admin APIs may query:
+The hub logs optional top-level `generation_id` on `user_activity_logs` to correlate **generate → open → start → complete** when the user continues from a fresh generation in the same tab. Admin APIs query:
 
 ```text
 where('generation_id', '==', id)
@@ -65,6 +65,19 @@ orderBy('timestamp', 'asc')
 Composite index (declared in the same hub [`firestore.indexes.json`](../../aiworkoutgenerator-hub/firestore.indexes.json)):
 
 - `generation_id` (Ascending), `timestamp` (Ascending)
+
+### Session-scoped timeline (admin, Phase 4)
+
+When logs include top-level `session_id`, admin **activity journey** can load all rows for one session (oldest first):
+
+```text
+where('session_id', '==', id)
+orderBy('timestamp', 'asc')
+```
+
+Composite index (declared in hub [`firestore.indexes.json`](../../aiworkoutgenerator-hub/firestore.indexes.json)):
+
+- `session_id` (Ascending), `timestamp` (Ascending)
 
 Deploy these indexes to the **hub** Firebase project using the same command as above (`firebase deploy --only firestore:indexes` from `apps/aiworkoutgenerator-hub`).
 
@@ -88,6 +101,18 @@ firebase deploy --only firestore:indexes
 ```
 
 Until indexes finish building in the console, admin **Workout journey** list/timeline requests may fail with a Firestore index error.
+
+### Troubleshooting: “The query requires an index” / `FAILED_PRECONDITION`
+
+Firestore does **not** require deploying “tables.” `user_activity_logs` is a collection; documents appear when the hub writes them. What you must deploy for admin list and timeline APIs are **composite indexes** (declared in the hub repo file above).
+
+1. **Confirm project alignment:** Admin’s `FIREBASE_SERVICE_ACCOUNT_KEY` must be for the **same** Firebase project that stores `user_activity_logs` (default hub project: `ai-workout-generator-hub` per [`apps/aiworkoutgenerator-hub/.firebaserc`](../../aiworkoutgenerator-hub/.firebaserc)). A wrong project or missing **Cloud Datastore User** on the service account can look like query failures; the canonical index error includes a **Create index** link scoped to the project Firestore chose for the query.
+2. **Create the missing composite:** Open the URL from the Firestore error (it pre-fills collection group `user_activity_logs` and field order). Typical engagement/journey queries need:
+   - **Recent rows by action:** `action` (Ascending) + `timestamp` (Descending)
+   - **Attempt timeline:** `workout_attempt_id` (Ascending) + `timestamp` (Ascending)
+   - **Generation timeline:** `generation_id` (Ascending) + `timestamp` (Ascending)
+   - **Session timeline:** `session_id` (Ascending) + `timestamp` (Ascending)
+3. **Deploy from repo (preferred):** After `firebase login --reauth` (or `firebase login:ci` in CI), run `firebase deploy --only firestore:indexes` from `apps/aiworkoutgenerator-hub` so all declared composites stay in sync. If the CLI reports invalid credentials, re-authentication is required on that machine; neither the Firebase MCP nor deploy will succeed until then.
 
 ### Phase 0 manual QA (player-attempt journeys)
 

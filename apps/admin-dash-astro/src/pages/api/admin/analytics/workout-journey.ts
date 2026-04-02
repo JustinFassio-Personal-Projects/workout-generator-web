@@ -9,6 +9,10 @@ import type { APIRoute } from 'astro';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
 import { isFirebaseConfigured } from '@/lib/firebase/admin';
 import {
+  buildFirestoreQueryErrorBody,
+  isFirestoreIndexOrPermissionError,
+} from '@/lib/firebase/firestore-query-errors';
+import {
   getWorkoutJourneyByAttemptId,
   listRecentWorkoutStarts,
 } from '@/lib/firebase/workout-journey';
@@ -32,7 +36,22 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
       listStartsParam === 'yes';
 
     if (attemptId) {
-      const steps = await getWorkoutJourneyByAttemptId(attemptId);
+      let steps;
+      try {
+        steps = await getWorkoutJourneyByAttemptId(attemptId);
+      } catch (firestoreErr) {
+        if (isFirestoreIndexOrPermissionError(firestoreErr)) {
+          const dev = import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true';
+          if (dev) {
+            console.error('[admin/analytics/workout-journey] Firestore (timeline):', firestoreErr);
+          }
+          return new Response(
+            JSON.stringify(buildFirestoreQueryErrorBody(firestoreErr, dev)),
+            { status: 503, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+        throw firestoreErr;
+      }
       if (steps === null) {
         return new Response(JSON.stringify({ error: 'Firestore unavailable.' }), {
           status: 503,
@@ -54,7 +73,22 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
         200,
         Math.max(1, parseInt(url.searchParams.get('limit') ?? '50', 10) || 50)
       );
-      const starts = await listRecentWorkoutStarts(days, limit);
+      let starts;
+      try {
+        starts = await listRecentWorkoutStarts(days, limit);
+      } catch (firestoreErr) {
+        if (isFirestoreIndexOrPermissionError(firestoreErr)) {
+          const dev = import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true';
+          if (dev) {
+            console.error('[admin/analytics/workout-journey] Firestore (list_starts):', firestoreErr);
+          }
+          return new Response(
+            JSON.stringify(buildFirestoreQueryErrorBody(firestoreErr, dev)),
+            { status: 503, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+        throw firestoreErr;
+      }
       if (starts === null) {
         return new Response(JSON.stringify({ error: 'Firestore unavailable.' }), {
           status: 503,
@@ -83,12 +117,24 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
-      console.error('[admin/analytics/workout-journey] Error:', message || '(unknown)');
+    const dev = import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true';
+    if (dev) {
+      console.error('[admin/analytics/workout-journey] Error:', message || '(unknown)', error);
     }
-    return new Response(JSON.stringify({ error: 'Failed to load workout journey data.' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to load workout journey data.',
+        ...(dev && message
+          ? {
+              details: message,
+              hint: 'If this mentions an index, deploy apps/aiworkoutgenerator-hub/firestore.indexes.json to your Firebase project. See FIRESTORE_INDEXES_RETENTION.md.',
+            }
+          : {}),
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 };

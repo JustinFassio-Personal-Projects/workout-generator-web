@@ -35,8 +35,12 @@ export const ANALYTICS_DATASETS: AnalyticsDataset[] = [
       '/api/admin/analytics/engagement?days={days}',
       '/api/admin/analytics/workout-journey?workout_attempt_id={uuid}',
       '/api/admin/analytics/workout-journey?list_starts=true&days={days}&limit={n}',
+      '/api/admin/analytics/activity-journey?list=1&action={hub_action}&days={days}&limit={n}',
+      '/api/admin/analytics/activity-journey?correlation=generation_id&id={uuid}',
+      '/api/admin/analytics/activity-journey?correlation=session_id&id={id}',
     ],
-    dataSourceNote: 'Hub Firestore activity + Supabase event overlays',
+    dataSourceNote:
+      'Hub Firestore activity + Supabase event overlays. `hub_action` values for activity-journey list mode match enabled `activity_journey_list` entries in activity-drill-down-config.',
   },
   {
     key: 'retention-cohorts',

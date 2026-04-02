@@ -11,12 +11,17 @@ import {
   YAxis,
 } from 'recharts';
 
+import {
+  ACTIVITY_JOURNEY_EXPLORER_ELEMENT_ID,
+  getDrillDownConfig,
+} from '@/lib/admin/activity-drill-down-config';
 import { adminFetch } from '@/lib/supabase/client/admin-fetch';
 
+import ActivityJourneyExplorer from './ActivityJourneyExplorer';
 import type { EngagementStats } from './types';
-import WorkoutJourneyExplorer from './WorkoutJourneyExplorer';
 
 const EngagementDetailPanel: React.FC = () => {
+  const [activeDrillDownEvent, setActiveDrillDownEvent] = useState('workout:start');
   const [days, setDays] = useState(30);
   const [engagement, setEngagement] = useState<EngagementStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -128,9 +133,11 @@ const EngagementDetailPanel: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {engagement.featureAdoptionHub.map((row, i) => {
-                      const isWorkoutStart = row.eventName === 'workout:start';
-                      const scrollToWorkoutJourneys = () => {
-                        document.getElementById('workout-journey-explorer')?.scrollIntoView({
+                      const drill = getDrillDownConfig(row.eventName);
+                      const isDrillDown = drill?.enabled === true;
+                      const scrollToActivityJourneys = () => {
+                        setActiveDrillDownEvent(row.eventName);
+                        document.getElementById(ACTIVITY_JOURNEY_EXPLORER_ELEMENT_ID)?.scrollIntoView({
                           behavior: 'smooth',
                           block: 'start',
                         });
@@ -138,25 +145,25 @@ const EngagementDetailPanel: React.FC = () => {
                       return (
                         <tr
                           key={i}
-                          role={isWorkoutStart ? 'button' : undefined}
+                          role={isDrillDown ? 'button' : undefined}
                           className={
-                            isWorkoutStart
+                            isDrillDown
                               ? 'cursor-pointer hover:bg-white/[0.06] focus-visible:bg-white/[0.06] focus-visible:ring-2 focus-visible:ring-amber-400/40 outline-none'
                               : undefined
                           }
-                          tabIndex={isWorkoutStart ? 0 : undefined}
+                          tabIndex={isDrillDown ? 0 : undefined}
                           aria-label={
-                            isWorkoutStart
-                              ? 'Workout started — scroll to workout journey explorer'
+                            isDrillDown
+                              ? `${row.displayLabel ?? row.eventName} — scroll to activity journey explorer`
                               : undefined
                           }
-                          onClick={isWorkoutStart ? scrollToWorkoutJourneys : undefined}
+                          onClick={isDrillDown ? scrollToActivityJourneys : undefined}
                           onKeyDown={
-                            isWorkoutStart
+                            isDrillDown
                               ? (e) => {
                                   if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault();
-                                    scrollToWorkoutJourneys();
+                                    scrollToActivityJourneys();
                                   }
                                 }
                               : undefined
@@ -165,8 +172,10 @@ const EngagementDetailPanel: React.FC = () => {
                           <td className="px-3 py-2 text-white/80">
                             <span className="inline-flex flex-wrap items-center gap-2">
                               <span>{row.displayLabel ?? row.eventName}</span>
-                              {isWorkoutStart && (
-                                <span className="text-xs font-medium text-amber-300">Browse journeys</span>
+                              {isDrillDown && (
+                                <span className="text-xs font-medium text-amber-300">
+                                  {drill.browseLabel}
+                                </span>
                               )}
                             </span>
                           </td>
@@ -185,7 +194,7 @@ const EngagementDetailPanel: React.FC = () => {
             )}
             {engagement.featureAdoptionHub != null && (
               <div className="mt-4">
-                <WorkoutJourneyExplorer />
+                <ActivityJourneyExplorer activeEventName={activeDrillDownEvent} />
               </div>
             )}
             {engagement.featureAdoptionMarketing && engagement.featureAdoptionMarketing.length > 0 && (

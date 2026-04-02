@@ -308,10 +308,16 @@ export function WrittenWorkoutView({
       {
         surface: analytics.surface,
         workout_attempt_id: analytics.workoutAttemptId,
+        ...(analytics.generationId
+          ? { generation_id: analytics.generationId }
+          : {}),
       },
       {
         sessionId: sessionId || undefined,
         workoutAttemptId: analytics.workoutAttemptId,
+        ...(analytics.generationId
+          ? { generationId: analytics.generationId }
+          : {}),
       }
     ).catch(() => {
       /* non-blocking */
@@ -723,6 +729,7 @@ export function WrittenWorkoutView({
         onOpenChange={setCompletionOpen}
         analyticsSurface={analytics?.surface}
         workoutAttemptId={analytics?.workoutAttemptId}
+        generationId={analytics?.generationId}
       />
     </div>
   );

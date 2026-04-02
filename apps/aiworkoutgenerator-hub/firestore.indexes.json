@@ -258,6 +258,14 @@
       "collectionGroup": "user_activity_logs",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "generation_id", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "user_activity_logs",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "action", "order": "ASCENDING" },
         { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]

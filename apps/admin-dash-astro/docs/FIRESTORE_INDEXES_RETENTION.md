@@ -53,6 +53,21 @@ Composite index (also declared in [`apps/aiworkoutgenerator-hub/firestore.indexe
 
 - `workout_attempt_id` (Ascending), `timestamp` (Ascending)
 
+### Generation funnel timeline (admin, future)
+
+The hub logs optional top-level `generation_id` on `user_activity_logs` to correlate **generate → open → start → complete** when the user continues from a fresh generation in the same tab. Future admin APIs may query:
+
+```text
+where('generation_id', '==', id)
+orderBy('timestamp', 'asc')
+```
+
+Composite index (declared in the same hub [`firestore.indexes.json`](../../aiworkoutgenerator-hub/firestore.indexes.json)):
+
+- `generation_id` (Ascending), `timestamp` (Ascending)
+
+Deploy these indexes to the **hub** Firebase project using the same command as above (`firebase deploy --only firestore:indexes` from `apps/aiworkoutgenerator-hub`).
+
 To list recent `workout:start` rows for exploration:
 
 ```text

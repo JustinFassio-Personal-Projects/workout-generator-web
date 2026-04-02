@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
+import { getGenerationIdForWorkout } from "@/lib/workout-generation-analytics-storage";
+
 /** Logged in `details.surface` for workout player analytics (admin journey). */
 export type WorkoutPlayerSurface =
   | "workout_player"
@@ -11,6 +13,7 @@ export type WorkoutPlayerSurface =
 const WorkoutAnalyticsAttemptContext = createContext<{
   workoutAttemptId: string;
   surface: WorkoutPlayerSurface;
+  generationId: string | null;
 } | null>(null);
 
 /**
@@ -28,9 +31,18 @@ export function WorkoutAnalyticsAttemptProvider({
 }) {
   const workoutAttemptId = useMemo(() => crypto.randomUUID(), [_workoutId]);
 
+  const generationId = useMemo(
+    () => (_workoutId ? getGenerationIdForWorkout(_workoutId) : null),
+    [_workoutId]
+  );
+
   const value = useMemo(
-    () => ({ workoutAttemptId, surface }),
-    [workoutAttemptId, surface]
+    () => ({
+      workoutAttemptId,
+      surface,
+      generationId,
+    }),
+    [workoutAttemptId, surface, generationId]
   );
 
   return (
@@ -43,6 +55,7 @@ export function WorkoutAnalyticsAttemptProvider({
 export function useWorkoutAnalyticsAttempt(): {
   workoutAttemptId: string;
   surface: WorkoutPlayerSurface;
+  generationId: string | null;
 } | null {
   return useContext(WorkoutAnalyticsAttemptContext);
 }

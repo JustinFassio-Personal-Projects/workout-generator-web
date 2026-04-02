@@ -465,10 +465,10 @@ function OnboardingFlow() {
 
 ### Workout Actions
 
-- `workout:generate` - User generates a new workout
-- `workout:open` - User lands on a workout player surface. Use `details.surface`: `workout_player` (guided player), `simple_player` (written / one-page desktop), `mobile_player` (written mobile). For backward-compatible dashboards, simple/mobile may also set `details.surface_legacy` (`written_sheet`, `written_sheet_mobile`). Include the same `workout_attempt_id` on the document (top-level, from the logging API / client payload) and in `details` if you want redundancy.
-- `workout:start` - User actually starts timing (first block timer run in the guided player, or **Start workout** on the written session). Emit **once per attempt**; correlate with `workout_attempt_id` and `session_id` from `useSession()`.
-- `workout:complete` - User completes a workout; pass the same `workout_attempt_id` and `details.surface` when available so admin **Workout journey** timelines show open → start → complete.
+- `workout:generate` - User generates a new workout. When using the hub generate flow, emit a new UUID as top-level `generation_id` (and optionally mirror it in `details`) so it can be tied to later player events from that creation funnel.
+- `workout:open` - User lands on a workout player surface. Use `details.surface`: `workout_player` (guided player), `simple_player` (written / one-page desktop), `mobile_player` (written mobile). For backward-compatible dashboards, simple/mobile may also set `details.surface_legacy` (`written_sheet`, `written_sheet_mobile`). Include the same `workout_attempt_id` on the document (top-level, from the logging API / client payload) and in `details` if you want redundancy. When the user arrived from a fresh generation in the same tab, also pass the same top-level `generation_id` (see **Generation funnel propagation** below).
+- `workout:start` - User actually starts timing (first block timer run in the guided player, or **Start workout** on the written session). Emit **once per attempt**; correlate with `workout_attempt_id` and `session_id` from `useSession()`. Pass `generation_id` when present (same id as the preceding `workout:generate` for that funnel).
+- `workout:complete` - User completes a workout; pass the same `workout_attempt_id`, optional `generation_id`, and `details.surface` when available so admin timelines can show open → start → complete and, when applicable, tie back to generate.
 - `workout:save` - User saves a workout
 - `workout:share` - User shares a workout
 
@@ -477,8 +477,15 @@ function OnboardingFlow() {
 | Field | Where | Purpose |
 | ----- | ----- | ------- |
 | `workout_attempt_id` | Top-level on `user_activity_logs` (server route + client logger) | Stable id for one visit through a player; admin queries `where("workout_attempt_id","==", id)` for a timeline. |
+| `generation_id` | Top-level on `user_activity_logs` (server route + client logger) | UUID for one **creation funnel**: same value on `workout:generate` and on `workout:open` / `workout:start` / `workout:complete` when the user continues from that generation in the same tab. Absent when the workout is opened from the library without a stored id (expected). |
 | `details.surface` | Inside `details` | Which player UI produced the event. |
 | `session_id` | Top-level when set | Ties to `app:session_*` and other session-scoped analytics. |
+
+#### Generation funnel propagation (hub)
+
+Workout details routes do not carry `generation_id` in the URL. The hub therefore stores it in **sessionStorage** keyed by workout id (`wg_generation_id:<workoutId>`) immediately after a successful generate, logs `workout:generate` with that id, and reads it in `WorkoutAnalyticsAttemptProvider` via `getGenerationIdForWorkout` (peek). After `workout:open` **persists** (`logUserActivity` resolves `true` — API `res.ok` or client Firestore `addDoc` succeeded), the hub calls `clearGenerationIdForWorkout` so a later visit to the same workout from the library does not reuse a stale id. If open logging fails (`false`), session storage is left intact so a remount or a future navigation that re-runs the player effect can retry. **React Strict Mode:** clearing runs only after a persisted open (not on peek-only mount), so a double mount still sees the same `generation_id` for open/start/complete until persistence succeeds.
+
+**Event order (when applicable):** `workout:generate` → `workout:open` → `workout:start` → `workout:complete`, each optionally carrying the same top-level `generation_id` for that funnel.
 
 ### Profile Actions
 

@@ -1,12 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useUser } from "@/lib/auth";
 import { useOnboardingStatus } from "@/hooks/useUserProfile";
 import { useTrainerWorkout } from "@/hooks/useTrainerWorkout";
 import { useSession } from "@/lib/session-tracker";
-import { logUserActivity } from "@/lib/user-activity-logger";
+import { useLogWorkoutOpenActivity } from "@/hooks/useLogWorkoutOpenActivity";
 import { ManualWorkoutPlayer } from "@/components/workout/player/ManualWorkoutPlayer";
 import WorkoutPlayerLoading from "./loading";
 import {
@@ -29,7 +29,6 @@ function WorkoutPlayerContent() {
   } = useTrainerWorkout(workoutId || "");
   /** True only while we have no workout yet (initial Firestore load). */
   const workoutInitialLoad = workoutLoading && !workout;
-  const hasLoggedWorkoutRef = useRef<string | null>(null);
 
   // Redirect if not authenticated or onboarding not completed
   useEffect(() => {
@@ -40,31 +39,14 @@ function WorkoutPlayerContent() {
     }
   }, [user, authLoading, completed, profileLoading, router]);
 
-  // Log workout opening when workout is available (same gate semantics as render: not initial load)
-  useEffect(() => {
-    if (!analytics) return;
-    if (workout?.id && user && !workoutInitialLoad) {
-      if (hasLoggedWorkoutRef.current !== workout.id) {
-        hasLoggedWorkoutRef.current = workout.id;
-        void logUserActivity(
-          user.uid,
-          "workout:open",
-          "workout",
-          workoutId,
-          {
-            surface: analytics.surface,
-            workout_attempt_id: analytics.workoutAttemptId,
-          },
-          {
-            sessionId: sessionId || undefined,
-            workoutAttemptId: analytics.workoutAttemptId,
-          }
-        ).catch(() => {
-          /* non-blocking */
-        });
-      }
-    }
-  }, [analytics, workout?.id, user, workoutInitialLoad, workoutId, sessionId]);
+  useLogWorkoutOpenActivity({
+    workoutRouteId: workoutId,
+    workoutDocumentId: workout?.id,
+    userId: user?.uid,
+    workoutInitialLoad,
+    sessionId: sessionId || undefined,
+    analytics,
+  });
 
   // Initial load only — do not unmount the player when `workoutLoading` is true
   // due to background image mapping after a save (that would reset block session UI).

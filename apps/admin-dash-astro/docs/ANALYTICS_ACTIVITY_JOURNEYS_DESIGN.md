@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Extend the **Analytics → Engagement → Feature adoption (Hub / Firestore)** experience so admins can move from aggregate counts to **inspectable user journeys**, starting with **Workout started** (already partially implemented) and **Workout generated**, then applying the same **scaffold** to other `user_activity_logs` actions.
+Extend the **Analytics → Engagement → Feature adoption (Hub / Firestore)** experience so admins can move from aggregate counts to **inspectable user journeys**. **Phase 0** delivered the **Workout started** baseline (attempt-scoped journeys); next is **Workout generated** and a **general scaffold** for other `user_activity_logs` actions.
 
 This document is implementation guidance for `admin-dash-astro` and, where noted, companion changes in `aiworkoutgenerator-hub` for correlation fields.
 
@@ -17,13 +17,13 @@ This document is implementation guidance for `admin-dash-astro` and, where noted
 | Journey API + queries | [`workout-journey.ts`](../src/lib/firebase/workout-journey.ts), [`workout-journey.ts` API route](../src/pages/api/admin/analytics/workout-journey.ts) | Firestore `user_activity_logs`; indexes documented in [`FIRESTORE_INDEXES_RETENTION.md`](./FIRESTORE_INDEXES_RETENTION.md). |
 | Hub correlation | Hub `workout_attempt_id` + `details.surface` | Documented in [`ACTIVITY_LOGGING.md`](../../aiworkoutgenerator-hub/docs/admin/ACTIVITY_LOGGING.md). |
 
-**Gap:** Only `workout:start` has a first-class **list + timeline** UX. **Workout generated** and other rows are not clickable drill-downs. The screenshot you shared (0 for Workout started in production) reflects either no `workout:start` logs yet or missing `workout_attempt_id` on those rows so they do not appear in `list_starts` queries—see §5.
+**Remaining gap:** **Workout generated** and other adoption rows do not yet have registry-driven drill-downs. If the **Workout journey explorer** list is empty in production while adoption counts show starts, typical causes are: traffic still on a build without `workout:start` + `workout_attempt_id`, legacy rows without the top-level id, or Firestore composite indexes not yet deployed—see [`FIRESTORE_INDEXES_RETENTION.md`](./FIRESTORE_INDEXES_RETENTION.md) and [Phase 0 completed](#phase-0-completed-baseline-player-attempt-journeys) below.
 
 ---
 
 ## Goals
 
-1. **Workout started:** Treat the table row as the primary entry (click row or prominent control), keep **Browse journeys**, and ensure empty states explain prerequisites (indexes, hub version, `workout_attempt_id`).
+1. **Workout started:** Treat the table row as the primary entry (click row or prominent control), keep **Browse journeys**, and ensure empty states explain prerequisites (indexes, hub version, `workout_attempt_id`). **Phase 0** shipped row click + keyboard focus, **Browse journeys**, `WorkoutJourneyExplorer`, and empty-state copy for indexes / hub version.
 2. **Workout generated:** Add a **parallel** drill-down: recent `workout:generate` rows, then a **journey** view correlated by top-level **`generation_id`** (approved approach — see §B).
 3. **General scaffold:** One pattern reusable for each Hub action (and later optional Marketing/Supabase rows), without duplicating bespoke APIs per action forever.
 
@@ -42,11 +42,11 @@ Non-goals for v1 of this design: full Supabase `analytics_funnel_events` parity 
 
 ## Correlation models (by action family)
 
-### A. Attempt-scoped (existing): `workout:open` | `workout:start` | `workout:complete`
+### A. Attempt-scoped (**Phase 0 shipped**): `workout:open` | `workout:start` | `workout:complete`
 
 - **Key:** `workout_attempt_id` (top-level).
-- **List:** `where action == 'workout:start'` + time range + `orderBy timestamp desc` (existing).
-- **Timeline:** `where workout_attempt_id == id` + `orderBy timestamp asc` (existing).
+- **List:** `where action == 'workout:start'` + time range + `orderBy timestamp desc` (admin: `list_starts` on `/api/admin/analytics/workout-journey`).
+- **Timeline:** `where workout_attempt_id == id` + `orderBy timestamp asc` (admin: `workout_attempt_id` query param).
 
 ### B. Generation-scoped (**Workout generated**) — **B1 approved**
 
@@ -154,7 +154,7 @@ In `EngagementDetailPanel`:
 - For rows with `enabled` drill-down: make the **Action** cell a button or link that sets `selectedDrillDownAction` in state (or navigates to `/analytics/detail/engagement/activity?action=workout:generate`).
 - Keep secondary text link **Browse** / **View journeys** consistent with today’s **Browse journeys** for `workout:start`.
 
-Optional: **full row click** with `cursor-pointer` and keyboard focus for accessibility.
+**Phase 0:** **Workout started** uses full row click, `cursor-pointer`, and keyboard (**Enter** / **Space**) on the adoption table row—pattern to mirror for future drill-down rows.
 
 ### 4. Route-based deep link (optional v1.1)
 
@@ -175,6 +175,27 @@ Exact propagation rules are product-specific; the admin design only requires **o
 
 ---
 
+## Phase 0 completed (baseline player-attempt journeys)
+
+**Status:** Implemented in **hub** (`aiworkoutgenerator-hub`) and **admin** (`admin-dash-astro`). Treat as **code complete**; **production sign-off** still requires composite indexes **built** on the hub Firebase project (see deploy steps in [`FIRESTORE_INDEXES_RETENTION.md`](./FIRESTORE_INDEXES_RETENTION.md)) and the Phase 0 manual QA checklist there.
+
+| Area | Delivered |
+| ---- | --------- |
+| **Hub — API** | `POST /api/analytics/log-activity` accepts optional top-level `workout_attempt_id` (validated; max length in `user-activity-constants.ts`); client `logUserActivity` trims before API / Firestore fallback. |
+| **Hub — correlation** | `WorkoutAnalyticsAttemptContext` (one UUID per player route mount); same id on `workout:open`, `workout:start`, `workout:complete` where applicable. |
+| **Hub — surfaces** | Guided player, written desktop, written mobile: `details.surface` = `workout_player` / `simple_player` / `mobile_player`; written paths also set `surface_legacy` for older dashboards. |
+| **Hub — logging** | `logUserActivity` extras include `workoutAttemptId`; `ManualWorkoutPlayer` + written views emit `workout:start` once per attempt; `CompletionModal` enriches `workout:complete` when under the provider. |
+| **Hub — docs** | [`ACTIVITY_LOGGING.md`](../../aiworkoutgenerator-hub/docs/admin/ACTIVITY_LOGGING.md) — workout funnel + correlation fields. |
+| **Hub — indexes** | [`firestore.indexes.json`](../../aiworkoutgenerator-hub/firestore.indexes.json) — `user_activity_logs` composites: `(workout_attempt_id, timestamp asc)`, `(action, timestamp desc)`. |
+| **Admin — API** | [`workout-journey.ts`](../src/lib/firebase/workout-journey.ts) queries + [`workout-journey` route](../src/pages/api/admin/analytics/workout-journey.ts): timeline by attempt id, recent `workout:start` list. |
+| **Admin — UI** | [`WorkoutJourneyExplorer.tsx`](../src/components/react/admin/analytics-detail/WorkoutJourneyExplorer.tsx); [`EngagementDetailPanel.tsx`](../src/components/react/admin/analytics-detail/EngagementDetailPanel.tsx) embeds explorer when Hub adoption is present; **Workout started** row scrolls to explorer (**Browse journeys**). |
+| **Admin — catalog** | [`analytics-datasets.ts`](../src/lib/admin/analytics-datasets.ts) documents journey endpoints under Engagement; [`analytics-glossary.ts`](../src/lib/admin/analytics-glossary.ts) — `workout_attempt_id`, workout surface, journey explorer. |
+| **Admin — docs** | [`ENGAGEMENT_FEATURE_ADOPTION.md`](./ENGAGEMENT_FEATURE_ADOPTION.md), [`FIRESTORE_INDEXES_RETENTION.md`](./FIRESTORE_INDEXES_RETENTION.md) — index deploy + Phase 0 QA steps. |
+
+**Next:** [Phased delivery](#phased-delivery-suggested) — Phase 1 (`generation_id`) and below.
+
+---
+
 ## Marketing & timer (Supabase) — phase 2
 
 The second table (`analytics_funnel_events`) uses different columns and possibly `session` or funnel ids. **Do not** force into the Firestore `ActivityJourneyExplorer` without a **second registry namespace**, e.g. `source: 'hub' | 'marketing'` and separate API routes under `/api/admin/analytics/funnel-events/…`. The screenshot’s “timer session…” row would map there.
@@ -187,7 +208,7 @@ Phases are ordered so **hub data exists before** admin queries and UI depend on 
 
 | Phase | Scope | Outcome |
 | ----- | ----- | ------- |
-| **0 — Current** | `workout_attempt_id`, `workout-journey` API, `WorkoutJourneyExplorer`, engagement **Browse journeys** for **Workout started** | Baseline player-attempt journeys. **Complete** when hub emits `workout:start` with `workout_attempt_id` on all three players, indexes are deployed ([`FIRESTORE_INDEXES_RETENTION.md`](./FIRESTORE_INDEXES_RETENTION.md)), and admin list/journey QA passes. |
+| **0 — Baseline (complete)** | `workout_attempt_id`, `workout-journey` API, `WorkoutJourneyExplorer`, engagement **Browse journeys** for **Workout started** | **Shipped** — see [Phase 0 completed](#phase-0-completed-baseline-player-attempt-journeys). **Production sign-off:** indexes deployed + hub QA on all three players + admin list/**View journey** per [`FIRESTORE_INDEXES_RETENTION.md`](./FIRESTORE_INDEXES_RETENTION.md). |
 | **1 — Hub: `generation_id`** | `POST /api/analytics/log-activity` + client logger: optional top-level `generation_id` (same max-length pattern as `workout_attempt_id`). Emit UUID on `workout:generate`; propagate to `workout:open` / `workout:start` / `workout:complete` per product rules when the user continues from that generation. | Firestore rows usable for generation-scoped timelines. |
 | **1b — Indexes** | Hub `firestore.indexes.json`: composite `user_activity_logs` on **`generation_id` ASC, `timestamp` ASC** (and list query already covered by `action` + `timestamp` for `workout:generate`). Document in [`FIRESTORE_INDEXES_RETENTION.md`](./FIRESTORE_INDEXES_RETENTION.md). | Queries succeed in production after deploy. |
 | **1c — Hub docs** | [`ACTIVITY_LOGGING.md`](../../aiworkoutgenerator-hub/docs/admin/ACTIVITY_LOGGING.md): define `generation_id`, event order generate → open → …, and propagation expectations. | Contract for client teams and admin. |
@@ -202,15 +223,16 @@ Phases are ordered so **hub data exists before** admin queries and UI depend on 
 
 ## Rollout plan (summary)
 
-The detailed sequence is **[Phased delivery (suggested)](#phased-delivery-suggested)**. In short: **hub `generation_id` + index + docs first**, then **admin API**, then **UI registry + Workout generated row**, then **more actions** and optionally **Supabase**.
+**Phase 0** (attempt-scoped **Workout started** journeys) is **done in code**; confirm indexes and QA in each environment. The detailed sequence is **[Phased delivery (suggested)](#phased-delivery-suggested)**. **From Phase 1 onward:** hub **`generation_id` + index + docs first**, then **admin API**, then **UI registry + Workout generated row**, then **more actions** and optionally **Supabase**.
 
 ---
 
 ## Testing
 
-- Contract tests or manual checks: list + timeline for each `enabled` action with dev Firestore data.
+- **Phase 0 (regression):** With dev/staging Firestore, confirm recent `workout:start` rows with top-level `workout_attempt_id` appear in the admin list; **View journey** returns ordered steps for a known id; missing indexes surface a clear error in the explorer.
+- Contract tests or manual checks: list + timeline for each `enabled` action with dev Firestore data (future registry actions).
 - Verify empty states when indexes are missing (Firestore error surfaced in UI).
-- After hub ships new fields, verify admin queries return expected ordering.
+- After hub ships new fields (e.g. `generation_id`), verify admin queries return expected ordering.
 
 ---
 

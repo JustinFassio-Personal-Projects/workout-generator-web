@@ -1,12 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useUser } from "@/lib/auth";
 import { useOnboardingStatus } from "@/hooks/useUserProfile";
 import { useTrainerWorkout } from "@/hooks/useTrainerWorkout";
 import { useSession } from "@/lib/session-tracker";
-import { logUserActivity } from "@/lib/user-activity-logger";
+import { useLogWorkoutOpenActivity } from "@/hooks/useLogWorkoutOpenActivity";
 import { WrittenWorkoutView } from "@/components/workout/written/WrittenWorkoutView";
 import WrittenWorkoutLoading from "./loading";
 import {
@@ -28,7 +28,6 @@ function WrittenWorkoutContent() {
     error,
   } = useTrainerWorkout(workoutId || "");
   const workoutInitialLoad = workoutLoading && !workout;
-  const hasLoggedWorkoutRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -38,31 +37,15 @@ function WrittenWorkoutContent() {
     }
   }, [user, authLoading, completed, profileLoading, router]);
 
-  useEffect(() => {
-    if (!analytics) return;
-    if (workout?.id && user && !workoutInitialLoad) {
-      if (hasLoggedWorkoutRef.current !== workout.id) {
-        hasLoggedWorkoutRef.current = workout.id;
-        void logUserActivity(
-          user.uid,
-          "workout:open",
-          "workout",
-          workoutId,
-          {
-            surface: analytics.surface,
-            workout_attempt_id: analytics.workoutAttemptId,
-            surface_legacy: "written_sheet",
-          },
-          {
-            sessionId: sessionId || undefined,
-            workoutAttemptId: analytics.workoutAttemptId,
-          }
-        ).catch(() => {
-          /* non-blocking */
-        });
-      }
-    }
-  }, [analytics, workout?.id, user, workoutInitialLoad, workoutId, sessionId]);
+  useLogWorkoutOpenActivity({
+    workoutRouteId: workoutId,
+    workoutDocumentId: workout?.id,
+    userId: user?.uid,
+    workoutInitialLoad,
+    sessionId: sessionId || undefined,
+    analytics,
+    surfaceLegacy: "written_sheet",
+  });
 
   if (authLoading || profileLoading || workoutInitialLoad) {
     return <WrittenWorkoutLoading />;

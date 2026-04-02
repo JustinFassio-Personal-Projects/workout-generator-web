@@ -3,7 +3,14 @@
 import { useEffect, useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, RefreshCw, Sparkles, Play, ScrollText } from "lucide-react";
+import {
+  BookOpen,
+  RefreshCw,
+  Sparkles,
+  Play,
+  ScrollText,
+  Smartphone,
+} from "lucide-react";
 
 import { useUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -90,6 +97,10 @@ export function WorkoutDetailsContent() {
 
   const goToWrittenFromIntro = useCallback(() => {
     router.replace(`/workouts/${encodeURIComponent(workoutId)}/written`);
+  }, [router, workoutId]);
+
+  const goToWrittenMobileFromIntro = useCallback(() => {
+    router.replace(`/workouts/${encodeURIComponent(workoutId)}/written/mobile`);
   }, [router, workoutId]);
 
   let tourAnchor: WorkoutTourAnchor | null = null;
@@ -204,7 +215,19 @@ export function WorkoutDetailsContent() {
             >
               <Link href={`/workouts/${encodeURIComponent(workoutId)}/written`}>
                 <ScrollText className="h-4 w-4 mr-2" />
-                Written workout
+                Simple Player
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              asChild
+              className="w-full sm:w-auto border-sky-500/35 hover:border-sky-400/60 hover:bg-sky-500/10 text-sky-100/95"
+            >
+              <Link
+                href={`/workouts/${encodeURIComponent(workoutId)}/written/mobile`}
+              >
+                <Smartphone className="h-4 w-4 mr-2" />
+                Mobile Player
               </Link>
             </Button>
             <Button
@@ -258,24 +281,25 @@ export function WorkoutDetailsContent() {
             if (!open) dismissReviewIntro();
           }}
         >
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="gap-6 p-6 sm:p-8 max-w-[min(100vw-1.5rem,64rem)] sm:max-w-5xl">
             <DialogHeader>
               <DialogTitle>Review and Edit mode</DialogTitle>
-              <DialogDescription className="text-left space-y-3 sm:pt-1">
+              <DialogDescription className="text-left space-y-3 sm:pt-1 text-sm sm:text-base">
                 <span className="block">
                   You&apos;re on the workout details page to review and edit
                   your plan before you train.
                 </span>
                 <span className="block">
-                  For a{" "}
                   <span className="font-medium text-foreground">
-                    one-page written sheet
+                    Simple Player
                   </span>{" "}
-                  of every exercise and set, use{" "}
+                  is a one-page written sheet of every exercise and set.{" "}
                   <span className="font-medium text-foreground">
-                    Written workout
+                    Mobile Player
                   </span>{" "}
-                  at the top of this page.
+                  is the same logging flow optimized for phones (weights, reps,
+                  sets, and done markers—without editing the plan). Both are at
+                  the top of this page.
                 </span>
                 <span className="block">
                   To <span className="font-medium text-foreground">run</span>{" "}
@@ -283,7 +307,7 @@ export function WorkoutDetailsContent() {
                   <span className="font-medium text-foreground">
                     save your session results
                   </span>
-                  , select{" "}
+                  , use{" "}
                   <span className="font-medium text-foreground">
                     Workout Player
                   </span>{" "}
@@ -291,32 +315,43 @@ export function WorkoutDetailsContent() {
                 </span>
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={dismissReviewIntro}
-              >
-                Got it
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full sm:w-auto border-sky-500/45 hover:border-sky-400/70 hover:bg-sky-500/10 text-sky-100 animate-pulse-sky-glow"
-                onClick={goToWrittenFromIntro}
-              >
-                <ScrollText className="h-4 w-4 mr-2" />
-                Open written workout
-              </Button>
-              <Button
-                type="button"
-                className="w-full sm:w-auto"
-                onClick={goToPlayerFromIntro}
-              >
-                <Play className="h-4 w-4 mr-2" />
-                Open Workout Player
-              </Button>
+            <DialogFooter className="flex flex-col gap-3 sm:flex-col sm:justify-stretch sm:space-x-0">
+              <div className="grid w-full min-w-0 grid-cols-2 gap-2 sm:gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto min-h-10 w-full min-w-0 gap-1.5 whitespace-normal border-sky-500/45 px-2 py-2.5 text-center text-xs leading-snug hover:border-sky-400/70 hover:bg-sky-500/10 text-sky-100 animate-pulse-sky-glow sm:text-sm sm:leading-snug"
+                  onClick={goToWrittenFromIntro}
+                >
+                  <ScrollText className="h-4 w-4 shrink-0" />
+                  <span className="text-balance">Open Simple Player</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto min-h-10 w-full min-w-0 gap-1.5 whitespace-normal border-sky-500/35 px-2 py-2.5 text-center text-xs leading-snug hover:border-sky-400/60 hover:bg-sky-500/10 text-sky-100/95 sm:text-sm sm:leading-snug"
+                  onClick={goToWrittenMobileFromIntro}
+                >
+                  <Smartphone className="h-4 w-4 shrink-0" />
+                  <span className="text-balance">Open Mobile Player</span>
+                </Button>
+                <Button
+                  type="button"
+                  className="h-auto min-h-10 w-full min-w-0 gap-1.5 whitespace-normal px-2 py-2.5 text-center text-xs leading-snug sm:text-sm sm:leading-snug"
+                  onClick={goToPlayerFromIntro}
+                >
+                  <Play className="h-4 w-4 shrink-0" />
+                  <span className="text-balance">Open Workout Player</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto min-h-10 w-full min-w-0 whitespace-normal px-2 py-2.5 text-center text-xs leading-snug sm:text-sm sm:leading-snug"
+                  onClick={dismissReviewIntro}
+                >
+                  Got it
+                </Button>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>

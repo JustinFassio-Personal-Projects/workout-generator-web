@@ -31,7 +31,11 @@ export const ANALYTICS_DATASETS: AnalyticsDataset[] = [
   {
     key: 'engagement',
     label: 'Engagement',
-    apiPaths: ['/api/admin/analytics/engagement?days={days}'],
+    apiPaths: [
+      '/api/admin/analytics/engagement?days={days}',
+      '/api/admin/analytics/workout-journey?workout_attempt_id={uuid}',
+      '/api/admin/analytics/workout-journey?list_starts=true&days={days}&limit={n}',
+    ],
     dataSourceNote: 'Hub Firestore activity + Supabase event overlays',
   },
   {

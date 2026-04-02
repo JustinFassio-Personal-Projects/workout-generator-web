@@ -53,6 +53,24 @@ const GLOSSARY_BY_DATASET_KEY: Record<string, AnalyticsGlossary> = {
         definition:
           'Event-level usage counts in trailing windows (7d / 30d), split by Hub activity and marketing/timer funnel events.',
       },
+      {
+        id: 'workout-attempt-id',
+        title: 'workout_attempt_id',
+        definition:
+          'Optional UUID on hub activity logs tying one player visit together. Expected sequence: workout:open → workout:start → workout:complete for the same id when the user finishes.',
+      },
+      {
+        id: 'workout-surface',
+        title: 'Workout surface',
+        definition:
+          'details.surface on workout events: workout_player (guided player), simple_player (written desktop), mobile_player (written mobile). Legacy values may appear as surface_legacy for dashboards comparing older data.',
+      },
+      {
+        id: 'workout-journey-explorer',
+        title: 'Workout journey explorer',
+        definition:
+          'Engagement drill-down that lists recent workout:start rows from Firestore and loads an ordered timeline for a chosen workout_attempt_id.',
+      },
     ],
   },
   'retention-cohorts': {

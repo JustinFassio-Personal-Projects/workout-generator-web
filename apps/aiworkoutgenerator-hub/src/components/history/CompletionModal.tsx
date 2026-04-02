@@ -33,6 +33,7 @@ import { devLogError } from "@/lib/devLog";
 import { useUser } from "@/lib/auth";
 import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
+import type { WorkoutPlayerSurface } from "@/contexts/WorkoutAnalyticsAttemptContext";
 import type { TrainerWorkout } from "@/types/firestore";
 import {
   getRpeLabel,
@@ -71,6 +72,9 @@ interface CompletionModalProps {
   onOpenChange: (open: boolean) => void;
   /** Per Firestore section index → elapsed seconds from manual section timers. */
   sessionSectionTiming?: Record<number, number>;
+  /** When set (player pages under WorkoutAnalyticsAttemptProvider), enriches workout:complete. */
+  analyticsSurface?: WorkoutPlayerSurface;
+  workoutAttemptId?: string;
 }
 
 export function CompletionModal({
@@ -78,6 +82,8 @@ export function CompletionModal({
   open,
   onOpenChange,
   sessionSectionTiming,
+  analyticsSurface,
+  workoutAttemptId,
 }: CompletionModalProps) {
   const router = useRouter();
   const { user } = useUser();
@@ -152,8 +158,13 @@ export function CompletionModal({
           enjoyment_rating: null,
           completion_percentage: completionPct,
           completed_at: new Date().toISOString(),
+          ...(analyticsSurface ? { surface: analyticsSurface } : {}),
+          ...(workoutAttemptId ? { workout_attempt_id: workoutAttemptId } : {}),
         },
-        sessionId || undefined
+        {
+          sessionId: sessionId || undefined,
+          ...(workoutAttemptId ? { workoutAttemptId } : {}),
+        }
       ).catch(() => {
         /* non-blocking */
       });
@@ -228,8 +239,15 @@ export function CompletionModal({
             enjoyment_rating: null,
             completion_percentage: 100,
             completed_at: new Date().toISOString(),
+            ...(analyticsSurface ? { surface: analyticsSurface } : {}),
+            ...(workoutAttemptId
+              ? { workout_attempt_id: workoutAttemptId }
+              : {}),
           },
-          sessionId || undefined
+          {
+            sessionId: sessionId || undefined,
+            ...(workoutAttemptId ? { workoutAttemptId } : {}),
+          }
         ).catch(() => {
           /* non-blocking */
         });

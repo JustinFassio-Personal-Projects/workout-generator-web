@@ -1,6 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useEffect, useMemo, useState } from "react";
+import {
+  useLayoutEffect,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Clock, ScrollText } from "lucide-react";
 
@@ -13,6 +20,9 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { CompletionModal } from "@/components/history/CompletionModal";
+import { useSession } from "@/lib/session-tracker";
+import { logUserActivity } from "@/lib/user-activity-logger";
+import { useWorkoutAnalyticsAttempt } from "@/contexts/WorkoutAnalyticsAttemptContext";
 import { useWrittenWorkoutSession } from "@/hooks/useWrittenWorkoutSession";
 import { useWrittenWorkoutFirestoreState } from "@/hooks/useWrittenWorkoutFirestoreState";
 import {
@@ -195,6 +205,9 @@ export function WrittenWorkoutMobileView({
   userId,
 }: WrittenWorkoutMobileViewProps) {
   const router = useRouter();
+  const { sessionId } = useSession();
+  const analytics = useWorkoutAnalyticsAttempt();
+  const loggedWorkoutStartRef = useRef(false);
   const [completionOpen, setCompletionOpen] = useState(false);
   const [lastSummary, setLastSummary] = useState<WorkoutSummary | null>(null);
   const [sessionTimerVisible, setSessionTimerVisible] = useState(false);
@@ -216,6 +229,30 @@ export function WrittenWorkoutMobileView({
     endSession,
     resetSession,
   } = useWrittenWorkoutSession(workoutState.id, userId);
+
+  const handleStartWorkout = useCallback(() => {
+    startWorkout();
+    if (loggedWorkoutStartRef.current || !analytics || !workoutState.id) {
+      return;
+    }
+    loggedWorkoutStartRef.current = true;
+    void logUserActivity(
+      userId,
+      "workout:start",
+      "workout",
+      workoutState.id,
+      {
+        surface: analytics.surface,
+        workout_attempt_id: analytics.workoutAttemptId,
+      },
+      {
+        sessionId: sessionId || undefined,
+        workoutAttemptId: analytics.workoutAttemptId,
+      }
+    ).catch(() => {
+      /* non-blocking */
+    });
+  }, [startWorkout, userId, analytics, workoutState.id, sessionId]);
 
   const backHref = `/workouts?id=${encodeURIComponent(workoutState.id)}`;
 
@@ -463,7 +500,7 @@ export function WrittenWorkoutMobileView({
           status={sessionState.status}
           totalSeconds={totalSeconds}
           segmentSeconds={segmentSeconds}
-          onStartWorkout={startWorkout}
+          onStartWorkout={handleStartWorkout}
           onLap={() => lap(maxExerciseFlatIndex)}
           onEndSession={endSession}
           onReset={resetSession}
@@ -477,6 +514,8 @@ export function WrittenWorkoutMobileView({
         workout={completionOpen ? workoutState : null}
         open={completionOpen}
         onOpenChange={setCompletionOpen}
+        analyticsSurface={analytics?.surface}
+        workoutAttemptId={analytics?.workoutAttemptId}
       />
     </div>
   );

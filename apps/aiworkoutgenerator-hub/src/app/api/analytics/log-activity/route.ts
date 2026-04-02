@@ -10,6 +10,7 @@ import type {
   UserActivityAction,
   UserActivityResourceType,
 } from "@/lib/user-activity-logger";
+import { WORKOUT_ATTEMPT_ID_MAX_LEN } from "@/lib/user-activity-constants";
 
 export const dynamic = "force-dynamic";
 
@@ -123,6 +124,27 @@ export async function POST(request: NextRequest) {
       sessionId = body.session_id;
     }
 
+    let workoutAttemptId: string | undefined;
+    if (
+      body.workout_attempt_id !== undefined &&
+      body.workout_attempt_id !== null
+    ) {
+      if (typeof body.workout_attempt_id !== "string") {
+        return NextResponse.json(
+          { error: "Invalid workout_attempt_id" },
+          { status: 400 }
+        );
+      }
+      const trimmed = body.workout_attempt_id.trim();
+      if (trimmed.length === 0 || trimmed.length > WORKOUT_ATTEMPT_ID_MAX_LEN) {
+        return NextResponse.json(
+          { error: "Invalid workout_attempt_id" },
+          { status: 400 }
+        );
+      }
+      workoutAttemptId = trimmed;
+    }
+
     const forwardedUa = request.headers.get("user-agent");
     const bodyUa = body.user_agent;
     const userAgent =
@@ -142,6 +164,9 @@ export async function POST(request: NextRequest) {
       resource_id: resourceId,
       details,
       ...(sessionId !== undefined ? { session_id: sessionId } : {}),
+      ...(workoutAttemptId !== undefined
+        ? { workout_attempt_id: workoutAttemptId }
+        : {}),
       ip_address: ipAddress,
       user_agent: userAgent,
       timestamp: FieldValue.serverTimestamp(),

@@ -16,6 +16,10 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { CompletionModal } from "@/components/history/CompletionModal";
 import { devLogError } from "@/lib/devLog";
+import { useUser } from "@/lib/auth";
+import { useSession } from "@/lib/session-tracker";
+import { logUserActivity } from "@/lib/user-activity-logger";
+import { useWorkoutAnalyticsAttempt } from "@/contexts/WorkoutAnalyticsAttemptContext";
 import { exerciseHasCompletedSet } from "@/lib/workout/exerciseCompletion";
 
 const SAFETY_STORAGE_KEY = "workout-player-safety-mode";
@@ -47,6 +51,10 @@ interface ManualWorkoutPlayerProps {
  * logs sets/reps/weight/completed, with live Firestore persistence.
  */
 export function ManualWorkoutPlayer({ workout }: ManualWorkoutPlayerProps) {
+  const { user } = useUser();
+  const { sessionId } = useSession();
+  const analytics = useWorkoutAnalyticsAttempt();
+  const loggedWorkoutStartRef = useRef(false);
   const [workoutState, setWorkoutState] = useState<TrainerWorkout>(workout);
   const [safetyMode, setSafetyMode] = useState(false);
   /** Hub = pick a block inside the player; block = active block session (shows block-only CTA). */
@@ -128,6 +136,34 @@ export function ManualWorkoutPlayer({ workout }: ManualWorkoutPlayerProps) {
     return () => clearInterval(id);
   }, [isTimerRunning, runningSectionIndex]);
 
+  const logWorkoutStartIfNeeded = useCallback(() => {
+    if (
+      loggedWorkoutStartRef.current ||
+      !user ||
+      !analytics ||
+      !workoutState.id
+    ) {
+      return;
+    }
+    loggedWorkoutStartRef.current = true;
+    void logUserActivity(
+      user.uid,
+      "workout:start",
+      "workout",
+      workoutState.id,
+      {
+        surface: analytics.surface,
+        workout_attempt_id: analytics.workoutAttemptId,
+      },
+      {
+        sessionId: sessionId || undefined,
+        workoutAttemptId: analytics.workoutAttemptId,
+      }
+    ).catch(() => {
+      /* non-blocking */
+    });
+  }, [user, analytics, workoutState.id, sessionId]);
+
   const handleSectionTimerToggle = useCallback(() => {
     const idx = sectionIndex;
     if (runningSectionIndex === idx && isTimerRunning) {
@@ -136,14 +172,21 @@ export function ManualWorkoutPlayer({ workout }: ManualWorkoutPlayerProps) {
       return;
     }
     if (runningSectionIndex === idx && !isTimerRunning) {
+      logWorkoutStartIfNeeded();
       setIsTimerRunning(true);
       setChromeUnlocked(false);
       return;
     }
+    logWorkoutStartIfNeeded();
     setRunningSectionIndex(idx);
     setIsTimerRunning(true);
     setChromeUnlocked(false);
-  }, [sectionIndex, runningSectionIndex, isTimerRunning]);
+  }, [
+    sectionIndex,
+    runningSectionIndex,
+    isTimerRunning,
+    logWorkoutStartIfNeeded,
+  ]);
 
   const handleSectionTimerReset = useCallback(() => {
     const idx = sectionIndex;
@@ -386,6 +429,10 @@ export function ManualWorkoutPlayer({ workout }: ManualWorkoutPlayerProps) {
   useEffect(() => {
     setWorkoutState(workout);
   }, [workout]);
+
+  useEffect(() => {
+    loggedWorkoutStartRef.current = false;
+  }, [workoutState.id]);
 
   const currentSectionElapsed = sectionElapsedSeconds[sectionIndex] ?? 0;
   const timerActiveForCurrentSection =
@@ -685,6 +732,8 @@ export function ManualWorkoutPlayer({ workout }: ManualWorkoutPlayerProps) {
         open={completionOpen}
         onOpenChange={setCompletionOpen}
         sessionSectionTiming={sessionSectionTiming}
+        analyticsSurface={analytics?.surface}
+        workoutAttemptId={analytics?.workoutAttemptId}
       />
     </>
   );

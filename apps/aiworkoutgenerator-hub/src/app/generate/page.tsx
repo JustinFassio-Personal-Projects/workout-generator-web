@@ -16,7 +16,9 @@ import {
   type WorkoutSummariesFilters,
 } from "@/hooks/useWorkoutSummaries";
 import { useSession } from "@/lib/session-tracker";
+import { devLogError } from "@/lib/devLog";
 import { logUserActivity } from "@/lib/user-activity-logger";
+import { setGenerationIdForWorkout } from "@/lib/workout-generation-analytics-storage";
 import { WORKOUT_LIMITS } from "@/lib/subscription-constants";
 import {
   TrainerService,
@@ -608,9 +610,11 @@ function GenerateWorkoutPageContent() {
       });
 
       if (isMountedRef.current) {
+        const generationId = crypto.randomUUID();
+        setGenerationIdForWorkout(workoutId, generationId);
         // Log activity after successful generation
         if (user) {
-          logUserActivity(
+          void logUserActivity(
             user.uid,
             "workout:generate",
             "workout",
@@ -625,8 +629,19 @@ function GenerateWorkoutPageContent() {
                   ? workoutEquipmentCategories
                   : undefined,
             },
-            sessionId || undefined
-          ).catch(console.error);
+            {
+              sessionId: sessionId || undefined,
+              generationId,
+            }
+          ).then((persisted) => {
+            // logUserActivity swallows errors and returns false; it does not reject in normal paths.
+            if (!persisted) {
+              devLogError(
+                "GenerateWorkoutPage.logUserActivity",
+                new Error("workout:generate not persisted")
+              );
+            }
+          });
         }
 
         // Refresh workout count to reflect the new workout

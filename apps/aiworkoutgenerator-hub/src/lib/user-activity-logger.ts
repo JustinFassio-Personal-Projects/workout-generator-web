@@ -4,9 +4,12 @@ import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { devLogError } from "@/lib/devLog";
 import { getAuthInstance } from "@/lib/firebase";
 import { getDbInstance } from "@/lib/firestore";
-import { WORKOUT_ATTEMPT_ID_MAX_LEN } from "@/lib/user-activity-constants";
+import {
+  GENERATION_ID_MAX_LEN,
+  WORKOUT_ATTEMPT_ID_MAX_LEN,
+} from "@/lib/user-activity-constants";
 
-export { WORKOUT_ATTEMPT_ID_MAX_LEN };
+export { GENERATION_ID_MAX_LEN, WORKOUT_ATTEMPT_ID_MAX_LEN };
 
 /**
  * Type definitions for user activity logging
@@ -45,6 +48,8 @@ export interface UserActivityLog {
   session_id?: string;
   /** Correlates open → start → complete for one player visit (admin journey queries). */
   workout_attempt_id?: string;
+  /** Correlates generate → open → start → complete for one creation funnel (admin). */
+  generation_id?: string;
   ip_address: string | null;
   user_agent: string | null;
   timestamp: ReturnType<typeof serverTimestamp>;
@@ -54,6 +59,7 @@ export interface UserActivityLog {
 export type LogUserActivityExtras = {
   sessionId?: string;
   workoutAttemptId?: string;
+  generationId?: string;
   authUser?: User | null;
 };
 
@@ -63,6 +69,7 @@ function normalizeLogExtras(
 ): {
   sessionId?: string;
   workoutAttemptId?: string;
+  generationId?: string;
   authUser?: User | null;
 } {
   if (sessionOrExtras === undefined) {
@@ -74,6 +81,7 @@ function normalizeLogExtras(
   return {
     sessionId: sessionOrExtras.sessionId,
     workoutAttemptId: sessionOrExtras.workoutAttemptId,
+    generationId: sessionOrExtras.generationId,
     authUser:
       sessionOrExtras.authUser !== undefined
         ? sessionOrExtras.authUser
@@ -89,8 +97,9 @@ function normalizeLogExtras(
  * @param resourceType - Type of resource (e.g., 'workout', 'profile', 'app')
  * @param resourceId - ID of the resource (null for app-level actions)
  * @param details - Additional action-specific data
- * @param sessionOrExtras - Session id string, or `{ sessionId, workoutAttemptId, authUser }`
+ * @param sessionOrExtras - Session id string, or `{ sessionId, workoutAttemptId, generationId, authUser }`
  * @param legacyAuthUser - Only used when 6th arg is a string (backward compatible)
+ * @returns `true` if a row was written via API or client Firestore fallback; `false` if skipped (e.g. auth mismatch) or all paths failed.
  */
 export async function logUserActivity(
   userId: string,
@@ -100,17 +109,17 @@ export async function logUserActivity(
   details: Record<string, unknown> = {},
   sessionOrExtras?: string | LogUserActivityExtras,
   legacyAuthUser?: User | null
-): Promise<void> {
-  const { sessionId, workoutAttemptId, authUser } = normalizeLogExtras(
-    sessionOrExtras,
-    legacyAuthUser
-  );
+): Promise<boolean> {
+  const { sessionId, workoutAttemptId, generationId, authUser } =
+    normalizeLogExtras(sessionOrExtras, legacyAuthUser);
   const trimmedWorkoutAttemptId =
     workoutAttemptId !== undefined ? workoutAttemptId.trim() : undefined;
+  const trimmedGenerationId =
+    generationId !== undefined ? generationId.trim() : undefined;
   try {
     const currentUser = authUser ?? getAuthInstance().currentUser;
     if (!currentUser || currentUser.uid !== userId) {
-      return;
+      return false;
     }
 
     const userAgent =
@@ -123,6 +132,13 @@ export async function logUserActivity(
         ? { workout_attempt_id: trimmedWorkoutAttemptId }
         : {};
 
+    const generationPayload =
+      trimmedGenerationId !== undefined &&
+      trimmedGenerationId.length > 0 &&
+      trimmedGenerationId.length <= GENERATION_ID_MAX_LEN
+        ? { generation_id: trimmedGenerationId }
+        : {};
+
     try {
       const res = await authenticatedFetch("/api/analytics/log-activity", {
         method: "POST",
@@ -133,13 +149,14 @@ export async function logUserActivity(
           details,
           ...(sessionId !== undefined ? { session_id: sessionId } : {}),
           ...workoutAttemptPayload,
+          ...generationPayload,
           user_agent: userAgent,
         }),
         headers: { "Content-Type": "application/json" },
         user: currentUser,
       });
       if (res.ok) {
-        return;
+        return true;
       }
     } catch {
       /* fall through to client Firestore */
@@ -158,6 +175,7 @@ export async function logUserActivity(
       details,
       ...(sessionId !== undefined ? { session_id: sessionId } : {}),
       ...workoutAttemptPayload,
+      ...generationPayload,
       ip_address: ipAddress,
       user_agent: userAgent,
       timestamp: serverTimestamp(),
@@ -183,7 +201,9 @@ export async function logUserActivity(
         throw firstError;
       }
     }
+    return true;
   } catch (error) {
     devLogError("logUserActivity", error);
+    return false;
   }
 }

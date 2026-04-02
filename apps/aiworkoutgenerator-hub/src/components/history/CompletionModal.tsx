@@ -75,6 +75,8 @@ interface CompletionModalProps {
   /** When set (player pages under WorkoutAnalyticsAttemptProvider), enriches workout:complete. */
   analyticsSurface?: WorkoutPlayerSurface;
   workoutAttemptId?: string;
+  /** Same source as analytics context; null when not in a generation funnel. */
+  generationId?: string | null;
 }
 
 export function CompletionModal({
@@ -84,6 +86,7 @@ export function CompletionModal({
   sessionSectionTiming,
   analyticsSurface,
   workoutAttemptId,
+  generationId,
 }: CompletionModalProps) {
   const router = useRouter();
   const { user } = useUser();
@@ -160,10 +163,12 @@ export function CompletionModal({
           completed_at: new Date().toISOString(),
           ...(analyticsSurface ? { surface: analyticsSurface } : {}),
           ...(workoutAttemptId ? { workout_attempt_id: workoutAttemptId } : {}),
+          ...(generationId ? { generation_id: generationId } : {}),
         },
         {
           sessionId: sessionId || undefined,
           ...(workoutAttemptId ? { workoutAttemptId } : {}),
+          ...(generationId ? { generationId } : {}),
         }
       ).catch(() => {
         /* non-blocking */
@@ -243,10 +248,12 @@ export function CompletionModal({
             ...(workoutAttemptId
               ? { workout_attempt_id: workoutAttemptId }
               : {}),
+            ...(generationId ? { generation_id: generationId } : {}),
           },
           {
             sessionId: sessionId || undefined,
             ...(workoutAttemptId ? { workoutAttemptId } : {}),
+            ...(generationId ? { generationId } : {}),
           }
         ).catch(() => {
           /* non-blocking */

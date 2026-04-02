@@ -10,7 +10,7 @@ import type {
   UserActivityAction,
   UserActivityResourceType,
 } from "@/lib/user-activity-logger";
-import { WORKOUT_ATTEMPT_ID_MAX_LEN } from "@/lib/user-activity-logger";
+import { WORKOUT_ATTEMPT_ID_MAX_LEN } from "@/lib/user-activity-constants";
 
 export const dynamic = "force-dynamic";
 

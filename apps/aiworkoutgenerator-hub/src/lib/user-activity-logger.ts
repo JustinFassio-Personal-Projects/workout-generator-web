@@ -4,6 +4,9 @@ import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { devLogError } from "@/lib/devLog";
 import { getAuthInstance } from "@/lib/firebase";
 import { getDbInstance } from "@/lib/firestore";
+import { WORKOUT_ATTEMPT_ID_MAX_LEN } from "@/lib/user-activity-constants";
+
+export { WORKOUT_ATTEMPT_ID_MAX_LEN };
 
 /**
  * Type definitions for user activity logging
@@ -32,9 +35,6 @@ export type UserActivityResourceType =
   | "recipe"
   | "subscription"
   | "app";
-
-/** Max length for client-supplied workout_attempt_id (UUID v4 = 36 chars). */
-export const WORKOUT_ATTEMPT_ID_MAX_LEN = 64;
 
 export interface UserActivityLog {
   user_id: string;
@@ -105,6 +105,8 @@ export async function logUserActivity(
     sessionOrExtras,
     legacyAuthUser
   );
+  const trimmedWorkoutAttemptId =
+    workoutAttemptId !== undefined ? workoutAttemptId.trim() : undefined;
   try {
     const currentUser = authUser ?? getAuthInstance().currentUser;
     if (!currentUser || currentUser.uid !== userId) {
@@ -115,10 +117,10 @@ export async function logUserActivity(
       typeof navigator !== "undefined" ? navigator.userAgent : null;
 
     const workoutAttemptPayload =
-      workoutAttemptId !== undefined &&
-      workoutAttemptId.length > 0 &&
-      workoutAttemptId.length <= WORKOUT_ATTEMPT_ID_MAX_LEN
-        ? { workout_attempt_id: workoutAttemptId }
+      trimmedWorkoutAttemptId !== undefined &&
+      trimmedWorkoutAttemptId.length > 0 &&
+      trimmedWorkoutAttemptId.length <= WORKOUT_ATTEMPT_ID_MAX_LEN
+        ? { workout_attempt_id: trimmedWorkoutAttemptId }
         : {};
 
     try {

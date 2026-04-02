@@ -18,6 +18,7 @@ import { useWrittenWorkoutFirestoreState } from "@/hooks/useWrittenWorkoutFirest
 import {
   flatIndexFromParts,
   maxFlattenedExerciseIndex,
+  sectionIndexFromFlatExerciseIndex,
   type WrittenSessionState,
 } from "@/lib/workout/writtenSession";
 import {
@@ -75,6 +76,26 @@ function WrittenWorkoutMobileAccordionSections({
   handleAddSet,
 }: WrittenWorkoutMobileAccordionSectionsProps) {
   const [openSectionIds, setOpenSectionIds] = useState<string[]>([]);
+
+  const focusedSectionIndex = useMemo(() => {
+    if (sessionState.status !== "active_work" && sessionState.status !== "rest") {
+      return null;
+    }
+    return sectionIndexFromFlatExerciseIndex(
+      sessionState.focusedExerciseFlatIndex,
+      sections
+    );
+  }, [sessionState.status, sessionState.focusedExerciseFlatIndex, sections]);
+
+  // useLayoutEffect: open the section containing the focused exercise before the
+  // parent scrollIntoView runs (child layout effects run before parent). Covers
+  // rest as well as active_work so highlight stays visible when the accordion
+  // would otherwise unmount closed content.
+  useLayoutEffect(() => {
+    if (focusedSectionIndex === null) return;
+    const id = `written-section-${focusedSectionIndex}`;
+    setOpenSectionIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  }, [focusedSectionIndex]);
 
   useEffect(() => {
     const expandFromHash = () => {

@@ -234,6 +234,21 @@ export function flatIndexFromParts(
   return sum + exerciseIdx;
 }
 
+/** Inverse of flatIndexFromParts: section index containing the exercise at flatIndex, or null if out of range. */
+export function sectionIndexFromFlatExerciseIndex(
+  flatIndex: number,
+  sections: { exercises?: unknown[] | null }[] | null | undefined
+): number | null {
+  if (!sections?.length || flatIndex < 0) return null;
+  let remaining = flatIndex;
+  for (let i = 0; i < sections.length; i++) {
+    const count = sections[i]?.exercises?.length ?? 0;
+    if (remaining < count) return i;
+    remaining -= count;
+  }
+  return null;
+}
+
 /**
  * After inserting one exercise at insertFlatIndex, bump session focus if it
  * pointed at or after that slot so highlighting stays on the same logical exercise.

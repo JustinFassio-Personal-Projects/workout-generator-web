@@ -4,6 +4,7 @@ import {
   adjustFocusAfterExerciseInsert,
   createEmptySession,
   flatIndexFromParts,
+  sectionIndexFromFlatExerciseIndex,
   getSegmentSeconds,
   getTotalSessionSeconds,
   parseStoredSession,
@@ -207,6 +208,25 @@ describe("flatIndexFromParts", () => {
 
   it("returns flat index for second section", () => {
     expect(flatIndexFromParts(1, 0, sections)).toBe(2);
+  });
+});
+
+describe("sectionIndexFromFlatExerciseIndex", () => {
+  const sections = [{ exercises: [{}, {}] }, { exercises: [{}] }];
+
+  it("returns null for empty or negative index", () => {
+    expect(sectionIndexFromFlatExerciseIndex(0, [])).toBe(null);
+    expect(sectionIndexFromFlatExerciseIndex(-1, sections)).toBe(null);
+  });
+
+  it("maps flat index back to section", () => {
+    expect(sectionIndexFromFlatExerciseIndex(0, sections)).toBe(0);
+    expect(sectionIndexFromFlatExerciseIndex(1, sections)).toBe(0);
+    expect(sectionIndexFromFlatExerciseIndex(2, sections)).toBe(1);
+  });
+
+  it("returns null when flat index is past last exercise", () => {
+    expect(sectionIndexFromFlatExerciseIndex(3, sections)).toBe(null);
   });
 });
 

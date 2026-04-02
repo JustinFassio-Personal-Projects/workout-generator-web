@@ -9,10 +9,15 @@ import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
 import { ManualWorkoutPlayer } from "@/components/workout/player/ManualWorkoutPlayer";
 import WorkoutPlayerLoading from "./loading";
+import {
+  WorkoutAnalyticsAttemptProvider,
+  useWorkoutAnalyticsAttempt,
+} from "@/contexts/WorkoutAnalyticsAttemptContext";
 
 function WorkoutPlayerContent() {
   const params = useParams();
   const workoutId = params.id as string;
+  const analytics = useWorkoutAnalyticsAttempt();
   const router = useRouter();
   const { user, loading: authLoading } = useUser();
   const { completed, loading: profileLoading } = useOnboardingStatus();
@@ -37,6 +42,7 @@ function WorkoutPlayerContent() {
 
   // Log workout opening when workout is available (same gate semantics as render: not initial load)
   useEffect(() => {
+    if (!analytics) return;
     if (workout?.id && user && !workoutInitialLoad) {
       if (hasLoggedWorkoutRef.current !== workout.id) {
         hasLoggedWorkoutRef.current = workout.id;
@@ -45,14 +51,27 @@ function WorkoutPlayerContent() {
           "workout:open",
           "workout",
           workoutId,
-          {},
-          sessionId || undefined
+          {
+            surface: analytics.surface,
+            workout_attempt_id: analytics.workoutAttemptId,
+          },
+          {
+            sessionId: sessionId || undefined,
+            workoutAttemptId: analytics.workoutAttemptId,
+          }
         ).catch(() => {
           /* non-blocking */
         });
       }
     }
-  }, [workout?.id, user, workoutInitialLoad, workoutId, sessionId]);
+  }, [
+    analytics,
+    workout?.id,
+    user,
+    workoutInitialLoad,
+    workoutId,
+    sessionId,
+  ]);
 
   // Initial load only — do not unmount the player when `workoutLoading` is true
   // due to background image mapping after a save (that would reset block session UI).
@@ -91,10 +110,24 @@ function WorkoutPlayerContent() {
   return <ManualWorkoutPlayer workout={workout} />;
 }
 
+function WorkoutPlayerOuter() {
+  const params = useParams();
+  const workoutId = (params.id as string) || "";
+  return (
+    <WorkoutAnalyticsAttemptProvider
+      key={workoutId}
+      workoutId={workoutId}
+      surface="workout_player"
+    >
+      <WorkoutPlayerContent />
+    </WorkoutAnalyticsAttemptProvider>
+  );
+}
+
 export default function WorkoutPlayerPage() {
   return (
     <Suspense fallback={<WorkoutPlayerLoading />}>
-      <WorkoutPlayerContent />
+      <WorkoutPlayerOuter />
     </Suspense>
   );
 }

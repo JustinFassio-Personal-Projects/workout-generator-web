@@ -9,10 +9,15 @@ import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
 import { WrittenWorkoutView } from "@/components/workout/written/WrittenWorkoutView";
 import WrittenWorkoutLoading from "./loading";
+import {
+  WorkoutAnalyticsAttemptProvider,
+  useWorkoutAnalyticsAttempt,
+} from "@/contexts/WorkoutAnalyticsAttemptContext";
 
 function WrittenWorkoutContent() {
   const params = useParams();
   const workoutId = params.id as string;
+  const analytics = useWorkoutAnalyticsAttempt();
   const router = useRouter();
   const { user, loading: authLoading } = useUser();
   const { completed, loading: profileLoading } = useOnboardingStatus();
@@ -34,6 +39,7 @@ function WrittenWorkoutContent() {
   }, [user, authLoading, completed, profileLoading, router]);
 
   useEffect(() => {
+    if (!analytics) return;
     if (workout?.id && user && !workoutInitialLoad) {
       if (hasLoggedWorkoutRef.current !== workout.id) {
         hasLoggedWorkoutRef.current = workout.id;
@@ -42,14 +48,28 @@ function WrittenWorkoutContent() {
           "workout:open",
           "workout",
           workoutId,
-          { surface: "written_sheet" },
-          sessionId || undefined
+          {
+            surface: analytics.surface,
+            workout_attempt_id: analytics.workoutAttemptId,
+            surface_legacy: "written_sheet",
+          },
+          {
+            sessionId: sessionId || undefined,
+            workoutAttemptId: analytics.workoutAttemptId,
+          }
         ).catch(() => {
           /* non-blocking */
         });
       }
     }
-  }, [workout?.id, user, workoutInitialLoad, workoutId, sessionId]);
+  }, [
+    analytics,
+    workout?.id,
+    user,
+    workoutInitialLoad,
+    workoutId,
+    sessionId,
+  ]);
 
   if (authLoading || profileLoading || workoutInitialLoad) {
     return <WrittenWorkoutLoading />;
@@ -85,10 +105,24 @@ function WrittenWorkoutContent() {
   );
 }
 
+function WrittenWorkoutOuter() {
+  const params = useParams();
+  const workoutId = (params.id as string) || "";
+  return (
+    <WorkoutAnalyticsAttemptProvider
+      key={workoutId}
+      workoutId={workoutId}
+      surface="simple_player"
+    >
+      <WrittenWorkoutContent />
+    </WorkoutAnalyticsAttemptProvider>
+  );
+}
+
 export default function WrittenWorkoutPage() {
   return (
     <Suspense fallback={<WrittenWorkoutLoading />}>
-      <WrittenWorkoutContent />
+      <WrittenWorkoutOuter />
     </Suspense>
   );
 }

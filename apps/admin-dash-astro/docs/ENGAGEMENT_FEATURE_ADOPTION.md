@@ -33,7 +33,13 @@ The config list is `HUB_FEATURE_ADOPTION_ACTIONS` in `engagement-hub.ts`; human-
 
 - **Lib:** [engagement-hub.ts](../src/lib/firebase/engagement-hub.ts) — single paginated scan over `timestamp` in `[now - 30d, now]`; per-action counters for 7d and 30d slices in the same loop.
 - **API:** `GET /api/admin/analytics/engagement` returns `featureAdoptionHub` when Firebase is configured and `featureAdoptionMarketing` (Supabase KEY_EVENTS).
-- **UI:** Two labeled subsections under Feature adoption: "Hub activity (Firestore)" and "Marketing & timer (Supabase)".
+- **API (journey):** `GET /api/admin/analytics/workout-journey` — either `workout_attempt_id={uuid}` (ordered steps for one attempt) or `list_starts=true&days=&limit=` (recent `workout:start` rows). See [workout-journey.ts](../src/lib/firebase/workout-journey.ts) and [FIRESTORE_INDEXES_RETENTION.md](./FIRESTORE_INDEXES_RETENTION.md) for required composite indexes on `user_activity_logs`.
+- **UI:** Two labeled subsections under Feature adoption: "Hub activity (Firestore)" and "Marketing & timer (Supabase)". When Hub adoption is present, **Workout journey explorer** lists recent starts with **View journey** to load the attempt timeline. The **Workout started** row is keyboard- and click-accessible: it scrolls to the explorer (hint: **Browse journeys**); see [FIRESTORE_INDEXES_RETENTION.md](./FIRESTORE_INDEXES_RETENTION.md) for index deploy and Phase 0 QA.
+- **Design (broader drill-downs):** To extend the same pattern to **Workout generated** and other Hub actions—and to scope Marketing/Supabase separately—see [ANALYTICS_ACTIVITY_JOURNEYS_DESIGN.md](./ANALYTICS_ACTIVITY_JOURNEYS_DESIGN.md).
+
+## Workout attempt correlation (hub)
+
+Hub clients should set top-level `workout_attempt_id` (via `POST /api/analytics/log-activity` or client Firestore write) on `workout:open`, `workout:start`, and `workout:complete` for the same UUID per player visit. Surfaces are documented in the hub [ACTIVITY_LOGGING.md](../../aiworkoutgenerator-hub/docs/admin/ACTIVITY_LOGGING.md) (`workout_player`, `simple_player`, `mobile_player`).
 
 ## Power-user distribution (follow-up)
 

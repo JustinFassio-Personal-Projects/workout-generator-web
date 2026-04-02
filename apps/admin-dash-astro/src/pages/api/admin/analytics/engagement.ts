@@ -67,7 +67,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
       });
     }
     if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
-      console.error('[admin/analytics/engagement] Error:', error);
+      console.error('[admin/analytics/engagement] Error:', message || '(unknown)');
     }
     return new Response(JSON.stringify({ error: 'Failed to fetch engagement analytics' }), {
       status: 500,

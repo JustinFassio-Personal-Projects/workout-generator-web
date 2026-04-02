@@ -9,10 +9,15 @@ import { useSession } from "@/lib/session-tracker";
 import { logUserActivity } from "@/lib/user-activity-logger";
 import { WrittenWorkoutMobileView } from "@/components/workout/written/WrittenWorkoutMobileView";
 import WrittenWorkoutLoading from "../loading";
+import {
+  WorkoutAnalyticsAttemptProvider,
+  useWorkoutAnalyticsAttempt,
+} from "@/contexts/WorkoutAnalyticsAttemptContext";
 
 function WrittenWorkoutMobileContent() {
   const params = useParams();
   const workoutId = params.id as string;
+  const analytics = useWorkoutAnalyticsAttempt();
   const router = useRouter();
   const { user, loading: authLoading } = useUser();
   const { completed, loading: profileLoading } = useOnboardingStatus();
@@ -34,6 +39,7 @@ function WrittenWorkoutMobileContent() {
   }, [user, authLoading, completed, profileLoading, router]);
 
   useEffect(() => {
+    if (!analytics) return;
     if (workout?.id && user && !workoutInitialLoad) {
       if (hasLoggedWorkoutRef.current !== workout.id) {
         hasLoggedWorkoutRef.current = workout.id;
@@ -42,14 +48,28 @@ function WrittenWorkoutMobileContent() {
           "workout:open",
           "workout",
           workoutId,
-          { surface: "written_sheet_mobile" },
-          sessionId || undefined
+          {
+            surface: analytics.surface,
+            workout_attempt_id: analytics.workoutAttemptId,
+            surface_legacy: "written_sheet_mobile",
+          },
+          {
+            sessionId: sessionId || undefined,
+            workoutAttemptId: analytics.workoutAttemptId,
+          }
         ).catch(() => {
           /* non-blocking */
         });
       }
     }
-  }, [workout?.id, user, workoutInitialLoad, workoutId, sessionId]);
+  }, [
+    analytics,
+    workout?.id,
+    user,
+    workoutInitialLoad,
+    workoutId,
+    sessionId,
+  ]);
 
   if (authLoading || profileLoading || workoutInitialLoad) {
     return <WrittenWorkoutLoading />;
@@ -89,10 +109,24 @@ function WrittenWorkoutMobileContent() {
   );
 }
 
+function WrittenWorkoutMobileOuter() {
+  const params = useParams();
+  const workoutId = (params.id as string) || "";
+  return (
+    <WorkoutAnalyticsAttemptProvider
+      key={workoutId}
+      workoutId={workoutId}
+      surface="mobile_player"
+    >
+      <WrittenWorkoutMobileContent />
+    </WorkoutAnalyticsAttemptProvider>
+  );
+}
+
 export default function WrittenWorkoutMobilePage() {
   return (
     <Suspense fallback={<WrittenWorkoutLoading />}>
-      <WrittenWorkoutMobileContent />
+      <WrittenWorkoutMobileOuter />
     </Suspense>
   );
 }

@@ -466,11 +466,19 @@ function OnboardingFlow() {
 ### Workout Actions
 
 - `workout:generate` - User generates a new workout
-- `workout:open` - User opens/views a workout (optionally disambiguate with `details.surface`, e.g. `"written_sheet"` for the one-page written view vs the workout player)
-- `workout:start` - User starts a workout
-- `workout:complete` - User completes a workout
+- `workout:open` - User lands on a workout player surface. Use `details.surface`: `workout_player` (guided player), `simple_player` (written / one-page desktop), `mobile_player` (written mobile). For backward-compatible dashboards, simple/mobile may also set `details.surface_legacy` (`written_sheet`, `written_sheet_mobile`). Include the same `workout_attempt_id` on the document (top-level, from the logging API / client payload) and in `details` if you want redundancy.
+- `workout:start` - User actually starts timing (first block timer run in the guided player, or **Start workout** on the written session). Emit **once per attempt**; correlate with `workout_attempt_id` and `session_id` from `useSession()`.
+- `workout:complete` - User completes a workout; pass the same `workout_attempt_id` and `details.surface` when available so admin **Workout journey** timelines show open → start → complete.
 - `workout:save` - User saves a workout
 - `workout:share` - User shares a workout
+
+#### Correlation fields (workout funnel)
+
+| Field | Where | Purpose |
+| ----- | ----- | ------- |
+| `workout_attempt_id` | Top-level on `user_activity_logs` (server route + client logger) | Stable id for one visit through a player; admin queries `where("workout_attempt_id","==", id)` for a timeline. |
+| `details.surface` | Inside `details` | Which player UI produced the event. |
+| `session_id` | Top-level when set | Ties to `app:session_*` and other session-scoped analytics. |
 
 ### Profile Actions
 

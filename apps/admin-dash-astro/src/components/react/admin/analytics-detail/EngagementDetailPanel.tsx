@@ -14,6 +14,7 @@ import {
 import { adminFetch } from '@/lib/supabase/client/admin-fetch';
 
 import type { EngagementStats } from './types';
+import WorkoutJourneyExplorer from './WorkoutJourneyExplorer';
 
 const EngagementDetailPanel: React.FC = () => {
   const [days, setDays] = useState(30);
@@ -126,15 +127,65 @@ const EngagementDetailPanel: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {engagement.featureAdoptionHub.map((row, i) => (
-                      <tr key={i}>
-                        <td className="px-3 py-2 text-white/80">{row.displayLabel ?? row.eventName}</td>
-                        <td className="px-3 py-2 text-right text-white/70">{row.count7d.toLocaleString()}</td>
-                        <td className="px-3 py-2 text-right text-white/70">{row.count30d.toLocaleString()}</td>
-                      </tr>
-                    ))}
+                    {engagement.featureAdoptionHub.map((row, i) => {
+                      const isWorkoutStart = row.eventName === 'workout:start';
+                      const scrollToWorkoutJourneys = () => {
+                        document.getElementById('workout-journey-explorer')?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      };
+                      return (
+                        <tr
+                          key={i}
+                          role={isWorkoutStart ? 'button' : undefined}
+                          className={
+                            isWorkoutStart
+                              ? 'cursor-pointer hover:bg-white/[0.06] focus-visible:bg-white/[0.06] focus-visible:ring-2 focus-visible:ring-amber-400/40 outline-none'
+                              : undefined
+                          }
+                          tabIndex={isWorkoutStart ? 0 : undefined}
+                          aria-label={
+                            isWorkoutStart
+                              ? 'Workout started — scroll to workout journey explorer'
+                              : undefined
+                          }
+                          onClick={isWorkoutStart ? scrollToWorkoutJourneys : undefined}
+                          onKeyDown={
+                            isWorkoutStart
+                              ? (e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    scrollToWorkoutJourneys();
+                                  }
+                                }
+                              : undefined
+                          }
+                        >
+                          <td className="px-3 py-2 text-white/80">
+                            <span className="inline-flex flex-wrap items-center gap-2">
+                              <span>{row.displayLabel ?? row.eventName}</span>
+                              {isWorkoutStart && (
+                                <span className="text-xs font-medium text-amber-300">Browse journeys</span>
+                              )}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 text-right text-white/70">
+                            {row.count7d.toLocaleString()}
+                          </td>
+                          <td className="px-3 py-2 text-right text-white/70">
+                            {row.count30d.toLocaleString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
+              </div>
+            )}
+            {engagement.featureAdoptionHub != null && (
+              <div className="mt-4">
+                <WorkoutJourneyExplorer />
               </div>
             )}
             {engagement.featureAdoptionMarketing && engagement.featureAdoptionMarketing.length > 0 && (

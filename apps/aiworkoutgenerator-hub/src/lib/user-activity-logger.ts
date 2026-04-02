@@ -33,6 +33,9 @@ export type UserActivityResourceType =
   | "subscription"
   | "app";
 
+/** Max length for client-supplied workout_attempt_id (UUID v4 = 36 chars). */
+export const WORKOUT_ATTEMPT_ID_MAX_LEN = 64;
+
 export interface UserActivityLog {
   user_id: string;
   action: UserActivityAction;
@@ -40,9 +43,42 @@ export interface UserActivityLog {
   resource_id: string | null;
   details: Record<string, unknown>;
   session_id?: string;
+  /** Correlates open → start → complete for one player visit (admin journey queries). */
+  workout_attempt_id?: string;
   ip_address: string | null;
   user_agent: string | null;
   timestamp: ReturnType<typeof serverTimestamp>;
+}
+
+/** Optional 6th argument to logUserActivity (replaces legacy sessionId-only string). */
+export type LogUserActivityExtras = {
+  sessionId?: string;
+  workoutAttemptId?: string;
+  authUser?: User | null;
+};
+
+function normalizeLogExtras(
+  sessionOrExtras?: string | LogUserActivityExtras,
+  legacyAuthUser?: User | null
+): {
+  sessionId?: string;
+  workoutAttemptId?: string;
+  authUser?: User | null;
+} {
+  if (sessionOrExtras === undefined) {
+    return { authUser: legacyAuthUser };
+  }
+  if (typeof sessionOrExtras === "string") {
+    return { sessionId: sessionOrExtras, authUser: legacyAuthUser };
+  }
+  return {
+    sessionId: sessionOrExtras.sessionId,
+    workoutAttemptId: sessionOrExtras.workoutAttemptId,
+    authUser:
+      sessionOrExtras.authUser !== undefined
+        ? sessionOrExtras.authUser
+        : legacyAuthUser,
+  };
 }
 
 /**
@@ -53,8 +89,8 @@ export interface UserActivityLog {
  * @param resourceType - Type of resource (e.g., 'workout', 'profile', 'app')
  * @param resourceId - ID of the resource (null for app-level actions)
  * @param details - Additional action-specific data
- * @param sessionId - Optional session identifier for grouping activities
- * @param authUser - Optional; when set, use for tokens instead of `auth.currentUser`
+ * @param sessionOrExtras - Session id string, or `{ sessionId, workoutAttemptId, authUser }`
+ * @param legacyAuthUser - Only used when 6th arg is a string (backward compatible)
  */
 export async function logUserActivity(
   userId: string,
@@ -62,9 +98,13 @@ export async function logUserActivity(
   resourceType: UserActivityResourceType,
   resourceId: string | null = null,
   details: Record<string, unknown> = {},
-  sessionId?: string,
-  authUser?: User | null
+  sessionOrExtras?: string | LogUserActivityExtras,
+  legacyAuthUser?: User | null
 ): Promise<void> {
+  const { sessionId, workoutAttemptId, authUser } = normalizeLogExtras(
+    sessionOrExtras,
+    legacyAuthUser
+  );
   try {
     const currentUser = authUser ?? getAuthInstance().currentUser;
     if (!currentUser || currentUser.uid !== userId) {
@@ -73,6 +113,13 @@ export async function logUserActivity(
 
     const userAgent =
       typeof navigator !== "undefined" ? navigator.userAgent : null;
+
+    const workoutAttemptPayload =
+      workoutAttemptId !== undefined &&
+      workoutAttemptId.length > 0 &&
+      workoutAttemptId.length <= WORKOUT_ATTEMPT_ID_MAX_LEN
+        ? { workout_attempt_id: workoutAttemptId }
+        : {};
 
     try {
       const res = await authenticatedFetch("/api/analytics/log-activity", {
@@ -83,6 +130,7 @@ export async function logUserActivity(
           resource_id: resourceId,
           details,
           ...(sessionId !== undefined ? { session_id: sessionId } : {}),
+          ...workoutAttemptPayload,
           user_agent: userAgent,
         }),
         headers: { "Content-Type": "application/json" },
@@ -107,6 +155,7 @@ export async function logUserActivity(
       resource_id: resourceId,
       details,
       ...(sessionId !== undefined ? { session_id: sessionId } : {}),
+      ...workoutAttemptPayload,
       ip_address: ipAddress,
       user_agent: userAgent,
       timestamp: serverTimestamp(),

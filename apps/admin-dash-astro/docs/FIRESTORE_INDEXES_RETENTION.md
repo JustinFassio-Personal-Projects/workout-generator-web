@@ -40,6 +40,45 @@ Firestore would require a **composite index** on:
 
 Create this in Firebase Console → Firestore → Indexes → Add index, or follow the link in the error message when the query runs.
 
+## Workout journey drill-down (admin)
+
+The hub logs optional top-level `workout_attempt_id` on `user_activity_logs`. Admin APIs may query:
+
+```text
+where('workout_attempt_id', '==', id)
+orderBy('timestamp', 'asc')
+```
+
+Composite index (also declared in [`apps/aiworkoutgenerator-hub/firestore.indexes.json`](../../aiworkoutgenerator-hub/firestore.indexes.json)):
+
+- `workout_attempt_id` (Ascending), `timestamp` (Ascending)
+
+To list recent `workout:start` rows for exploration:
+
+```text
+where('action', '==', 'workout:start')
+orderBy('timestamp', 'desc')
+```
+
+Composite index: `action` (Ascending), `timestamp` (Descending).
+
+### Deploying these indexes (operators)
+
+Indexes are declared in the hub app at [`apps/aiworkoutgenerator-hub/firestore.indexes.json`](../../aiworkoutgenerator-hub/firestore.indexes.json). Push them to the **hub** Firebase project (the one that receives `user_activity_logs`):
+
+```bash
+cd apps/aiworkoutgenerator-hub
+firebase login   # or firebase login:ci for CI
+firebase deploy --only firestore:indexes
+```
+
+Until indexes finish building in the console, admin **Workout journey** list/timeline requests may fail with a Firestore index error.
+
+### Phase 0 manual QA (player-attempt journeys)
+
+1. **Hub:** From each player (guided, written desktop, written mobile), start a workout and complete once; in Firestore `user_activity_logs`, confirm `workout:open`, `workout:start`, and `workout:complete` share the same `workout_attempt_id` where applicable.
+2. **Admin:** Analytics → Engagement → **Workout started** counts move after new traffic; click the **Workout started** row (or use **Browse journeys**) to scroll to the explorer; **View journey** shows an ordered timeline for a chosen attempt id.
+
 ## IAM
 
 The service account (`FIREBASE_SERVICE_ACCOUNT_KEY`) needs **Cloud Datastore User** (or Firebase Admin) to read from `user_activity_logs`.

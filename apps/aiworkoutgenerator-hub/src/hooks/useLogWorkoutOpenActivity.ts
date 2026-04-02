@@ -21,7 +21,7 @@ type OpenAnalytics = {
  * Clears generation sessionStorage only after a persisted open.
  */
 export function useLogWorkoutOpenActivity(args: {
-  workoutRouteId: string;
+  /** Firestore `trainer_workouts` doc id (aligns with `workout:start` / generate `resource_id` and generation sessionStorage key). */
   workoutDocumentId: string | undefined;
   userId: string | undefined;
   workoutInitialLoad: boolean;
@@ -30,7 +30,6 @@ export function useLogWorkoutOpenActivity(args: {
   surfaceLegacy?: string;
 }): void {
   const {
-    workoutRouteId,
     workoutDocumentId,
     userId,
     workoutInitialLoad,
@@ -65,7 +64,7 @@ export function useLogWorkoutOpenActivity(args: {
       userId,
       "workout:open",
       "workout",
-      workoutRouteId,
+      workoutDocumentId,
       {
         surface: analytics.surface,
         workout_attempt_id: analytics.workoutAttemptId,
@@ -90,7 +89,7 @@ export function useLogWorkoutOpenActivity(args: {
         inFlightDocIdRef.current = null;
         if (persisted) {
           persistedForDocIdRef.current = workoutDocumentId;
-          clearGenerationIdForWorkout(workoutRouteId);
+          clearGenerationIdForWorkout(workoutDocumentId);
         } else if (failedAttemptsRef.current < MAX_WORKOUT_OPEN_ATTEMPTS) {
           failedAttemptsRef.current += 1;
           setRetryNonce((n) => n + 1);
@@ -119,7 +118,6 @@ export function useLogWorkoutOpenActivity(args: {
     workoutDocumentId,
     userId,
     workoutInitialLoad,
-    workoutRouteId,
     sessionId,
     surfaceLegacy,
     retryNonce,

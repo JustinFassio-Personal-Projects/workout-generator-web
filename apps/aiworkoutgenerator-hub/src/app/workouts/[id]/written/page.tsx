@@ -38,7 +38,6 @@ function WrittenWorkoutContent() {
   }, [user, authLoading, completed, profileLoading, router]);
 
   useLogWorkoutOpenActivity({
-    workoutRouteId: workoutId,
     workoutDocumentId: workout?.id,
     userId: user?.uid,
     workoutInitialLoad,

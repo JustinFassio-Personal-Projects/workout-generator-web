@@ -51,7 +51,10 @@ export function useTrainerWorkout(workoutId: string) {
           return;
         }
 
-        let workout = snap.data() as TrainerWorkout;
+        let workout = {
+          ...(snap.data() as TrainerWorkout),
+          id: snap.id,
+        };
 
         // SAFEGUARD: If sections was corrupted to an object (due to Firestore dot notation),
         // convert it back to an array. This can happen if sections.N.field was used in an update.

@@ -9,15 +9,17 @@
  * until open is logged once).
  */
 
-const storageKey = (workoutId: string) => `wg_generation_id:${workoutId}`;
+const storageKey = (normalizedWorkoutId: string) =>
+  `wg_generation_id:${normalizedWorkoutId}`;
 
 export function setGenerationIdForWorkout(
   workoutId: string,
   generationId: string
 ): void {
-  if (typeof window === "undefined" || !workoutId.trim()) return;
+  const id = workoutId.trim();
+  if (typeof window === "undefined" || !id) return;
   try {
-    window.sessionStorage.setItem(storageKey(workoutId), generationId);
+    window.sessionStorage.setItem(storageKey(id), generationId);
   } catch {
     /* quota or private mode */
   }
@@ -25,9 +27,10 @@ export function setGenerationIdForWorkout(
 
 /** Non-destructive read for analytics payloads until `clearGenerationIdForWorkout`. */
 export function getGenerationIdForWorkout(workoutId: string): string | null {
-  if (typeof window === "undefined" || !workoutId.trim()) return null;
+  const id = workoutId.trim();
+  if (typeof window === "undefined" || !id) return null;
   try {
-    const value = window.sessionStorage.getItem(storageKey(workoutId));
+    const value = window.sessionStorage.getItem(storageKey(id));
     return value != null && value.length > 0 ? value : null;
   } catch {
     return null;
@@ -35,9 +38,10 @@ export function getGenerationIdForWorkout(workoutId: string): string | null {
 }
 
 export function clearGenerationIdForWorkout(workoutId: string): void {
-  if (typeof window === "undefined" || !workoutId.trim()) return;
+  const id = workoutId.trim();
+  if (typeof window === "undefined" || !id) return;
   try {
-    window.sessionStorage.removeItem(storageKey(workoutId));
+    window.sessionStorage.removeItem(storageKey(id));
   } catch {
     /* ignore */
   }

@@ -614,7 +614,7 @@ function GenerateWorkoutPageContent() {
         setGenerationIdForWorkout(workoutId, generationId);
         // Log activity after successful generation
         if (user) {
-          logUserActivity(
+          void logUserActivity(
             user.uid,
             "workout:generate",
             "workout",
@@ -633,9 +633,15 @@ function GenerateWorkoutPageContent() {
               sessionId: sessionId || undefined,
               generationId,
             }
-          ).catch((err) =>
-            devLogError("GenerateWorkoutPage.logUserActivity", err)
-          );
+          ).then((persisted) => {
+            // logUserActivity swallows errors and returns false; it does not reject in normal paths.
+            if (!persisted) {
+              devLogError(
+                "GenerateWorkoutPage.logUserActivity",
+                new Error("workout:generate not persisted")
+              );
+            }
+          });
         }
 
         // Refresh workout count to reflect the new workout

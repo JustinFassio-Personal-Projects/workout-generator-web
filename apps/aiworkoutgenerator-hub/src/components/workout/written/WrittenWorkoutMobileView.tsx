@@ -80,7 +80,10 @@ function WrittenWorkoutMobileAccordionSections({
   // Merge user toggles + hash with the section that contains the focused exercise
   // during an active session (derive in render—no setState in layout effect).
   const focusedSectionId = useMemo(() => {
-    if (sessionState.status !== "active_work" && sessionState.status !== "rest") {
+    if (
+      sessionState.status !== "active_work" &&
+      sessionState.status !== "rest"
+    ) {
       return null;
     }
     const idx = sectionIndexFromFlatExerciseIndex(
@@ -92,7 +95,8 @@ function WrittenWorkoutMobileAccordionSections({
 
   const openSectionIds = useMemo(() => {
     if (!focusedSectionId) return userOpenSectionIds;
-    if (userOpenSectionIds.includes(focusedSectionId)) return userOpenSectionIds;
+    if (userOpenSectionIds.includes(focusedSectionId))
+      return userOpenSectionIds;
     return [...userOpenSectionIds, focusedSectionId];
   }, [userOpenSectionIds, focusedSectionId]);
 
@@ -101,7 +105,9 @@ function WrittenWorkoutMobileAccordionSections({
       if (typeof window === "undefined") return;
       const id = window.location.hash.replace(/^#/, "");
       if (id.startsWith("written-section-")) {
-        setUserOpenSectionIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+        setUserOpenSectionIds((prev) =>
+          prev.includes(id) ? prev : [...prev, id]
+        );
       }
     };
     queueMicrotask(expandFromHash);

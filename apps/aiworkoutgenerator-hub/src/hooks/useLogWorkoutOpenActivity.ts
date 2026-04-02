@@ -47,7 +47,8 @@ export function useLogWorkoutOpenActivity(args: {
     persistedForDocIdRef.current = null;
     inFlightDocIdRef.current = null;
     failedAttemptsRef.current = 0;
-    setRetryNonce(0);
+    const id = setTimeout(() => setRetryNonce(0), 0);
+    return () => clearTimeout(id);
   }, [workoutDocumentId]);
 
   useEffect(() => {
@@ -92,7 +93,9 @@ export function useLogWorkoutOpenActivity(args: {
           clearGenerationIdForWorkout(workoutDocumentId);
         } else if (failedAttemptsRef.current < MAX_WORKOUT_OPEN_ATTEMPTS) {
           failedAttemptsRef.current += 1;
-          setRetryNonce((n) => n + 1);
+          setTimeout(() => {
+            if (!cancelled) setRetryNonce((n) => n + 1);
+          }, 0);
         }
       })
       .catch(() => {
@@ -103,7 +106,9 @@ export function useLogWorkoutOpenActivity(args: {
         inFlightDocIdRef.current = null;
         if (failedAttemptsRef.current < MAX_WORKOUT_OPEN_ATTEMPTS) {
           failedAttemptsRef.current += 1;
-          setRetryNonce((n) => n + 1);
+          setTimeout(() => {
+            if (!cancelled) setRetryNonce((n) => n + 1);
+          }, 0);
         }
       });
 

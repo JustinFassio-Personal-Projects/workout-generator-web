@@ -6,7 +6,7 @@ import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { devLogError } from "@/lib/devLog";
 import { useSession } from "@/lib/session-tracker";
 
-/** Client-side minimum interval between successful presence POSTs (aligns with server throttle). */
+/** Client-side minimum interval between presence POST attempts (aligns with server throttle). */
 const CLIENT_PRESENCE_MIN_MS = 60_000;
 
 function isPresenceHeartbeatEnabled(): boolean {
@@ -20,29 +20,28 @@ function isPresenceHeartbeatEnabled(): boolean {
 export function PresenceHeartbeat() {
   const { user, loading } = useUser();
   const { sessionId } = useSession();
-  const lastSuccessMsRef = useRef(0);
+  /** Throttle by attempt time, not only success — avoids hammering the API on repeated focus/visibility if every response is non-2xx. */
+  const lastAttemptMsRef = useRef(0);
 
   const postPresence = useCallback(async () => {
     if (!user) return;
     const now = Date.now();
-    if (now - lastSuccessMsRef.current < CLIENT_PRESENCE_MIN_MS) return;
+    if (now - lastAttemptMsRef.current < CLIENT_PRESENCE_MIN_MS) return;
+    lastAttemptMsRef.current = now;
     try {
-      const res = await authenticatedFetch("/api/analytics/presence", {
+      await authenticatedFetch("/api/analytics/presence", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sessionId ? { session_id: sessionId } : {}),
         user,
       });
-      if (res.ok) {
-        lastSuccessMsRef.current = Date.now();
-      }
     } catch (e) {
       devLogError("PresenceHeartbeat.post", e);
     }
   }, [user, sessionId]);
 
   useEffect(() => {
-    lastSuccessMsRef.current = 0;
+    lastAttemptMsRef.current = 0;
   }, [user?.uid]);
 
   useEffect(() => {

@@ -22,4 +22,10 @@ describe("presence-throttle", () => {
     const prev = now - 61_000;
     expect(shouldSkipPresenceWrite(prev, now, 60_000)).toBe(false);
   });
+
+  it("does not skip when previous last_seen is ahead of now (clock skew)", () => {
+    const now = 1_000_000;
+    const prev = now + 5_000;
+    expect(shouldSkipPresenceWrite(prev, now, 60_000)).toBe(false);
+  });
 });

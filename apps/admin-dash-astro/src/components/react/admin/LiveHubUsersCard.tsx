@@ -84,7 +84,15 @@ const LiveHubUsersCard: React.FC = () => {
         q.set('window', 'pacific_day');
       }
       const res = await adminFetch(`/api/admin/hub/live-users?${q.toString()}`);
-      const json = (await res.json()) as Record<string, unknown>;
+      const text = await res.text();
+      let json: Record<string, unknown> = {};
+      if (text) {
+        try {
+          json = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          // Non-JSON body (e.g. proxy error page) — still surface status via apiErrorMessage
+        }
+      }
       if (!res.ok) {
         throw new Error(apiErrorMessage(json, 'Failed to load'));
       }

@@ -7,8 +7,11 @@
 
 import type admin from 'firebase-admin';
 
-/** Firestore getAll supports a limited number of document refs per call. */
-const GET_ALL_BATCH_SIZE = 10;
+/**
+ * Firestore `getAll` is batched to limit per-request size; 100 is a conservative balance
+ * between RPC count and staying well under typical getAll document limits.
+ */
+const GET_ALL_BATCH_SIZE = 100;
 
 function nameFromProfileData(
   data: admin.firestore.DocumentData | undefined

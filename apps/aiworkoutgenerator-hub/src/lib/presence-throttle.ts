@@ -12,5 +12,10 @@ export function shouldSkipPresenceWrite(
   if (prevLastSeenMs === null || !Number.isFinite(prevLastSeenMs)) {
     return false;
   }
+  // If Firestore last_seen is ahead of server wall clock (skew), do not skip — negative delta
+  // would otherwise keep skipping until the gap closes.
+  if (nowMs <= prevLastSeenMs) {
+    return false;
+  }
   return nowMs - prevLastSeenMs < minIntervalMs;
 }

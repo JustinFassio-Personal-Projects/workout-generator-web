@@ -68,7 +68,7 @@ function formatSeen(iso: string): string {
 }
 
 const LiveHubUsersCard: React.FC = () => {
-  const [source, setSource] = useState<LiveSource>(defaultSourceFromEnv);
+  const [source, setSource] = useState<LiveSource>(() => defaultSourceFromEnv());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<LiveHubUsersResponse | null>(null);

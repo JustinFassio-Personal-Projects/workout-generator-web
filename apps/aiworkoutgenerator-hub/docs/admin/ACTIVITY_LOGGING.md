@@ -479,7 +479,7 @@ function OnboardingFlow() {
 | `workout_attempt_id` | Top-level on `user_activity_logs` (server route + client logger) | Stable id for one visit through a player; admin queries `where("workout_attempt_id","==", id)` for a timeline. |
 | `generation_id` | Top-level on `user_activity_logs` (server route + client logger) | UUID for one **creation funnel**: same value on `workout:generate` and on `workout:open` / `workout:start` / `workout:complete` when the user continues from that generation in the same tab. Absent when the workout is opened from the library without a stored id (expected). |
 | `details.surface` | Inside `details` | Which player UI produced the event. |
-| `session_id` | Top-level when set | Ties to `app:session_*` and other session-scoped analytics. |
+| `session_id` | Top-level when set | Ties to `app:session_*` and other session-scoped analytics. When present on rows, the admin **activity journey** API can load an ordered **session timeline** (`where session_id == id`, `orderBy timestamp asc`) for drill-downs such as **Session started**; deploy the `(session_id, timestamp)` composite on `user_activity_logs` (see hub `firestore.indexes.json` and admin `FIRESTORE_INDEXES_RETENTION.md`). |
 
 #### Generation funnel propagation (hub)
 

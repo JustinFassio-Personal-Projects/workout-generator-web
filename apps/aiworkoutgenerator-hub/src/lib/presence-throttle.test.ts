@@ -6,9 +6,9 @@ import {
 
 describe("presence-throttle", () => {
   it("does not skip when there is no previous write", () => {
-    expect(shouldSkipPresenceWrite(null, 1_000_000, PRESENCE_MIN_INTERVAL_MS)).toBe(
-      false
-    );
+    expect(
+      shouldSkipPresenceWrite(null, 1_000_000, PRESENCE_MIN_INTERVAL_MS)
+    ).toBe(false);
   });
 
   it("skips when within min interval", () => {

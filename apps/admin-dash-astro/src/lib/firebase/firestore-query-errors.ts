@@ -37,7 +37,8 @@ export function buildFirestoreQueryErrorBody(error: unknown, dev: boolean): Fire
   return {
     error:
       'Firestore query failed. Typical causes: composite index not built on this Firebase project, wrong project in FIREBASE_SERVICE_ACCOUNT_KEY, or the service account lacks Cloud Datastore User.',
-    hint: 'Deploy indexes from apps/aiworkoutgenerator-hub/firestore.indexes.json to the project that owns user_activity_logs. List queries need action (Ascending) + timestamp (Descending). Attempt timelines need workout_attempt_id + timestamp (Ascending). See apps/admin-dash-astro/docs/FIRESTORE_INDEXES_RETENTION.md.',
+    hint:
+      'Deploy indexes from apps/aiworkoutgenerator-hub/firestore.indexes.json to the project that owns user_activity_logs. List queries need action (Ascending) + timestamp (Descending). Attempt timelines need workout_attempt_id + timestamp (Ascending). Generation timelines need generation_id + timestamp (Ascending). Session timelines need session_id + timestamp (Ascending). See apps/admin-dash-astro/docs/FIRESTORE_INDEXES_RETENTION.md.',
     ...(dev ? { details: msg } : {}),
   };
 }

@@ -82,9 +82,9 @@ const CONFIGS: DrillDownConfig[] = [
     browseLabel: 'Browse journeys',
     explorerTitle: 'Workout started — journey explorer',
     listDescription:
-      'Recent workout:start events that include a workout_attempt_id. Choose View journey to see ordered open → start → complete (and other) rows for that attempt.',
+      'Recent workout:start events. Rows with a top-level workout_attempt_id can use View journey to see ordered open → start → complete (and other) rows for that attempt.',
     emptyHint:
-      'The list only includes workout:start rows with a top-level workout_attempt_id (current hub clients). If counts stay at zero, confirm users are on a build that logs starts from all three players and that Firestore composite indexes are deployed (see FIRESTORE_INDEXES_RETENTION.md).',
+      'This list may include workout:start rows without a top-level workout_attempt_id from mixed or legacy clients; those rows cannot open View journey. If counts stay at zero, confirm users are on a build that logs starts from all three players and that Firestore composite indexes are deployed (see FIRESTORE_INDEXES_RETENTION.md).',
     list: { type: 'workout_journey_starts' },
     timeline: { type: 'workout_attempt_timeline' },
     defaultListLimit: 50,

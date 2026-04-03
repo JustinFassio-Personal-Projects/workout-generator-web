@@ -79,7 +79,20 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
         Math.max(1, parseInt(url.searchParams.get('limit') ?? '50', 10) || 50)
       );
 
-      const rows = await listRecentByAction(action, days, limit);
+      let rows;
+      try {
+        rows = await listRecentByAction(action, days, limit);
+      } catch (firestoreErr) {
+        if (isFirestoreIndexOrPermissionError(firestoreErr)) {
+          const dev = import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true';
+          if (dev) console.error('[admin/analytics/activity-journey] Firestore (list):', firestoreErr);
+          return new Response(JSON.stringify(buildFirestoreQueryErrorBody(firestoreErr, dev)), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+        throw firestoreErr;
+      }
       if (rows === null) {
         return new Response(JSON.stringify({ error: 'Firestore unavailable.' }), {
           status: 503,

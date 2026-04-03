@@ -185,7 +185,8 @@ export function prepareDeepDiveDocument(html: string, input: DeepDiveMetaInput):
   );
   const withMuscleDiagram = injectMuscleDiagramImage(withCloseBar, input.muscleDiagramImageUrl);
 
-  const headOpenMatch = withMuscleDiagram.match(/<head\s[^>]*>/i) ?? withMuscleDiagram.match(/<head\s*>/i);
+  const headOpenMatch =
+    withMuscleDiagram.match(/<head\s[^>]*>/i) ?? withMuscleDiagram.match(/<head\s*>/i);
   const headCloseMatch = withMuscleDiagram.match(/<\/head\s*>/i);
 
   // Edge case: no proper head — fall back to inject-style behavior (append our block before </head> or create minimal head)

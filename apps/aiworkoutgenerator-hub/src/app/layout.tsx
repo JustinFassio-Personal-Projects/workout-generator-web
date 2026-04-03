@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { SupportFAB } from "@/components/support/SupportFAB";
 import { SessionProvider } from "@/lib/session-tracker";
 import { SessionTracker } from "@/components/session-tracker";
+import { PresenceHeartbeat } from "@/components/PresenceHeartbeat";
 import { UpgradeModalProvider } from "@/components/upgrade";
 import { ReverseTrialCapabilitiesProvider } from "@/components/reverse-trial/ReverseTrialCapabilitiesContext";
 import { ReverseTrialBanner } from "@/components/reverse-trial/ReverseTrialBanner";
@@ -58,6 +59,7 @@ export default function RootLayout({
                 <ReverseTrialCapabilitiesProvider>
                   <SessionProvider>
                     <SessionTracker />
+                    <PresenceHeartbeat />
                     <ReverseTrialBanner />
                     {children}
                     <SupportFAB />

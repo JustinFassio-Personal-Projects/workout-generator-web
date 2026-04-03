@@ -197,7 +197,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     }
     if (logsResult.status === 'rejected') {
       if (import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_ERROR_LOGGING === 'true') {
-        console.error('[getDashboardStats] getAllLogsServer failed (workout_logs may be missing):', logsResult.reason);
+        console.error(
+          '[getDashboardStats] getAllLogsServer failed (workout_logs may be missing):',
+          logsResult.reason
+        );
       }
       throw logsResult.reason;
     }

@@ -62,9 +62,11 @@ const pageTitle =
 
 const pageDescription =
   showActiveView && fullProgram
-    ? fullProgram.description || `${fullProgram.title} — ${fullProgram.durationWeeks}-week training program`
+    ? fullProgram.description ||
+      `${fullProgram.title} — ${fullProgram.durationWeeks}-week training program`
     : preview
-      ? preview.metadata.description || `${preview.metadata.title} — ${preview.metadata.durationWeeks}-week training program`
+      ? preview.metadata.description ||
+        `${preview.metadata.title} — ${preview.metadata.durationWeeks}-week training program`
       : undefined;
 
 const siteUrl = Astro.site?.href?.replace(/\/$/, '') || Astro.url.origin;

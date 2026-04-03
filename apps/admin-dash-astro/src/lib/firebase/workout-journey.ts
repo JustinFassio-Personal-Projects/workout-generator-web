@@ -32,7 +32,7 @@ export interface WorkoutActivityLogRow {
   details: Record<string, unknown>;
 }
 
-function activityCollectionName(): string {
+export function getUserActivityCollectionName(): string {
   return process.env.FIREBASE_USER_ACTIVITY_COLLECTION ?? 'user_activity_logs';
 }
 
@@ -46,7 +46,10 @@ function timestampToIso(value: unknown): string | null {
   return null;
 }
 
-function docToRow(doc: admin.firestore.DocumentSnapshot): WorkoutActivityLogRow | null {
+/** Parse a Firestore `user_activity_logs` document (shared with live-hub-users and journey queries). */
+export function parseUserActivityLogDoc(
+  doc: admin.firestore.DocumentSnapshot
+): WorkoutActivityLogRow | null {
   const data = doc.data();
   if (!data) return null;
   const iso = timestampToIso(data.timestamp);
@@ -83,13 +86,13 @@ async function timelineByTopLevelField(
   }
 
   const snap = await db
-    .collection(activityCollectionName())
+    .collection(getUserActivityCollectionName())
     .where(field, '==', trimmed)
     .orderBy('timestamp', 'asc')
     .limit(limitRows)
     .get();
 
-  return snap.docs.map((d) => docToRow(d)).filter(Boolean) as WorkoutActivityLogRow[];
+  return snap.docs.map((d) => parseUserActivityLogDoc(d)).filter(Boolean) as WorkoutActivityLogRow[];
 }
 
 /**
@@ -151,14 +154,14 @@ export async function listRecentByAction(
   const fromTs = admin.firestore.Timestamp.fromDate(fromDate);
 
   const snap = await db
-    .collection(activityCollectionName())
+    .collection(getUserActivityCollectionName())
     .where('action', '==', action)
     .where('timestamp', '>=', fromTs)
     .orderBy('timestamp', 'desc')
     .limit(cappedLimit)
     .get();
 
-  return snap.docs.map((d) => docToRow(d)).filter(Boolean) as WorkoutActivityLogRow[];
+  return snap.docs.map((d) => parseUserActivityLogDoc(d)).filter(Boolean) as WorkoutActivityLogRow[];
 }
 
 /**

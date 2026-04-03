@@ -38,6 +38,7 @@ export const ANALYTICS_DATASETS: AnalyticsDataset[] = [
       '/api/admin/analytics/activity-journey?list=1&action={hub_action}&days={days}&limit={n}',
       '/api/admin/analytics/activity-journey?correlation=generation_id&id={uuid}',
       '/api/admin/analytics/activity-journey?correlation=session_id&id={id}',
+      '/api/admin/hub/live-users?limit={n}&source=activity|presence&window=pacific_day|rolling&minutes={m}',
     ],
     dataSourceNote:
       'Hub Firestore activity + Supabase event overlays. `hub_action` values for activity-journey list mode match enabled `activity_journey_list` entries in activity-drill-down-config.',

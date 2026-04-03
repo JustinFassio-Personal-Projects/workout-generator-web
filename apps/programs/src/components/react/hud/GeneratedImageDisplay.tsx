@@ -32,16 +32,14 @@ const GeneratedImageDisplay: React.FC<GeneratedImageDisplayProps> = ({
         />
       </div>
       {exerciseName && (
-        <p className="font-mono text-[10px] uppercase text-white/50">
-          {exerciseName}
-        </p>
+        <p className="font-mono text-[10px] uppercase text-white/50">{exerciseName}</p>
       )}
       <div className="flex flex-col gap-2 sm:flex-row">
         <button
           type="button"
           onClick={onSave}
           disabled={saving}
-          className="flex flex-1 items-center justify-center rounded-2xl border border-orange-light/50 bg-orange-light/20 py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors hover:bg-orange-light/30 disabled:opacity-50"
+          className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 flex flex-1 items-center justify-center rounded-2xl border py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors disabled:opacity-50"
         >
           {saving ? 'Saving…' : 'Save'}
         </button>

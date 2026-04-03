@@ -28,10 +28,7 @@ const HEART_RATE_MAX = 220;
 const MINUTES_MIN = 0;
 const MINUTES_MAX = 60;
 
-const WorkoutInsightForm: React.FC<WorkoutInsightFormProps> = ({
-  onSubmit,
-  loading,
-}) => {
+const WorkoutInsightForm: React.FC<WorkoutInsightFormProps> = ({ onSubmit, loading }) => {
   const [heartRate, setHeartRate] = useState<string>('');
   const [minutesSinceLastSet, setMinutesSinceLastSet] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
@@ -79,7 +76,7 @@ const WorkoutInsightForm: React.FC<WorkoutInsightFormProps> = ({
           placeholder="e.g. 120"
           required
           disabled={loading}
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white placeholder:text-white/30 focus:border-orange-light/50 focus:outline-none focus:ring-1 focus:ring-orange-light/50 disabled:opacity-50"
+          className="focus:border-orange-light/50 focus:ring-orange-light/50 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 disabled:opacity-50"
         />
       </div>
       <div>
@@ -98,7 +95,7 @@ const WorkoutInsightForm: React.FC<WorkoutInsightFormProps> = ({
           onChange={(e) => setMinutesSinceLastSet(e.target.value)}
           placeholder="e.g. 2"
           disabled={loading}
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white placeholder:text-white/30 focus:border-orange-light/50 focus:outline-none focus:ring-1 focus:ring-orange-light/50 disabled:opacity-50"
+          className="focus:border-orange-light/50 focus:ring-orange-light/50 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 disabled:opacity-50"
         />
       </div>
       <div>
@@ -115,7 +112,7 @@ const WorkoutInsightForm: React.FC<WorkoutInsightFormProps> = ({
           onChange={(e) => setNotes(e.target.value)}
           placeholder="How you felt, intensity, etc."
           disabled={loading}
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white placeholder:text-white/30 focus:border-orange-light/50 focus:outline-none focus:ring-1 focus:ring-orange-light/50 disabled:opacity-50"
+          className="focus:border-orange-light/50 focus:ring-orange-light/50 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 disabled:opacity-50"
         />
       </div>
       {error && (

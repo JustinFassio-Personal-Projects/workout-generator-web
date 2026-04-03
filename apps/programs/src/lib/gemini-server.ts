@@ -24,7 +24,8 @@ function isRetryableError(error: unknown): boolean {
   const msg = error instanceof Error ? error.message : String(error);
   const lower = msg.toLowerCase();
   if (lower.includes('503') || lower.includes('unavailable')) return true;
-  if (lower.includes('429') || lower.includes('rate limit') || lower.includes('resource exhausted')) return true;
+  if (lower.includes('429') || lower.includes('rate limit') || lower.includes('resource exhausted'))
+    return true;
   if (lower.includes('deadline expired') || lower.includes('deadline_exceeded')) return true;
   if (error && typeof error === 'object') {
     const obj = error as { status?: string; code?: number };
@@ -660,9 +661,7 @@ export async function generateWorkoutRecoveryInsight(params: {
   exerciseCount?: number;
 }): Promise<string> {
   requireGeminiApiKey();
-  const parts: string[] = [
-    `Post-workout heart rate: ${params.heartRate} bpm.`,
-  ];
+  const parts: string[] = [`Post-workout heart rate: ${params.heartRate} bpm.`];
   if (params.minutesSinceLastSet != null) {
     parts.push(`Measured ${params.minutesSinceLastSet} minutes after last set.`);
   }

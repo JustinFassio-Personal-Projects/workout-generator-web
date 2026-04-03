@@ -34,10 +34,10 @@ ON CONFLICT (id) DO UPDATE SET role = 'admin', email = EXCLUDED.email, full_name
 
 ## Roles in this app
 
-| Role      | Meaning |
-|----------|---------|
-| `client` | Default; can use programs/workouts they’re enrolled in. |
-| `trainer`| Can manage own programs and see trainer roster. |
-| `admin`  | Full content admin: programs, challenges, workouts, exercises, users, stats. |
+| Role      | Meaning                                                                      |
+| --------- | ---------------------------------------------------------------------------- |
+| `client`  | Default; can use programs/workouts they’re enrolled in.                      |
+| `trainer` | Can manage own programs and see trainer roster.                              |
+| `admin`   | Full content admin: programs, challenges, workouts, exercises, users, stats. |
 
 Only `profiles.role` is used. The **admin-dash-astro** app may use an `admin_users` table; that is separate. For programs-admin, updating `profiles.role` to `'admin'` is sufficient for super admin access.

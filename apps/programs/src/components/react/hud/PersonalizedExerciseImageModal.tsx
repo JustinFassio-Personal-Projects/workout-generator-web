@@ -79,13 +79,11 @@ const PersonalizedExerciseImageModal: React.FC<PersonalizedExerciseImageModalPro
     if (!image || !exerciseName) return;
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('Unauthorized');
-      await uploadPersonalizedExerciseImage(
-        user.id,
-        generateSlug(exerciseName),
-        image
-      );
+      await uploadPersonalizedExerciseImage(user.id, generateSlug(exerciseName), image);
       toast.success('Image saved');
       onClose();
     } catch (err) {

@@ -1,9 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createClient } from '@supabase/supabase-js';
-import {
-  extractAccessToken,
-  getCurrentUserFromRequest,
-} from '@/lib/supabase/admin/auth';
+import { extractAccessToken, getCurrentUserFromRequest } from '@/lib/supabase/admin/auth';
 import { generatePersonalizedExerciseImage } from '@/lib/gemini-server';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
@@ -45,7 +42,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       return jsonError('exerciseName is required', 400);
     }
     if (!isValidDataUrl(referenceImage)) {
-      return jsonError('referenceImage is required and must be a data URL (data:image/...;base64,...)', 400);
+      return jsonError(
+        'referenceImage is required and must be a data URL (data:image/...;base64,...)',
+        400
+      );
     }
 
     const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -73,23 +73,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       return jsonError('Session not found or access denied', 404);
     }
 
-    const image = await generatePersonalizedExerciseImage(
-      exerciseName.trim(),
-      referenceImage
-    );
+    const image = await generatePersonalizedExerciseImage(exerciseName.trim(), referenceImage);
 
     return new Response(JSON.stringify({ image }), {
       status: 200,
       headers: JSON_HEADERS,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Failed to generate image';
+    const message = error instanceof Error ? error.message : 'Failed to generate image';
     const lower = message.toLowerCase();
     const isRateLimit =
-      lower.includes('429') ||
-      lower.includes('rate limit') ||
-      lower.includes('resource exhausted');
+      lower.includes('429') || lower.includes('rate limit') || lower.includes('resource exhausted');
     if (isRateLimit) {
       return jsonError('Rate limit exceeded. Please try again shortly.', 429);
     }

@@ -44,8 +44,7 @@ const PersonalizedExerciseImageForm: React.FC<PersonalizedExerciseImageFormProps
     reader.readAsDataURL(file);
   };
 
-  const canSubmit =
-    selectedExercise && referenceImageData && consentChecked && !loading;
+  const canSubmit = selectedExercise && referenceImageData && consentChecked && !loading;
 
   return (
     <form
@@ -67,7 +66,7 @@ const PersonalizedExerciseImageForm: React.FC<PersonalizedExerciseImageFormProps
           value={selectedExercise ?? ''}
           onChange={(e) => onSelectExercise(e.target.value || '')}
           disabled={loading}
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white focus:border-orange-light/50 focus:outline-none focus:ring-1 focus:ring-orange-light/50 disabled:opacity-50"
+          className="focus:border-orange-light/50 focus:ring-orange-light/50 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white focus:outline-none focus:ring-1 disabled:opacity-50"
         >
           <option value="">Select exercise…</option>
           {exercises.map((ex) => (
@@ -93,7 +92,7 @@ const PersonalizedExerciseImageForm: React.FC<PersonalizedExerciseImageFormProps
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 bg-white/5 py-6 transition-colors hover:border-orange-light/50 hover:bg-white/10 disabled:opacity-50"
+          className="hover:border-orange-light/50 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 bg-white/5 py-6 transition-colors hover:bg-white/10 disabled:opacity-50"
         >
           {referenceImageData ? (
             <div className="flex items-center gap-3">
@@ -123,7 +122,7 @@ const PersonalizedExerciseImageForm: React.FC<PersonalizedExerciseImageFormProps
           checked={consentChecked}
           onChange={(e) => onConsentChange(e.target.checked)}
           disabled={loading}
-          className="mt-0.5 h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light focus:ring-orange-light/50"
+          className="focus:ring-orange-light/50 mt-0.5 h-4 w-4 rounded border-white/20 bg-black/20 text-orange-light"
         />
         <span className="font-mono text-[10px] text-white/70">
           I agree to use my photo for AI image generation

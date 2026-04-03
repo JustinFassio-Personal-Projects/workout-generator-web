@@ -2,10 +2,12 @@
  * Placeholder dashboard home. Replace or extend as you add features from programs.
  */
 import React from 'react';
+import LiveHubUsersCard from './LiveHubUsersCard';
 
 const DashboardHome: React.FC = () => {
   return (
     <div className="space-y-6">
+      <LiveHubUsersCard />
       <h2 className="text-2xl font-bold text-white">Dashboard</h2>
       <p className="text-white/70">
         Welcome to the admin dashboard. Copy features one at a time from{' '}

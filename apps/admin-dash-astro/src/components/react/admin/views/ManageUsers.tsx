@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Filter, LogOut, RefreshCw } from 'lucide-react';
 import type {
   AdminUsersTabId,
@@ -132,6 +133,9 @@ const TABLE_INNER_CLASS = 'w-full min-w-[720px]';
 const TABLE_INNER_WIDE_CLASS = 'w-full min-w-[960px]';
 
 const ManageUsers: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const searchSeededFromUrlRef = useRef(false);
+
   const [tab, setTab] = useState<AdminUsersTabId>('supabase');
 
   const [supabaseUsers, setSupabaseUsers] = useState<UserProfile[]>([]);
@@ -150,6 +154,15 @@ const ManageUsers: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [revokingUid, setRevokingUid] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (searchSeededFromUrlRef.current) return;
+    const q = searchParams.get('q')?.trim() || searchParams.get('uid')?.trim();
+    if (q) {
+      setSearchQuery(q);
+      searchSeededFromUrlRef.current = true;
+    }
+  }, [searchParams]);
 
   /** First Hub dashboard request (stats + first page of users, one Firestore snapshot). */
   const [hubBootstrapLoading, setHubBootstrapLoading] = useState(true);

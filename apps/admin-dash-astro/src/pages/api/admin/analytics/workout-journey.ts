@@ -7,7 +7,8 @@
 
 import type { APIRoute } from 'astro';
 import { verifyAdminRequest } from '@/lib/supabase/admin/auth';
-import { isFirebaseConfigured } from '@/lib/firebase/admin';
+import { getFirebaseFirestore, isFirebaseConfigured } from '@/lib/firebase/admin';
+import { fetchDisplayNamesByUid } from '@/lib/firebase/user-profile-display-names';
 import {
   buildFirestoreQueryErrorBody,
   isFirestoreIndexOrPermissionError,
@@ -95,7 +96,27 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
           headers: { 'Content-Type': 'application/json' },
         });
       }
-      return new Response(JSON.stringify({ starts, days, limit }), {
+
+      const db = getFirebaseFirestore();
+      let startsWithNames = starts;
+      if (db && starts.length > 0) {
+        const uidSet = new Set<string>();
+        for (const row of starts) {
+          const uid = row.user_id?.trim();
+          if (uid) uidSet.add(uid);
+        }
+        const displayNames = await fetchDisplayNamesByUid(db, [...uidSet]);
+        startsWithNames = starts.map((row) => {
+          const uid = row.user_id?.trim() ?? '';
+          const label = uid ? displayNames.get(uid) : undefined;
+          return {
+            ...row,
+            user_display_name: label ?? null,
+          };
+        });
+      }
+
+      return new Response(JSON.stringify({ starts: startsWithNames, days, limit }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });

@@ -1,9 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createClient } from '@supabase/supabase-js';
-import {
-  extractAccessToken,
-  getCurrentUserFromRequest,
-} from '@/lib/supabase/admin/auth';
+import { extractAccessToken, getCurrentUserFromRequest } from '@/lib/supabase/admin/auth';
 import { generateWorkoutRecoveryInsight } from '@/lib/gemini-server';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
@@ -41,36 +38,31 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     const minutesSinceLastSet =
       body.minutesSinceLastSet != null
-        ? (typeof body.minutesSinceLastSet === 'number'
-            ? body.minutesSinceLastSet
-            : Number(body.minutesSinceLastSet))
+        ? typeof body.minutesSinceLastSet === 'number'
+          ? body.minutesSinceLastSet
+          : Number(body.minutesSinceLastSet)
         : undefined;
     if (
       minutesSinceLastSet != null &&
-      (!Number.isFinite(minutesSinceLastSet) ||
-        minutesSinceLastSet < 0 ||
-        minutesSinceLastSet > 60)
+      (!Number.isFinite(minutesSinceLastSet) || minutesSinceLastSet < 0 || minutesSinceLastSet > 60)
     ) {
       return jsonError('minutesSinceLastSet must be 0–60 if provided', 400);
     }
 
-    const notes =
-      typeof body.notes === 'string' ? body.notes.trim() || undefined : undefined;
-    const workoutTitle =
-      typeof body.workoutTitle === 'string' ? body.workoutTitle : undefined;
-    const programTitle =
-      typeof body.programTitle === 'string' ? body.programTitle : undefined;
+    const notes = typeof body.notes === 'string' ? body.notes.trim() || undefined : undefined;
+    const workoutTitle = typeof body.workoutTitle === 'string' ? body.workoutTitle : undefined;
+    const programTitle = typeof body.programTitle === 'string' ? body.programTitle : undefined;
     const durationSeconds =
       body.durationSeconds != null
-        ? (typeof body.durationSeconds === 'number'
-            ? body.durationSeconds
-            : Number(body.durationSeconds))
+        ? typeof body.durationSeconds === 'number'
+          ? body.durationSeconds
+          : Number(body.durationSeconds)
         : undefined;
     const exerciseCount =
       body.exerciseCount != null
-        ? (typeof body.exerciseCount === 'number'
-            ? body.exerciseCount
-            : Number(body.exerciseCount))
+        ? typeof body.exerciseCount === 'number'
+          ? body.exerciseCount
+          : Number(body.exerciseCount)
         : undefined;
 
     const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -108,13 +100,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       workoutTitle,
       programTitle,
       durationSeconds:
-        durationSeconds != null && Number.isFinite(durationSeconds)
-          ? durationSeconds
-          : undefined,
+        durationSeconds != null && Number.isFinite(durationSeconds) ? durationSeconds : undefined,
       exerciseCount:
-        exerciseCount != null && Number.isFinite(exerciseCount)
-          ? exerciseCount
-          : undefined,
+        exerciseCount != null && Number.isFinite(exerciseCount) ? exerciseCount : undefined,
     });
 
     return new Response(JSON.stringify({ insight }), {
@@ -122,13 +110,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       headers: JSON_HEADERS,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Failed to generate insight';
+    const message = error instanceof Error ? error.message : 'Failed to generate insight';
     const lower = message.toLowerCase();
     const isRateLimit =
-      lower.includes('429') ||
-      lower.includes('rate limit') ||
-      lower.includes('resource exhausted');
+      lower.includes('429') || lower.includes('rate limit') || lower.includes('resource exhausted');
     if (isRateLimit) {
       return jsonError('Rate limit exceeded. Please try again shortly.', 429);
     }

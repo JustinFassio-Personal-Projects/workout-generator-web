@@ -110,7 +110,8 @@ function mapRow(row: GeneratedExerciseRow): GeneratedExercise {
     rejectedBy: row.rejected_by ?? undefined,
     rejectionReason: row.rejection_reason ?? undefined,
     deepDiveHtmlContent: row.deep_dive_html_content ?? undefined,
-    muscleEngagementMap: (row.muscle_engagement_map ?? undefined) as GeneratedExercise['muscleEngagementMap'],
+    muscleEngagementMap: (row.muscle_engagement_map ??
+      undefined) as GeneratedExercise['muscleEngagementMap'],
     muscleDiagramImageUrl: row.muscle_diagram_image_url ?? undefined,
     userFriendlyInstructions: row.user_friendly_instructions ?? undefined,
     suitableBlocks: (row.suitable_blocks ?? []) as SuitableBlock[],
@@ -144,7 +145,8 @@ function mapRowToSerialized(row: GeneratedExerciseRow): SerializedGeneratedExerc
     rejectedBy: row.rejected_by ?? undefined,
     rejectionReason: row.rejection_reason ?? undefined,
     deepDiveHtmlContent: row.deep_dive_html_content ?? undefined,
-    muscleEngagementMap: (row.muscle_engagement_map ?? undefined) as GeneratedExercise['muscleEngagementMap'],
+    muscleEngagementMap: (row.muscle_engagement_map ??
+      undefined) as GeneratedExercise['muscleEngagementMap'],
     muscleDiagramImageUrl: row.muscle_diagram_image_url ?? undefined,
     userFriendlyInstructions: row.user_friendly_instructions ?? undefined,
     suitableBlocks: (row.suitable_blocks ?? []) as SuitableBlock[],

@@ -194,7 +194,7 @@ const SessionDetailDrawer: React.FC<SessionDetailDrawerProps> = ({
           <button
             type="button"
             onClick={() => setPersonalizedImageModalOpen(true)}
-            className="border-white/20 bg-white/5 hover:bg-white/10 mb-3 flex w-full items-center justify-center gap-2 rounded-2xl border py-3 font-mono text-xs font-bold uppercase tracking-widest text-white/70 transition-colors"
+            className="mb-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 py-3 font-mono text-xs font-bold uppercase tracking-widest text-white/70 transition-colors hover:bg-white/10"
           >
             <Camera className="h-4 w-4" />
             Create your exercise moment

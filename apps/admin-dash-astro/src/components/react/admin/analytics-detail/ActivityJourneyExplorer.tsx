@@ -7,6 +7,7 @@ import {
   getDrillDownConfig,
   resolveRowTimelineTarget,
 } from '@/lib/admin/activity-drill-down-config';
+import { timelineHeadingWithPossessive } from '@/lib/admin/possessive-label';
 import { adminFetch } from '@/lib/supabase/client/admin-fetch';
 
 function shortId(value: string | null, head = 8): string {
@@ -34,6 +35,7 @@ function normalizeRow(raw: unknown): ActivityLogRow {
       timestamp: '',
       action: '',
       user_id: null,
+      user_display_name: null,
       session_id: null,
       resource_id: null,
       workout_attempt_id: null,
@@ -47,11 +49,16 @@ function normalizeRow(raw: unknown): ActivityLogRow {
     detailsRaw != null && typeof detailsRaw === 'object' && !Array.isArray(detailsRaw)
       ? (detailsRaw as Record<string, unknown>)
       : {};
+  const rawName = r.user_display_name;
+  const userDisplayName =
+    typeof rawName === 'string' ? (rawName.trim() || null) : null;
+
   return {
     id: r.id != null ? String(r.id) : '',
     timestamp: r.timestamp != null ? String(r.timestamp) : '',
     action: r.action != null ? String(r.action) : '',
     user_id: r.user_id != null ? String(r.user_id) : null,
+    user_display_name: userDisplayName,
     session_id: r.session_id != null ? String(r.session_id) : null,
     resource_id: r.resource_id != null ? String(r.resource_id) : null,
     workout_attempt_id: r.workout_attempt_id != null ? String(r.workout_attempt_id) : null,
@@ -167,6 +174,7 @@ const ActivityJourneyExplorer: React.FC<ActivityJourneyExplorerProps> = ({ activ
   const [listError, setListError] = useState<string | null>(null);
 
   const [selectedTimeline, setSelectedTimeline] = useState<ActivityTimelineTarget | null>(null);
+  const [timelineUserDisplayName, setTimelineUserDisplayName] = useState<string | null>(null);
   const [timelineRows, setTimelineRows] = useState<ActivityLogRow[]>([]);
   const [timelineLoading, setTimelineLoading] = useState(false);
   const [timelineError, setTimelineError] = useState<string | null>(null);
@@ -194,6 +202,7 @@ const ActivityJourneyExplorer: React.FC<ActivityJourneyExplorerProps> = ({ activ
 
   useEffect(() => {
     setSelectedTimeline(null);
+    setTimelineUserDisplayName(null);
     setTimelineRows([]);
     setTimelineError(null);
   }, [activeEventName]);
@@ -204,12 +213,18 @@ const ActivityJourneyExplorer: React.FC<ActivityJourneyExplorerProps> = ({ activ
     }
   }, [enabled, loadList]);
 
-  const loadTimeline = async (target: ActivityTimelineTarget) => {
+  const loadTimeline = async (
+    target: ActivityTimelineTarget,
+    listRowUserDisplayName?: string | null
+  ) => {
     if (!enabled) return;
     try {
       setTimelineLoading(true);
       setTimelineError(null);
       setSelectedTimeline(target);
+      const trimmed =
+        typeof listRowUserDisplayName === 'string' ? listRowUserDisplayName.trim() : '';
+      setTimelineUserDisplayName(trimmed || null);
       const rows = await fetchTimelineRows(target);
       setTimelineRows(rows);
     } catch (err) {
@@ -282,6 +297,9 @@ const ActivityJourneyExplorer: React.FC<ActivityJourneyExplorerProps> = ({ activ
               <tr>
                 <th className="px-2 py-2 text-left text-white/70">Time (UTC)</th>
                 <th className="px-2 py-2 text-left text-white/70">User</th>
+                {enabled.showUserDisplayNameColumn && (
+                  <th className="px-2 py-2 text-left text-white/70">Name</th>
+                )}
                 <th className="px-2 py-2 text-left text-white/70">Resource</th>
                 {enabled.showSurfaceColumn && (
                   <th className="px-2 py-2 text-left text-white/70">Surface</th>
@@ -312,6 +330,14 @@ const ActivityJourneyExplorer: React.FC<ActivityJourneyExplorerProps> = ({ activ
                     <td className="px-2 py-1.5 font-mono" title={row.user_id ?? ''}>
                       {shortId(row.user_id)}
                     </td>
+                    {enabled.showUserDisplayNameColumn && (
+                      <td
+                        className="max-w-[160px] truncate px-2 py-1.5 text-white/85"
+                        title={row.user_display_name ?? ''}
+                      >
+                        {row.user_display_name?.trim() ? row.user_display_name.trim() : '—'}
+                      </td>
+                    )}
                     <td className="px-2 py-1.5 font-mono" title={row.resource_id ?? ''}>
                       {shortId(row.resource_id)}
                     </td>
@@ -346,7 +372,9 @@ const ActivityJourneyExplorer: React.FC<ActivityJourneyExplorerProps> = ({ activ
                       {timelineTarget ? (
                         <button
                           type="button"
-                          onClick={() => void loadTimeline(timelineTarget)}
+                          onClick={() =>
+                            void loadTimeline(timelineTarget, row.user_display_name ?? null)
+                          }
                           className="text-amber-300 hover:underline"
                         >
                           View journey
@@ -366,7 +394,9 @@ const ActivityJourneyExplorer: React.FC<ActivityJourneyExplorerProps> = ({ activ
       {showTimelinePanel &&
         (selectedTimeline || timelineLoading || timelineError || timelineRows.length > 0) && (
         <div className="rounded border border-white/10 bg-black/20 p-3">
-          <h4 className="mb-2 text-xs font-medium text-white/70">Timeline</h4>
+          <h4 className="mb-2 text-xs font-medium text-white/70">
+            {timelineHeadingWithPossessive(timelineUserDisplayName)}
+          </h4>
           {selectedTimeline && (
             <p className="mb-2 font-mono text-[11px] text-white/50">
               {timelineCorrelationField(selectedTimeline)}: {selectedTimeline.id}

@@ -27,7 +27,7 @@ const RecoveryAssessmentDisplay: React.FC<RecoveryAssessmentDisplayProps> = ({
         <p className="mb-2 font-mono text-[10px] font-medium uppercase text-white/50">
           Recovery assessment
         </p>
-        <div className="prose prose-invert prose-sm max-w-none [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:my-2 [&>li]:my-0.5">
+        <div className="prose prose-invert prose-sm max-w-none [&>li]:my-0.5 [&>p:last-child]:mb-0 [&>p]:mb-2 [&>ul]:my-2">
           <ReactMarkdown
             components={{
               p: ({ children }) => <p className="text-white/90">{children}</p>,
@@ -46,7 +46,7 @@ const RecoveryAssessmentDisplay: React.FC<RecoveryAssessmentDisplayProps> = ({
           type="button"
           onClick={onSave}
           disabled={saving}
-          className="flex flex-1 items-center justify-center rounded-2xl border border-orange-light/50 bg-orange-light/20 py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors hover:bg-orange-light/30 disabled:opacity-50"
+          className="border-orange-light/50 bg-orange-light/20 hover:bg-orange-light/30 flex flex-1 items-center justify-center rounded-2xl border py-3 font-heading text-sm font-black uppercase text-orange-light transition-colors disabled:opacity-50"
         >
           {saving ? 'Saving…' : 'Save'}
         </button>

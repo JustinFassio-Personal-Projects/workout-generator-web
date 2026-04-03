@@ -11,6 +11,8 @@ export type ActivityLogRow = {
   timestamp: string;
   action: string;
   user_id: string | null;
+  /** From API enrichment (e.g. workout-journey list_starts + user_profiles). */
+  user_display_name?: string | null;
   session_id: string | null;
   resource_id: string | null;
   workout_attempt_id: string | null;
@@ -55,6 +57,8 @@ export interface DrillDownConfig {
   showGenerationIdColumn: boolean;
   showAttemptIdColumn: boolean;
   showSessionIdColumn: boolean;
+  /** Hub user_profiles display name column (list API must enrich). */
+  showUserDisplayNameColumn: boolean;
 }
 
 /** List actions allowed for `GET .../activity-journey?list=1&action=` — derived from enabled registry rows. */
@@ -96,6 +100,7 @@ const CONFIGS: DrillDownConfig[] = [
     showGenerationIdColumn: false,
     showAttemptIdColumn: true,
     showSessionIdColumn: false,
+    showUserDisplayNameColumn: true,
   },
   {
     eventName: 'workout:generate',
@@ -117,6 +122,7 @@ const CONFIGS: DrillDownConfig[] = [
     showGenerationIdColumn: true,
     showAttemptIdColumn: false,
     showSessionIdColumn: false,
+    showUserDisplayNameColumn: false,
   },
   {
     eventName: 'workout:open',
@@ -142,6 +148,7 @@ const CONFIGS: DrillDownConfig[] = [
     showGenerationIdColumn: true,
     showAttemptIdColumn: true,
     showSessionIdColumn: true,
+    showUserDisplayNameColumn: false,
   },
   {
     eventName: 'workout:complete',
@@ -160,6 +167,7 @@ const CONFIGS: DrillDownConfig[] = [
     showGenerationIdColumn: false,
     showAttemptIdColumn: false,
     showSessionIdColumn: true,
+    showUserDisplayNameColumn: false,
   },
   {
     eventName: 'recipe:view',
@@ -176,6 +184,7 @@ const CONFIGS: DrillDownConfig[] = [
     showGenerationIdColumn: false,
     showAttemptIdColumn: false,
     showSessionIdColumn: true,
+    showUserDisplayNameColumn: false,
   },
   {
     eventName: 'app:session_start',
@@ -197,6 +206,7 @@ const CONFIGS: DrillDownConfig[] = [
     showGenerationIdColumn: false,
     showAttemptIdColumn: false,
     showSessionIdColumn: true,
+    showUserDisplayNameColumn: false,
   },
 ];
 

@@ -214,7 +214,7 @@ const TodayWorkoutCard: React.FC<TodayWorkoutCardProps> = ({
             <button
               type="button"
               onClick={() => setPersonalizedImageModalOpen(true)}
-              className="border-white/20 bg-white/5 hover:bg-white/10 flex w-full items-center justify-center gap-2 rounded-full border py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-white/70 transition-colors"
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-white/70 transition-colors hover:bg-white/10"
             >
               <Camera className="h-3.5 w-3.5" />
               Create your exercise moment

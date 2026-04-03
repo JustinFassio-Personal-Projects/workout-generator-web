@@ -22,6 +22,11 @@ service cloud.firestore {
     match /api_rate_limits/{doc} {
       allow read, write: if false;
     }
+
+    // Hub presence heartbeat (server-only via Admin SDK; POST /api/analytics/presence)
+    match /user_presence/{userId} {
+      allow read, write: if false;
+    }
     
     // Users collection
     // SECURITY: Users can read/update their own profile but CANNOT modify the 'role' field

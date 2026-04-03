@@ -35,11 +35,9 @@ export async function saveWorkoutInsight(params: SaveWorkoutInsightParams): Prom
     insight_text: params.insightText,
   };
 
-  const { error } = await supabase
-    .from('workout_insights')
-    .upsert(payload, {
-      onConflict: 'user_workout_log_id',
-    });
+  const { error } = await supabase.from('workout_insights').upsert(payload, {
+    onConflict: 'user_workout_log_id',
+  });
 
   if (error) throw error;
 }

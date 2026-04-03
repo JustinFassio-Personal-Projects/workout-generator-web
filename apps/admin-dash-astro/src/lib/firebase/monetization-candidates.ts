@@ -8,6 +8,7 @@
 
 import admin from 'firebase-admin';
 import { getFirebaseAuth, getFirebaseFirestore } from './admin';
+import { fetchDisplayNamesByUid } from './user-profile-display-names';
 import { getQualifyingActions } from './retention-cohorts';
 import type { ActiveDefinition } from './retention-cohorts';
 
@@ -161,44 +162,6 @@ async function fetchActivityAggregates(
   return byUid;
 }
 
-/**
- * Fetch display names from Firestore user_profiles for given UIDs.
- */
-async function fetchDisplayNames(
-  db: admin.firestore.Firestore,
-  uids: string[]
-): Promise<Map<string, string>> {
-  const byUid = new Map<string, string>();
-  if (uids.length === 0) return byUid;
-
-  const collectionName =
-    process.env.FIREBASE_USER_PROFILES_COLLECTION ?? 'user_profiles';
-  const refs = uids.map((uid) => db.collection(collectionName).doc(uid));
-
-  try {
-    const snapshots = await db.getAll(...refs);
-    for (let i = 0; i < uids.length; i++) {
-      const doc = snapshots[i];
-      if (!doc?.exists) continue;
-      const data = doc.data();
-      const displayName = data?.display_name;
-      if (typeof displayName === 'string' && displayName.trim()) {
-        byUid.set(uids[i], displayName.trim());
-      } else {
-        const first = data?.first_name;
-        const last = data?.last_name;
-        if (typeof first === 'string' || typeof last === 'string') {
-          const name = [first, last].filter(Boolean).join(' ').trim();
-          if (name) byUid.set(uids[i], name);
-        }
-      }
-    }
-  } catch {
-    // Non-fatal: names are optional; candidates still shown with UID only
-  }
-  return byUid;
-}
-
 function buildReasons(
   signals: CandidateSignals,
   signupAgeDays: number,
@@ -339,7 +302,7 @@ export async function getMonetizationCandidates(
   const capped = candidates.slice(0, limit);
 
   const uids = capped.map((c) => c.uid);
-  const displayNames = await fetchDisplayNames(db, uids);
+  const displayNames = await fetchDisplayNamesByUid(db, uids);
   for (const c of capped) {
     const name = displayNames.get(c.uid);
     if (name) c.displayName = name;

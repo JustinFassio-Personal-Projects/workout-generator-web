@@ -8,9 +8,7 @@
 import React, { useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useGenerationState } from '@workout-generator/content-generation-lab';
-import WorkoutInsightForm, {
-  type WorkoutInsightFormData,
-} from './WorkoutInsightForm';
+import WorkoutInsightForm, { type WorkoutInsightFormData } from './WorkoutInsightForm';
 import RecoveryAssessmentDisplay from './RecoveryAssessmentDisplay';
 import { saveWorkoutInsight } from '@/lib/supabase/client/workout-insights';
 
@@ -27,10 +25,7 @@ export interface WorkoutInsightModalProps {
   onClose: () => void;
 }
 
-const WorkoutInsightModal: React.FC<WorkoutInsightModalProps> = ({
-  session,
-  onClose,
-}) => {
+const WorkoutInsightModal: React.FC<WorkoutInsightModalProps> = ({ session, onClose }) => {
   const formDataRef = useRef<WorkoutInsightFormData | null>(null);
   const [saving, setSaving] = React.useState(false);
 

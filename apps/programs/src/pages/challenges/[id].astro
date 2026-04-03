@@ -69,8 +69,9 @@ const siteUrl = Astro.site?.href?.replace(/\/$/, '') || Astro.url.origin;
 const canonicalPageUrl = challengeId ? `${siteUrl}/challenges/${challengeId}` : undefined;
 
 const ogImage =
-  (showActiveView && fullChallenge ? fullChallenge.heroImageUrl : preview?.metadata?.heroImageUrl) ||
-  undefined;
+  (showActiveView && fullChallenge
+    ? fullChallenge.heroImageUrl
+    : preview?.metadata?.heroImageUrl) || undefined;
 
 const breadcrumbTitle =
   (showActiveView && fullChallenge ? fullChallenge.title : preview?.metadata.title) ?? 'Challenge';
@@ -79,7 +80,12 @@ const zones = await getAllZonesServer();
 const zonesForClient = zones.map((z) => ({ id: z.id, name: z.name }));
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} canonicalUrl={canonicalPageUrl} ogImage={ogImage}>
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={canonicalPageUrl}
+  ogImage={ogImage}
+>
   <div
     class="relative min-h-screen overflow-x-hidden text-white selection:bg-orange-light selection:text-black"
   >

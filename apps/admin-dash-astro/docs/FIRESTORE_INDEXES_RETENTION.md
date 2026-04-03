@@ -12,6 +12,30 @@ orderBy('timestamp')
 
 Firestore typically serves this with the **single-field** index on `timestamp`, which is created automatically for simple range queries. No manual index is usually required.
 
+### Live hub users (admin dashboard home)
+
+`GET /api/admin/hub/live-users` reads recent rows for the **Live** card (default activity window: **since midnight `America/Los_Angeles` through now**, not a 5-minute rolling slice):
+
+```text
+where('timestamp', '>=', fromTs)
+orderBy('timestamp', 'desc')
+limit(scanLimit)
+```
+
+`fromTs` is either the start of the current Pacific calendar day or `now - minutes` when `window=rolling`. This uses the **automatic single-field index** on `timestamp` (same idea as the retention time window above). No extra composite is declared in [`firestore.indexes.json`](../../aiworkoutgenerator-hub/firestore.indexes.json) for this query. If Firestore ever returns a missing-index error for this shape, use the console link from the error or confirm the project matches admin’s `FIREBASE_SERVICE_ACCOUNT_KEY` (see troubleshooting below).
+
+### Live hub users — presence (v2 heartbeat)
+
+`GET /api/admin/hub/live-users?source=presence` reads the `user_presence` collection (or `FIREBASE_USER_PRESENCE_COLLECTION`):
+
+```text
+where('last_seen_at', '>=', fromTs)
+orderBy('last_seen_at', 'desc')
+limit(scanLimit)
+```
+
+This typically uses the **automatic single-field index** on `last_seen_at`. If Firestore returns a missing-index error, use the console link from the error or confirm project alignment (same as above).
+
 ## Firebase Console
 
 To view or create indexes:

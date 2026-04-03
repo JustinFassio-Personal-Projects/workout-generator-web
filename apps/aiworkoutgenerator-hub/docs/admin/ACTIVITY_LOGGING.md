@@ -508,6 +508,21 @@ Workout details routes do not carry `generation_id` in the URL. The hub therefor
 - `app:session_start` - User session started
 - `app:session_end` - User session ended
 
+### Presence heartbeat (admin “Live” v2)
+
+Separate from activity rows: a lightweight **heartbeat** updates Firestore `user_presence/{uid}` so the admin dashboard can list users by **recent heartbeat** (stricter than inferring from `user_activity_logs` alone).
+
+| Item | Detail |
+| ---- | ------ |
+| **Endpoint** | `POST /api/analytics/presence` (Next.js route in the hub) |
+| **Auth** | Firebase App Check + Bearer ID token (same pattern as `POST /api/analytics/log-activity`) |
+| **Body** | Optional JSON `{ "session_id": "<session from SessionProvider>" }` — no other PII required |
+| **Server behavior** | Writes `last_seen_at` / `updated_at` with `serverTimestamp()`; **skips** the write if the previous `last_seen_at` was within **60 seconds** (`{ "ok": true, "skipped": true }`) |
+| **Collection** | `user_presence` by default; override with env `FIREBASE_USER_PRESENCE_COLLECTION` if needed |
+| **Firestore rules** | `user_presence` is **server-only** (no client read/write); updates use the Admin SDK from the API route |
+| **Client** | `PresenceHeartbeat` (root layout) calls the endpoint when `NEXT_PUBLIC_HUB_PRESENCE_HEARTBEAT=true`, with a **60s** minimum between successful client calls, plus on tab focus / visibility |
+| **Deploy rules** | After changing `firestore.rules`, deploy from this app: `firebase deploy --only firestore:rules` (from `apps/aiworkoutgenerator-hub` with the correct project) |
+
 ## Best Practices
 
 1. **Never Block User Flow**: Activity logging should be asynchronous and never prevent user actions from completing.

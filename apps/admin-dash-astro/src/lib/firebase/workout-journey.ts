@@ -23,6 +23,8 @@ export interface WorkoutActivityLogRow {
   timestamp: string;
   action: string;
   user_id: string | null;
+  /** Set only when API enriches from Firestore user_profiles (e.g. list_starts). */
+  user_display_name?: string | null;
   session_id: string | null;
   resource_id: string | null;
   workout_attempt_id: string | null;
